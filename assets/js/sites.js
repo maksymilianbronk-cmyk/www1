@@ -5,12 +5,13 @@
  *   2. Dodaj wpis poniżej.
  *
  * Pola:
- *   slug  — nazwa folderu w sites/
- *   title — tytuł karty
- *   desc  — krótki opis
- *   icon  — emoji jako miniatura (gdy brak podglądu iframe)
- *   tag   — etykieta kategorii (np. "landing", "gra", "narzędzie")
+ *   slug    — nazwa folderu w sites/
+ *   title   — tytuł karty
+ *   desc    — krótki opis
+ *   icon    — emoji jako miniatura (gdy brak podglądu iframe)
+ *   tag     — etykieta kategorii (np. "landing", "gra", "narzędzie")
  *   preview — true = wyświetl podgląd iframe (domyślnie false)
+ *   meta    — obiekt: { colors[], fonts[], tech[] }
  */
 const SITES = [
   {
@@ -19,7 +20,12 @@ const SITES = [
     desc: "Pierwsza strona w kolekcji — szablon startowy.",
     icon: "👋",
     tag: "przykład",
-    preview: false,
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#6c63ff", "#e8e8f0", "#8888a0"],
+      fonts: ["system-ui"],
+      tech: ["HTML", "CSS"],
+    },
   },
   {
     slug: "katalog",
@@ -27,7 +33,12 @@ const SITES = [
     desc: "Panel z logowaniem: foldery stron, manager plików i baza promotorów.",
     icon: "🗂️",
     tag: "crm",
-    preview: false,
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#1a1a22", "#6c63ff", "#42d392", "#ff5c6c"],
+      fonts: ["system-ui", "monospace"],
+      tech: ["HTML", "CSS", "Vanilla JS", "localStorage"],
+    },
   },
   {
     slug: "prompty",
@@ -35,7 +46,12 @@ const SITES = [
     desc: "Gotowe prompty do tworzenia stron: nowe projekty, redesign, branże i własna baza wiedzy.",
     icon: "💡",
     tag: "narzędzie",
-    preview: false,
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#1a1a22", "#6c63ff", "#ff6b9d", "#f5a623"],
+      fonts: ["system-ui", "monospace"],
+      tech: ["HTML", "CSS", "Vanilla JS", "localStorage"],
+    },
   },
   {
     slug: "scenariusze",
@@ -43,7 +59,12 @@ const SITES = [
     desc: "Krok po kroku: jak zlecić redesign lub nową stronę — z gotowymi promptami i integracją CRM.",
     icon: "🗺️",
     tag: "przewodnik",
-    preview: false,
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#1a1a22", "#6c63ff", "#ff6584", "#43d9b8"],
+      fonts: ["system-ui", "monospace"],
+      tech: ["HTML", "CSS", "Vanilla JS"],
+    },
   },
   {
     slug: "fryzjerka",
@@ -51,6 +72,11 @@ const SITES = [
     desc: "Ultra-nowoczesny dark-editorial landing dla salonu fryzjerskiego. Animacje, galeria, rezerwacja.",
     icon: "✂️",
     tag: "landing",
-    preview: false,
+    preview: true,
+    meta: {
+      colors: ["#080706", "#100f0c", "#c9a96e", "#f0ebe0", "#6e6a60"],
+      fonts: ["Cormorant Garamond", "Inter", "Playfair Display SC"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
   },
 ];
