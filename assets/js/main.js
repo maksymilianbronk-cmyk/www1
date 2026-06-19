@@ -26,14 +26,22 @@ if (!SITES || SITES.length === 0) {
           ${site.tag ? `<span class="card-tag">${site.tag}</span>` : ''}
         </div>
       </a>
-      <button class="card-info-btn" data-slug="${site.slug}" aria-label="Informacje o stronie ${site.title}">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <circle cx="7" cy="7" r="6.5" stroke="currentColor"/>
-          <rect x="6.3" y="5.5" width="1.4" height="5" rx=".7" fill="currentColor"/>
-          <circle cx="7" cy="3.5" r=".8" fill="currentColor"/>
-        </svg>
-        info
-      </button>
+      <div class="card-actions">
+        <button class="card-info-btn" data-slug="${site.slug}" aria-label="Informacje o stronie ${site.title}">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <circle cx="7" cy="7" r="6.5" stroke="currentColor"/>
+            <rect x="6.3" y="5.5" width="1.4" height="5" rx=".7" fill="currentColor"/>
+            <circle cx="7" cy="3.5" r=".8" fill="currentColor"/>
+          </svg>
+          info
+        </button>
+        <button class="card-zip-btn" data-slug="${site.slug}" aria-label="Pobierz ${site.title} jako ZIP">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <path d="M6.5 1v8M3.5 6l3 3 3-3M1.5 10.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          zip
+        </button>
+      </div>
     </div>
   `).join('');
 }
@@ -102,6 +110,43 @@ function closeModal() { modal.classList.remove('open'); }
 mClose.addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ── ZIP DOWNLOAD ── */
+gallery.addEventListener('click', async e => {
+  const btn = e.target.closest('.card-zip-btn');
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const site = SITES.find(s => s.slug === btn.dataset.slug);
+  if (site) await downloadZip(site, btn);
+});
+
+async function downloadZip(site, btn) {
+  btn.classList.add('loading');
+  btn.disabled = true;
+  try {
+    const zip = new JSZip();
+    const folder = zip.folder(site.slug);
+    const files = site.meta?.files || ['index.html'];
+    await Promise.all(files.map(async file => {
+      const res = await fetch(`sites/${site.slug}/${file}`);
+      if (!res.ok) throw new Error(res.status);
+      folder.file(file, await res.blob());
+    }));
+    const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(blob),
+      download: `${site.slug}.zip`,
+    });
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    alert(`Nie udało się pobrać: ${err.message}`);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
 
 /* ── SWATCH COPY ── */
 mBody.addEventListener('click', e => {
