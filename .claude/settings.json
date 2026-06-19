@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "wordpress": {
+      "command": "node",
+      "args": ["mcp/wordpress-server.js"],
+      "cwd": "."
+    }
+  }
+}
