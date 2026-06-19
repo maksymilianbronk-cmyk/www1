@@ -269,17 +269,17 @@ function migrateProjects(projects){
 function loadState(){
   try{
     const raw=localStorage.getItem(LS_KEY);
-    if(raw){ const d=JSON.parse(raw); return{projects:migrateProjects(d.projects),folders:d.folders||[],promoters:d.promoters||}; }
+    if(raw){ const d=JSON.parse(raw); return{projects:migrateProjects(d.projects),folders:d.folders||[],promoters:d.promoters||[]}; }
   }catch(e){}
   // migrate from v2
   try{
     const v2=localStorage.getItem("katalog_data_v2");
-    if(v2){ const d=JSON.parse(v2); return{projects:migrateProjects(d.projects),folders:d.folders||[],promoters:d.promoters||}; }
+    if(v2){ const d=JSON.parse(v2); return{projects:migrateProjects(d.projects),folders:d.folders||[],promoters:d.promoters||[]}; }
   }catch(e){}
   // migrate from v1
   try{
     const v1=localStorage.getItem("katalog_data_v1");
-    if(v1){ const d=JSON.parse(v1); return{projects:[],folders:d.folders||[],promoters:d.promoters||}; }
+    if(v1){ const d=JSON.parse(v1); return{projects:[],folders:d.folders||[],promoters:d.promoters||[]}; }
   }catch(e){}
   return{projects:[],folders:[],promoters:[]};
 }
