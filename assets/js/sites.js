@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "ortopeda",
+    title: "Ortopeda — Dr Wiśniewski",
+    desc: "Ultra-lekki light-mode landing dla ortopedy. Animowany SVG kręgosłupa, split hero, statystyki, rezerwacja.",
+    icon: "🦴",
+    tag: "klinika",
+    preview: true,
+    meta: {
+      colors: ["#f7f6f3", "#ffffff", "#0b6659", "#161618", "#78787e"],
+      fonts: ["Cormorant Garamond", "DM Sans"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "masaz",
     title: "Sensum — Gabinet Masażu",
     desc: "Luksusowy dark-wellness landing dla gabinetu masażu. Oddychające hero, mosaikowa galeria, booking.",

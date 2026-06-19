@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dr Marek Wiśniewski — Ortopeda Warszawa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════
+       DR WIŚNIEWSKI — ORTOPEDA
+       Paleta: ciepła biel #f7f6f3 (premium paper)
+               + deep teal #0b6659 (precision + health)
+               + near-black #161618 (authority)
+       Typografia: Cormorant Garamond 300 (precision serif)
+                 + DM Sans 300 (warm, human sans)
+       Ultra-light: biel, przestrzeń, jeden akcent
+    ═══════════════════════════════════════════ */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #f7f6f3;
+      --white:    #ffffff;
+      --teal:     #0b6659;
+      --teal-m:   #1a8a7a;
+      --teal-l:   #e5f2ef;
+      --ink:      #161618;
+      --dim:      #78787e;
+      --dim2:     #b8b8c0;
+      --border:   rgba(0,0,0,0.08);
+      --r:        4px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+
+    /* ═══ NAV ═══ */
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 200;
+      padding: 22px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(247,246,243,0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      transition: padding .3s;
+    }
+
+    .nav.compact { padding: 14px 60px; }
+
+    @media (max-width: 700px) { .nav { padding: 16px 24px; } }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      flex-shrink: 0;
+    }
+
+    .nav-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: .02em;
+    }
+
+    .nav-name span { color: var(--teal); }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+    }
+
+    @media (max-width: 680px) { .nav-links { display: none; } }
+
+    .nav-links a {
+      font-size: .72rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-links a:hover { color: var(--teal); }
+
+    .nav-btn {
+      font-size: .72rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 9px 22px;
+      background: var(--teal);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: var(--r);
+      transition: background .2s;
+    }
+
+    .nav-btn:hover { background: var(--teal-m); }
+
+    /* ═══════════════════════════════════════════
+       HERO — split layout
+       Lewo: tekst + badge + CTA
+       Prawo: zdjęcie lekarza w wysokiej ramce
+       WOW: animowany SVG kręgosłupa (stroke-dashoffset)
+    ═══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      padding-top: 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding-left: 60px;
+      padding-right: 0;
+      gap: 0;
+      align-items: stretch;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 100px 24px 60px;
+        min-height: auto;
+      }
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 60px 80px 0;
+    }
+
+    @media (max-width: 860px) { .hero-left { padding: 0 0 40px; } }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .68rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp .7s ease forwards .15s;
+    }
+
+    .hero-badge::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--teal);
+    }
+
+    .hero-h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(3.2rem, 5.5vw, 6rem);
+      line-height: 1.0;
+      letter-spacing: -.01em;
+      color: var(--ink);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp .9s cubic-bezier(0.16,1,0.3,1) forwards .3s;
+    }
+
+    .hero-h1 em {
+      font-style: italic;
+      color: var(--teal);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--dim);
+      line-height: 1.75;
+      max-width: 400px;
+      margin-bottom: 44px;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .55s;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .72s;
+    }
+
+    .btn-teal {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 14px 30px;
+      background: var(--teal);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: var(--r);
+      transition: background .2s, box-shadow .2s;
+    }
+
+    .btn-teal:hover {
+      background: var(--teal-m);
+      box-shadow: 0 4px 24px rgba(11,102,89,.25);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 14px 26px;
+      border: 1px solid var(--border);
+      color: var(--dim);
+      font-size: .78rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: var(--r);
+      transition: border-color .2s, color .2s;
+    }
+
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+      background: var(--teal-l);
+    }
+
+    @media (max-width: 860px) {
+      .hero-right { height: 440px; border-radius: var(--r); overflow: hidden; }
+    }
+
+    .hero-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: saturate(.9);
+    }
+
+    .hero-photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(247,246,243,.18) 0%, transparent 40%);
+    }
+
+    /* Animowany SVG kręgosłupa — WOW MOMENT */
+    .spine-svg {
+      position: absolute;
+      right: 32px;
+      bottom: 40px;
+      width: 60px;
+      opacity: .22;
+      pointer-events: none;
+    }
+
+    .spine-path {
+      stroke: var(--teal);
+      stroke-width: 1.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 800;
+      stroke-dashoffset: 800;
+      animation: drawSpine 3.5s cubic-bezier(0.4,0,0.2,1) forwards 1s;
+    }
+
+    .disc-path {
+      stroke: var(--teal);
+      stroke-width: 1;
+      fill: none;
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: drawSpine 2s ease forwards 3s;
+    }
+
+    @keyframes drawSpine {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ═══ STATS STRIP ═══ */
+    .stats {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .stats-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 48px 60px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 720px) {
+      .stats-inner { grid-template-columns: 1fr 1fr; padding: 40px 24px; }
+    }
+
+    .stat {
+      text-align: center;
+      padding: 0 16px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 4vw, 3.6rem);
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-n em { font-style: normal; color: var(--teal-m); }
+
+    .stat-label {
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ═══ SECTION COMMONS ═══ */
+    .sec {
+      padding: 100px 60px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 700px) { .sec { padding: 72px 24px; } }
+
+    .sec-label {
+      font-size: .62rem;
+      letter-spacing: .32em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 14px;
+    }
+
+    .sec-h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+
+    .sec-h2 em { font-style: italic; color: var(--teal); }
+
+    .sec-lead {
+      font-size: .95rem;
+      color: var(--dim);
+      line-height: 1.8;
+      max-width: 520px;
+      margin-bottom: 56px;
+    }
+
+    /* scroll reveal */
+    .rv {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .8s ease, transform .8s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .rv.on { opacity: 1; transform: none; }
+    .rv.d1 { transition-delay: .1s; }
+    .rv.d2 { transition-delay: .2s; }
+    .rv.d3 { transition-delay: .3s; }
+
+    /* ═══ SPECJALIZACJE — 4 karty ═══ */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .spec-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow .3s, border-color .3s, transform .3s;
+    }
+
+    .spec-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--teal);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .spec-card:hover {
+      box-shadow: 0 8px 40px rgba(0,0,0,.08);
+      border-color: transparent;
+      transform: translateY(-2px);
+    }
+
+    .spec-card:hover::before { transform: scaleX(1); }
+
+    .spec-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--teal-l);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .spec-icon svg { color: var(--teal); }
+
+    .spec-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .spec-desc {
+      font-size: .82rem;
+      color: var(--dim);
+      line-height: 1.75;
+    }
+
+    .spec-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 18px;
+    }
+
+    .spec-tag {
+      font-size: .65rem;
+      padding: 3px 9px;
+      background: var(--teal-l);
+      color: var(--teal);
+      border-radius: 99px;
+      letter-spacing: .04em;
+    }
+
+    /* ═══ PROCES — 3 kroki z connecting line ═══ */
+    .process-section { background: var(--white); }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    @media (max-width: 680px) {
+      .process-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Łącząca linia między krokami */
+    .process-grid::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: calc(16.666% + 14px);
+      right: calc(16.666% + 14px);
+      height: 1px;
+      background: linear-gradient(to right, var(--teal), var(--teal-m), var(--teal));
+      opacity: .3;
+    }
+
+    @media (max-width: 680px) { .process-grid::before { display: none; } }
+
+    .process-step {
+      padding: 0 32px 0;
+      text-align: center;
+    }
+
+    .step-num-wrap {
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--teal);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      background: var(--white);
+      position: relative;
+      z-index: 1;
+      transition: background .3s;
+    }
+
+    .process-step:hover .step-num-wrap {
+      background: var(--teal);
+    }
+
+    .step-num-wrap span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: var(--teal);
+      transition: color .3s;
+    }
+
+    .process-step:hover .step-num-wrap span { color: var(--white); }
+
+    .step-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: .84rem;
+      color: var(--dim);
+      line-height: 1.75;
+    }
+
+    /* ═══ O LEKARZU ═══ */
+    .doctor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    @media (max-width: 760px) { .doctor-grid { grid-template-columns: 1fr; } }
+
+    .doctor-img-wrap { position: relative; }
+
+    .doctor-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: var(--r);
+      filter: saturate(.88);
+    }
+
+    .doctor-badge {
+      position: absolute;
+      bottom: -16px;
+      right: -16px;
+      background: var(--teal);
+      color: var(--white);
+      padding: 16px 20px;
+      border-radius: var(--r);
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(11,102,89,.3);
+    }
+
+    .doctor-badge-n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .doctor-badge-l {
+      font-size: .6rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      opacity: .8;
+      margin-top: 4px;
+    }
+
+    .doctor-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      line-height: 1.1;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .doctor-title {
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 24px;
+    }
+
+    .doctor-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      color: var(--dim);
+      line-height: 1.65;
+      border-left: 2px solid var(--teal);
+      padding-left: 18px;
+      margin-bottom: 22px;
+    }
+
+    .doctor-bio {
+      font-size: .88rem;
+      color: var(--dim);
+      line-height: 1.85;
+      margin-bottom: 28px;
+    }
+
+    .doctor-creds {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .cred {
+      font-size: .68rem;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--dim);
+      letter-spacing: .05em;
+    }
+
+    /* ═══ OPINIE ═══ */
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .testi {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px 28px;
+      position: relative;
+      transition: box-shadow .3s;
+    }
+
+    .testi:hover { box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+
+    .testi-stars {
+      color: var(--teal);
+      font-size: .7rem;
+      letter-spacing: 3px;
+      margin-bottom: 16px;
+    }
+
+    .testi-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1.75;
+      margin-bottom: 20px;
+    }
+
+    .testi-author {
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .testi-condition {
+      font-size: .68rem;
+      color: var(--teal);
+      margin-top: 3px;
+    }
+
+    /* ═══ KONTAKT / REZERWACJA ═══ */
+    .booking-section { background: var(--white); }
+
+    .booking-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 100px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    @media (max-width: 760px) {
+      .booking-inner { grid-template-columns: 1fr; gap: 48px; padding: 72px 24px; }
+    }
+
+    .booking-text .sec-h2 { margin-bottom: 14px; }
+
+    .booking-contacts {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .contact-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--teal-l);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--teal);
+    }
+
+    .contact-info { font-size: .88rem; }
+    .contact-label { font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dim2); margin-bottom: 2px; }
+    .contact-val { color: var(--ink); }
+    .contact-val a { color: inherit; text-decoration: none; }
+    .contact-val a:hover { color: var(--teal); }
+
+    .bform { display: flex; flex-direction: column; gap: 14px; }
+
+    .brow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 480px) { .brow { grid-template-columns: 1fr; } }
+
+    .bfield { display: flex; flex-direction: column; gap: 6px; }
+
+    .bfield label {
+      font-size: .62rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .bfield input,
+    .bfield select,
+    .bfield textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 12px 14px;
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color .2s, background .2s;
+      width: 100%;
+    }
+
+    .bfield input:focus,
+    .bfield select:focus,
+    .bfield textarea:focus {
+      border-color: var(--teal);
+      background: var(--white);
+    }
+
+    .bfield select option { background: var(--white); }
+    .bfield textarea { resize: vertical; min-height: 90px; }
+
+    .btn-submit {
+      padding: 14px;
+      background: var(--teal);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--r);
+      cursor: pointer;
+      transition: background .2s, box-shadow .2s;
+      width: 100%;
+    }
+
+    .btn-submit:hover {
+      background: var(--teal-m);
+      box-shadow: 0 4px 24px rgba(11,102,89,.25);
+    }
+
+    /* ═══ FOOTER ═══ */
+    .site-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 60px;
+      border-top: 1px solid var(--border);
+      font-size: .75rem;
+      color: var(--dim);
+    }
+
+    @media (max-width: 700px) { .site-foot { padding: 16px 24px; flex-direction: column; gap: 8px; text-align: center; } }
+
+    .site-foot a {
+      color: var(--dim);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .site-foot a:hover { color: var(--teal); }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" id="nav">
+    <a class="nav-logo" href="#top">
+      <div class="nav-dot"></div>
+      <span class="nav-name">Dr <span>Wiśniewski</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#specjalizacje">Specjalizacje</a></li>
+      <li><a href="#o-lekarzu">O lekarzu</a></li>
+      <li><a href="#opinie">Opinie</a></li>
+    </ul>
+    <a class="nav-btn" href="#rezerwacja">Umów wizytę</a>
+  </nav>
+
+  <!-- HERO — split layout + animowany SVG kręgosłupa -->
+  <section id="top">
+    <div class="hero">
+      <div class="hero-left">
+        <p class="hero-badge">Ortopeda · Traumatolog · Warszawa</p>
+        <h1 class="hero-h1">
+          Przywracamy<br>
+          <em>sprawność</em><br>
+          życia.
+        </h1>
+        <p class="hero-sub">Specjalistyczna diagnostyka i leczenie narządu ruchu — od bólu kolana po endoprotezę biodra. Indywidualne podejście, bez czekania.</p>
+        <div class="hero-actions">
+          <a class="btn-teal" href="#rezerwacja">
+            Umów wizytę
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M2 11L11 2M11 2H5M11 2v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </a>
+          <a class="btn-outline" href="tel:+48600000000">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M2 2.5A1.5 1.5 0 013.5 1h1a1 1 0 011 .757l.5 2A1 1 0 015.28 5L4.5 5.78a8 8 0 003.72 3.72l.78-.78a1 1 0 011.243-.72l2 .5A1 1 0 0113 9.5v1A1.5 1.5 0 0111.5 12C6.253 12 2 7.747 2 2.5z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+            </svg>
+            +48 600 000 000
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <img class="hero-photo"
+          src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=900&q=90"
+          alt="Dr Marek Wiśniewski — ortopeda">
+        <div class="hero-photo-overlay"></div>
+
+        <!-- WOW: Animowany SVG kręgosłupa — rysuje się przez 3.5s -->
+        <svg class="spine-svg" viewBox="0 0 60 360" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- Kręgi szyjne -->
+          <rect class="disc-path" x="22" y="12" width="16" height="5" rx="2.5"/>
+          <rect class="disc-path" x="21" y="26" width="18" height="5" rx="2.5" style="animation-delay:3.1s"/>
+          <rect class="disc-path" x="20" y="40" width="20" height="5" rx="2.5" style="animation-delay:3.2s"/>
+          <!-- Kręgi piersiowe -->
+          <rect class="disc-path" x="19" y="56" width="22" height="5" rx="2.5" style="animation-delay:3.3s"/>
+          <rect class="disc-path" x="18" y="70" width="24" height="5" rx="2.5" style="animation-delay:3.4s"/>
+          <rect class="disc-path" x="18" y="84" width="24" height="5" rx="2.5" style="animation-delay:3.5s"/>
+          <rect class="disc-path" x="17" y="98" width="26" height="5" rx="2.5" style="animation-delay:3.6s"/>
+          <rect class="disc-path" x="17" y="112" width="26" height="5" rx="2.5" style="animation-delay:3.7s"/>
+          <rect class="disc-path" x="17" y="126" width="26" height="5" rx="2.5" style="animation-delay:3.8s"/>
+          <rect class="disc-path" x="18" y="140" width="24" height="5" rx="2.5" style="animation-delay:3.9s"/>
+          <rect class="disc-path" x="18" y="154" width="24" height="5" rx="2.5" style="animation-delay:4.0s"/>
+          <rect class="disc-path" x="19" y="168" width="22" height="5" rx="2.5" style="animation-delay:4.1s"/>
+          <!-- Kręgi lędźwiowe -->
+          <rect class="disc-path" x="17" y="184" width="26" height="6" rx="3" style="animation-delay:4.2s"/>
+          <rect class="disc-path" x="16" y="200" width="28" height="6" rx="3" style="animation-delay:4.3s"/>
+          <rect class="disc-path" x="16" y="216" width="28" height="6" rx="3" style="animation-delay:4.4s"/>
+          <rect class="disc-path" x="16" y="232" width="28" height="6" rx="3" style="animation-delay:4.5s"/>
+          <rect class="disc-path" x="17" y="248" width="26" height="6" rx="3" style="animation-delay:4.6s"/>
+          <!-- Kość krzyżowa -->
+          <path class="disc-path" d="M18 264 Q10 290 18 320 Q30 340 42 320 Q50 290 42 264 Z" style="animation-delay:4.7s"/>
+          <!-- Linia kręgosłupa -->
+          <path class="spine-path" d="M30 14 C24 30 36 50 30 68 C24 86 36 106 30 124 C24 142 36 162 30 180 C24 196 36 216 30 232 C28 248 30 265 30 290"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stats-inner">
+      <div class="stat rv">
+        <div class="stat-n">18</div>
+        <div class="stat-label">lat doświadczenia</div>
+      </div>
+      <div class="stat rv d1">
+        <div class="stat-n">4<em>200</em>+</div>
+        <div class="stat-label">operacji</div>
+      </div>
+      <div class="stat rv d2">
+        <div class="stat-n">98<em>%</em></div>
+        <div class="stat-label">zadowolonych pacjentów</div>
+      </div>
+      <div class="stat rv d3">
+        <div class="stat-n">4</div>
+        <div class="stat-label">specjalizacje</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPECJALIZACJE -->
+  <section class="sec" id="specjalizacje">
+    <p class="sec-label rv">Czym się zajmuję</p>
+    <h2 class="sec-h2 rv d1">Specjalizacje</h2>
+    <p class="sec-lead rv d2">Kompleksowe leczenie narządu ruchu — od diagnostyki po rehabilitację po zabiegu.</p>
+    <div class="spec-grid">
+      <div class="spec-card rv">
+        <div class="spec-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 2v4M10 14v4M2 10h4M14 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="spec-name">Kolano</div>
+        <p class="spec-desc">Artroskopia, rekonstrukcja więzadła ACL, leczenie meniskus, endoproteza stawu kolanowego.</p>
+        <div class="spec-tags">
+          <span class="spec-tag">Artroskopia</span>
+          <span class="spec-tag">ACL</span>
+          <span class="spec-tag">Endoproteza</span>
+        </div>
+      </div>
+      <div class="spec-card rv d1">
+        <div class="spec-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2C10 2 8 6 8 10C8 14 10 18 10 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M10 2C10 2 12 6 12 10C12 14 10 18 10 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="8" y1="7" x2="12" y2="7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+            <line x1="8" y1="10" x2="12" y2="10" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+            <line x1="8" y1="13" x2="12" y2="13" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="spec-name">Kręgosłup</div>
+        <p class="spec-desc">Leczenie dyskopatii, stenozy kanału kręgowego, skoliozy i urazów kręgosłupa.</p>
+        <div class="spec-tags">
+          <span class="spec-tag">Dyskopatia</span>
+          <span class="spec-tag">Stenoza</span>
+          <span class="spec-tag">Skolioza</span>
+        </div>
+      </div>
+      <div class="spec-card rv d2">
+        <div class="spec-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 10v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M6 13h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="spec-name">Biodro</div>
+        <p class="spec-desc">Endoproteza stawu biodrowego, osteotomia, leczenie złamań i impingement.</p>
+        <div class="spec-tags">
+          <span class="spec-tag">Endoproteza</span>
+          <span class="spec-tag">Osteotomia</span>
+          <span class="spec-tag">Impingement</span>
+        </div>
+      </div>
+      <div class="spec-card rv d3">
+        <div class="spec-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 16L8 8l4 4 4-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="spec-name">Ramię</div>
+        <p class="spec-desc">Stożek rotatorów, niestabilność stawu ramiennego, operacja Bankart, SLAP.</p>
+        <div class="spec-tags">
+          <span class="spec-tag">Stożek rotatorów</span>
+          <span class="spec-tag">Bankart</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCES -->
+  <div class="process-section">
+    <section class="sec">
+      <p class="sec-label rv" style="text-align:center">Jak leczymy</p>
+      <h2 class="sec-h2 rv d1" style="text-align:center;max-width:none">Od bólu do <em>pełnej sprawności</em></h2>
+      <p class="sec-lead rv d2" style="margin:0 auto 56px;text-align:center">Trzyetapowy plan — jasny, przewidywalny, skuteczny.</p>
+      <div class="process-grid">
+        <div class="process-step rv">
+          <div class="step-num-wrap"><span>1</span></div>
+          <div class="step-title">Diagnostyka</div>
+          <p class="step-desc">Szczegółowy wywiad, badanie fizykalne, analiza obrazowania RTG i MRI. Stawiamy precyzyjną diagnozę.</p>
+        </div>
+        <div class="process-step rv d1">
+          <div class="step-num-wrap"><span>2</span></div>
+          <div class="step-title">Plan leczenia</div>
+          <p class="step-desc">Wspólnie ustalamy optymalną ścieżkę — zachowawczą lub operacyjną. Tłumaczymy każdy krok.</p>
+        </div>
+        <div class="process-step rv d2">
+          <div class="step-num-wrap"><span>3</span></div>
+          <div class="step-title">Powrót do życia</div>
+          <p class="step-desc">Kontrola pooperacyjna, plan rehabilitacji i pełna dostępność do czasu pełnego powrotu do aktywności.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- O LEKARZU -->
+  <section class="sec" id="o-lekarzu">
+    <div class="doctor-grid">
+      <div class="doctor-img-wrap rv">
+        <img class="doctor-img"
+          src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=600&q=88"
+          alt="Dr Marek Wiśniewski" loading="lazy">
+        <div class="doctor-badge">
+          <div class="doctor-badge-n">18</div>
+          <div class="doctor-badge-l">lat praktyki</div>
+        </div>
+      </div>
+      <div class="rv d1">
+        <p class="sec-label">O lekarzu</p>
+        <h2 class="doctor-name">Dr hab. Marek<br>Wiśniewski</h2>
+        <p class="doctor-title">Spec. ortopedii i traumatologii</p>
+        <blockquote class="doctor-quote">„Każdy pacjent przychodzi do mnie nie z bólem, ale z niemożnością życia tak jak chce. Moją rolą jest to zmienić."</blockquote>
+        <p class="doctor-bio">Absolwent Warszawskiego Uniwersytetu Medycznego, specjalizacja w ortopedii i traumatologii narządu ruchu. Staże w Klinice Ortopedii Inselspital w Bernie oraz Hospital for Special Surgery w Nowym Jorku. Autor 28 publikacji naukowych, wykładowca akademicki.</p>
+        <div class="doctor-creds">
+          <span class="cred">WUM — doktor habilitowany</span>
+          <span class="cred">Inselspital Berno</span>
+          <span class="cred">HSS New York</span>
+          <span class="cred">PTOiTR — członek zarządu</span>
+          <span class="cred">ESSKA</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPINIE -->
+  <div class="process-section">
+    <section class="sec" id="opinie">
+      <p class="sec-label rv">Pacjenci o mnie</p>
+      <h2 class="sec-h2 rv d1">Opinie <em>po leczeniu</em></h2>
+      <div class="testi-grid" style="margin-top:52px">
+        <div class="testi rv">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">„Po operacji ACL od 3 lat gram w piłkę bez żadnych problemów. Podejście Doktora Wiśniewskiego — wyjaśnienie każdego etapu — sprawiło, że nie bałem się operacji."</p>
+          <div class="testi-author">Tomasz K., 34 l.</div>
+          <div class="testi-condition">Rekonstrukcja ACL</div>
+        </div>
+        <div class="testi rv d1">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">„Przez 3 lata nie mogłam wejść po schodach bez bólu. Po endoprotezie biodra wróciłam do nordic walkingu. Czułam się traktowana jak człowiek, nie jak numer."</p>
+          <div class="testi-author">Janina W., 68 l.</div>
+          <div class="testi-condition">Endoproteza biodra</div>
+        </div>
+        <div class="testi rv d2">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">„Dyskopatia L4/L5 od 2 lat. Pan Doktor zaproponował leczenie zachowawcze, a dopiero gdy nie przyniosło efektu — mikrodiscektomię. Podejście bez 'od razu na stół' robi różnicę."</p>
+          <div class="testi-author">Marcin P., 47 l.</div>
+          <div class="testi-condition">Dyskopatia L4/L5</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- REZERWACJA + KONTAKT -->
+  <div class="booking-section">
+    <div class="booking-inner" id="rezerwacja">
+      <div class="booking-text rv">
+        <p class="sec-label">Kontakt</p>
+        <h2 class="sec-h2">Umów <em>wizytę</em></h2>
+        <p class="sec-lead" style="margin-bottom:0">Pierwsza wizyta konsultacyjna trwa 45 minut. Odpiszemy do 4 godzin w dni robocze.</p>
+        <div class="booking-contacts">
+          <div class="contact-row">
+            <div class="contact-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M2 3.5A1.5 1.5 0 013.5 2h1a1 1 0 011 .757l.5 2a1 1 0 01-.72 1.243L4.5 6.78A9 9 0 009.22 11.5l.78-.78a1 1 0 011.243-.72l2 .5A1 1 0 0114 11.5v1A1.5 1.5 0 0112.5 14C6.704 14 2 9.296 2 3.5z" stroke="currentColor" stroke-width="1.2" fill="none"/>
+              </svg>
+            </div>
+            <div class="contact-info">
+              <div class="contact-label">Telefon</div>
+              <div class="contact-val"><a href="tel:+48600000000">+48 600 000 000</a></div>
+            </div>
+          </div>
+          <div class="contact-row">
+            <div class="contact-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M2 6l6 4 6-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="contact-info">
+              <div class="contact-label">E-mail</div>
+              <div class="contact-val"><a href="mailto:kontakt@drwisniewsk.pl">kontakt@drwisniewski.pl</a></div>
+            </div>
+          </div>
+          <div class="contact-row">
+            <div class="contact-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 1.5C5.515 1.5 3.5 3.515 3.5 6c0 3.75 4.5 8.5 4.5 8.5S12.5 9.75 12.5 6c0-2.485-2.015-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.2"/>
+                <circle cx="8" cy="6" r="1.5" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <div class="contact-info">
+              <div class="contact-label">Adres</div>
+              <div class="contact-val">ul. Mokotowska 15/3, Warszawa</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="bform rv d1" onsubmit="return false">
+        <div class="brow">
+          <div class="bfield">
+            <label for="fn">Imię i nazwisko</label>
+            <input type="text" id="fn" placeholder="Jan Kowalski" autocomplete="name">
+          </div>
+          <div class="bfield">
+            <label for="ph">Telefon</label>
+            <input type="tel" id="ph" placeholder="+48 000 000 000" autocomplete="tel">
+          </div>
+        </div>
+        <div class="bfield">
+          <label for="spec">Powód wizyty</label>
+          <select id="spec">
+            <option value="">Wybierz...</option>
+            <option>Ból/problem z kolanem</option>
+            <option>Ból/problem z kręgosłupem</option>
+            <option>Ból/problem z biodrem</option>
+            <option>Ból/problem z barkiem</option>
+            <option>Uraz / wypadek</option>
+            <option>Konsultacja przed operacją</option>
+            <option>Kontrola po operacji</option>
+            <option>Inne</option>
+          </select>
+        </div>
+        <div class="brow">
+          <div class="bfield">
+            <label for="dt">Preferowany termin</label>
+            <input type="date" id="dt">
+          </div>
+          <div class="bfield">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="jan@email.pl" autocomplete="email">
+          </div>
+        </div>
+        <div class="bfield">
+          <label for="note">Opis problemu</label>
+          <textarea id="note" placeholder="Krótki opis objawów, czas trwania, czy masz wyniki badań..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Wyślij prośbę o wizytę</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-foot">
+    <span>© 2025 Dr hab. Marek Wiśniewski — Ortopeda Traumatolog</span>
+    <a href="../../">← wróć do kolekcji</a>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('compact', window.scrollY > 60);
+    }, { passive: true });
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.10 });
+    document.querySelectorAll('.rv').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
