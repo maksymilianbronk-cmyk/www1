@@ -8,16 +8,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&family=Playfair+Display+SC:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    /* ──────────────────────────────── TOKENS ── */
     :root {
       --bg:       #080706;
-      --surface:  #100f0c;
-      --surface2: #181612;
-      --gold:     #c9a96e;
+      --surface:  #0f0e0c;
+      --surface2: #181512;
+      --gold:     #d4af70;
       --gold-dim: #6a5530;
-      --cream:    #f0ebe0;
-      --dim:      #6e6a60;
+      --gold-faint: rgba(212,175,112,.08);
+      --cream:    #f2ede2;
+      --dim:      #6a6660;
       --dim2:     #3a3830;
-      --border:   #22201a;
+      --border:   #242018;
+      --white:    #ffffff;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,46 +35,46 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    img { display: block; max-width: 100%; }
+    img { display: block; }
 
-    /* ── NAV ── */
+    /* ──────────────────────────────── NAV ── */
     .nav {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      inset: 0 0 auto;
       z-index: 200;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 28px 56px;
-      transition: padding .3s, background .4s, border-color .4s;
+      padding: 32px 64px;
+      transition: padding .32s ease, background .4s, border-color .4s;
       border-bottom: 1px solid transparent;
     }
 
     .nav.stuck {
-      padding: 16px 56px;
-      background: rgba(8,7,6,.9);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      padding: 16px 64px;
+      background: rgba(8,7,6,.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-color: var(--border);
     }
 
     .nav-logo {
       font-family: 'Playfair Display SC', serif;
-      font-size: 1.15rem;
-      letter-spacing: .18em;
+      font-size: 1.12rem;
+      letter-spacing: .2em;
       color: var(--cream);
       text-decoration: none;
     }
 
     .nav-links {
       display: flex;
-      gap: 40px;
+      gap: 44px;
       list-style: none;
     }
 
     .nav-links a {
-      font-size: .68rem;
-      letter-spacing: .22em;
+      font-size: .66rem;
+      letter-spacing: .24em;
       text-transform: uppercase;
       color: var(--dim);
       text-decoration: none;
@@ -81,7 +84,7 @@
     .nav-links a:hover { color: var(--cream); }
 
     .nav-btn {
-      font-size: .68rem;
+      font-size: .66rem;
       letter-spacing: .2em;
       text-transform: uppercase;
       padding: 10px 26px;
@@ -93,27 +96,54 @@
 
     .nav-btn:hover { background: var(--gold); color: var(--bg); }
 
-    /* ── HERO ── */
+    /* ──────────────────────────────── HERO ── */
     .hero {
-      display: grid;
-      grid-template-columns: 55% 45%;
+      position: relative;
       min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
     }
 
-    .hero-left {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 140px 72px 80px 72px;
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(.5) contrast(1.1) saturate(.85);
+      transition: transform 12s ease;
+    }
+
+    .hero:hover .hero-bg img { transform: scale(1.05); }
+
+    /* gradient: dark left to transparent right */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right,  rgba(8,7,6,.96) 0%, rgba(8,7,6,.72) 42%, rgba(8,7,6,.2) 68%, transparent 100%),
+        linear-gradient(to top,    rgba(8,7,6,.88) 0%, transparent 40%);
+    }
+
+    .hero-content {
       position: relative;
+      z-index: 2;
+      padding: 0 72px 100px;
+      max-width: 780px;
     }
 
     .hero-eyebrow {
-      font-size: .65rem;
+      font-size: .64rem;
       letter-spacing: .34em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 32px;
+      margin-bottom: 28px;
       display: flex;
       align-items: center;
       gap: 14px;
@@ -129,11 +159,11 @@
 
     .hero-h1 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(4rem, 6.5vw, 8rem);
+      font-size: clamp(5.5rem, 10.5vw, 12rem);
       font-weight: 300;
-      line-height: .92;
-      letter-spacing: -.02em;
-      margin-bottom: 36px;
+      line-height: .88;
+      letter-spacing: -.025em;
+      margin-bottom: 40px;
     }
 
     .hero-h1 em {
@@ -142,26 +172,26 @@
     }
 
     .hero-lead {
-      font-size: .9rem;
-      line-height: 1.85;
+      font-size: .92rem;
+      line-height: 1.9;
       color: var(--dim);
-      max-width: 360px;
-      margin-bottom: 52px;
+      max-width: 380px;
+      margin-bottom: 56px;
     }
 
     .hero-cta {
       display: flex;
-      gap: 24px;
+      gap: 28px;
       align-items: center;
     }
 
     .btn-gold {
       display: inline-block;
-      padding: 15px 40px;
+      padding: 15px 44px;
       background: var(--gold);
       color: var(--bg);
-      font-size: .7rem;
-      letter-spacing: .22em;
+      font-size: .68rem;
+      letter-spacing: .24em;
       text-transform: uppercase;
       font-weight: 400;
       text-decoration: none;
@@ -170,8 +200,8 @@
 
     .btn-gold:hover { opacity: .82; }
 
-    .btn-text {
-      font-size: .7rem;
+    .btn-ghost {
+      font-size: .68rem;
       letter-spacing: .2em;
       text-transform: uppercase;
       color: var(--dim);
@@ -182,123 +212,111 @@
       transition: color .2s;
     }
 
-    .btn-text span { transition: transform .2s; }
-    .btn-text:hover { color: var(--cream); }
-    .btn-text:hover span { transform: translateX(5px); }
+    .btn-ghost span { transition: transform .2s; }
+    .btn-ghost:hover { color: var(--cream); }
+    .btn-ghost:hover span { transform: translateX(5px); }
 
-    .hero-right {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-right img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(.72) contrast(1.05) saturate(.88);
-      transition: transform 9s ease;
-    }
-
-    .hero:hover .hero-right img { transform: scale(1.05); }
-
-    .hero-scroll-indicator {
+    /* scroll indicator — bottom right of hero */
+    .hero-scroll {
       position: absolute;
-      bottom: 44px;
-      left: 72px;
+      bottom: 48px;
+      right: 72px;
+      z-index: 3;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
-      font-size: .6rem;
+      gap: 10px;
+      font-size: .58rem;
       letter-spacing: .28em;
       text-transform: uppercase;
       color: var(--dim);
-      z-index: 2;
     }
 
     .scroll-line {
       width: 1px;
-      height: 52px;
+      height: 56px;
       background: linear-gradient(to bottom, var(--gold), transparent);
-      animation: linePulse 2.2s ease-in-out infinite;
+      animation: lineAnim 2.4s ease-in-out infinite;
     }
 
-    @keyframes linePulse {
-      0%,100% { opacity:.35; transform:scaleY(.75); }
-      50% { opacity:1; transform:scaleY(1); }
+    @keyframes lineAnim {
+      0%,100% { opacity:.3; transform: scaleY(.7); }
+      50%      { opacity:1;  transform: scaleY(1); }
     }
 
-    /* ── MARQUEE ── */
+    /* ──────────────────────────────── MARQUEE ── */
     .marquee-strip {
       overflow: hidden;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
       background: var(--surface);
-      padding: 15px 0;
+      padding: 16px 0;
     }
 
     .marquee-track {
       display: flex;
-      animation: marqueeRoll 30s linear infinite;
+      animation: marquee 32s linear infinite;
       white-space: nowrap;
     }
 
     .m-item {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-style: italic;
       font-weight: 300;
       color: var(--dim);
-      padding: 0 0 0 72px;
+      padding-left: 80px;
       flex-shrink: 0;
     }
 
     .m-sep {
       display: inline-block;
       color: var(--gold);
-      margin-left: 72px;
+      margin-left: 80px;
     }
 
-    @keyframes marqueeRoll {
+    @keyframes marquee {
       from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      to   { transform: translateX(-50%); }
     }
 
-    /* ── ABOUT ── */
+    /* ──────────────────────────────── ABOUT ── */
     .about {
       display: grid;
       grid-template-columns: 1fr 1fr;
     }
 
-    .about-img {
+    .about-photo {
       position: relative;
       overflow: hidden;
-      min-height: 600px;
+      min-height: 620px;
     }
 
-    .about-img img {
+    .about-photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.78) saturate(.82);
-      transition: transform .7s ease;
+      filter: brightness(.75) saturate(.8);
+      transition: transform .8s ease;
     }
 
-    .about-img:hover img { transform: scale(1.04); }
+    .about-photo:hover img { transform: scale(1.04); }
 
-    .about-content {
+    .about-body {
       background: var(--surface);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 88px 80px;
+      padding: 96px 88px;
     }
 
+    /* ──────────── shared typography ── */
     .label {
-      font-size: .63rem;
-      letter-spacing: .34em;
+      font-size: .62rem;
+      letter-spacing: .36em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 24px;
+      margin-bottom: 22px;
       display: flex;
       align-items: center;
       gap: 14px;
@@ -313,24 +331,21 @@
       flex-shrink: 0;
     }
 
-    .label.label--center {
-      justify-content: center;
-    }
-
-    .label.label--center::before { display: none; }
+    .label.center { justify-content: center; }
+    .label.center::before { display: none; }
 
     .sec-h2 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.2rem, 3.8vw, 4rem);
+      font-size: clamp(2.4rem, 4vw, 4.4rem);
       font-weight: 300;
-      line-height: 1.08;
+      line-height: 1.05;
       letter-spacing: -.015em;
-      margin-bottom: 28px;
+      margin-bottom: 30px;
     }
 
     .sec-h2 em { font-style: italic; color: var(--gold); }
 
-    .about-body {
+    .body-text {
       font-size: .88rem;
       line-height: 1.9;
       color: var(--dim);
@@ -348,88 +363,126 @@
 
     .stat-val {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 3.2rem;
+      font-size: 3.4rem;
       font-weight: 300;
       line-height: 1;
-      color: var(--cream);
     }
 
     .stat-lbl {
-      font-size: .64rem;
+      font-size: .62rem;
       letter-spacing: .16em;
       text-transform: uppercase;
       color: var(--dim);
       margin-top: 6px;
     }
 
-    /* ── SERVICES ── */
+    /* ──────────────────────────────── SERVICES ── */
     .services {
-      padding: 112px 56px;
-      max-width: 1280px;
+      padding: 120px 64px;
+      max-width: 1320px;
       margin: 0 auto;
     }
 
     .services-hd {
       text-align: center;
-      margin-bottom: 72px;
+      margin-bottom: 80px;
     }
 
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-    }
-
-    .svc {
-      background: var(--surface);
-      padding: 52px 44px;
+    /* Full-width horizontal list */
+    .svc-list {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      transition: background .3s;
     }
 
-    .svc:hover { background: var(--surface2); }
+    .svc-row {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      align-items: center;
+      gap: 40px;
+      padding: 36px 0;
+      border-top: 1px solid var(--border);
+      position: relative;
+      transition: background .25s;
+      cursor: default;
+    }
+
+    .svc-row:last-child { border-bottom: 1px solid var(--border); }
+
+    .svc-row::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 0;
+      background: var(--gold-faint);
+      transition: width .35s ease;
+    }
+
+    .svc-row:hover::before { width: 100%; }
 
     .svc-num {
       font-family: 'Cormorant Garamond', serif;
-      font-size: .82rem;
-      font-style: italic;
-      color: var(--gold-dim);
+      font-size: 4.5rem;
+      font-weight: 300;
+      color: var(--dim2);
+      line-height: 1;
+      user-select: none;
+      transition: color .25s;
     }
+
+    .svc-row:hover .svc-num { color: var(--gold-dim); }
+
+    .svc-main {}
 
     .svc-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.85rem;
+      font-size: clamp(1.6rem, 2.5vw, 2.4rem);
       font-weight: 300;
-      line-height: 1.1;
+      line-height: 1.15;
+      margin-bottom: 6px;
+      transition: color .25s;
     }
+
+    .svc-row:hover .svc-name { color: var(--white); }
 
     .svc-desc {
       font-size: .83rem;
-      line-height: 1.82;
+      line-height: 1.75;
       color: var(--dim);
-      flex: 1;
+      max-width: 520px;
+    }
+
+    .svc-price-col {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
     }
 
     .svc-price {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       color: var(--gold);
-      margin-top: 8px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
     }
 
-    /* ── GALLERY ── */
+    .svc-arrow {
+      font-size: .72rem;
+      letter-spacing: .2em;
+      color: var(--dim);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity .25s, transform .25s;
+    }
+
+    .svc-row:hover .svc-arrow { opacity: 1; transform: none; }
+
+    /* ──────────────────────────────── GALLERY ── */
     .gallery-wrap {
-      padding-bottom: 112px;
+      padding-bottom: 120px;
     }
 
     .gallery-hd {
-      padding: 80px 72px 52px;
+      padding: 88px 72px 56px;
     }
 
     .gallery-grid {
@@ -448,13 +501,35 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.82) saturate(.78) contrast(1.04);
-      transition: transform .65s ease, filter .45s ease;
+      filter: brightness(.8) saturate(.75) contrast(1.05);
+      transition: transform .7s ease, filter .5s ease;
     }
 
     .gal:hover img {
-      transform: scale(1.07);
-      filter: brightness(.92) saturate(1) contrast(1.04);
+      transform: scale(1.08);
+      filter: brightness(.9) saturate(1) contrast(1.05);
+    }
+
+    /* hover caption overlay */
+    .gal-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8,7,6,.82) 0%, rgba(8,7,6,.1) 50%, transparent 100%);
+      display: flex;
+      align-items: flex-end;
+      padding: 22px 20px;
+      opacity: 0;
+      transition: opacity .4s ease;
+    }
+
+    .gal:hover .gal-overlay { opacity: 1; }
+
+    .gal-caption {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--cream);
+      letter-spacing: .04em;
     }
 
     .gal:nth-child(1) { grid-column: span 5; grid-row: span 2; }
@@ -463,21 +538,23 @@
     .gal:nth-child(4) { grid-column: span 3; }
     .gal:nth-child(5) { grid-column: span 4; }
 
-    /* ── TESTIMONIALS ── */
+    /* ──────────────────────────────── TESTIMONIALS ── */
     .testimonials {
       background: var(--surface);
-      padding: 112px 56px;
+      padding: 120px 56px;
       text-align: center;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
 
     .t-quote {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.5rem, 2.8vw, 2.5rem);
+      font-size: clamp(1.6rem, 3vw, 2.8rem);
       font-weight: 300;
       font-style: italic;
-      line-height: 1.55;
-      max-width: 800px;
-      margin: 44px auto 0;
+      line-height: 1.5;
+      max-width: 860px;
+      margin: 48px auto 0;
       transition: opacity .3s;
     }
 
@@ -485,8 +562,8 @@
     .t-quote::after  { content: '\201D'; color: var(--gold); }
 
     .t-author {
-      font-size: .7rem;
-      letter-spacing: .22em;
+      font-size: .68rem;
+      letter-spacing: .24em;
       text-transform: uppercase;
       color: var(--dim);
       margin-top: 28px;
@@ -501,7 +578,7 @@
     }
 
     .t-dot {
-      width: 36px;
+      width: 38px;
       height: 1px;
       background: var(--dim2);
       cursor: pointer;
@@ -510,50 +587,68 @@
 
     .t-dot.on { background: var(--gold); }
 
-    /* ── TEAM ── */
+    /* ──────────────────────────────── TEAM ── */
     .team {
-      padding: 112px 56px;
-      max-width: 1280px;
+      padding: 120px 64px;
+      max-width: 1320px;
       margin: 0 auto;
     }
 
-    .team-hd { margin-bottom: 64px; }
+    .team-hd { margin-bottom: 72px; }
 
     .team-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 36px;
+      gap: 32px;
     }
 
     .team-card {}
 
+    /* photo with name overlay */
     .team-photo {
+      position: relative;
       aspect-ratio: 3/4;
       overflow: hidden;
-      margin-bottom: 22px;
+      margin-bottom: 0;
     }
 
     .team-photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: grayscale(.35) brightness(.82);
-      transition: transform .65s ease, filter .45s ease;
+      filter: grayscale(.4) brightness(.8);
+      transition: transform .7s ease, filter .5s ease;
     }
 
     .team-card:hover .team-photo img {
-      transform: scale(1.04);
+      transform: scale(1.05);
       filter: grayscale(0) brightness(.9);
+    }
+
+    .team-name-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 64px 24px 24px;
+      background: linear-gradient(to top, rgba(8,7,6,.9) 0%, rgba(8,7,6,.4) 60%, transparent 100%);
+      transform: translateY(8px);
+      opacity: 0;
+      transition: transform .45s ease, opacity .45s ease;
+    }
+
+    .team-card:hover .team-name-overlay {
+      transform: none;
+      opacity: 1;
     }
 
     .team-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.55rem;
+      font-size: 1.6rem;
       font-weight: 300;
+      color: var(--cream);
     }
 
     .team-role {
-      font-size: .65rem;
+      font-size: .62rem;
       letter-spacing: .22em;
       text-transform: uppercase;
       color: var(--gold);
@@ -564,44 +659,46 @@
       font-size: .82rem;
       line-height: 1.8;
       color: var(--dim);
-      margin-top: 12px;
+      margin-top: 18px;
+      padding: 18px 0 0;
+      border-top: 1px solid var(--border);
     }
 
-    /* ── BOOKING ── */
+    /* ──────────────────────────────── BOOKING ── */
     .booking {
       position: relative;
-      min-height: 56vh;
+      min-height: 60vh;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      overflow: hidden;
     }
 
     .booking-bg {
       position: absolute;
       inset: 0;
-      overflow: hidden;
     }
 
     .booking-bg img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.28) saturate(.5);
+      filter: brightness(.22) saturate(.4);
     }
 
     .booking-inner {
       position: relative;
       z-index: 2;
-      padding: 88px 56px;
+      padding: 96px 56px;
     }
 
     .booking-h2 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3rem, 6.5vw, 6.5rem);
+      font-size: clamp(3.5rem, 8vw, 9rem);
       font-weight: 300;
-      line-height: .94;
-      margin: 24px 0 44px;
+      line-height: .9;
+      margin: 28px 0 48px;
     }
 
     .booking-h2 em { font-style: italic; color: var(--gold); }
@@ -610,8 +707,8 @@
       font-size: .88rem;
       line-height: 1.85;
       color: var(--dim);
-      max-width: 460px;
-      margin: 0 auto 48px;
+      max-width: 440px;
+      margin: 0 auto 52px;
     }
 
     .booking-actions {
@@ -622,47 +719,47 @@
       flex-wrap: wrap;
     }
 
-    /* ── FOOTER ── */
+    /* ──────────────────────────────── FOOTER ── */
     .footer {
       background: var(--surface);
       border-top: 1px solid var(--border);
-      padding: 72px 72px 32px;
+      padding: 80px 80px 36px;
     }
 
     .footer-grid {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 1fr;
       gap: 56px;
-      margin-bottom: 56px;
+      margin-bottom: 64px;
     }
 
     .f-brand {
       font-family: 'Playfair Display SC', serif;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       letter-spacing: .14em;
       margin-bottom: 14px;
     }
 
     .f-tagline {
       font-size: .82rem;
-      line-height: 1.75;
+      line-height: 1.8;
       color: var(--dim);
-      max-width: 260px;
+      max-width: 240px;
     }
 
     .f-col-title {
-      font-size: .63rem;
-      letter-spacing: .3em;
+      font-size: .6rem;
+      letter-spacing: .32em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .f-links {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 11px;
+      gap: 12px;
     }
 
     .f-links a {
@@ -676,7 +773,7 @@
 
     .footer-bottom {
       border-top: 1px solid var(--border);
-      padding-top: 24px;
+      padding-top: 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -684,71 +781,70 @@
       color: var(--dim);
     }
 
-    .footer-bottom a {
-      color: #6c63ff;
-      text-decoration: none;
-    }
-
+    .footer-bottom a { color: #6c63ff; text-decoration: none; }
     .footer-bottom a:hover { text-decoration: underline; }
 
-    /* ── REVEAL ── */
+    /* ──────────────────────────────── REVEAL ── */
     .rv {
       opacity: 0;
-      transform: translateY(30px);
-      transition: opacity .75s ease, transform .75s ease;
+      transform: translateY(32px);
+      transition: opacity .8s ease, transform .8s ease;
     }
 
+    .rv.rl { transform: translateX(-32px); }  /* from left */
+    .rv.rr { transform: translateX(32px); }   /* from right */
+
     .rv.in { opacity: 1; transform: none; }
+
     .rv.d1 { transition-delay: .1s; }
     .rv.d2 { transition-delay: .2s; }
-    .rv.d3 { transition-delay: .3s; }
-    .rv.d4 { transition-delay: .42s; }
+    .rv.d3 { transition-delay: .32s; }
+    .rv.d4 { transition-delay: .44s; }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
+    /* ──────────────────────────────── RESPONSIVE ── */
+    @media (max-width: 1100px) {
       .nav-links { display: none; }
-      .nav, .nav.stuck { padding: 18px 32px; }
-      .hero { grid-template-columns: 1fr; }
-      .hero-right { height: 60vw; min-height: 320px; }
-      .hero-left { padding: 120px 40px 64px; }
-      .hero-scroll-indicator { left: 40px; }
+      .nav, .nav.stuck { padding: 18px 36px; }
+      .hero-content { padding: 0 40px 80px; }
+      .hero-scroll { right: 40px; bottom: 40px; }
       .about { grid-template-columns: 1fr; }
-      .about-img { min-height: 56vw; }
-      .about-content { padding: 64px 40px; }
-      .services { padding: 80px 32px; }
-      .services-grid { grid-template-columns: 1fr 1fr; }
-      .gallery-hd { padding: 64px 40px 40px; }
-      .gallery-grid {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-      }
-      .gal { height: 260px; grid-column: span 1 !important; grid-row: span 1 !important; }
-      .team { padding: 80px 32px; }
-      .team-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
-      .footer { padding: 56px 40px 28px; }
+      .about-photo { min-height: 60vw; }
+      .about-body { padding: 64px 44px; }
+      .services { padding: 88px 36px; }
+      .svc-row { grid-template-columns: 72px 1fr auto; gap: 24px; }
+      .svc-num { font-size: 3.2rem; }
+      .gallery-hd { padding: 72px 44px 44px; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .gal { height: 280px; grid-column: span 1 !important; grid-row: span 1 !important; }
+      .team { padding: 88px 36px; }
+      .team-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
+      .footer { padding: 64px 44px 28px; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
     }
 
-    @media (max-width: 640px) {
-      .hero-h1 { font-size: 3.2rem; }
-      .hero-left { padding: 104px 24px 56px; }
-      .hero-scroll-indicator { display: none; }
-      .about-content { padding: 52px 24px; }
-      .services-grid { grid-template-columns: 1fr; }
+    @media (max-width: 700px) {
+      .hero-h1 { font-size: clamp(3.5rem, 14vw, 6rem); }
+      .hero-content { padding: 0 28px 72px; }
+      .hero-scroll { display: none; }
+      .hero-lead { max-width: 100%; }
+      .about-body { padding: 52px 28px; }
       .services { padding: 72px 20px; }
-      .gallery-hd { padding: 56px 24px 32px; }
+      .svc-row { grid-template-columns: 56px 1fr; gap: 16px; padding: 28px 0; }
+      .svc-price-col { display: none; }
+      .svc-num { font-size: 2.4rem; }
+      .gallery-hd { padding: 64px 28px 36px; }
+      .gal { height: 220px; }
       .gallery-grid { gap: 3px; }
-      .gal { height: 200px; }
-      .testimonials { padding: 80px 24px; }
+      .testimonials { padding: 88px 28px; }
       .team { padding: 72px 20px; }
       .team-grid { grid-template-columns: 1fr; }
-      .booking-inner { padding: 72px 24px; }
+      .booking-inner { padding: 72px 28px; }
       .booking-actions { flex-direction: column; }
-      .footer { padding: 48px 24px 24px; }
+      .nav-btn { display: none; }
+      .footer { padding: 52px 28px 24px; }
       .footer-grid { grid-template-columns: 1fr; gap: 32px; }
       .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
-      .stats { gap: 32px; }
-      .nav-btn { display: none; }
+      .stats { gap: 28px; }
     }
   </style>
 </head>
@@ -766,9 +862,12 @@
     <a class="nav-btn" href="#rezerwacja">Zarezerwuj</a>
   </nav>
 
-  <!-- HERO -->
+  <!-- HERO — full bleed z gradientem -->
   <section class="hero" id="top">
-    <div class="hero-left">
+    <div class="hero-bg">
+      <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1800&auto=format&fit=crop&q=88" alt="">
+    </div>
+    <div class="hero-content">
       <p class="hero-eyebrow rv">Warszawa · Prestiżowy Salon Fryzjerski</p>
       <h1 class="hero-h1 rv d1">
         Sztuka<br>
@@ -778,13 +877,10 @@
       <p class="hero-lead rv d2">Autorskie stylizacje, precyzyjna koloryzacja i kuracje regenerujące — skrojone na miarę każdej kobiety.</p>
       <div class="hero-cta rv d3">
         <a class="btn-gold" href="#rezerwacja">Zarezerwuj wizytę</a>
-        <a class="btn-text" href="#uslugi">Nasze usługi <span>→</span></a>
+        <a class="btn-ghost" href="#uslugi">Nasze usługi <span>→</span></a>
       </div>
     </div>
-    <div class="hero-right">
-      <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&auto=format&fit=crop&q=85" alt="Wnętrze salonu Atelier Noir">
-    </div>
-    <div class="hero-scroll-indicator">
+    <div class="hero-scroll">
       <div class="scroll-line"></div>
       <span>scroll</span>
     </div>
@@ -798,30 +894,28 @@
       <span class="m-item">Baleyaż<span class="m-sep">✦</span></span>
       <span class="m-item">Olaplex<span class="m-sep">✦</span></span>
       <span class="m-item">Ombre<span class="m-sep">✦</span></span>
-      <span class="m-item">Botox na włosy<span class="m-sep">✦</span></span>
-      <span class="m-item">Keratyna<span class="m-sep">✦</span></span>
+      <span class="m-item">Botox keratynowy<span class="m-sep">✦</span></span>
       <span class="m-item">Stylizacja ślubna<span class="m-sep">✦</span></span>
       <span class="m-item">Strzyżenie<span class="m-sep">✦</span></span>
       <span class="m-item">Koloryzacja<span class="m-sep">✦</span></span>
       <span class="m-item">Baleyaż<span class="m-sep">✦</span></span>
       <span class="m-item">Olaplex<span class="m-sep">✦</span></span>
       <span class="m-item">Ombre<span class="m-sep">✦</span></span>
-      <span class="m-item">Botox na włosy<span class="m-sep">✦</span></span>
-      <span class="m-item">Keratyna<span class="m-sep">✦</span></span>
+      <span class="m-item">Botox keratynowy<span class="m-sep">✦</span></span>
       <span class="m-item">Stylizacja ślubna<span class="m-sep">✦</span></span>
     </div>
   </div>
 
   <!-- ABOUT -->
   <section class="about" id="studio">
-    <div class="about-img">
-      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=85" alt="Stylizacja włosów">
+    <div class="about-photo rv rl">
+      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=88" alt="Stylizacja włosów">
     </div>
-    <div class="about-content">
+    <div class="about-body">
       <p class="label rv">O studio</p>
       <h2 class="sec-h2 rv d1">Gdzie rzemiosło<br>spotyka <em>artyzm</em></h2>
-      <p class="about-body rv d2">Atelier Noir to prestiżowy salon fryzjerski w sercu Warszawy, gdzie każda wizyta to wyjątkowe doświadczenie. Nasz zespół łączy zamiłowanie do fryzjerstwa z nieustanną edukacją i najlepszymi produktami dostępnymi na rynku.</p>
-      <p class="about-body rv d2">Pracujemy wyłącznie z markami premium — L&rsquo;Oréal Professionnel, Wella Professionals, Olaplex — bo Twoje włosy zasługują na to, co najlepsze.</p>
+      <p class="body-text rv d2">Atelier Noir to prestiżowy salon w sercu Warszawy, gdzie każda wizyta to wyjątkowe doświadczenie. Łączymy zamiłowanie do fryzjerstwa z nieustanną edukacją i produktami premium.</p>
+      <p class="body-text rv d2">Pracujemy wyłącznie z L&rsquo;Oréal Professionnel, Wella Professionals i Olaplex — bo Twoje włosy zasługują na to, co najlepsze.</p>
       <div class="stats rv d3">
         <div>
           <div class="stat-val">6+</div>
@@ -839,48 +933,78 @@
     </div>
   </section>
 
-  <!-- SERVICES -->
+  <!-- SERVICES — horizontal list -->
   <section class="services" id="uslugi">
     <div class="services-hd">
-      <p class="label label--center rv">Oferta</p>
+      <p class="label center rv">Oferta</p>
       <h2 class="sec-h2 rv d1" style="text-align:center">Pełna gama<br><em>usług</em></h2>
     </div>
-    <div class="services-grid">
-      <div class="svc rv">
+    <div class="svc-list">
+      <div class="svc-row rv">
         <div class="svc-num">01</div>
-        <div class="svc-name">Strzyżenie</div>
-        <div class="svc-desc">Precyzyjne strzyżenie dopasowane do kształtu twarzy, struktury włosa i Twojego stylu życia. Konsultacja, mycie i stylizacja w cenie.</div>
-        <div class="svc-price">od 120 zł</div>
+        <div class="svc-main">
+          <div class="svc-name">Strzyżenie</div>
+          <div class="svc-desc">Precyzyjne strzyżenie dopasowane do kształtu twarzy, struktury włosa i stylu życia. Konsultacja i stylizacja w cenie.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 120 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
       </div>
-      <div class="svc rv d1">
+      <div class="svc-row rv d1">
         <div class="svc-num">02</div>
-        <div class="svc-name">Koloryzacja</div>
-        <div class="svc-desc">Pełna koloryzacja, refleksy, technika baleyażu i ombre. Bezpieczne formuły bez amoniaku lub klasyczne — Twój wybór.</div>
-        <div class="svc-price">od 220 zł</div>
+        <div class="svc-main">
+          <div class="svc-name">Koloryzacja</div>
+          <div class="svc-desc">Pełna koloryzacja, refleksy, baleyaż i ombre. Bezpieczne formuły bez amoniaku lub klasyczne — Twój wybór.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 220 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
       </div>
-      <div class="svc rv d2">
+      <div class="svc-row rv d2">
         <div class="svc-num">03</div>
-        <div class="svc-name">Kuracja Olaplex</div>
-        <div class="svc-desc">Odbudowa wiązań disulfidowych wewnątrz włosa. Efekt miękkości i blasku już po pierwszym zabiegu — bez kompromisów.</div>
-        <div class="svc-price">od 130 zł</div>
+        <div class="svc-main">
+          <div class="svc-name">Kuracja Olaplex</div>
+          <div class="svc-desc">Odbudowa wiązań disulfidowych wewnątrz włosa. Miękkość i blask już po pierwszym zabiegu — bez kompromisów.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 130 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
       </div>
-      <div class="svc rv">
+      <div class="svc-row rv">
         <div class="svc-num">04</div>
-        <div class="svc-name">Botox keratynowy</div>
-        <div class="svc-desc">Wygładzenie, intensywne nawilżenie i redukcja puszenia. Efekt trwa do 4 miesięcy, włosy stają się podatne i jedwabiste.</div>
-        <div class="svc-price">od 350 zł</div>
+        <div class="svc-main">
+          <div class="svc-name">Botox keratynowy</div>
+          <div class="svc-desc">Wygładzenie, nawilżenie i redukcja puszenia na do 4 miesięcy. Włosy jedwabiste, podatne i lśniące.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 350 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
       </div>
-      <div class="svc rv d1">
+      <div class="svc-row rv d1">
         <div class="svc-num">05</div>
-        <div class="svc-name">Stylizacja ślubna</div>
-        <div class="svc-desc">Próbne upięcia i kreacje na Twój wyjątkowy dzień. Pracujemy z wyprzedzeniem — perfekcja jest tutaj standardem.</div>
-        <div class="svc-price">od 380 zł</div>
+        <div class="svc-main">
+          <div class="svc-name">Stylizacja ślubna</div>
+          <div class="svc-desc">Próbne upięcia i kreacje na Twój wyjątkowy dzień. Pracujemy z wyprzedzeniem — perfekcja jest tutaj standardem.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 380 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
       </div>
-      <div class="svc rv d2">
+      <div class="svc-row rv d2">
         <div class="svc-num">06</div>
-        <div class="svc-name">Pakiet VIP</div>
-        <div class="svc-desc">Strzyżenie + koloryzacja + regeneracja + stylizacja. Kompletne doświadczenie Atelier — dla kobiet, które pragną tylko najlepszego.</div>
-        <div class="svc-price">od 550 zł</div>
+        <div class="svc-main">
+          <div class="svc-name">Pakiet VIP</div>
+          <div class="svc-desc">Strzyżenie + koloryzacja + regeneracja + stylizacja. Kompletne doświadczenie Atelier dla kobiet, które pragną tylko najlepszego.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 550 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
       </div>
     </div>
   </section>
@@ -893,26 +1017,31 @@
     </div>
     <div class="gallery-grid">
       <div class="gal">
-        <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&auto=format&fit=crop&q=85" alt="Koloryzacja">
+        <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&auto=format&fit=crop&q=88" alt="">
+        <div class="gal-overlay"><span class="gal-caption">Koloryzacja baleyaż</span></div>
       </div>
       <div class="gal">
-        <img src="https://images.unsplash.com/photo-1500840216050-6ffa99d75160?w=700&auto=format&fit=crop&q=85" alt="Stylizacja">
+        <img src="https://images.unsplash.com/photo-1500840216050-6ffa99d75160?w=700&auto=format&fit=crop&q=88" alt="">
+        <div class="gal-overlay"><span class="gal-caption">Stylizacja blow-dry</span></div>
       </div>
       <div class="gal">
-        <img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=600&auto=format&fit=crop&q=85" alt="Salon">
+        <img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=600&auto=format&fit=crop&q=88" alt="">
+        <div class="gal-overlay"><span class="gal-caption">Wnętrze salonu</span></div>
       </div>
       <div class="gal">
-        <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&auto=format&fit=crop&q=85" alt="Strzyżenie">
+        <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&auto=format&fit=crop&q=88" alt="">
+        <div class="gal-overlay"><span class="gal-caption">Precyzyjne strzyżenie</span></div>
       </div>
       <div class="gal">
-        <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=700&auto=format&fit=crop&q=85" alt="Efekt końcowy">
+        <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=700&auto=format&fit=crop&q=88" alt="">
+        <div class="gal-overlay"><span class="gal-caption">Efekt końcowy</span></div>
       </div>
     </div>
   </section>
 
   <!-- TESTIMONIALS -->
   <section class="testimonials" id="opinie">
-    <p class="label label--center rv">Opinie klientek</p>
+    <p class="label center rv">Opinie klientek</p>
     <blockquote class="t-quote rv d1" id="tq">Przyszłam po poleceniu koleżanki i zostałam na lata. Nigdzie indziej moje włosy nie wyglądały tak jak tutaj — pełne życia, koloru i piękne.</blockquote>
     <div class="t-author rv d2" id="ta">— Aleksandra W., klientka od 2020</div>
     <div class="t-dots rv d3">
@@ -931,43 +1060,49 @@
     <div class="team-grid">
       <div class="team-card rv">
         <div class="team-photo">
-          <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=500&auto=format&fit=crop&q=80" alt="Zofia Kowalska">
+          <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=500&auto=format&fit=crop&q=82" alt="Zofia Kowalska">
+          <div class="team-name-overlay">
+            <div class="team-name">Zofia Kowalska</div>
+            <div class="team-role">Master Stylistka & Założycielka</div>
+          </div>
         </div>
-        <div class="team-name">Zofia Kowalska</div>
-        <div class="team-role">Master Stylistka & Założycielka</div>
         <div class="team-bio">10 lat doświadczenia, szkolenia w Paryżu i Mediolanie. Specjalizacja w koloryzacji i transformacjach.</div>
       </div>
       <div class="team-card rv d1">
         <div class="team-photo">
-          <img src="https://images.unsplash.com/photo-1523264653568-d3d4032d1476?w=500&auto=format&fit=crop&q=80" alt="Marta Nowak">
+          <img src="https://images.unsplash.com/photo-1523264653568-d3d4032d1476?w=500&auto=format&fit=crop&q=82" alt="Marta Nowak">
+          <div class="team-name-overlay">
+            <div class="team-name">Marta Nowak</div>
+            <div class="team-role">Senior Colorist</div>
+          </div>
         </div>
-        <div class="team-name">Marta Nowak</div>
-        <div class="team-role">Senior Colorist</div>
         <div class="team-bio">Certyfikowana ekspertka Olaplex. Mistrzyni baleyażu i technik rozjaśniania bez uszkodzeń struktury włosa.</div>
       </div>
       <div class="team-card rv d2">
         <div class="team-photo">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80" alt="Karolina Wiśniewska">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=82" alt="Karolina Wiśniewska">
+          <div class="team-name-overlay">
+            <div class="team-name">Karolina Wiśniewska</div>
+            <div class="team-role">Stylistka & Tricholog</div>
+          </div>
         </div>
-        <div class="team-name">Karolina Wiśniewska</div>
-        <div class="team-role">Stylistka & Tricholog</div>
         <div class="team-bio">Pasjonatka zdrowych włosów, specjalistka keratynowego prostowania i kuracji głęboko regenerujących.</div>
       </div>
     </div>
   </section>
 
-  <!-- BOOKING -->
+  <!-- BOOKING CTA -->
   <section class="booking" id="rezerwacja">
     <div class="booking-bg">
-      <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1600&auto=format&fit=crop&q=75" alt="">
+      <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1800&auto=format&fit=crop&q=75" alt="">
     </div>
     <div class="booking-inner">
-      <p class="label label--center rv">Zarezerwuj wizytę</p>
+      <p class="label center rv">Zarezerwuj wizytę</p>
       <h2 class="booking-h2 rv d1">Czas na<br><em>zmianę.</em></h2>
-      <p class="booking-sub rv d2">Zarezerwuj termin online lub zadzwoń do nas. Pierwsza konsultacja jest zawsze bezpłatna.</p>
+      <p class="booking-sub rv d2">Zarezerwuj termin online lub zadzwoń. Pierwsza konsultacja zawsze bezpłatna.</p>
       <div class="booking-actions rv d3">
         <a class="btn-gold" href="tel:+48501000000">+48 501 000 000</a>
-        <a class="btn-text" href="mailto:rezerwacja@ateliernoir.pl" style="color:var(--dim)">rezerwacja@ateliernoir.pl <span>→</span></a>
+        <a class="btn-ghost" href="mailto:rezerwacja@ateliernoir.pl" style="color:var(--dim)">rezerwacja@ateliernoir.pl <span>→</span></a>
       </div>
     </div>
   </section>
@@ -1017,17 +1152,17 @@
     // Sticky nav
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
-      nav.classList.toggle('stuck', window.scrollY > 56);
+      nav.classList.toggle('stuck', window.scrollY > 60);
     }, { passive: true });
 
-    // Scroll reveal
+    // Scroll reveal (supports both vertical + horizontal variants)
     const rvEls = document.querySelectorAll('.rv');
-    const revObs = new IntersectionObserver(entries => {
+    const obs = new IntersectionObserver(entries => {
       entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('in'); revObs.unobserve(e.target); }
+        if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
       });
     }, { threshold: 0.1 });
-    rvEls.forEach(el => revObs.observe(el));
+    rvEls.forEach(el => obs.observe(el));
 
     // Testimonials carousel
     const slides = [
@@ -1056,7 +1191,7 @@
     }
 
     dots.forEach(d => d.addEventListener('click', () => showSlide(+d.dataset.i)));
-    setInterval(() => showSlide((cur + 1) % slides.length), 5500);
+    setInterval(() => showSlide((cur + 1) % slides.length), 5800);
   </script>
 </body>
 </html>
