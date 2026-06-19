@@ -45,4 +45,12 @@ const SITES = [
     tag: "przewodnik",
     preview: false,
   },
+  {
+    slug: "fryzjerka",
+    title: "Salon Fryzjerski — Landing",
+    desc: "Ultra-nowoczesny dark-editorial landing dla salonu fryzjerskiego. Animacje, galeria, rezerwacja.",
+    icon: "✂️",
+    tag: "landing",
+    preview: false,
+  },
 ];
