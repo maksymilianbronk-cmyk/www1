@@ -21,4 +21,12 @@ const SITES = [
     tag: "przykład",
     preview: false,
   },
+  {
+    slug: "katalog",
+    title: "Katalog stron — CRM",
+    desc: "Panel z logowaniem: foldery stron, manager plików i baza promotorów.",
+    icon: "🗂️",
+    tag: "crm",
+    preview: false,
+  },
 ];
