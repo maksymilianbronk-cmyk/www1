@@ -1,0 +1,13 @@
+{
+  "name": "wordpress-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for managing WordPress sites via REST API",
+  "main": "wordpress-server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node wordpress-server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}
