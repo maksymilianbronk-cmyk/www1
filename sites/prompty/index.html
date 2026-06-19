@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biblioteka promptów — Katalog stron</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f13;--surface:#1a1a22;--surface-2:#22222e;--surface-3:#2a2a38;
+  --border:#2e2e3e;--accent:#6c63ff;--accent-dim:#3d3880;--accent-hover:#7d75ff;
+  --text:#e8e8f0;--text-dim:#8888a0;--text-muted:#555570;
+  --ok:#42d392;--warn:#f5a623;--info:#4ab3ff;--pink:#ff6b9d;
+  --radius:10px;
+}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* Header */
+.site-header{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem}
+.brand .dot{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#b06cff);display:flex;align-items:center;justify-content:center;font-size:.95rem}
+.nav-links{display:flex;align-items:center;gap:16px}
+.nav-links a{color:var(--text-dim);text-decoration:none;font-size:.85rem}
+.nav-links a:hover{color:var(--text)}
+
+/* Hero */
+.hero{padding:56px 32px 40px;text-align:center;background:radial-gradient(ellipse at 50% -20%,rgba(108,99,255,.12),transparent 60%)}
+.hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 40%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.hero p{color:var(--text-dim);font-size:1rem;max-width:560px;margin:0 auto 28px;line-height:1.6}
+.search-wrap{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px}
+.search-wrap input{flex:1;background:none;border:none;color:var(--text);font-size:.95rem}
+.search-wrap input:focus{outline:none}
+.search-wrap input::placeholder{color:var(--text-muted)}
+
+/* Stats */
+.stats{display:flex;justify-content:center;gap:40px;padding:20px 32px;border-bottom:1px solid var(--border)}
+.stat{text-align:center}
+.stat .n{font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent),#b06cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat .l{font-size:.78rem;color:var(--text-muted);margin-top:2px}
+
+/* Categories */
+.cats-wrap{padding:20px 32px;border-bottom:1px solid var(--border);overflow-x:auto}
+.cats{display:flex;gap:8px;min-width:max-content}
+.cat-btn{padding:8px 14px;border-radius:99px;border:1px solid var(--border);background:none;color:var(--text-dim);font-size:.82rem;font-weight:500;transition:all .15s}
+.cat-btn:hover{border-color:var(--accent-dim);color:var(--text)}
+.cat-btn.active{background:var(--accent-dim);border-color:var(--accent-dim);color:#fff}
+
+/* Grid */
+.grid-wrap{padding:28px 32px;max-width:1400px;margin:0 auto}
+.section-title{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.prompts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:36px}
+.no-results{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.no-results .big{font-size:2rem;margin-bottom:10px}
+
+/* Prompt card */
+.p-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .15s,transform .15s;display:flex;flex-direction:column}
+.p-card:hover{border-color:var(--accent-dim);transform:translateY(-2px)}
+.p-card-top{padding:18px 18px 14px}
+.p-card-badges{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.cat-badge{font-size:.68rem;padding:3px 9px;border-radius:99px;font-weight:600;letter-spacing:.03em}
+.p-title{font-size:1rem;font-weight:700;margin-bottom:6px;line-height:1.3}
+.p-desc{font-size:.83rem;color:var(--text-dim);line-height:1.5;margin-bottom:12px}
+.p-preview{font-size:.78rem;color:var(--text-muted);font-family:monospace;background:var(--surface-2);border-radius:7px;padding:10px 12px;line-height:1.6;max-height:80px;overflow:hidden;position:relative}
+.p-preview::after{content:"";position:absolute;bottom:0;left:0;right:0;height:30px;background:linear-gradient(transparent,var(--surface-2))}
+.p-card-bottom{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface-2)}
+.p-card-bottom .tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:.68rem;color:var(--text-muted);background:var(--surface-3);padding:2px 7px;border-radius:99px}
+.btn-copy{padding:7px 13px;background:var(--accent);border:none;color:#fff;border-radius:7px;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:5px;transition:background .15s;white-space:nowrap}
+.btn-copy:hover{background:var(--accent-hover)}
+.btn-copy.copied{background:rgba(66,211,146,.2);color:var(--ok)}
+
+/* Color themes per category */
+.cat-nowa-strona{background:rgba(108,99,255,.18);color:#a095ff}
+.cat-redesign{background:rgba(245,166,35,.15);color:#f5a623}
+.cat-gastronomia{background:rgba(255,107,157,.15);color:#ff6b9d}
+.cat-beauty{background:rgba(255,107,157,.15);color:#ff6b9d}
+.cat-budownictwo{background:rgba(74,179,255,.15);color:#4ab3ff}
+.cat-handel{background:rgba(66,211,146,.15);color:#42d392}
+.cat-edukacja{background:rgba(245,166,35,.15);color:#f5a623}
+.cat-portfolio{background:rgba(176,108,255,.15);color:#b06cff}
+.cat-landing{background:rgba(66,211,146,.15);color:#42d392}
+.cat-custom{background:rgba(255,107,157,.18);color:#ff6b9d}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;z-index:40}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.modal .sub{color:var(--text-dim);font-size:.83rem;margin-bottom:16px}
+.prompt-full{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:monospace;font-size:.8rem;line-height:1.7;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:380px;overflow-y:auto;margin-bottom:16px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.btn-ghost{padding:9px 14px;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:.85rem;font-weight:500}
+.btn-ghost:hover{border-color:var(--accent-dim)}
+
+/* Custom prompt form */
+.add-section{padding:0 32px 40px;max-width:1400px;margin:0 auto}
+.add-box{background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);padding:24px}
+.add-box h3{font-size:1rem;font-weight:700;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.78rem;color:var(--text-dim);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.88rem}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:100px;font-family:monospace;font-size:.82rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* Footer */
+.site-footer{text-align:center;padding:24px;font-size:.8rem;color:var(--text-muted);border-top:1px solid var(--border)}
+.site-footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:640px){
+  .site-header{padding:16px 18px}
+  .hero{padding:36px 18px 28px}
+  .grid-wrap,.add-section{padding-left:18px;padding-right:18px}
+  .stats{gap:24px;padding:16px 18px}
+  .cats-wrap{padding:14px 18px}
+  .two-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand"><span class="dot">📋</span> Biblioteka promptów</div>
+  <nav class="nav-links">
+    <a href="../katalog/">🗂️ CRM</a>
+    <a href="../../">← kolekcja</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Biblioteka promptów www</h1>
+  <p>Gotowe briefe do tworzenia stron — skopiuj, wklej do Claude i zleć budowę strony dla klienta.</p>
+  <div class="search-wrap">
+    🔍 <input type="text" id="searchInput" placeholder="Szukaj po nazwie, branży, słowie kluczowym…">
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat"><div class="n" id="statTotal">0</div><div class="l">promptów łącznie</div></div>
+  <div class="stat"><div class="n" id="statCats">9</div><div class="l">kategorii</div></div>
+  <div class="stat"><div class="n" id="statCustom">0</div><div class="l">własnych</div></div>
+</div>
+
+<div class="cats-wrap">
+  <div class="cats">
+    <button class="cat-btn active" data-cat="all">Wszystkie</button>
+    <button class="cat-btn" data-cat="nowa-strona">🚀 Nowa strona</button>
+    <button class="cat-btn" data-cat="redesign">🔄 Redesign</button>
+    <button class="cat-btn" data-cat="landing">🎯 Landing page</button>
+    <button class="cat-btn" data-cat="gastronomia">🍽️ Gastronomia</button>
+    <button class="cat-btn" data-cat="beauty">💆 Beauty / Zdrowie</button>
+    <button class="cat-btn" data-cat="budownictwo">🏗️ Budownictwo</button>
+    <button class="cat-btn" data-cat="handel">🛍️ Handel / Sklep</button>
+    <button class="cat-btn" data-cat="edukacja">📚 Edukacja</button>
+    <button class="cat-btn" data-cat="portfolio">🎨 Portfolio</button>
+    <button class="cat-btn" data-cat="custom">⭐ Własne</button>
+  </div>
+</div>
+
+<div class="grid-wrap" id="gridWrap"></div>
+
+<div class="add-section">
+  <div class="add-box">
+    <h3>➕ Dodaj własny prompt</h3>
+    <form id="addForm">
+      <div class="two-col">
+        <div class="field"><label>Tytuł promptu *</label><input id="customTitle" placeholder="np. Strona hotelu butikowego" required></div>
+        <div class="field"><label>Kategoria</label>
+          <select id="customCat">
+            <option value="custom">Własne</option>
+            <option value="nowa-strona">Nowa strona</option>
+            <option value="redesign">Redesign</option>
+            <option value="landing">Landing page</option>
+            <option value="gastronomia">Gastronomia</option>
+            <option value="beauty">Beauty / Zdrowie</option>
+            <option value="budownictwo">Budownictwo</option>
+            <option value="handel">Handel / Sklep</option>
+            <option value="edukacja">Edukacja</option>
+            <option value="portfolio">Portfolio</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Krótki opis *</label><input id="customDesc" placeholder="Czego dotyczy ten prompt?" required></div>
+      <div class="field"><label>Treść promptu *</label><textarea id="customPrompt" placeholder="Wklej lub napisz swój prompt..." required></textarea></div>
+      <div style="display:flex;justify-content:flex-end"><button type="submit" class="btn-copy" style="padding:10px 18px;font-size:.88rem">Zapisz prompt →</button></div>
+    </form>
+  </div>
+</div>
+
+<footer class="site-footer">
+  Biblioteka promptów · <a href="../katalog/">CRM</a> · <a href="../../">Kolekcja stron</a>
+</footer>
+
+<div id="modalRoot"></div>
+
+<script>
+(function(){
+"use strict";
+const LS_KEY="prompts_custom_v1";
+
+/* ================================================================
+   PROMPTS DATABASE
+   ================================================================ */
+const PROMPTS=[
+  /* ---- NOWA STRONA ---- */
+  {id:"ns1",cat:"nowa-strona",title:"Strona firmowa — pełna prezentacja",desc:"Kompletna strona firmowa z wszystkimi kluczowymi sekcjami. Idealna do prezentacji firmy usługowej.",tags:["firma","usługi","profesjonalna"],
+  prompt:`nowa strona: [slug-firmy]
+
+Typ: Strona firmowa — pełna prezentacja
+Klient: [Nazwa firmy]
+Branża: [branża]
+Styl: profesjonalny, nowoczesny, zaufanie
+Kolory: [główny], [akcent]
+
+Sekcje:
+• Hero — hasło, podtytuł, 2 CTA przyciski (kontakt + o nas)
+• O firmie — historia, wartości, wyróżniki (3 kolumny z ikonami)
+• Usługi — karty usług z ikoną emoji, tytułem i krótkim opisem
+• Dlaczego my — 4 argumenty (zaufanie, doświadczenie, jakość, szybkość)
+• Realizacje / portfolio — grid z miniaturami i opisami
+• Opinie klientów — slider / grid 3–4 opinii
+• Zespół — karty z nazwiskiem, stanowiskiem, zdjęciem-placeholder
+• Kontakt — formularz (imię, email, telefon, wiadomość) + mapa-placeholder
+• Footer — logo, menu, dane kontaktowe, copyright
+
+Wymagania:
+• Dark theme, tło #0f0f13
+• Smooth scroll, animacje przy scroll (Intersection Observer)
+• Sticky header z efektem blur
+• Mobile-first, responsywny
+• Bez zewnętrznych bibliotek
+• Vanilla HTML/CSS/JS`},
+
+  {id:"ns2",cat:"nowa-strona",title:"One-pager — szybka wizytówka online",desc:"Prosta, elegancka strona wizytówkowa. Gotowa w 1 pliku. Dla freelancerów, małych firm, rzemieślników.",tags:["wizytówka","one-page","szybka"],
+  prompt:`nowa strona: [slug]
+
+Typ: Wizytówka online — one-pager
+Klient: [Imię i nazwisko / nazwa]
+Branża: [branża]
+Styl: minimalistyczny, elegancki, osobisty
+Kolory: [1–2 kolory akcentu]
+
+Sekcje (na jednej stronie, scroll):
+• Hero — imię/nazwa, tagline, avatar-placeholder, socials
+• Czym się zajmuję — 3 obszary w kartach
+• Moje usługi / oferta — prosta lista lub karty
+• Kilka słów o mnie — krótki bio z wyróżnionymi faktami
+• Kontakt — e-mail, telefon, formularz
+
+Wymagania:
+• Bardzo szybka i lekka strona
+• Animacje wejścia dla sekcji
+• Responsywna, piękna na mobile
+• Link powrotny do kolekcji`},
+
+  {id:"ns3",cat:"nowa-strona",title:"Strona agencji / studia kreatywnego",desc:"Dla agencji marketingowych, brandingowych, designerskich. Styl bold, energetyczny, portfolio jako rdzeń.",tags:["agencja","kreatywna","portfolio"],
+  prompt:`nowa strona: [slug-agencji]
+
+Typ: Strona agencji kreatywnej
+Klient: [Nazwa agencji]
+Branża: marketing / design / branding
+Styl: bold, nowoczesny, odważny — duże typografie, kontrast, ruch
+Kolory: [mocny akcent np. elektryczny niebieski lub limonka]
+
+Sekcje:
+• Hero fullscreen — wielki nagłówek (efekt typing lub split), subhero, CTA
+• Reel / showreel — grid prac (placeholder 6–8 projektów) z hover reveal
+• Usługi — lista z ikonami i opisami (identyfikacja wizualna, web design, kampanie, social)
+• Proces pracy — timeline 4 kroków (brief → koncepcja → realizacja → launch)
+• Klienci — logotypy (placeholder rectangles)
+• Kontakt — luźna forma, "Zacznijmy coś razem"
+
+Efekty:
+• Cursor follower lub efekt parallax
+• Smooth page transitions
+• Animowane liczby (lata doświadczenia, projekty, klienci)`},
+
+  {id:"ns4",cat:"nowa-strona",title:"Strona startupu / produktu SaaS",desc:"Landing page dla aplikacji lub startupu. Układ hero → features → social proof → pricing → CTA.",tags:["startup","saas","produkt","tech"],
+  prompt:`nowa strona: [slug-produktu]
+
+Typ: Landing page produktu / startupu
+Klient: [Nazwa produktu]
+Branża: tech / SaaS / aplikacja
+Styl: nowoczesny tech, gradient, glassmorphism akcenty
+Kolory: fiolet/niebieski gradient + biel
+
+Sekcje:
+• Hero — nazwa produktu, 1-zdaniowy opis, mockup-placeholder urządzenia, 2 CTA (Wypróbuj za darmo / Zobacz demo)
+• Social proof — logotypy firm używających produktu + liczby (użytkownicy, NPS, uptime)
+• Features — 3+3 karty funkcji z ikoną, tytułem i opisem
+• Jak to działa — 3-etapowy proces z ilustracjami-placeholder
+• Testimoniale — 3 cytaty z avatar-placeholder
+• Cennik — 3 plany (Free, Pro, Enterprise) z listą cech i CTA
+• FAQ — 5–7 pytań accordion
+• CTA końcowe — "Zacznij za darmo dziś"
+
+Efekty:
+• Gradient mesh background w hero
+• Glassmorphism karty na features
+• Animowane liczniki w social proof`},
+
+  /* ---- REDESIGN ---- */
+  {id:"re1",cat:"redesign",title:"Modernizacja starej strony — dark upgrade",desc:"Stara strona dostaje nowe życie. Ciemny motyw, nowoczesny layout, zachowanie treści klienta.",tags:["modernizacja","dark-theme","upgrade"],
+  prompt:`redesign: [slug]
+
+Typ: Modernizacja istniejącej strony
+Klient: [Nazwa]
+Obecny styl: [stary / przestarzały / jasny / bez responsywności]
+Nowy styl: nowoczesny dark theme, profesjonalny
+
+Wytyczne redesignu:
+• Zachowaj strukturę i treść — zmień tylko design
+• Dark theme: tło #0f0f13, surface #1a1a22, akcent [kolor klienta]
+• Typografia: większa, lepsza hierarchia, system-ui lub Inter
+• Spacing: więcej białej przestrzeni, sekcje jasno oddzielone
+• Mobile: pełna responsywność priorytetem
+• Header: sticky z blur backdrop
+• Animacje: delikatne, wejścia przy scroll
+• Footer: przebuduj na grid z kolumnami
+
+Szczególna uwaga:
+• Formularz kontaktowy musi działać (HTML only, z fetch/mailto fallback)
+• Logo i kolory marki klienta zachowane`},
+
+  {id:"re2",cat:"redesign",title:"Redesign mobile-first — priorytet telefon",desc:"Strona zoptymalizowana przede wszystkim pod mobile. Dla biznesów gdzie 80%+ ruchu to telefony.",tags:["mobile","responsywność","UX"],
+  prompt:`redesign: [slug]-mobile
+
+Typ: Redesign mobile-first
+Klient: [Nazwa]
+Cel: 90%+ ruchu z telefonów — strona musi być idealna na małym ekranie
+
+Priorytety:
+• Rozmiar dotykowych przycisków min. 48×48px
+• Font min. 16px na mobile
+• Sticky bottom bar z kluczowym CTA (Zadzwoń, Wyślij wiadomość)
+• Karty zamiast tabel
+• Hamburger menu z animowanym full-screen overlay
+• Zdjęcia lazy-load, WebP format (placeholders)
+• Brak hover-only interakcji
+
+Sekcje (uproszczone, szybkie ładowanie):
+• Hero z jednym CTA
+• Najważniejsze 3 usługi
+• Dane kontaktowe z click-to-call
+• Mapa placeholder
+• Opinie — carousel na mobile`},
+
+  {id:"re3",cat:"redesign",title:"Konwersja — landing zoptymalizowany pod CTA",desc:"Przeprojektowanie strony pod jedną konwersję. Usuń rozpraszacze, wzmocnij CTA, dodaj social proof.",tags:["konwersja","CTA","landing","sprzedaż"],
+  prompt:`redesign: [slug]-konwersja
+
+Typ: Redesign pod wysoką konwersję
+Klient: [Nazwa]
+Cel konwersji: [np. wypełnienie formularza / zakup / telefon]
+
+Zasady konwersji do zastosowania:
+• Jeden główny CTA powtórzony 3× (hero, środek, footer)
+• Usunięcie menu (lub ograniczenie do minimum)
+• Powyżej folderu: propozycja wartości + CTA + social proof
+• Licznik pilności lub ograniczona oferta (opcjonalnie)
+• Trust signals: certyfikaty, lata doświadczenia, liczba klientów
+• Testimoniale z imię + stanowisko + zdjęcie-placeholder
+• FAQ usuwające obiekcje
+• Formularz max 3 pola
+• Gwarancja / bezpieczeństwo pod formularzem`},
+
+  /* ---- LANDING PAGE ---- */
+  {id:"lp1",cat:"landing",title:"Landing promocyjny — oferta limitowana",desc:"Strona dla jednej oferty, produktu lub akcji czasowej. Maksymalna koncentracja na konwersji.",tags:["promocja","oferta","jednorazowa"],
+  prompt:`nowa strona: [slug-promo]
+
+Typ: Landing page — oferta specjalna
+Klient: [Nazwa]
+Cel: sprzedaż / zapis / kontakt dla jednej konkretnej oferty
+
+Elementy obowiązkowe:
+• Nagłówek z konkretną propozycją wartości (co, dla kogo, co uzyska)
+• Licznik odliczający (CSS animacja, bez JS bibliotek — użyj wartości symbolicznych)
+• 3 bloki z benefitami (ikona emoji + tytuł + zdanie)
+• Social proof: "Zaufało nam X klientów" + 2–3 mini-opinie
+• Formularz: tylko imię + email + CTA "Chcę skorzystać"
+• Gwarancja pod formularzem (np. 30-dni gwarancja satysfakcji)
+• FAQ — 3 pytania z rozwijaniem accordion
+
+Styl:
+• Urgency — ciepłe kolory akcentu (pomarańcz, żółty lub czerwień)
+• Duże, odważne nagłówki
+• Jeden kolor CTA przez całą stronę`},
+
+  {id:"lp2",cat:"landing",title:"Landing eventy / konferencja / webinar",desc:"Strona zapisu na event. Agenda, prelegenci, licznik do daty, formularz rejestracyjny.",tags:["event","konferencja","webinar","zapis"],
+  prompt:`nowa strona: [slug-event]
+
+Typ: Landing page eventu / konferencji / webinaru
+Klient: [Nazwa eventu]
+Data: [data i godzina]
+
+Sekcje:
+• Hero — nazwa eventu, data, miejsce/online, CTA "Zapisz się" + licznik dni/h/min
+• O czym będziemy mówić — 3–5 punktów agendy
+• Prelegenci — karty z avatar-placeholder, imię, stanowisko, firma
+• Program — timeline z godzinami
+• Dla kogo — "Ten event jest dla ciebie jeśli..." (lista)
+• Formularz rejestracji — imię, email, firma, [specyficzne pola]
+• Sponsorzy / partnerzy — loga placeholder
+• FAQ — 4–5 pytań
+
+Styl:
+• Energetyczny, brandowy kolor eventu
+• Licznik jako główny element hero
+• Karty prelegentów z hover efektem`},
+
+  /* ---- GASTRONOMIA ---- */
+  {id:"gas1",cat:"gastronomia",title:"Restauracja / kawiarnia — pełna strona",desc:"Stylowa strona restauracji z menu, galerią, rezerwacją i historią miejsca.",tags:["restauracja","kawiarnia","jedzenie","rezerwacja"],
+  prompt:`nowa strona: [slug-restauracji]
+
+Typ: Strona restauracji / kawiarni
+Klient: [Nazwa restauracji]
+Kuchnia: [rodzaj kuchni]
+Styl miejsca: [klimatyczny / nowoczesny / tradycyjny]
+Kolory: [paleta — np. czerń+złoto / biel+zieleń]
+
+Sekcje:
+• Hero fullscreen — zdjęcie (placeholder), nazwa, hasło, "Zarezerwuj stolik" CTA
+• Historia / O nas — krótka narracja o miejscu, kuchni, filozofii
+• Menu — karty w grupach: przystawki, dania główne, desery, napoje (po 3–4 pozycje z ceną placeholder)
+• Galeria — masonry grid (8–12 zdjęć placeholder z opisami)
+• Wyróżniki — "Świeże składniki", "Własny wypiek", etc. (3 ikony)
+• Rezerwacja — formularz: data, godzina, liczba osób, imię, telefon
+• Opinie Google — 3 opinie 5★
+• Dojazd i godziny — placeholder mapy + godziny otwarcia
+• Footer z adresem i social media
+
+Styl:
+• Ciepłe, apetyczne kolory (złoto, brąz, kremowy)
+• Duże zdjęcia-placeholder z gradient overlay
+• Elegancka typografia serif dla nazw dań`},
+
+  {id:"gas2",cat:"gastronomia",title:"Food delivery / zamówienia online",desc:"Landing do zamawiania jedzenia. Szybkie CTA, popularne pozycje menu, obszar dostawy.",tags:["delivery","zamówienia","fast-food"],
+  prompt:`nowa strona: [slug-delivery]
+
+Typ: Strona zamówień online / food delivery
+Klient: [Nazwa]
+Rodzaj jedzenia: [pizza / sushi / burgery / etc.]
+
+Sekcje:
+• Hero — duże CTA "Zamów teraz", czas dostawy (np. 30 min), minimalny koszt zamówienia
+• Popularne dania — karty 6–8 bestsellerów z ceną i przyciskiem "Dodaj"
+• Kategorie — karty z emoji: 🍕 Pizza, 🍔 Burgery, etc.
+• Obszar dostawy — lista dzielnic / kod pocztowy checker (UI only)
+• Jak zamawiać — 3 kroki z ikonami
+• Opinie klientów — 4 mini-opinie z gwiazdkami
+• App download — sekcja z CTA pobrania aplikacji (placeholder)
+
+Styl:
+• Szybki, energetyczny — czerwień/pomarańcz
+• Duże zdjęcia dań-placeholder
+• Sticky zamów teraz na mobile`},
+
+  {id:"gas3",cat:"gastronomia",title:"Catering / imprezy — strona ofertowa",desc:"Dla firm cateringowych. Oferta na imprezy, wesela, eventy firmowe. Formularz wyceny.",tags:["catering","wesele","imprezy","eventy"],
+  prompt:`nowa strona: [slug-catering]
+
+Typ: Strona firmy cateringowej
+Klient: [Nazwa]
+Specjalizacja: [wesela / eventy firmowe / szkolenia / etc.]
+
+Sekcje:
+• Hero — "Twoje wyjątkowe wydarzenie zasługuje na wyjątkowe jedzenie" + CTA "Wyceń event"
+• Oferta — karty: Wesela, Eventy firmowe, Uroczystości prywatne, Konferencje
+• Nasze menu — próbkowe menu z sekcjami (przystawki zimne, gorące, dania główne, desery)
+• Realizacje — grid zdjęć-placeholder z opisem eventu
+• Jak działamy — 4 kroki: Kontakt → Brief → Menu → Realizacja
+• Dlaczego my — certyfikaty, HACCP, lata doświadczenia, liczba eventów
+• Formularz wyceny — rodzaj eventu, data, liczba gości, budżet, telefon, email
+• Opinie weselne — cytaty par młodych`},
+
+  /* ---- BEAUTY / ZDROWIE ---- */
+  {id:"be1",cat:"beauty",title:"Salon beauty / SPA — strona premium",desc:"Elegancka strona salonu urody lub SPA. Oferta zabiegów, rezerwacja online, cennik.",tags:["salon","SPA","uroda","premium"],
+  prompt:`nowa strona: [slug-salon]
+
+Typ: Strona salonu beauty / SPA
+Klient: [Nazwa salonu]
+Specjalizacja: [makijaż / paznokcie / masaże / kompleksowe]
+Styl: elegancki, kobiecy lub neutralny, premium
+
+Sekcje:
+• Hero — zdjęcie-placeholder atmosferyczne, hasło, "Zarezerwuj wizytę" CTA
+• O salonie — historia, filozofia, wyróżniki (certyfikowane kosmetyki, doświadczony team)
+• Oferta — karty zabiegów w grupach (pielęgnacja twarzy, stylizacja, masaże) z czasem i ceną-placeholder
+• Cennik — tabela/karty z pełną ofertą
+• Galeria efektów — przed/po placeholder lub gallery grid
+• Nasz zespół — karty stylistek z imię, specjalizacja, doświadczenie
+• Opinie — 4 opinie klientek z gwiazdkami
+• Rezerwacja — formularz: usługa, termin, specjalistka (select), imię, telefon, email
+
+Styl:
+• Pastelowe akcenty (róż, nude, złoto) lub dark + gold
+• Delikatne animacje, elegancka typografia
+• Zdjęcia-placeholder z miękkim filtrem`},
+
+  {id:"be2",cat:"beauty",title:"Gabinet medyczny / klinika — profesjonalna",desc:"Strona dla lekarza, kliniki, gabinetu stomatologicznego lub rehabilitacyjnego. Zaufanie i profesjonalizm.",tags:["klinika","lekarz","gabinet","zdrowie"],
+  prompt:`nowa strona: [slug-klinika]
+
+Typ: Strona gabinetu / kliniki medycznej
+Klient: [Dr [Nazwisko] / Nazwa kliniki]
+Specjalizacja: [stomatologia / dermatologia / rehabilitacja / etc.]
+
+Sekcje:
+• Hero — "Twoje zdrowie w dobrych rękach", zdjęcie-placeholder, 2 CTA: Umów wizytę / Poznaj nas
+• Specjalizacje — karty zabiegów/usług z opisem i ikoną medyczną (emoji)
+• O doktorze/klinice — certyfikaty, doświadczenie, wykształcenie, liczba pacjentów
+• Jak wygląda wizyta — 3–4 kroki (rejestracja → wywiad → badanie → plan leczenia)
+• Opinie pacjentów — 3 opinie z gwiazdkami (zgodne z zasadami reklamy medycznej)
+• Cennik orientacyjny — tabela lub zakres cen
+• Formularz rejestracji — specjalność, termin, imię, telefon, email, notatka
+• Dane kliniki — godziny, adres, telefon, formularz kontaktowy
+
+Styl:
+• Czysty, profesjonalny — biel + niebieski lub zieleń
+• Ikony medyczne (emoji)
+• Trust badges — certyfikaty, izby lekarskie`},
+
+  {id:"be3",cat:"beauty",title:"Siłownia / studio fitness — energetyczna",desc:"Strona dla siłowni, studia jogi, crossfit lub trenera personalnego. Energetyczna, motywująca.",tags:["siłownia","fitness","trener","sport"],
+  prompt:`nowa strona: [slug-fitness]
+
+Typ: Strona siłowni / studia fitness
+Klient: [Nazwa]
+Typ: [siłownia / joga / crossfit / trener personalny]
+Styl: energetyczny, motywujący, dark + mocne akcenty
+
+Sekcje:
+• Hero fullscreen — hasło motywacyjne, CTA "Dołącz teraz" + "Bezpłatny trening", bg zdjęcie-placeholder
+• Oferty / karnety — karty 3 planów z ceną i listą benefitów
+• Zajęcia — harmonogram (grid tygodniowy) lub lista zajęć z ikoną, godziną, poziomem
+• Trenerzy — karty z imię, specjalizacja, certyfikaty, zdjęcie-placeholder
+• Sprzęt / obiekty — wyróżniki (m² powierzchni, liczba maszyn, etc.)
+• Efekty klientów — transformacje (before/after placeholder)
+• Bezpłatna próba — duże CTA z formularzem: imię, email, telefon, "Przyjdź na pierwsze darmowe ćwiczenia"
+
+Styl:
+• Dark theme, czerwień lub żółty akcent
+• Duże zdjęcia-placeholder z overlay
+• Animowane liczniki (kg, lat doświadczenia, klientów)`},
+
+  /* ---- BUDOWNICTWO ---- */
+  {id:"bu1",cat:"budownictwo",title:"Firma budowlana / remontowa — solidna",desc:"Strona wykonawcy budowlanego. Realizacje jako główny dowód, formularz wyceny, certyfikaty.",tags:["budownictwo","remont","wykonawca","solidna"],
+  prompt:`nowa strona: [slug-budowlana]
+
+Typ: Strona firmy budowlanej / remontowej
+Klient: [Nazwa firmy]
+Specjalizacja: [budowa domów / remonty / wykończenia / instalacje]
+
+Sekcje:
+• Hero — logo, hasło "Budujemy z pasją od [rok]", CTA "Wycena bezpłatna" + tel.
+• Usługi — karty: Budowa domów, Remonty, Wykończenia, Instalacje (ikony emoji)
+• Realizacje — grid 6–9 zdjęć-placeholder z opisem: nazwa inwestycji, rok, m²
+• Dlaczego my — 4 wyróżniki: Doświadczenie, Terminowość, Gwarancja, Certyfikaty
+• Etapy współpracy — timeline: Wycena → Projekt → Realizacja → Odbiór
+• Certyfikaty i ubezpieczenie — ikony/placeholdery
+• Opinie inwestorów — 3–4 opinie
+• Formularz wyceny — rodzaj prac, m², termin, imię, telefon, email, opis
+
+Styl:
+• Profesjonalny, solidny — granat + złoto / szary + niebieski
+• Realizacje jako główna sekcja (duże zdjęcia)
+• Typografia ciężka, pewna`},
+
+  {id:"bu2",cat:"budownictwo",title:"Architekt / projektant wnętrz — portfolio",desc:"Strona architekta lub projektanta wnętrz. Eleganckie portfolio z case studies, minimalizm.",tags:["architekt","projektant","wnętrza","portfolio"],
+  prompt:`nowa strona: [slug-architekt]
+
+Typ: Strona architekta / projektanta wnętrz
+Klient: [Imię Nazwisko] Architekt
+Styl pracy: [minimalistyczny / skandynawski / nowoczesny / klasyczny]
+
+Sekcje:
+• Hero — imię, tytuł "Architekt / Projektant wnętrz", 1 duże zdjęcie-placeholder, krótkie credo
+• Portfolio — masonry grid projektów (8+), każdy z nazwą, rokiem, metrażem, przyciskiem "Zobacz więcej"
+• O mnie — filozofia projektowania, wykształcenie, doświadczenie, nagrody
+• Usługi — Projekt koncepcyjny, Projekt wykonawczy, Nadzór, Konsultacje
+• Jak pracuję — 5 etapów procesu
+• Klienci — mini-opinie + liczby (projekty, lata, m²)
+• Kontakt — formularz + dostępność + okres oczekiwania na wycenę
+
+Styl:
+• Minimalistyczny, dużo whitespace (dark lub light)
+• Duże zdjęcia portfolio
+• Elegancka typografia`},
+
+  /* ---- HANDEL ---- */
+  {id:"ha1",cat:"handel",title:"Sklep lokalny / butik — prezentacja oferty",desc:"Strona sklepu stacjonarnego lub butiku. Pokazuje ofertę, lokalizację, ceny, promocje.",tags:["sklep","butik","oferta","lokalny"],
+  prompt:`nowa strona: [slug-sklep]
+
+Typ: Strona sklepu / butiku
+Klient: [Nazwa sklepu]
+Branża: [odzież / biżuteria / kwiaciarnia / sklep zoologiczny / etc.]
+Styl: [przyjazny / elegancki / kolorowy]
+
+Sekcje:
+• Hero — zdjęcie sklepu / produktu placeholder, hasło, "Odwiedź nas" lub "Sprawdź ofertę"
+• Nowości / bestsellery — grid 6–8 produktów z ceną-placeholder, kategorią, przyciskiem
+• Kategorie — karty kategorii z ikoną emoji i opisem
+• O sklepie — historia, właściciel (imię), wartości, wyróżniki
+• Promocje — baner/sekcja z aktualną promocją
+• Lokalizacja i godziny — mapa placeholder + pełne godziny, adres, parking
+• Kontakt — telefon, email, messenger
+
+Styl:
+• Ciepły, zachęcający
+• Produkty jako main content
+• Wyraźne ceny i "dodaj do koszyka" UI (bez backendu)`},
+
+  {id:"ha2",cat:"handel",title:"Landing page produktu — sprzedaż bezpośrednia",desc:"Jedna strona, jeden produkt. Maksymalna konwersja. Cechy, opinie, FAQ, CTA wielokrotne.",tags:["produkt","sprzedaż","direct","e-commerce"],
+  prompt:`nowa strona: [slug-produkt]
+
+Typ: Landing page pojedynczego produktu
+Klient: [Nazwa produktu]
+Produkt: [dokładny opis produktu]
+Cel: bezpośrednia sprzedaż lub zapytanie
+
+Sekcje:
+• Hero — nazwa produktu, 3-słowowe hasło, mockup/zdjęcie-placeholder, cena, "Zamów" CTA
+• Cechy — 6 cech produktu (ikona emoji + nazwa + 1 zdanie opisu)
+• Jak to działa / zastosowanie — 3-etapowy opis użycia
+• Dla kogo — "Idealny jeśli..." lista 5–6 punktów
+• Specyfikacja — tabela lub grid z parametrami
+• Opinie — 4–5 opinii z gwiazdkami i zdjęciem-placeholder
+• Często kupowane razem — 2–3 produkty placeholder
+• FAQ — 5 pytań
+• CTA końcowe — "Zamów dziś i otrzymaj w 24h"`},
+
+  /* ---- EDUKACJA ---- */
+  {id:"ed1",cat:"edukacja",title:"Kurs online / webinar — landing zapisu",desc:"Strona sprzedażowa kursu lub szkolenia online. Dla trenerów, coachów, ekspertów.",tags:["kurs","szkolenie","online","coaching"],
+  prompt:`nowa strona: [slug-kurs]
+
+Typ: Landing page kursu / szkolenia online
+Klient: [Imię Nazwisko] — [specjalizacja]
+Temat kursu: [temat]
+Format: [video / webinar / live / hybrid]
+
+Sekcje:
+• Hero — tytuł kursu (duży, konkretny), dla kogo, co osiągniesz, cena, "Zapisz się" CTA
+• Dla kogo — "Ten kurs jest dla ciebie jeśli..." (5 punktów) + "Nie jest dla ciebie jeśli..."
+• Program kursu — accordion lub timeline z modułami i lekcjami
+• Co uzyskasz — 6 konkretnych umiejętności / wyników
+• O mnie / prowadzącym — bio, osiągnięcia, publikacje, zdjęcie-placeholder
+• Opinie absolwentów — 4 opinie z efektami ("Zarobiłem X w Y tygodni po kursie")
+• Cennik — 1–2 warianty z listą zawartości
+• Bonus — co dostajesz dodatkowo
+• Gwarancja — 30-dni gwarancja satysfakcji
+• FAQ — 6 pytań
+• Odliczanie lub "Zostało X miejsc"`,},
+
+  {id:"ed2",cat:"edukacja",title:"Szkoła / centrum edukacyjne — prezentacja",desc:"Strona szkoły językowej, muzycznej, tańca, korepetytora lub centrum edukacyjnego.",tags:["szkoła","nauka","zajęcia","dzieci"],
+  prompt:`nowa strona: [slug-szkola]
+
+Typ: Strona szkoły / centrum edukacyjnego
+Klient: [Nazwa]
+Typ zajęć: [język angielski / muzyka / taniec / korepetycje / etc.]
+
+Sekcje:
+• Hero — "Odkryj swój potencjał z [Nazwa]", CTA "Zapisz się na próbną lekcję", zdjęcie-placeholder
+• Oferta zajęć — karty kursów z poziomem, wiekiem, ceną-placeholder, terminem
+• Dlaczego my — 4 wyróżniki: certyfikowani nauczyciele, mała grupa, elastyczne godziny, gwarancja postępów
+• Nauczyciele — karty z imię, wykształcenie, doświadczenie, certyfikaty
+• Efekty uczniów — osiągnięcia, egzaminy zdane, liczby
+• Harmonogram — tabela lub grid z zajęciami w tygodniu
+• Formularz próbnej lekcji — wiek / poziom, imię, telefon, email, preferowany termin
+• Opinie rodziców / uczniów — 4 opinie`},
+
+  /* ---- PORTFOLIO ---- */
+  {id:"po1",cat:"portfolio",title:"Portfolio fotografa / artysty — wizualne",desc:"Strona fotografa, ilustratora, videographera. Zdjęcia jako główny element, minimalistyczne UI.",tags:["fotograf","artysta","portfolio","wizualne"],
+  prompt:`nowa strona: [slug-fotograf]
+
+Typ: Portfolio wizualne — fotograf / artysta
+Klient: [Imię Nazwisko]
+Specjalizacja: [portrety / ślubna / produktowa / architektura / street]
+Styl: minimalistyczny, ciemny — zdjęcia jako 100% contentu
+
+Sekcje:
+• Hero fullscreen — 1 najlepsze zdjęcie-placeholder, tylko imię i specjalizacja
+• Portfolio — masonry grid lub lightbox gallery (12–16 placeholder)
+• Kategorie — filtry: [kategoria 1], [kategoria 2], [kategoria 3]
+• O mnie — krótki bio (3–4 zdania), sprzęt, filozofia
+• Usługi i cennik — tabela z pakietami: Basic, Standard, Premium
+• Proces — jak wygląda sesja (4 kroki)
+• Kontakt — formularz: rodzaj sesji, data, lokalizacja, budżet, email
+
+Styl:
+• Absolutne minimum UI — maksimum zdjęcia
+• Czarne tło, białe teksty
+• Hover na zdjęciach — delikatne rozjaśnienie`},
+
+  {id:"po2",cat:"portfolio",title:"Portfolio web developer / designer",desc:"Strona dla programisty, web developera lub UX/UI designera. Tech-look, projekty z opisem case study.",tags:["developer","designer","UX","tech"],
+  prompt:`nowa strona: [slug-dev]
+
+Typ: Portfolio web developera / designera
+Klient: [Imię Nazwisko]
+Specjalizacja: [frontend / fullstack / UX/UI / webdesign]
+Stack: [React/Vue/vanilla / Figma / etc.]
+
+Sekcje:
+• Hero — imię, tytuł, 1-zdaniowe "elevator pitch", dostępność (np. "Dostępny od [miesiąc]"), GitHub + LinkedIn ikony
+• Projekty — karty 4–6 projektów: nazwa, krótki opis, technologie (taglify), link demo + kod
+• Umiejętności — grid ikon technologii (emoji jako placeholder) z poziomem biegłości
+• Doświadczenie — timeline: firma / freelance, rola, czas, osiągnięcia
+• O mnie — bio, skąd pasja, hobby-tech, certyfikaty
+• Kontakt — "Zróbmy coś razem", formularz lub bezpośredni email + response time
+
+Styl:
+• Terminal / tech aesthetic lub clean minimal
+• Animacje kodu w tle (opcjonalnie, CSS only)
+• Kolor akcentu: elektryczny zielony, niebieski lub fiolet`},
+];
+
+/* ================================================================
+   CUSTOM PROMPTS (localStorage)
+   ================================================================ */
+const CUSTOM_LS="prompts_custom_v1";
+function loadCustom(){ try{return JSON.parse(localStorage.getItem(CUSTOM_LS)||"[]");}catch(e){return[];} }
+function saveCustom(arr){ localStorage.setItem(CUSTOM_LS,JSON.stringify(arr)); }
+
+let customPrompts=loadCustom();
+let activeCat="all";
+let searchQ="";
+
+/* ================================================================
+   RENDER
+   ================================================================ */
+function allPrompts(){ return [...PROMPTS,...customPrompts.map(p=>({...p,isCustom:true}))];}
+
+function getCatClass(cat){ return`cat-${cat}`; }
+function getCatLabel(cat){
+  const map={nowa:"nowa-strona","nowa-strona":"🚀 Nowa strona",redesign:"🔄 Redesign",landing:"🎯 Landing",gastronomia:"🍽️ Gastronomia",beauty:"💆 Beauty",budownictwo:"🏗️ Budownictwo",handel:"🛍️ Handel",edukacja:"📚 Edukacja",portfolio:"🎨 Portfolio",custom:"⭐ Własne"};
+  return map[cat]||cat;
+}
+
+function filterPrompts(){
+  const q=searchQ.toLowerCase();
+  return allPrompts().filter(p=>{
+    const catMatch=activeCat==="all"||(activeCat==="custom"?p.isCustom:p.cat===activeCat);
+    const textMatch=!q||(p.title+p.desc+(p.tags||[]).join(" ")+p.prompt).toLowerCase().includes(q);
+    return catMatch&&textMatch;
+  });
+}
+
+function render(){
+  const items=filterPrompts();
+  const custom=customPrompts.length;
+  document.getElementById("statTotal").textContent=allPrompts().length;
+  document.getElementById("statCustom").textContent=custom;
+  const wrap=document.getElementById("gridWrap");
+  if(!items.length){
+    wrap.innerHTML=`<div class="no-results"><div class="big">🔍</div><p>Nie znaleziono promptów dla <strong>"${esc(searchQ||activeCat)}"</strong></p></div>`;
+    return;
+  }
+  // group by category
+  const groups={};
+  items.forEach(p=>{const k=p.isCustom?"custom":p.cat;if(!groups[k])groups[k]=[];groups[k].push(p);});
+  const catOrder=["nowa-strona","redesign","landing","gastronomia","beauty","budownictwo","handel","edukacja","portfolio","custom"];
+  let html="";
+  catOrder.forEach(cat=>{
+    if(!groups[cat])return;
+    html+=`<div class="section-title">${getCatLabel(cat)}</div><div class="prompts-grid">`;
+    groups[cat].forEach(p=>{
+      const tags=(p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join("");
+      html+=`
+        <div class="p-card">
+          <div class="p-card-top">
+            <div class="p-card-badges">
+              <span class="cat-badge ${getCatClass(p.isCustom?"custom":p.cat)}">${getCatLabel(p.isCustom?"custom":p.cat)}</span>
+              ${p.isCustom?'<span class="cat-badge cat-custom">własny</span>':""}
+            </div>
+            <div class="p-title">${esc(p.title)}</div>
+            <div class="p-desc">${esc(p.desc)}</div>
+            <div class="p-preview">${esc(p.prompt.slice(0,180))}…</div>
+          </div>
+          <div class="p-card-bottom">
+            <div class="tags">${tags}</div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              ${p.isCustom?`<button class="btn-copy" style="background:rgba(255,92,108,.15);color:#ff5c6c;border:1px solid rgba(255,92,108,.3)" data-del-custom="${p.id}" title="Usuń">🗑</button>`:""}
+              <button class="btn-copy" data-open="${p.id}">Użyj →</button>
+            </div>
+          </div>
+        </div>`;
+    });
+    html+="</div>";
+  });
+  wrap.innerHTML=html;
+}
+
+/* ================================================================
+   EVENTS
+   ================================================================ */
+document.querySelectorAll(".cat-btn").forEach(b=>{
+  b.addEventListener("click",()=>{
+    activeCat=b.dataset.cat;
+    document.querySelectorAll(".cat-btn").forEach(x=>x.classList.toggle("active",x===b));
+    render();
+  });
+});
+
+document.getElementById("searchInput").addEventListener("input",e=>{
+  searchQ=e.target.value;
+  render();
+});
+
+document.getElementById("gridWrap").addEventListener("click",async e=>{
+  const open=e.target.closest("[data-open]");
+  if(open){
+    const id=open.dataset.open;
+    const p=allPrompts().find(x=>x.id===id);
+    if(p) openPromptModal(p);
+    return;
+  }
+  const del=e.target.closest("[data-del-custom]");
+  if(del){
+    const id=del.dataset.delCustom;
+    if(confirm("Usunąć ten prompt?")){
+      customPrompts=customPrompts.filter(p=>p.id!==id);
+      saveCustom(customPrompts);
+      render();
+    }
+  }
+});
+
+function openPromptModal(p){
+  const root=document.getElementById("modalRoot");
+  root.innerHTML=`
+    <div class="modal-bg" id="mbg">
+      <div class="modal">
+        <h3>${esc(p.title)}</h3>
+        <div class="sub">${esc(p.desc)}</div>
+        <div class="prompt-full" id="pfull">${esc(p.prompt)}</div>
+        <div class="modal-actions">
+          <span id="copyOk" style="color:var(--ok);font-size:.83rem;opacity:0;transition:opacity .3s">✅ Skopiowano!</span>
+          <button class="btn-ghost" id="mclose">Zamknij</button>
+          <button class="btn-copy" id="mcopy">📋 Kopiuj prompt</button>
+        </div>
+      </div>
+    </div>`;
+  const close=()=>root.innerHTML="";
+  document.getElementById("mclose").addEventListener("click",close);
+  document.getElementById("mbg").addEventListener("click",e=>{if(e.target.id==="mbg")close();});
+  document.getElementById("mcopy").addEventListener("click",async()=>{
+    try{await navigator.clipboard.writeText(p.prompt);}catch(err){prompt("Skopiuj:",p.prompt);return;}
+    const ok=document.getElementById("copyOk");ok.style.opacity="1";setTimeout(()=>ok.style.opacity="0",2000);
+  });
+}
+
+document.getElementById("addForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const title=document.getElementById("customTitle").value.trim();
+  const cat=document.getElementById("customCat").value;
+  const desc=document.getElementById("customDesc").value.trim();
+  const prompt=document.getElementById("customPrompt").value.trim();
+  if(!title||!desc||!prompt)return;
+  const newP={id:"c-"+Date.now(),cat,title,desc,tags:[],prompt,isCustom:true};
+  customPrompts.unshift(newP);
+  saveCustom(customPrompts);
+  e.target.reset();
+  // switch to custom tab if not all
+  activeCat="all";
+  document.querySelectorAll(".cat-btn").forEach(b=>b.classList.toggle("active",b.dataset.cat==="all"));
+  render();
+  document.getElementById("gridWrap").scrollIntoView({behavior:"smooth"});
+});
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* INIT */
+render();
+})();
+</script>
+</body>
+</html>

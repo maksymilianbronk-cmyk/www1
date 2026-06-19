@@ -29,4 +29,12 @@ const SITES = [
     tag: "crm",
     preview: false,
   },
+  {
+    slug: "prompty",
+    title: "Biblioteka promptów",
+    desc: "Gotowe prompty do tworzenia stron: nowe projekty, redesign, branże i własna baza wiedzy.",
+    icon: "💡",
+    tag: "narzędzie",
+    preview: false,
+  },
 ];
