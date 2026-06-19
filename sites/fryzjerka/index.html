@@ -6,21 +6,29 @@
   <title>Atelier Noir — Salon Fryzjerski Warszawa</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&family=Playfair+Display+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;1,6..96,400;1,6..96,600&family=DM+Sans:wght@300;400;500&family=Playfair+Display+SC:wght@400&display=swap" rel="stylesheet">
   <style>
-    /* ──────────────────────────────── TOKENS ── */
+    /* ═══════════════════════════════════════════
+       DESIGN SYSTEM
+       Paleta: aksamitna czerń #09080c + antyczne złoto #c8a870
+       + zgaszona różowa #c9a4a0 (kobiecość bez kiczu)
+       Typografia: Bodoni Moda (haute couture display)
+                   + DM Sans (ciepły, lifestyle body)
+    ═══════════════════════════════════════════ */
     :root {
-      --bg:       #080706;
-      --surface:  #0f0e0c;
-      --surface2: #181512;
-      --gold:     #d4af70;
-      --gold-dim: #6a5530;
-      --gold-faint: rgba(212,175,112,.08);
-      --cream:    #f2ede2;
-      --dim:      #6a6660;
-      --dim2:     #3a3830;
-      --border:   #242018;
-      --white:    #ffffff;
+      --bg:         #09080c;
+      --surface:    #0e0d11;
+      --surface2:   #151319;
+      --gold:       #c8a870;
+      --gold-dim:   #5e4e28;
+      --gold-glow:  rgba(200,168,112,.12);
+      --rose:       #c9a4a0;
+      --rose-dim:   rgba(201,164,160,.15);
+      --cream:      #f2ede4;
+      --dim:        #68645c;
+      --dim2:       #302e2a;
+      --border:     #1e1c18;
+      --white:      #ffffff;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,7 +37,7 @@
     body {
       background: var(--bg);
       color: var(--cream);
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'DM Sans', system-ui, sans-serif;
       font-weight: 300;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
@@ -37,7 +45,7 @@
 
     img { display: block; }
 
-    /* ──────────────────────────────── NAV ── */
+    /* ═══════════ NAV ═══════════ */
     .nav {
       position: fixed;
       inset: 0 0 auto;
@@ -51,17 +59,17 @@
     }
 
     .nav.stuck {
-      padding: 16px 64px;
-      background: rgba(8,7,6,.92);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      padding: 15px 64px;
+      background: rgba(9,8,12,.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border-color: var(--border);
     }
 
     .nav-logo {
       font-family: 'Playfair Display SC', serif;
-      font-size: 1.12rem;
-      letter-spacing: .2em;
+      font-size: 1.1rem;
+      letter-spacing: .22em;
       color: var(--cream);
       text-decoration: none;
     }
@@ -73,8 +81,8 @@
     }
 
     .nav-links a {
-      font-size: .66rem;
-      letter-spacing: .24em;
+      font-size: .64rem;
+      letter-spacing: .26em;
       text-transform: uppercase;
       color: var(--dim);
       text-decoration: none;
@@ -84,7 +92,7 @@
     .nav-links a:hover { color: var(--cream); }
 
     .nav-btn {
-      font-size: .66rem;
+      font-size: .64rem;
       letter-spacing: .2em;
       text-transform: uppercase;
       padding: 10px 26px;
@@ -96,7 +104,11 @@
 
     .nav-btn:hover { background: var(--gold); color: var(--bg); }
 
-    /* ──────────────────────────────── HERO ── */
+    /* ═══════════ HERO ═══════════
+       Full-bleed, gradient overlay.
+       Tytuł używa "line reveal" — klasa haute couture:
+       overflow: hidden na .rl, tekst wjeżdża od dołu.
+    ═══════════════════════════════ */
     .hero {
       position: relative;
       min-height: 100vh;
@@ -105,6 +117,7 @@
       overflow: hidden;
     }
 
+    /* Zdjęcie tła */
     .hero-bg {
       position: absolute;
       inset: 0;
@@ -115,20 +128,31 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.5) contrast(1.1) saturate(.85);
-      transition: transform 12s ease;
+      filter: brightness(.45) contrast(1.12) saturate(.78);
+      transition: transform 14s ease;
     }
 
-    .hero:hover .hero-bg img { transform: scale(1.05); }
+    .hero:hover .hero-bg img { transform: scale(1.04); }
 
-    /* gradient: dark left to transparent right */
+    /* Gradient — ciemno po lewej/dole, transparentny po prawej */
     .hero-bg::after {
       content: '';
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(to right,  rgba(8,7,6,.96) 0%, rgba(8,7,6,.72) 42%, rgba(8,7,6,.2) 68%, transparent 100%),
-        linear-gradient(to top,    rgba(8,7,6,.88) 0%, transparent 40%);
+        linear-gradient(to right,  rgba(9,8,12,.96) 0%, rgba(9,8,12,.7) 44%, rgba(9,8,12,.18) 72%, transparent 100%),
+        linear-gradient(to top,    rgba(9,8,12,.92) 0%, transparent 42%);
+    }
+
+    /* Grain texture — dodaje głębię i taktylność */
+    .hero-grain {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: .032;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
     }
 
     .hero-content {
@@ -139,14 +163,16 @@
     }
 
     .hero-eyebrow {
-      font-size: .64rem;
-      letter-spacing: .34em;
+      font-size: .6rem;
+      letter-spacing: .38em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 28px;
+      margin-bottom: 36px;
       display: flex;
       align-items: center;
       gap: 14px;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .2s;
     }
 
     .hero-eyebrow::before {
@@ -157,32 +183,60 @@
       background: var(--gold);
     }
 
+    /* Kontener jednej linii tytułu — overflow:hidden tworzy "kurtynę" */
     .hero-h1 {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Bodoni Moda', serif;
       font-size: clamp(5.5rem, 10.5vw, 12rem);
-      font-weight: 300;
-      line-height: .88;
-      letter-spacing: -.025em;
-      margin-bottom: 40px;
+      font-weight: 400;
+      line-height: .9;
+      letter-spacing: -.02em;
+      margin-bottom: 44px;
     }
 
-    .hero-h1 em {
+    .rl {
+      display: block;
+      overflow: hidden;
+      padding-bottom: .08em; /* zapobiega ucięciu dolnych descenderów */
+    }
+
+    /* Tekst wjeżdża od dołu — line reveal (Chanel, LV style) */
+    .rl-inner {
+      display: inline-block;
+      transform: translateY(115%);
+      animation: lineReveal 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: var(--d, 0s);
+    }
+
+    .rl-inner em {
       font-style: italic;
       color: var(--gold);
     }
 
+    @keyframes lineReveal {
+      to { transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: none; }
+    }
+
     .hero-lead {
-      font-size: .92rem;
-      line-height: 1.9;
+      font-size: .9rem;
+      line-height: 1.95;
       color: var(--dim);
-      max-width: 380px;
-      margin-bottom: 56px;
+      max-width: 360px;
+      margin-bottom: 52px;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards .9s;
     }
 
     .hero-cta {
       display: flex;
       gap: 28px;
       align-items: center;
+      opacity: 0;
+      animation: fadeUp .8s ease forwards 1.1s;
     }
 
     .btn-gold {
@@ -195,6 +249,7 @@
       text-transform: uppercase;
       font-weight: 400;
       text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
       transition: opacity .2s;
     }
 
@@ -216,103 +271,38 @@
     .btn-ghost:hover { color: var(--cream); }
     .btn-ghost:hover span { transform: translateX(5px); }
 
-    /* scroll indicator — bottom right of hero */
     .hero-scroll {
       position: absolute;
       bottom: 48px;
-      right: 72px;
+      right: 64px;
       z-index: 3;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      font-size: .58rem;
-      letter-spacing: .28em;
+      font-size: .56rem;
+      letter-spacing: .3em;
       text-transform: uppercase;
       color: var(--dim);
+      opacity: 0;
+      animation: fadeUp .8s ease forwards 1.4s;
     }
 
     .scroll-line {
       width: 1px;
-      height: 56px;
+      height: 52px;
       background: linear-gradient(to bottom, var(--gold), transparent);
-      animation: lineAnim 2.4s ease-in-out infinite;
+      animation: linePulse 2.4s ease-in-out infinite;
     }
 
-    @keyframes lineAnim {
-      0%,100% { opacity:.3; transform: scaleY(.7); }
-      50%      { opacity:1;  transform: scaleY(1); }
+    @keyframes linePulse {
+      0%,100% { opacity: .3; transform: scaleY(.65); }
+      50%      { opacity: 1;  transform: scaleY(1); }
     }
 
-    /* ──────────────────────────────── MARQUEE ── */
-    .marquee-strip {
-      overflow: hidden;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      padding: 16px 0;
-    }
-
-    .marquee-track {
-      display: flex;
-      animation: marquee 32s linear infinite;
-      white-space: nowrap;
-    }
-
-    .m-item {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem;
-      font-style: italic;
-      font-weight: 300;
-      color: var(--dim);
-      padding-left: 80px;
-      flex-shrink: 0;
-    }
-
-    .m-sep {
-      display: inline-block;
-      color: var(--gold);
-      margin-left: 80px;
-    }
-
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    /* ──────────────────────────────── ABOUT ── */
-    .about {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .about-photo {
-      position: relative;
-      overflow: hidden;
-      min-height: 620px;
-    }
-
-    .about-photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(.75) saturate(.8);
-      transition: transform .8s ease;
-    }
-
-    .about-photo:hover img { transform: scale(1.04); }
-
-    .about-body {
-      background: var(--surface);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 96px 88px;
-    }
-
-    /* ──────────── shared typography ── */
+    /* ═══════════ SHARED ═══════════ */
     .label {
-      font-size: .62rem;
+      font-size: .6rem;
       letter-spacing: .36em;
       text-transform: uppercase;
       color: var(--gold);
@@ -335,9 +325,9 @@
     .label.center::before { display: none; }
 
     .sec-h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(2.4rem, 4vw, 4.4rem);
-      font-weight: 300;
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(2.4rem, 4vw, 4.6rem);
+      font-weight: 400;
       line-height: 1.05;
       letter-spacing: -.015em;
       margin-bottom: 30px;
@@ -345,99 +335,147 @@
 
     .sec-h2 em { font-style: italic; color: var(--gold); }
 
-    .body-text {
-      font-size: .88rem;
-      line-height: 1.9;
-      color: var(--dim);
-      margin-bottom: 18px;
-      max-width: 420px;
+    /* ═══════════ GALLERY REEL ═══════════
+       Pozioma galeria drag-to-scroll (portretowa 3:4)
+       Tworzy "przewijaj żeby zobaczyć więcej" efekt
+       który jest bardziej editorial niż statyczny grid.
+    ═══════════════════════════════════════ */
+    .gallery-wrap {
+      padding: 100px 0 80px;
     }
 
-    .stats {
+    .gallery-hd {
+      padding: 0 72px 52px;
+    }
+
+    .gallery-reel {
       display: flex;
-      gap: 52px;
-      margin-top: 44px;
-      padding-top: 36px;
-      border-top: 1px solid var(--border);
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 0 72px 20px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      cursor: grab;
+      user-select: none;
     }
 
-    .stat-val {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3.4rem;
-      font-weight: 300;
-      line-height: 1;
+    .gallery-reel::-webkit-scrollbar { display: none; }
+    .gallery-reel.grabbing { cursor: grabbing; }
+
+    .reel-item {
+      position: relative;
+      flex-shrink: 0;
+      width: clamp(220px, 22vw, 320px);
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      scroll-snap-align: start;
     }
 
-    .stat-lbl {
-      font-size: .62rem;
-      letter-spacing: .16em;
+    .reel-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(.78) saturate(.75) contrast(1.06);
+      transition: transform .65s ease, filter .45s ease;
+      pointer-events: none;
+    }
+
+    .gallery-reel.grabbing .reel-item img { transition: none; }
+
+    .reel-item:hover img {
+      transform: scale(1.06);
+      filter: brightness(.9) saturate(1) contrast(1.06);
+    }
+
+    .reel-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 56px 20px 20px;
+      background: linear-gradient(to top, rgba(9,8,12,.88) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity .4s;
+    }
+
+    .reel-item:hover .reel-overlay { opacity: 1; }
+
+    .reel-cap {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--cream);
+    }
+
+    /* Subtelna wskazówka do scrollowania */
+    .reel-hint {
+      text-align: center;
+      font-size: .6rem;
+      letter-spacing: .22em;
       text-transform: uppercase;
-      color: var(--dim);
-      margin-top: 6px;
+      color: var(--dim2);
+      margin-top: 16px;
+      padding: 0 72px;
     }
 
-    /* ──────────────────────────────── SERVICES ── */
+    /* ═══════════ SERVICES ═══════════ */
     .services {
-      padding: 120px 64px;
+      padding: 100px 72px;
       max-width: 1320px;
       margin: 0 auto;
     }
 
     .services-hd {
       text-align: center;
-      margin-bottom: 80px;
+      margin-bottom: 72px;
     }
 
-    /* Full-width horizontal list */
-    .svc-list {
-      display: flex;
-      flex-direction: column;
-    }
+    .svc-list { display: flex; flex-direction: column; }
 
     .svc-row {
       display: grid;
-      grid-template-columns: 100px 1fr auto;
+      grid-template-columns: 80px 1fr auto;
       align-items: center;
       gap: 40px;
-      padding: 36px 0;
+      padding: 32px 0;
       border-top: 1px solid var(--border);
       position: relative;
-      transition: background .25s;
       cursor: default;
     }
 
     .svc-row:last-child { border-bottom: 1px solid var(--border); }
 
+    /* złoty pasek po lewej wysuwa się na hover */
     .svc-row::before {
       content: '';
       position: absolute;
       left: 0; top: 0; bottom: 0;
-      width: 0;
-      background: var(--gold-faint);
-      transition: width .35s ease;
+      width: 2px;
+      background: var(--gold);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform .4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .svc-row:hover::before { width: 100%; }
+    .svc-row:hover::before { transform: scaleY(1); }
 
     .svc-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 4.5rem;
-      font-weight: 300;
+      font-family: 'Bodoni Moda', serif;
+      font-size: 3.2rem;
+      font-weight: 400;
       color: var(--dim2);
       line-height: 1;
       user-select: none;
-      transition: color .25s;
+      transition: color .3s;
+      text-align: right;
     }
 
     .svc-row:hover .svc-num { color: var(--gold-dim); }
 
-    .svc-main {}
-
     .svc-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.6rem, 2.5vw, 2.4rem);
-      font-weight: 300;
-      line-height: 1.15;
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(1.5rem, 2.4vw, 2.4rem);
+      font-weight: 400;
+      line-height: 1.1;
       margin-bottom: 6px;
       transition: color .25s;
     }
@@ -445,8 +483,8 @@
     .svc-row:hover .svc-name { color: var(--white); }
 
     .svc-desc {
-      font-size: .83rem;
-      line-height: 1.75;
+      font-size: .84rem;
+      line-height: 1.8;
       color: var(--dim);
       max-width: 520px;
     }
@@ -456,116 +494,150 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 8px;
+      gap: 6px;
+      min-width: 120px;
     }
 
     .svc-price {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1.3rem;
+      font-style: italic;
       color: var(--gold);
     }
 
     .svc-arrow {
-      font-size: .72rem;
+      font-size: .62rem;
       letter-spacing: .2em;
       color: var(--dim);
       opacity: 0;
-      transform: translateX(-6px);
+      transform: translateX(-8px);
       transition: opacity .25s, transform .25s;
     }
 
     .svc-row:hover .svc-arrow { opacity: 1; transform: none; }
 
-    /* ──────────────────────────────── GALLERY ── */
-    .gallery-wrap {
-      padding-bottom: 120px;
-    }
-
-    .gallery-hd {
-      padding: 88px 72px 56px;
-    }
-
-    .gallery-grid {
+    /* ═══════════ ABOUT ═══════════ */
+    .about {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-template-rows: 340px 340px;
-      gap: 4px;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--border);
     }
 
-    .gal {
-      overflow: hidden;
+    .about-photo {
       position: relative;
+      overflow: hidden;
+      min-height: 620px;
     }
 
-    .gal img {
+    .about-photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.8) saturate(.75) contrast(1.05);
-      transition: transform .7s ease, filter .5s ease;
+      filter: brightness(.72) saturate(.78);
+      transition: transform .8s ease;
     }
 
-    .gal:hover img {
-      transform: scale(1.08);
-      filter: brightness(.9) saturate(1) contrast(1.05);
-    }
+    .about-photo:hover img { transform: scale(1.04); }
 
-    /* hover caption overlay */
-    .gal-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(8,7,6,.82) 0%, rgba(8,7,6,.1) 50%, transparent 100%);
+    .about-body {
+      background: var(--surface);
       display: flex;
-      align-items: flex-end;
-      padding: 22px 20px;
-      opacity: 0;
-      transition: opacity .4s ease;
+      flex-direction: column;
+      justify-content: center;
+      padding: 96px 88px;
     }
 
-    .gal:hover .gal-overlay { opacity: 1; }
+    .body-text {
+      font-size: .88rem;
+      line-height: 1.95;
+      color: var(--dim);
+      margin-bottom: 18px;
+      max-width: 420px;
+    }
 
-    .gal-caption {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1rem;
+    /* Różowy akcent — pull-quote */
+    .pull-quote {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1.15rem;
       font-style: italic;
-      color: var(--cream);
-      letter-spacing: .04em;
+      color: var(--rose);
+      border-left: 2px solid var(--rose);
+      padding-left: 20px;
+      margin: 28px 0;
+      line-height: 1.6;
     }
 
-    .gal:nth-child(1) { grid-column: span 5; grid-row: span 2; }
-    .gal:nth-child(2) { grid-column: span 4; }
-    .gal:nth-child(3) { grid-column: span 3; }
-    .gal:nth-child(4) { grid-column: span 3; }
-    .gal:nth-child(5) { grid-column: span 4; }
+    .stats {
+      display: flex;
+      gap: 48px;
+      margin-top: 40px;
+      padding-top: 36px;
+      border-top: 1px solid var(--border);
+    }
 
-    /* ──────────────────────────────── TESTIMONIALS ── */
+    .stat-val {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 3.4rem;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .stat-lbl {
+      font-size: .6rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: 6px;
+    }
+
+    /* ═══════════ TESTIMONIALS ═══════════
+       Duży dekoracyjny cudzysłów w tle —
+       zamiast zwykłego CSS ::before.
+    ═══════════════════════════════════════ */
     .testimonials {
       background: var(--surface);
       padding: 120px 56px;
       text-align: center;
+      position: relative;
+      overflow: hidden;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
     }
 
+    /* Dekoracyjny wielki cudzysłów */
+    .testimonials::before {
+      content: '\201C';
+      font-family: 'Bodoni Moda', serif;
+      font-size: 32rem;
+      line-height: .7;
+      color: var(--dim2);
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+
+    .testimonials > * { position: relative; z-index: 1; }
+
     .t-quote {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.6rem, 3vw, 2.8rem);
-      font-weight: 300;
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(1.5rem, 2.8vw, 2.6rem);
+      font-weight: 400;
       font-style: italic;
       line-height: 1.5;
-      max-width: 860px;
-      margin: 48px auto 0;
+      max-width: 840px;
+      margin: 44px auto 0;
       transition: opacity .3s;
     }
 
-    .t-quote::before { content: '\201E'; color: var(--gold); }
-    .t-quote::after  { content: '\201D'; color: var(--gold); }
-
     .t-author {
-      font-size: .68rem;
-      letter-spacing: .24em;
+      font-size: .66rem;
+      letter-spacing: .26em;
       text-transform: uppercase;
-      color: var(--dim);
+      color: var(--rose);
       margin-top: 28px;
       transition: opacity .3s;
     }
@@ -587,27 +659,24 @@
 
     .t-dot.on { background: var(--gold); }
 
-    /* ──────────────────────────────── TEAM ── */
+    /* ═══════════ TEAM ═══════════ */
     .team {
-      padding: 120px 64px;
+      padding: 112px 72px;
       max-width: 1320px;
       margin: 0 auto;
     }
 
-    .team-hd { margin-bottom: 72px; }
+    .team-hd { margin-bottom: 68px; }
 
     .team-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
+      gap: 28px;
     }
 
-    .team-card {}
-
-    /* photo with name overlay */
     .team-photo {
       position: relative;
-      aspect-ratio: 3/4;
+      aspect-ratio: 3 / 4;
       overflow: hidden;
       margin-bottom: 0;
     }
@@ -616,58 +685,55 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: grayscale(.4) brightness(.8);
+      filter: grayscale(.45) brightness(.78);
       transition: transform .7s ease, filter .5s ease;
     }
 
     .team-card:hover .team-photo img {
       transform: scale(1.05);
-      filter: grayscale(0) brightness(.9);
+      filter: grayscale(0) brightness(.88);
     }
 
-    .team-name-overlay {
+    .team-overlay {
       position: absolute;
       bottom: 0; left: 0; right: 0;
       padding: 64px 24px 24px;
-      background: linear-gradient(to top, rgba(8,7,6,.9) 0%, rgba(8,7,6,.4) 60%, transparent 100%);
-      transform: translateY(8px);
+      background: linear-gradient(to top, rgba(9,8,12,.92) 0%, rgba(9,8,12,.3) 60%, transparent 100%);
+      transform: translateY(10px);
       opacity: 0;
-      transition: transform .45s ease, opacity .45s ease;
+      transition: transform .5s ease, opacity .5s ease;
     }
 
-    .team-card:hover .team-name-overlay {
-      transform: none;
-      opacity: 1;
-    }
+    .team-card:hover .team-overlay { transform: none; opacity: 1; }
 
     .team-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem;
-      font-weight: 300;
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
       color: var(--cream);
     }
 
     .team-role {
-      font-size: .62rem;
+      font-size: .6rem;
       letter-spacing: .22em;
       text-transform: uppercase;
-      color: var(--gold);
-      margin-top: 4px;
+      color: var(--rose);
+      margin-top: 5px;
     }
 
     .team-bio {
       font-size: .82rem;
       line-height: 1.8;
       color: var(--dim);
-      margin-top: 18px;
-      padding: 18px 0 0;
+      margin-top: 16px;
+      padding: 16px 0 0;
       border-top: 1px solid var(--border);
     }
 
-    /* ──────────────────────────────── BOOKING ── */
+    /* ═══════════ BOOKING CTA ═══════════ */
     .booking {
       position: relative;
-      min-height: 60vh;
+      min-height: 62vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -684,7 +750,17 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(.22) saturate(.4);
+      filter: brightness(.2) saturate(.35);
+    }
+
+    /* Grain na booking też */
+    .booking-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: .025;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
     }
 
     .booking-inner {
@@ -694,20 +770,43 @@
     }
 
     .booking-h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3.5rem, 8vw, 9rem);
-      font-weight: 300;
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(3.5rem, 8vw, 9.5rem);
+      font-weight: 400;
       line-height: .9;
-      margin: 28px 0 48px;
+      margin: 28px 0 20px;
+      letter-spacing: -.015em;
     }
 
     .booking-h2 em { font-style: italic; color: var(--gold); }
 
+    /* Urgency — subtelnie, nie agresywnie */
+    .booking-urgency {
+      font-size: .66rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .booking-urgency::before,
+    .booking-urgency::after {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--rose);
+    }
+
     .booking-sub {
       font-size: .88rem;
-      line-height: 1.85;
+      line-height: 1.9;
       color: var(--dim);
-      max-width: 440px;
+      max-width: 420px;
       margin: 0 auto 52px;
     }
 
@@ -719,7 +818,7 @@
       flex-wrap: wrap;
     }
 
-    /* ──────────────────────────────── FOOTER ── */
+    /* ═══════════ FOOTER ═══════════ */
     .footer {
       background: var(--surface);
       border-top: 1px solid var(--border);
@@ -729,14 +828,14 @@
     .footer-grid {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 56px;
-      margin-bottom: 64px;
+      gap: 52px;
+      margin-bottom: 60px;
     }
 
     .f-brand {
       font-family: 'Playfair Display SC', serif;
       font-size: 1.6rem;
-      letter-spacing: .14em;
+      letter-spacing: .15em;
       margin-bottom: 14px;
     }
 
@@ -748,19 +847,14 @@
     }
 
     .f-col-title {
-      font-size: .6rem;
-      letter-spacing: .32em;
+      font-size: .58rem;
+      letter-spacing: .34em;
       text-transform: uppercase;
       color: var(--gold);
       margin-bottom: 22px;
     }
 
-    .f-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    .f-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
 
     .f-links a {
       font-size: .84rem;
@@ -777,74 +871,76 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: .74rem;
+      font-size: .72rem;
       color: var(--dim);
     }
 
     .footer-bottom a { color: #6c63ff; text-decoration: none; }
     .footer-bottom a:hover { text-decoration: underline; }
 
-    /* ──────────────────────────────── REVEAL ── */
+    /* ═══════════ SCROLL REVEAL ═══════════ */
     .rv {
       opacity: 0;
-      transform: translateY(32px);
+      transform: translateY(30px);
       transition: opacity .8s ease, transform .8s ease;
     }
 
-    .rv.rl { transform: translateX(-32px); }  /* from left */
-    .rv.rr { transform: translateX(32px); }   /* from right */
-
+    .rv.rl { transform: translateX(-30px); }
+    .rv.rr { transform: translateX(30px); }
     .rv.in { opacity: 1; transform: none; }
 
     .rv.d1 { transition-delay: .1s; }
-    .rv.d2 { transition-delay: .2s; }
-    .rv.d3 { transition-delay: .32s; }
-    .rv.d4 { transition-delay: .44s; }
+    .rv.d2 { transition-delay: .22s; }
+    .rv.d3 { transition-delay: .34s; }
+    .rv.d4 { transition-delay: .46s; }
 
-    /* ──────────────────────────────── RESPONSIVE ── */
+    /* ═══════════ RESPONSIVE ═══════════ */
     @media (max-width: 1100px) {
       .nav-links { display: none; }
       .nav, .nav.stuck { padding: 18px 36px; }
       .hero-content { padding: 0 40px 80px; }
-      .hero-scroll { right: 40px; bottom: 40px; }
+      .hero-scroll { right: 40px; }
+      .gallery-hd { padding: 0 40px 48px; }
+      .gallery-reel { padding: 0 40px 20px; }
+      .reel-hint { padding: 0 40px; }
+      .services { padding: 80px 36px; }
+      .svc-row { grid-template-columns: 64px 1fr auto; gap: 24px; }
+      .svc-num { font-size: 2.4rem; }
       .about { grid-template-columns: 1fr; }
       .about-photo { min-height: 60vw; }
       .about-body { padding: 64px 44px; }
-      .services { padding: 88px 36px; }
-      .svc-row { grid-template-columns: 72px 1fr auto; gap: 24px; }
-      .svc-num { font-size: 3.2rem; }
-      .gallery-hd { padding: 72px 44px 44px; }
-      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
-      .gal { height: 280px; grid-column: span 1 !important; grid-row: span 1 !important; }
       .team { padding: 88px 36px; }
-      .team-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
-      .footer { padding: 64px 44px 28px; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .footer { padding: 64px 40px 28px; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
     }
 
     @media (max-width: 700px) {
-      .hero-h1 { font-size: clamp(3.5rem, 14vw, 6rem); }
+      .hero-h1 { font-size: clamp(3.6rem, 14vw, 6rem); }
       .hero-content { padding: 0 28px 72px; }
       .hero-scroll { display: none; }
       .hero-lead { max-width: 100%; }
-      .about-body { padding: 52px 28px; }
+      .gallery-wrap { padding: 72px 0 56px; }
+      .gallery-hd { padding: 0 24px 36px; }
+      .gallery-reel { padding: 0 24px 16px; }
+      .reel-hint { padding: 0 24px; }
+      .reel-item { width: 68vw; }
       .services { padding: 72px 20px; }
-      .svc-row { grid-template-columns: 56px 1fr; gap: 16px; padding: 28px 0; }
+      .svc-row { grid-template-columns: 52px 1fr; gap: 16px; padding: 26px 0; }
       .svc-price-col { display: none; }
-      .svc-num { font-size: 2.4rem; }
-      .gallery-hd { padding: 64px 28px 36px; }
-      .gal { height: 220px; }
-      .gallery-grid { gap: 3px; }
+      .svc-num { font-size: 2rem; text-align: left; }
+      .about-body { padding: 52px 24px; }
       .testimonials { padding: 88px 28px; }
+      .testimonials::before { font-size: 18rem; }
       .team { padding: 72px 20px; }
       .team-grid { grid-template-columns: 1fr; }
-      .booking-inner { padding: 72px 28px; }
+      .booking-inner { padding: 72px 24px; }
       .booking-actions { flex-direction: column; }
-      .nav-btn { display: none; }
-      .footer { padding: 52px 28px 24px; }
+      .footer { padding: 52px 24px 24px; }
       .footer-grid { grid-template-columns: 1fr; gap: 32px; }
       .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
       .stats { gap: 28px; }
+      .nav-btn { display: none; }
     }
   </style>
 </head>
@@ -854,30 +950,31 @@
   <nav class="nav" id="nav">
     <a class="nav-logo" href="#top">Atelier Noir</a>
     <ul class="nav-links">
-      <li><a href="#studio">Studio</a></li>
-      <li><a href="#uslugi">Usługi</a></li>
       <li><a href="#galeria">Galeria</a></li>
+      <li><a href="#uslugi">Usługi</a></li>
+      <li><a href="#studio">Studio</a></li>
       <li><a href="#zespol">Zespół</a></li>
     </ul>
     <a class="nav-btn" href="#rezerwacja">Zarezerwuj</a>
   </nav>
 
-  <!-- HERO — full bleed z gradientem -->
+  <!-- HERO -->
   <section class="hero" id="top">
     <div class="hero-bg">
       <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1800&auto=format&fit=crop&q=88" alt="">
     </div>
+    <div class="hero-grain" aria-hidden="true"></div>
     <div class="hero-content">
-      <p class="hero-eyebrow rv">Warszawa · Prestiżowy Salon Fryzjerski</p>
-      <h1 class="hero-h1 rv d1">
-        Sztuka<br>
-        <em>Twojego</em><br>
-        włosa.
+      <p class="hero-eyebrow">Warszawa · Prestiżowy Salon Fryzjerski</p>
+      <h1 class="hero-h1" aria-label="Sztuka Twojego włosa.">
+        <span class="rl"><span class="rl-inner" style="--d:.35s">Sztuka</span></span>
+        <span class="rl"><span class="rl-inner" style="--d:.52s"><em>Twojego</em></span></span>
+        <span class="rl"><span class="rl-inner" style="--d:.69s">włosa.</span></span>
       </h1>
-      <p class="hero-lead rv d2">Autorskie stylizacje, precyzyjna koloryzacja i kuracje regenerujące — skrojone na miarę każdej kobiety.</p>
-      <div class="hero-cta rv d3">
+      <p class="hero-lead">Autorskie stylizacje, precyzyjna koloryzacja i kuracje regenerujące — dla każdej kobiety która wie, czego chce.</p>
+      <div class="hero-cta">
         <a class="btn-gold" href="#rezerwacja">Zarezerwuj wizytę</a>
-        <a class="btn-ghost" href="#uslugi">Nasze usługi <span>→</span></a>
+        <a class="btn-ghost" href="#galeria">Nasze realizacje <span>→</span></a>
       </div>
     </div>
     <div class="hero-scroll">
@@ -886,36 +983,130 @@
     </div>
   </section>
 
-  <!-- MARQUEE -->
-  <div class="marquee-strip" aria-hidden="true">
-    <div class="marquee-track">
-      <span class="m-item">Strzyżenie<span class="m-sep">✦</span></span>
-      <span class="m-item">Koloryzacja<span class="m-sep">✦</span></span>
-      <span class="m-item">Baleyaż<span class="m-sep">✦</span></span>
-      <span class="m-item">Olaplex<span class="m-sep">✦</span></span>
-      <span class="m-item">Ombre<span class="m-sep">✦</span></span>
-      <span class="m-item">Botox keratynowy<span class="m-sep">✦</span></span>
-      <span class="m-item">Stylizacja ślubna<span class="m-sep">✦</span></span>
-      <span class="m-item">Strzyżenie<span class="m-sep">✦</span></span>
-      <span class="m-item">Koloryzacja<span class="m-sep">✦</span></span>
-      <span class="m-item">Baleyaż<span class="m-sep">✦</span></span>
-      <span class="m-item">Olaplex<span class="m-sep">✦</span></span>
-      <span class="m-item">Ombre<span class="m-sep">✦</span></span>
-      <span class="m-item">Botox keratynowy<span class="m-sep">✦</span></span>
-      <span class="m-item">Stylizacja ślubna<span class="m-sep">✦</span></span>
+  <!-- GALLERY REEL — drag-to-scroll, portretowa (3:4)
+       Pozycja: PRZED usługami — najpierw "chcę tak wyglądać",
+       potem "ile to kosztuje". Klasyczna sekwencja AIDA.
+  -->
+  <section class="gallery-wrap" id="galeria">
+    <div class="gallery-hd rv">
+      <p class="label">Realizacje</p>
+      <h2 class="sec-h2">Każde włosy<br>to inna <em>historia</em></h2>
     </div>
-  </div>
+    <div class="gallery-reel" id="reel" role="list">
+      <div class="reel-item" role="listitem">
+        <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=700&auto=format&fit=crop&q=88" alt="Koloryzacja baleyaż" loading="lazy">
+        <div class="reel-overlay"><span class="reel-cap">Koloryzacja baleyaż</span></div>
+      </div>
+      <div class="reel-item" role="listitem">
+        <img src="https://images.unsplash.com/photo-1500840216050-6ffa99d75160?w=700&auto=format&fit=crop&q=88" alt="Stylizacja blow-dry" loading="lazy">
+        <div class="reel-overlay"><span class="reel-cap">Stylizacja blow-dry</span></div>
+      </div>
+      <div class="reel-item" role="listitem">
+        <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=700&auto=format&fit=crop&q=88" alt="Efekt końcowy" loading="lazy">
+        <div class="reel-overlay"><span class="reel-cap">Efekt końcowy</span></div>
+      </div>
+      <div class="reel-item" role="listitem">
+        <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=700&auto=format&fit=crop&q=88" alt="Precyzyjne strzyżenie" loading="lazy">
+        <div class="reel-overlay"><span class="reel-cap">Precyzyjne strzyżenie</span></div>
+      </div>
+      <div class="reel-item" role="listitem">
+        <img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=700&auto=format&fit=crop&q=88" alt="Wnętrze salonu" loading="lazy">
+        <div class="reel-overlay"><span class="reel-cap">Atelier Noir</span></div>
+      </div>
+      <div class="reel-item" role="listitem">
+        <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=700&auto=format&fit=crop&q=88" alt="Kuracja Olaplex" loading="lazy">
+        <div class="reel-overlay"><span class="reel-cap">Kuracja Olaplex</span></div>
+      </div>
+    </div>
+    <p class="reel-hint rv d1">przeciągnij lub przewiń</p>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services" id="uslugi">
+    <div class="services-hd">
+      <p class="label center rv">Oferta</p>
+      <h2 class="sec-h2 rv d1" style="text-align:center">Pełna gama<br><em>usług</em></h2>
+    </div>
+    <div class="svc-list">
+      <div class="svc-row rv">
+        <div class="svc-num">01</div>
+        <div>
+          <div class="svc-name">Strzyżenie</div>
+          <div class="svc-desc">Precyzyjne strzyżenie dopasowane do kształtu twarzy i stylu życia. Konsultacja i stylizacja w cenie.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 120 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
+      </div>
+      <div class="svc-row rv d1">
+        <div class="svc-num">02</div>
+        <div>
+          <div class="svc-name">Koloryzacja</div>
+          <div class="svc-desc">Pełna koloryzacja, refleksy, baleyaż i ombre. Bezpieczne formuły bez amoniaku lub klasyczne — Twój wybór.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 220 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
+      </div>
+      <div class="svc-row rv d2">
+        <div class="svc-num">03</div>
+        <div>
+          <div class="svc-name">Kuracja Olaplex</div>
+          <div class="svc-desc">Odbudowa wiązań disulfidowych wewnątrz włosa. Miękkość i blask już po pierwszym zabiegu.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 130 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
+      </div>
+      <div class="svc-row rv">
+        <div class="svc-num">04</div>
+        <div>
+          <div class="svc-name">Botox keratynowy</div>
+          <div class="svc-desc">Wygładzenie, nawilżenie i redukcja puszenia do 4 miesięcy. Włosy jedwabiste i podatne.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 350 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
+      </div>
+      <div class="svc-row rv d1">
+        <div class="svc-num">05</div>
+        <div>
+          <div class="svc-name">Stylizacja ślubna</div>
+          <div class="svc-desc">Próbne upięcia i kreacje ślubne. Pracujemy z wyprzedzeniem — perfekcja jest tutaj standardem.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 380 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
+      </div>
+      <div class="svc-row rv d2">
+        <div class="svc-num">06</div>
+        <div>
+          <div class="svc-name">Pakiet VIP</div>
+          <div class="svc-desc">Strzyżenie + koloryzacja + regeneracja + stylizacja. Kompletne doświadczenie dla kobiet, które pragną tylko najlepszego.</div>
+        </div>
+        <div class="svc-price-col">
+          <span class="svc-price">od 550 zł</span>
+          <span class="svc-arrow">UMÓW →</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ABOUT -->
   <section class="about" id="studio">
     <div class="about-photo rv rl">
-      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=88" alt="Stylizacja włosów">
+      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&auto=format&fit=crop&q=88" alt="Stylizacja" loading="lazy">
     </div>
     <div class="about-body">
       <p class="label rv">O studio</p>
       <h2 class="sec-h2 rv d1">Gdzie rzemiosło<br>spotyka <em>artyzm</em></h2>
-      <p class="body-text rv d2">Atelier Noir to prestiżowy salon w sercu Warszawy, gdzie każda wizyta to wyjątkowe doświadczenie. Łączymy zamiłowanie do fryzjerstwa z nieustanną edukacją i produktami premium.</p>
-      <p class="body-text rv d2">Pracujemy wyłącznie z L&rsquo;Oréal Professionnel, Wella Professionals i Olaplex — bo Twoje włosy zasługują na to, co najlepsze.</p>
+      <p class="body-text rv d2">Atelier Noir to prestiżowy salon w sercu Warszawy, gdzie każda wizyta to wyjątkowe doświadczenie. Łączymy zamiłowanie do fryzjerstwa z nieustanną edukacją.</p>
+      <blockquote class="pull-quote rv d2">Pracujemy wyłącznie z L&rsquo;Oréal Professionnel, Wella i Olaplex — bo Twoje włosy zasługują na to, co najlepsze.</blockquote>
       <div class="stats rv d3">
         <div>
           <div class="stat-val">6+</div>
@@ -933,116 +1124,10 @@
     </div>
   </section>
 
-  <!-- SERVICES — horizontal list -->
-  <section class="services" id="uslugi">
-    <div class="services-hd">
-      <p class="label center rv">Oferta</p>
-      <h2 class="sec-h2 rv d1" style="text-align:center">Pełna gama<br><em>usług</em></h2>
-    </div>
-    <div class="svc-list">
-      <div class="svc-row rv">
-        <div class="svc-num">01</div>
-        <div class="svc-main">
-          <div class="svc-name">Strzyżenie</div>
-          <div class="svc-desc">Precyzyjne strzyżenie dopasowane do kształtu twarzy, struktury włosa i stylu życia. Konsultacja i stylizacja w cenie.</div>
-        </div>
-        <div class="svc-price-col">
-          <span class="svc-price">od 120 zł</span>
-          <span class="svc-arrow">UMÓW →</span>
-        </div>
-      </div>
-      <div class="svc-row rv d1">
-        <div class="svc-num">02</div>
-        <div class="svc-main">
-          <div class="svc-name">Koloryzacja</div>
-          <div class="svc-desc">Pełna koloryzacja, refleksy, baleyaż i ombre. Bezpieczne formuły bez amoniaku lub klasyczne — Twój wybór.</div>
-        </div>
-        <div class="svc-price-col">
-          <span class="svc-price">od 220 zł</span>
-          <span class="svc-arrow">UMÓW →</span>
-        </div>
-      </div>
-      <div class="svc-row rv d2">
-        <div class="svc-num">03</div>
-        <div class="svc-main">
-          <div class="svc-name">Kuracja Olaplex</div>
-          <div class="svc-desc">Odbudowa wiązań disulfidowych wewnątrz włosa. Miękkość i blask już po pierwszym zabiegu — bez kompromisów.</div>
-        </div>
-        <div class="svc-price-col">
-          <span class="svc-price">od 130 zł</span>
-          <span class="svc-arrow">UMÓW →</span>
-        </div>
-      </div>
-      <div class="svc-row rv">
-        <div class="svc-num">04</div>
-        <div class="svc-main">
-          <div class="svc-name">Botox keratynowy</div>
-          <div class="svc-desc">Wygładzenie, nawilżenie i redukcja puszenia na do 4 miesięcy. Włosy jedwabiste, podatne i lśniące.</div>
-        </div>
-        <div class="svc-price-col">
-          <span class="svc-price">od 350 zł</span>
-          <span class="svc-arrow">UMÓW →</span>
-        </div>
-      </div>
-      <div class="svc-row rv d1">
-        <div class="svc-num">05</div>
-        <div class="svc-main">
-          <div class="svc-name">Stylizacja ślubna</div>
-          <div class="svc-desc">Próbne upięcia i kreacje na Twój wyjątkowy dzień. Pracujemy z wyprzedzeniem — perfekcja jest tutaj standardem.</div>
-        </div>
-        <div class="svc-price-col">
-          <span class="svc-price">od 380 zł</span>
-          <span class="svc-arrow">UMÓW →</span>
-        </div>
-      </div>
-      <div class="svc-row rv d2">
-        <div class="svc-num">06</div>
-        <div class="svc-main">
-          <div class="svc-name">Pakiet VIP</div>
-          <div class="svc-desc">Strzyżenie + koloryzacja + regeneracja + stylizacja. Kompletne doświadczenie Atelier dla kobiet, które pragną tylko najlepszego.</div>
-        </div>
-        <div class="svc-price-col">
-          <span class="svc-price">od 550 zł</span>
-          <span class="svc-arrow">UMÓW →</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- GALLERY -->
-  <section class="gallery-wrap" id="galeria">
-    <div class="gallery-hd rv">
-      <p class="label">Galeria</p>
-      <h2 class="sec-h2">Nasze <em>realizacje</em></h2>
-    </div>
-    <div class="gallery-grid">
-      <div class="gal">
-        <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800&auto=format&fit=crop&q=88" alt="">
-        <div class="gal-overlay"><span class="gal-caption">Koloryzacja baleyaż</span></div>
-      </div>
-      <div class="gal">
-        <img src="https://images.unsplash.com/photo-1500840216050-6ffa99d75160?w=700&auto=format&fit=crop&q=88" alt="">
-        <div class="gal-overlay"><span class="gal-caption">Stylizacja blow-dry</span></div>
-      </div>
-      <div class="gal">
-        <img src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=600&auto=format&fit=crop&q=88" alt="">
-        <div class="gal-overlay"><span class="gal-caption">Wnętrze salonu</span></div>
-      </div>
-      <div class="gal">
-        <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=600&auto=format&fit=crop&q=88" alt="">
-        <div class="gal-overlay"><span class="gal-caption">Precyzyjne strzyżenie</span></div>
-      </div>
-      <div class="gal">
-        <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=700&auto=format&fit=crop&q=88" alt="">
-        <div class="gal-overlay"><span class="gal-caption">Efekt końcowy</span></div>
-      </div>
-    </div>
-  </section>
-
   <!-- TESTIMONIALS -->
   <section class="testimonials" id="opinie">
     <p class="label center rv">Opinie klientek</p>
-    <blockquote class="t-quote rv d1" id="tq">Przyszłam po poleceniu koleżanki i zostałam na lata. Nigdzie indziej moje włosy nie wyglądały tak jak tutaj — pełne życia, koloru i piękne.</blockquote>
+    <blockquote class="t-quote rv d1" id="tq">Przyszłam po poleceniu koleżanki i zostałam na lata. Nigdzie indziej moje włosy nie wyglądały tak pięknie — pełne życia i koloru.</blockquote>
     <div class="t-author rv d2" id="ta">— Aleksandra W., klientka od 2020</div>
     <div class="t-dots rv d3">
       <div class="t-dot on" data-i="0"></div>
@@ -1060,8 +1145,8 @@
     <div class="team-grid">
       <div class="team-card rv">
         <div class="team-photo">
-          <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=500&auto=format&fit=crop&q=82" alt="Zofia Kowalska">
-          <div class="team-name-overlay">
+          <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=500&auto=format&fit=crop&q=82" alt="Zofia Kowalska" loading="lazy">
+          <div class="team-overlay">
             <div class="team-name">Zofia Kowalska</div>
             <div class="team-role">Master Stylistka & Założycielka</div>
           </div>
@@ -1070,23 +1155,23 @@
       </div>
       <div class="team-card rv d1">
         <div class="team-photo">
-          <img src="https://images.unsplash.com/photo-1523264653568-d3d4032d1476?w=500&auto=format&fit=crop&q=82" alt="Marta Nowak">
-          <div class="team-name-overlay">
+          <img src="https://images.unsplash.com/photo-1523264653568-d3d4032d1476?w=500&auto=format&fit=crop&q=82" alt="Marta Nowak" loading="lazy">
+          <div class="team-overlay">
             <div class="team-name">Marta Nowak</div>
             <div class="team-role">Senior Colorist</div>
           </div>
         </div>
-        <div class="team-bio">Certyfikowana ekspertka Olaplex. Mistrzyni baleyażu i technik rozjaśniania bez uszkodzeń struktury włosa.</div>
+        <div class="team-bio">Certyfikowana ekspertka Olaplex. Mistrzyni baleyażu i technik rozjaśniania bez uszkodzeń włosa.</div>
       </div>
       <div class="team-card rv d2">
         <div class="team-photo">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=82" alt="Karolina Wiśniewska">
-          <div class="team-name-overlay">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=82" alt="Karolina Wiśniewska" loading="lazy">
+          <div class="team-overlay">
             <div class="team-name">Karolina Wiśniewska</div>
             <div class="team-role">Stylistka & Tricholog</div>
           </div>
         </div>
-        <div class="team-bio">Pasjonatka zdrowych włosów, specjalistka keratynowego prostowania i kuracji głęboko regenerujących.</div>
+        <div class="team-bio">Specjalistka keratynowego prostowania i kuracji głęboko regenerujących. Pasjonatka zdrowych włosów.</div>
       </div>
     </div>
   </section>
@@ -1094,12 +1179,13 @@
   <!-- BOOKING CTA -->
   <section class="booking" id="rezerwacja">
     <div class="booking-bg">
-      <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1800&auto=format&fit=crop&q=75" alt="">
+      <img src="https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1800&auto=format&fit=crop&q=75" alt="" loading="lazy">
     </div>
     <div class="booking-inner">
       <p class="label center rv">Zarezerwuj wizytę</p>
       <h2 class="booking-h2 rv d1">Czas na<br><em>zmianę.</em></h2>
-      <p class="booking-sub rv d2">Zarezerwuj termin online lub zadzwoń. Pierwsza konsultacja zawsze bezpłatna.</p>
+      <p class="booking-urgency rv d2">Najbliższy wolny termin: ten tydzień</p>
+      <p class="booking-sub rv d2">Zarezerwuj online lub zadzwoń. Pierwsza konsultacja zawsze bezpłatna.</p>
       <div class="booking-actions rv d3">
         <a class="btn-gold" href="tel:+48501000000">+48 501 000 000</a>
         <a class="btn-ghost" href="mailto:rezerwacja@ateliernoir.pl" style="color:var(--dim)">rezerwacja@ateliernoir.pl <span>→</span></a>
@@ -1117,9 +1203,9 @@
       <div>
         <div class="f-col-title">Nawigacja</div>
         <ul class="f-links">
-          <li><a href="#studio">O studio</a></li>
-          <li><a href="#uslugi">Usługi</a></li>
           <li><a href="#galeria">Galeria</a></li>
+          <li><a href="#uslugi">Usługi</a></li>
+          <li><a href="#studio">O studio</a></li>
           <li><a href="#zespol">Zespół</a></li>
         </ul>
       </div>
@@ -1149,26 +1235,50 @@
   </footer>
 
   <script>
-    // Sticky nav
+    // ── Sticky nav
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('stuck', window.scrollY > 60);
     }, { passive: true });
 
-    // Scroll reveal (supports both vertical + horizontal variants)
+    // ── Scroll reveal
     const rvEls = document.querySelectorAll('.rv');
-    const obs = new IntersectionObserver(entries => {
+    const revObs = new IntersectionObserver(entries => {
       entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+        if (e.isIntersecting) { e.target.classList.add('in'); revObs.unobserve(e.target); }
       });
-    }, { threshold: 0.1 });
-    rvEls.forEach(el => obs.observe(el));
+    }, { threshold: 0.08 });
+    rvEls.forEach(el => revObs.observe(el));
 
-    // Testimonials carousel
+    // ── Drag-to-scroll gallery reel
+    const reel = document.getElementById('reel');
+    let isDown = false, startX = 0, scrollLeft = 0;
+
+    reel.addEventListener('mousedown', e => {
+      isDown = true;
+      reel.classList.add('grabbing');
+      startX = e.pageX - reel.offsetLeft;
+      scrollLeft = reel.scrollLeft;
+    });
+
+    ['mouseleave', 'mouseup'].forEach(ev =>
+      reel.addEventListener(ev, () => { isDown = false; reel.classList.remove('grabbing'); })
+    );
+
+    reel.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - reel.offsetLeft;
+      reel.scrollLeft = scrollLeft - (x - startX) * 1.6;
+    });
+
+    // Touch devices — natywny scroll (scroll-snap obsługuje sam)
+
+    // ── Testimonials carousel
     const slides = [
-      { q: "Przyszłam po poleceniu koleżanki i zostałam na lata. Nigdzie indziej moje włosy nie wyglądały tak jak tutaj — pełne życia, koloru i piękne.", a: "— Aleksandra W., klientka od 2020" },
+      { q: "Przyszłam po poleceniu koleżanki i zostałam na lata. Nigdzie indziej moje włosy nie wyglądały tak pięknie — pełne życia i koloru.", a: "— Aleksandra W., klientka od 2020" },
       { q: "Baleyaż Marty to prawdziwe dzieło sztuki. Wychodzę z salonu za każdym razem z szerokim uśmiechem i poczuciem wyjątkowości.", a: "— Karolina T., klientka od 2021" },
-      { q: "Wreszcie salon, który naprawdę słucha. Zofia zrozumiała, czego chcę lepiej niż ja sama — efekt przerósł każde oczekiwanie.", a: "— Natalia M., klientka od 2022" },
+      { q: "Wreszcie salon, który naprawdę słucha. Zofia zrozumiała, czego chcę, lepiej niż ja sama — efekt przerósł każde oczekiwanie.", a: "— Natalia M., klientka od 2022" },
     ];
 
     const tq = document.getElementById('tq');
@@ -1191,7 +1301,7 @@
     }
 
     dots.forEach(d => d.addEventListener('click', () => showSlide(+d.dataset.i)));
-    setInterval(() => showSlide((cur + 1) % slides.length), 5800);
+    setInterval(() => showSlide((cur + 1) % slides.length), 6000);
   </script>
 </body>
 </html>
