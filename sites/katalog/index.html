@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Katalog stron — CRM</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -220,6 +221,10 @@ tr:hover td{background:var(--surface-2)}
     <div class="nav-item" data-view="promoters">
       <span class="ico">👥</span> Promotorzy <span class="count" id="cntPromoters">0</span>
     </div>
+    <div class="nav-section">Narzędzia</div>
+    <div class="nav-item" data-view="import">
+      <span class="ico">📦</span> Import ZIP <span class="count" id="cntImported">0</span>
+    </div>
     <div class="side-footer">
       <a href="../scenariusze/">🗺️ Scenariusze pracy</a>
       <a href="../prompty/">📋 Biblioteka promptów</a>
@@ -317,14 +322,20 @@ document.querySelectorAll(".nav-item").forEach(n=>{
   });
 });
 
+/* ── IMPORT HELPERS ── */
+function getImported(){try{return JSON.parse(localStorage.getItem("www1_imported_v1")||"[]");}catch{return[];}}
+function saveImported(list){localStorage.setItem("www1_imported_v1",JSON.stringify(list));}
+
 function render(){
   document.getElementById("cntProjects").textContent=state.projects.length;
   document.getElementById("cntFolders").textContent=state.folders.length;
   document.getElementById("cntPromoters").textContent=state.promoters.length;
+  document.getElementById("cntImported").textContent=getImported().length;
   const c=document.getElementById("content");
   if(view==="projects") c.innerHTML=renderProjects();
   else if(view==="files"){ c.innerHTML=openFolderId?renderFileManager():renderFolders(); if(openFolderId)wireFileManager(); }
   else if(view==="promoters") c.innerHTML=renderPromoters();
+  else if(view==="import"){ c.innerHTML=renderImport(); wireImport(); }
 }
 
 /* ================================================================
@@ -706,6 +717,142 @@ function openModal({title,fields,onSave}){
   document.getElementById("modalBg").addEventListener("click",e=>{if(e.target.id==="modalBg")close();});
   document.getElementById("gf").addEventListener("submit",e=>{e.preventDefault();const data={};fields.forEach(f=>{data[f.name]=(e.target.elements[f.name].value||"").trim();});if(fields.some(f=>f.required&&!data[f.name]))return;onSave(data);close();});
   const first=root.querySelector("input,select,textarea");if(first)first.focus();
+}
+
+/* ================================================================
+   IMPORT ZIP
+   ================================================================ */
+function renderImport(){
+  const list=getImported();
+  const rows=list.map(s=>`
+    <div class="file-row">
+      <span class="fi">${esc(s.icon||"📄")}</span>
+      <div class="info">
+        <div class="nm">${esc(s.title)}</div>
+        <div class="meta">${esc(s.tag||"import")} · <code style="font-size:.78rem">${esc(s.slug)}</code> · ${fmtDate(s.importedAt)}</div>
+      </div>
+      <a href="../../" target="_blank" class="icon-btn" title="Otwórz galerię" style="text-decoration:none">↗</a>
+      <button class="icon-btn del" data-rmi="${esc(s.slug)}" title="Usuń z kolekcji">🗑</button>
+    </div>`).join("");
+  return`
+    <div class="page-head">
+      <div><h2>Import ZIP</h2><div class="sub">Zaimportuj stronę z pliku .zip — pojawi się w głównej galerii kolekcji</div></div>
+    </div>
+    <div class="dropzone" id="importZone" style="cursor:pointer">
+      <div class="big">📦</div>
+      <div>Przeciągnij plik <strong>.zip</strong> lub <label for="zipInput" style="cursor:pointer">wybierz z dysku</label></div>
+      <input type="file" id="zipInput" accept=".zip" class="hidden">
+      <div style="font-size:.78rem;margin-top:10px;color:var(--text-muted)">ZIP powinien zawierać plik <code>index.html</code> — pozostałe zasoby z absolutnymi URL-ami (Unsplash, Google Fonts) zadziałają automatycznie.</div>
+    </div>
+    <div id="importStatus"></div>
+    <div id="importFormWrap" class="hidden"></div>
+    ${list.length?`
+    <div class="page-head" style="margin-top:32px">
+      <div><h2 style="font-size:1.1rem;font-weight:600">Zaimportowane strony (${list.length})</h2><div class="sub">Widoczne w głównej galerii pod kolekcją</div></div>
+    </div>
+    <div id="importedRows">${rows}</div>`:"<div id=\"importedRows\"></div>"}`;
+}
+
+function wireImport(){
+  const zone=document.getElementById("importZone");
+  const input=document.getElementById("zipInput");
+  const statusEl=document.getElementById("importStatus");
+  const formWrap=document.getElementById("importFormWrap");
+
+  // delete imported site
+  document.getElementById("content").addEventListener("click",e=>{
+    const d=e.target.closest("[data-rmi]");
+    if(!d)return;
+    const slug=d.dataset.rmi;
+    const found=getImported().find(s=>s.slug===slug);
+    if(found&&confirm(`Usunąć „${found.title}" z kolekcji?`)){
+      saveImported(getImported().filter(s=>s.slug!==slug));
+      render();
+    }
+  },{once:true});
+
+  if(!zone||!input)return;
+
+  zone.addEventListener("click",e=>{ if(e.target===zone||e.target===zone.firstElementChild)input.click(); });
+  ["dragenter","dragover"].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add("drag");}));
+  ["dragleave","drop"].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove("drag");}));
+  zone.addEventListener("drop",e=>{ if(e.dataTransfer.files[0]) processZip(e.dataTransfer.files[0]); });
+  input.addEventListener("change",()=>{ if(input.files[0]) processZip(input.files[0]); });
+
+  async function processZip(file){
+    if(!window.JSZip){statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Biblioteka JSZip nie załadowała się. Odśwież stronę i spróbuj ponownie.</p>`;return;}
+    statusEl.innerHTML=`<p style="color:var(--text-dim);margin:12px 0">⏳ Przetwarzam <strong>${esc(file.name)}</strong>…</p>`;
+    formWrap.classList.add("hidden");
+    try{
+      const zip=await JSZip.loadAsync(file);
+      let htmlEntry=null;
+      // prefer root index.html
+      zip.forEach((path,entry)=>{
+        if(!entry.dir&&path.toLowerCase()==="index.html"&&!htmlEntry) htmlEntry=entry;
+      });
+      // fallback: first index.html at any depth
+      if(!htmlEntry) zip.forEach((path,entry)=>{
+        if(!entry.dir&&path.toLowerCase().endsWith("/index.html")&&!htmlEntry) htmlEntry=entry;
+      });
+      // fallback: any html file
+      if(!htmlEntry) zip.forEach((path,entry)=>{
+        if(!entry.dir&&/\.html?$/.test(path.toLowerCase())&&!htmlEntry) htmlEntry=entry;
+      });
+      if(!htmlEntry){statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Nie znaleziono pliku <code>index.html</code> w archiwum.</p>`;return;}
+
+      const html=await htmlEntry.async("string");
+      const autoSlug=slugify(file.name.replace(/\.zip$/i,""));
+      const sizeKb=Math.round(html.length/1024);
+
+      statusEl.innerHTML=`<div style="color:var(--ok);padding:10px 0">✅ Znaleziono <strong>${esc(htmlEntry.name)}</strong> (${sizeKb} KB). Uzupełnij dane:</div>`;
+      formWrap.classList.remove("hidden");
+      formWrap.innerHTML=`
+        <form id="importSaveForm" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;max-width:580px;margin-top:8px">
+          <div class="two-col">
+            <div class="field"><label>Tytuł strony *</label><input name="title" required placeholder="np. Strona Klienta ABC" id="iTitle" autofocus></div>
+            <div class="field"><label>Slug (ID) *</label><input name="slug" value="${esc(autoSlug)}" required placeholder="np. klient-abc" id="iSlug"></div>
+          </div>
+          <div class="field"><label>Opis</label><input name="desc" placeholder="Krótki opis widoczny na karcie w galerii"></div>
+          <div class="two-col">
+            <div class="field"><label>Ikona (emoji)</label><input name="icon" value="🌐" maxlength="4" placeholder="🌐"></div>
+            <div class="field"><label>Tag kategorii</label><input name="tag" value="import" placeholder="np. landing, portfolio"></div>
+          </div>
+          <div class="modal-actions" style="margin-top:14px;padding-top:14px">
+            <button type="button" class="btn ghost sm" id="importCancel">Anuluj</button>
+            <button type="submit" class="btn">📥 Dodaj do kolekcji</button>
+          </div>
+        </form>`;
+
+      document.getElementById("importCancel").onclick=()=>{formWrap.classList.add("hidden");statusEl.innerHTML="";};
+
+      // auto-slugify title
+      document.getElementById("iTitle").addEventListener("input",ev=>{
+        const s=document.getElementById("iSlug");
+        if(!s._manual) s.value=slugify(ev.target.value);
+      });
+      document.getElementById("iSlug").addEventListener("input",()=>{ document.getElementById("iSlug")._manual=true; });
+
+      document.getElementById("importSaveForm").addEventListener("submit",e=>{
+        e.preventDefault();
+        const fd=new FormData(e.target);
+        const slug=slugify(fd.get("slug")||"");
+        if(!slug){alert("Podaj slug!");return;}
+        if(html.length>4*1024*1024){alert("Plik jest zbyt duży (>4 MB). Zaimportuj stronę z mniejszymi zasobami.");return;}
+        const existing=getImported();
+        if(existing.some(s=>s.slug===slug)){if(!confirm(`Slug „${slug}" już istnieje. Nadpisać?`))return;}
+        const entry={slug,title:(fd.get("title")||slug).trim(),desc:(fd.get("desc")||"").trim(),icon:(fd.get("icon")||"📄").trim(),tag:(fd.get("tag")||"import").trim(),html,importedAt:Date.now()};
+        saveImported([entry,...existing.filter(s=>s.slug!==slug)]);
+        statusEl.innerHTML=`<div style="background:rgba(66,211,146,.1);border:1px solid rgba(66,211,146,.3);border-radius:8px;padding:16px;margin-top:12px">
+          <p style="color:var(--ok);font-weight:600">✅ Strona „${esc(entry.title)}" dodana do kolekcji!</p>
+          <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px">Wróć do <a href="../../" style="color:var(--accent)">galerii kolekcji</a>, aby zobaczyć kartę.</p>
+        </div>`;
+        formWrap.classList.add("hidden");
+        render();
+      });
+    }catch(err){
+      statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Błąd odczytu ZIP: ${esc(String(err.message||err))}</p>`;
+    }
+  }
 }
 
 /* ================================================================

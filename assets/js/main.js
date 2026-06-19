@@ -3,27 +3,44 @@ const modal   = document.getElementById('info-modal');
 const mBody   = document.getElementById('modal-body');
 const mClose  = document.getElementById('modal-close');
 
+/* ── IMPORTED SITES FROM LOCALSTORAGE ── */
+const IMPORTED = (() => {
+  try {
+    return JSON.parse(localStorage.getItem('www1_imported_v1') || '[]').map(s => ({
+      slug: s.slug,
+      title: s.title,
+      desc: s.desc || '',
+      icon: s.icon || '📄',
+      tag: s.tag || 'import',
+      preview: !!s.html,
+      meta: s.meta || {},
+      _imported: true,
+      _blobUrl: s.html
+        ? URL.createObjectURL(new Blob([s.html], { type: 'text/html' }))
+        : null
+    }));
+  } catch { return []; }
+})();
+
+const ALL_SITES = [...SITES, ...IMPORTED];
+
 /* ── BUILD CARDS ── */
-if (!SITES || SITES.length === 0) {
-  gallery.innerHTML = `
-    <div class="empty">
-      <h2>Brak stron w kolekcji</h2>
-      <p>Dodaj pierwszą stronę: utwórz folder <code>sites/&lt;slug&gt;/</code><br>
-         i dodaj wpis w <code>assets/js/sites.js</code>.</p>
-    </div>`;
-} else {
-  gallery.innerHTML = SITES.map(site => `
+function buildCard(site) {
+  const href = site._blobUrl ? site._blobUrl : `sites/${site.slug}/`;
+  const linkExtra = site._blobUrl ? ' target="_blank" rel="noopener"' : '';
+  const iframeSrc = site._blobUrl ? site._blobUrl : `sites/${site.slug}/`;
+  return `
     <div class="card">
-      <a class="card-link" href="sites/${site.slug}/" aria-label="${site.title}">
+      <a class="card-link" href="${href}"${linkExtra} aria-label="${site.title}">
         <div class="card-preview">
           ${site.preview
-            ? `<iframe src="sites/${site.slug}/" loading="lazy" title="${site.title}" tabindex="-1"></iframe>`
+            ? `<iframe src="${iframeSrc}" loading="lazy" title="${site.title}" tabindex="-1"></iframe>`
             : `<span class="card-icon">${site.icon || '🌐'}</span>`}
         </div>
         <div class="card-body">
           <div class="card-title">${site.title}</div>
           <div class="card-desc">${site.desc || ''}</div>
-          ${site.tag ? `<span class="card-tag">${site.tag}</span>` : ''}
+          ${site.tag ? `<span class="card-tag">${site.tag}${site._imported ? ' · import' : ''}</span>` : ''}
         </div>
       </a>
       <div class="card-actions">
@@ -35,15 +52,32 @@ if (!SITES || SITES.length === 0) {
           </svg>
           info
         </button>
-        <button class="card-zip-btn" data-slug="${site.slug}" aria-label="Pobierz ${site.title} jako ZIP">
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-            <path d="M6.5 1v8M3.5 6l3 3 3-3M1.5 10.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          zip
-        </button>
+        ${site._imported
+          ? `<button class="card-zip-btn card-rm-btn" data-slug="${site.slug}" aria-label="Usuń ${site.title} z kolekcji">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <path d="M2 2l9 9M11 2l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              usuń
+            </button>`
+          : `<button class="card-zip-btn" data-slug="${site.slug}" aria-label="Pobierz ${site.title} jako ZIP">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <path d="M6.5 1v8M3.5 6l3 3 3-3M1.5 10.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              zip
+            </button>`}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+}
+
+if (!ALL_SITES || ALL_SITES.length === 0) {
+  gallery.innerHTML = `
+    <div class="empty">
+      <h2>Brak stron w kolekcji</h2>
+      <p>Dodaj pierwszą stronę: utwórz folder <code>sites/&lt;slug&gt;/</code><br>
+         i dodaj wpis w <code>assets/js/sites.js</code>.</p>
+    </div>`;
+} else {
+  gallery.innerHTML = ALL_SITES.map(buildCard).join('');
 }
 
 /* ── INFO BUTTON CLICK ── */
@@ -52,13 +86,15 @@ gallery.addEventListener('click', e => {
   if (!btn) return;
   e.preventDefault();
   e.stopPropagation();
-  const site = SITES.find(s => s.slug === btn.dataset.slug);
+  const site = ALL_SITES.find(s => s.slug === btn.dataset.slug);
   if (site) openModal(site);
 });
 
 /* ── MODAL ── */
 function openModal(site) {
   const m = site.meta || {};
+  const href = site._blobUrl ? site._blobUrl : `sites/${site.slug}/`;
+  const linkExtra = site._blobUrl ? ' target="_blank" rel="noopener"' : ' target="_blank" rel="noopener"';
 
   const swatches = (m.colors || []).map(c => `
     <button class="swatch" data-hex="${c}" style="--c:${c}" title="Kopiuj ${c}" aria-label="Kolor ${c}">
@@ -72,7 +108,7 @@ function openModal(site) {
     <div class="mi-head">
       <span class="mi-icon">${site.icon || '🌐'}</span>
       <div>
-        <span class="mi-tag">${site.tag || ''}</span>
+        <span class="mi-tag">${site.tag || ''}${site._imported ? ' · zaimportowana' : ''}</span>
         <h2 class="mi-title">${site.title}</h2>
       </div>
     </div>
@@ -93,7 +129,7 @@ function openModal(site) {
         <div class="mi-label">Technologie</div>
         <div class="mi-badges">${badges(m.tech, 'mi-badge--tech')}</div>
       </div>` : ''}
-    <a class="mi-open" href="sites/${site.slug}/" target="_blank" rel="noopener">
+    <a class="mi-open" href="${href}"${linkExtra}>
       Otwórz stronę
       <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
         <path d="M2 11L11 2M11 2H5M11 2v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -111,13 +147,26 @@ mClose.addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-/* ── ZIP DOWNLOAD ── */
+/* ── ZIP DOWNLOAD / REMOVE IMPORTED ── */
 gallery.addEventListener('click', async e => {
   const btn = e.target.closest('.card-zip-btn');
   if (!btn) return;
   e.preventDefault();
   e.stopPropagation();
-  const site = SITES.find(s => s.slug === btn.dataset.slug);
+
+  if (btn.classList.contains('card-rm-btn')) {
+    const slug = btn.dataset.slug;
+    if (!confirm(`Usunąć „${slug}" z kolekcji?`)) return;
+    try {
+      const list = JSON.parse(localStorage.getItem('www1_imported_v1') || '[]');
+      localStorage.setItem('www1_imported_v1', JSON.stringify(list.filter(s => s.slug !== slug)));
+    } catch {}
+    const card = btn.closest('.card');
+    if (card) { card.style.transition = 'opacity .3s,transform .3s'; card.style.opacity = '0'; card.style.transform = 'scale(.95)'; setTimeout(() => card.remove(), 300); }
+    return;
+  }
+
+  const site = ALL_SITES.find(s => s.slug === btn.dataset.slug);
   if (site) await downloadZip(site, btn);
 });
 
