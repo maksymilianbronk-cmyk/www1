@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "masaz",
+    title: "Sensum — Gabinet Masażu",
+    desc: "Luksusowy dark-wellness landing dla gabinetu masażu. Oddychające hero, mosaikowa galeria, booking.",
+    icon: "🌿",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#0b0a08", "#141210", "#c08040", "#f0ece4", "#b5a090"],
+      fonts: ["Fraunces", "Outfit"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "fryzjerka",
     title: "Salon Fryzjerski — Landing",
     desc: "Ultra-nowoczesny dark-editorial landing dla salonu fryzjerskiego. Animacje, galeria, rezerwacja.",
