@@ -37,4 +37,12 @@ const SITES = [
     tag: "narzędzie",
     preview: false,
   },
+  {
+    slug: "scenariusze",
+    title: "Scenariusze pracy",
+    desc: "Krok po kroku: jak zlecić redesign lub nową stronę — z gotowymi promptami i integracją CRM.",
+    icon: "🗺️",
+    tag: "przewodnik",
+    preview: false,
+  },
 ];

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scenariusze pracy — Web Studio</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f13;--surface:#1a1a22;--surface2:#22222e;--surface3:#2a2a38;
+  --border:#2e2e3e;--accent:#6c63ff;--accent2:#ff6584;--accent3:#43d9b8;--warn:#f5c542;
+  --text:#e8e8f0;--muted:#8888a0;--faint:#3a3a50;
+  --radius:12px;
+}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;min-height:100vh}
+
+/* nav */
+nav{display:flex;align-items:center;gap:6px;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+nav a{color:var(--muted);text-decoration:none;font-size:.85rem;padding:4px 10px;border-radius:6px}
+nav a:hover{color:var(--text);background:var(--surface2)}
+nav .cur{color:var(--accent);background:rgba(108,99,255,.12)}
+nav .sep{color:var(--faint)}
+
+/* page header */
+.hero{max-width:1120px;margin:0 auto;padding:36px 24px 20px}
+.hero h1{font-size:2.2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem;max-width:560px;line-height:1.6}
+
+/* status legend */
+.legend{max-width:1120px;margin:0 auto;padding:0 24px 28px}
+.legend h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.statuses{display:flex;flex-wrap:wrap;gap:8px}
+.sbadge{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:99px;font-size:.8rem;font-weight:600}
+.sbadge::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-robocze{background:rgba(136,136,160,.12);color:#8888a0}
+.s-wtoku{background:rgba(108,99,255,.15);color:#8c84ff}
+.s-czeka{background:rgba(245,197,66,.15);color:#f5c542}
+.s-zatwierdzone{background:rgba(67,217,184,.15);color:#43d9b8}
+.s-zakonczone{background:rgba(255,101,132,.15);color:#ff6584}
+
+/* scenario cards */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1120px;margin:0 auto;padding:0 24px 24px}
+@media(max-width:720px){.cards{grid-template-columns:1fr}}
+.sc-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:28px;cursor:pointer;transition:.18s;position:relative;overflow:hidden}
+.sc-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,99,255,.12)}
+.sc-card.open{border-color:var(--accent);background:var(--surface2)}
+.sc-card .tag{position:absolute;top:18px;right:18px;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--accent);color:#fff}
+.sc-card .tag.green{background:var(--accent3);color:#0f0f13}
+.sc-card .icon{font-size:2.6rem;margin-bottom:12px}
+.sc-card h2{font-size:1.25rem;font-weight:700;margin-bottom:6px}
+.sc-card .desc{color:var(--muted);font-size:.88rem;line-height:1.5}
+.sc-card .toggle-hint{margin-top:14px;font-size:.8rem;color:var(--accent);font-weight:600}
+
+/* steps panel */
+.panel{display:none;max-width:1120px;margin:0 auto;padding:0 24px 48px}
+.panel.open{display:block}
+.panel-head{display:flex;align-items:center;gap:12px;padding:20px 0 16px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.panel-head .bigicon{font-size:1.8rem}
+.panel-head h2{font-size:1.4rem;font-weight:700}
+.close-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:.85rem}
+.close-btn:hover{border-color:var(--accent);color:var(--text)}
+
+/* progress dots */
+.prog{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.prog-dot{width:32px;height:5px;border-radius:3px;background:var(--border);transition:.25s}
+.prog-dot.done{background:var(--accent3)}
+.prog-dot.active{background:var(--accent)}
+
+/* step */
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;transition:border-color .18s}
+.step.done{border-color:rgba(67,217,184,.35);opacity:.75}
+.step.current{border-color:var(--accent)}
+.step-head{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer}
+.num{width:34px;height:34px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.88rem;flex-shrink:0;transition:.18s}
+.step.done .num{background:var(--accent3);color:#0f0f13}
+.step.current .num{background:var(--accent);color:#fff}
+.step-titles{flex:1}
+.step-title{font-weight:600;font-size:.97rem}
+.step-sub{color:var(--muted);font-size:.8rem;margin-top:2px}
+.check{width:26px;height:26px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:.18s}
+.check:hover{border-color:var(--accent3)}
+.step.done .check{border-color:var(--accent3);background:var(--accent3);color:#0f0f13}
+
+/* step body */
+.step-body{padding:0 18px 18px 64px;display:none}
+.step-body.open{display:block}
+.step-body p{color:var(--muted);font-size:.88rem;line-height:1.65;margin-bottom:10px}
+.step-body ul{color:var(--muted);font-size:.88rem;line-height:1.9;padding-left:1.2rem;margin-bottom:10px}
+.step-body li{margin-bottom:2px}
+.tip{background:rgba(108,99,255,.09);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.84rem;color:var(--text);margin:10px 0}
+.tip strong{color:#a095ff}
+.warn{background:rgba(245,197,66,.08);border-left:3px solid var(--warn);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.84rem;color:var(--text);margin:10px 0}
+.ok-box{background:rgba(67,217,184,.08);border-left:3px solid var(--accent3);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.84rem;color:var(--text);margin:10px 0}
+
+/* prompt box */
+.pbox{position:relative;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:10px 0}
+.pbox-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);font-weight:700;margin-bottom:7px}
+.pbox pre{font-size:.78rem;font-family:'Consolas','Courier New',monospace;color:var(--text);white-space:pre-wrap;word-break:break-word;line-height:1.6;max-height:220px;overflow-y:auto}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--accent);border:none;color:#fff;padding:4px 10px;border-radius:5px;font-size:.73rem;cursor:pointer;font-weight:600}
+.copy-btn:hover{background:#7c73ff}
+
+/* cta buttons */
+.ctas{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.cta{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:.15s}
+.cta.primary{background:var(--accent);color:#fff}
+.cta.primary:hover{background:#7c73ff}
+.cta.sec{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.cta.sec:hover{border-color:var(--accent)}
+
+footer{text-align:center;padding:32px 16px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:16px}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../../">← Kolekcja</a>
+  <span class="sep">/</span>
+  <a href="../katalog/">CRM</a>
+  <span class="sep">/</span>
+  <a href="../prompty/">Prompty</a>
+  <span class="sep">/</span>
+  <a href="#" class="cur">Scenariusze</a>
+</nav>
+
+<div class="hero">
+  <h1>🗺️ Scenariusze pracy</h1>
+  <p>Dwa gotowe przepływy pracy — jak zlecić projekt Claude i dostarczyć gotową stronę klientowi. Krok po kroku, z promptami i linkami do CRM.</p>
+</div>
+
+<div class="legend">
+  <h3>Statusy projektów w CRM</h3>
+  <div class="statuses">
+    <span class="sbadge s-robocze">Robocze</span>
+    <span class="sbadge s-wtoku">W toku</span>
+    <span class="sbadge s-czeka">Czeka na zatwierdzenie</span>
+    <span class="sbadge s-zatwierdzone">Zatwierdzone</span>
+    <span class="sbadge s-zakonczone">Zakończone</span>
+  </div>
+</div>
+
+<!-- Scenario choice cards -->
+<div class="cards">
+  <div class="sc-card" id="card-redesign" onclick="toggle('redesign')">
+    <div class="tag">7 kroków</div>
+    <div class="icon">🔄</div>
+    <h2>Przeróbka istniejącej strony</h2>
+    <p class="desc">Klient ma już stronę i chce ją odświeżyć — nowy wygląd, lepsza struktura, aktualna treść. Przekazujesz URL i opis zmian, Claude robi resztę.</p>
+    <div class="toggle-hint" id="hint-redesign">▼ Pokaż instrukcję</div>
+  </div>
+  <div class="sc-card" id="card-nowa" onclick="toggle('nowa')">
+    <div class="tag green">8 kroków</div>
+    <div class="icon">✨</div>
+    <h2>Nowa strona od zera</h2>
+    <p class="desc">Klient zaczyna od zera — nowa strona, może też potrzebować logo. Zbierasz wymagania, generujesz brief, Claude tworzy profesjonalną stronę.</p>
+    <div class="toggle-hint" id="hint-nowa">▼ Pokaż instrukcję</div>
+  </div>
+</div>
+
+<!-- ======== PANEL: Redesign ======== -->
+<div class="panel" id="panel-redesign">
+  <div class="panel-head">
+    <span class="bigicon">🔄</span>
+    <h2>Przeróbka istniejącej strony</h2>
+    <button class="close-btn" onclick="close('redesign')">✕ Zamknij</button>
+  </div>
+  <div class="prog" id="prog-redesign"></div>
+  <div id="body-redesign"></div>
+</div>
+
+<!-- ======== PANEL: Nowa strona ======== -->
+<div class="panel" id="panel-nowa">
+  <div class="panel-head">
+    <span class="bigicon">✨</span>
+    <h2>Nowa strona od zera</h2>
+    <button class="close-btn" onclick="close('nowa')">✕ Zamknij</button>
+  </div>
+  <div class="prog" id="prog-nowa"></div>
+  <div id="body-nowa"></div>
+</div>
+
+<footer><a href="../../">← wróć do kolekcji</a></footer>
+
+<script>
+const STEPS = {
+  redesign: [
+    {
+      title: "Zbierz informacje od klienta",
+      sub: "Co chce zmienić i dlaczego",
+      html: `<p>Przed rozpoczęciem pracy zadaj klientowi kilka pytań:</p>
+<ul>
+  <li><strong>Adres URL</strong> obecnej strony</li>
+  <li>Co konkretnie mu <strong>nie pasuje</strong> (wygląd, treść, struktura, brakujące sekcje)</li>
+  <li>Czy ma nowe <strong>materiały</strong> — zdjęcia, logo, teksty do wstawienia</li>
+  <li>Przykład innej strony która mu się podoba — <strong>"styl jaki chcę"</strong></li>
+  <li>Termin realizacji i budżet</li>
+</ul>
+<div class="tip"><strong>Wskazówka:</strong> Poproś o link do 2–3 stron "w tym stylu" — to więcej mówi niż opis słowny. Zapisz URL klienta do notatek w projekcie.</div>`
+    },
+    {
+      title: "Załóż projekt w CRM",
+      sub: "Katalog → Projekty → Nowy projekt",
+      html: `<p>Otwórz CRM i utwórz nowy projekt. Wypełnij:</p>
+<ul>
+  <li><strong>Nazwa projektu</strong> — np. <em>„Redesign strony Kwiaciarnia Róża"</em></li>
+  <li><strong>Klient</strong> — imię lub nazwa firmy</li>
+  <li><strong>Slug</strong> — np. <code>kwiaciarnia-roza-v2</code> (identyfikator folderu)</li>
+  <li><strong>Branża</strong> — kwiaciarstwo, gastronomia, uroda…</li>
+  <li><strong>Styl</strong> — np. <em>„elegancki, ciemne tło, złoty akcent"</em></li>
+  <li><strong>Notatki</strong> — wklej tutaj URL obecnej strony klienta</li>
+</ul>
+<p>Projekt tworzony jest ze statusem <strong>Robocze</strong>.</p>
+<div class="ctas"><a class="cta primary" href="../katalog/" target="_blank">Otwórz CRM →</a></div>`
+    },
+    {
+      title: "Wygeneruj brief w CRM",
+      sub: "Kliknij „Generuj prompt" przy projekcie",
+      html: `<p>W widoku <strong>Projekty</strong> kliknij przycisk <strong>📋 Generuj prompt</strong> przy swoim projekcie. CRM wygeneruje gotowy prompt uwzględniający wszystkie dane.</p>
+<p>Skopiuj prompt. Albo użyj poniższego szablonu bezpośrednio:</p>
+<div class="pbox-label">Prompt — redesign (szablon)</div>
+<div class="pbox">
+<pre>Zrób redesign strony internetowej.
+
+URL obecnej strony: [WKLEJ URL]
+Klient / firma: [NAZWA]
+Branża: [BRANŻA]
+Co chce zmienić: [OPIS — np. "nowy wygląd, dodać sekcję portfolio, usunąć slider"]
+Styl docelowy: [STYL — np. "nowoczesny minimalizm, ciemne tło, złote akcenty"]
+Kolory: [KOLORY — np. "#1a2e5a i #c9a84c"]
+Sekcje do zachowania: [np. hero, o nas, kontakt]
+
+Wymagania techniczne:
+• Kompletny, samodzielny plik HTML (CSS i JS wbudowane, brak CDN)
+• Responsywna (mobile-first), lang="pl", UTF-8
+• Nowoczesny design — CSS Grid, animacje scroll (Intersection Observer)
+• Formularz kontaktowy HTML5
+Zwróć TYLKO kod HTML.</pre>
+  <button class="copy-btn" onclick="cp(this)">Kopiuj</button>
+</div>`
+    },
+    {
+      title: "Wyślij prompt do Claude i pobierz kod",
+      sub: "Nowa rozmowa z Claude — iteruj do satysfakcji",
+      html: `<p>Otwórz <strong>nową rozmowę z Claude</strong> (chat.claude.ai lub aplikacja) i wklej skopiowany brief.</p>
+<p>Claude zwróci kompletny kod HTML. Skopiuj cały kod.</p>
+<div class="tip"><strong>Iteruj w tej samej rozmowie:</strong> „zmień kolor przycisków na zielony", „dodaj sekcję z opiniami", „nagłówek bardziej odważny" itp. Nie zamykaj tej rozmowy — wróć do niej przy poprawkach po zatwierdzeniu.</div>
+<div class="warn">Nie zaczynaj od nowa — każda poprawka w tej samej rozmowie zachowuje kontekst stylu i struktury strony.</div>`
+    },
+    {
+      title: "Utwórz stronę w kolekcji",
+      sub: "Wróć tutaj — do Claude Code",
+      html: `<p>W <strong>tej rozmowie z Claude Code</strong> (tym oknem) napisz polecenie:</p>
+<div class="pbox">
+<pre>nowa strona [slug-projektu]
+
+[WKLEJ KOD HTML OD CLAUDE]</pre>
+  <button class="copy-btn" onclick="cp(this)">Kopiuj</button>
+</div>
+<p>Claude Code automatycznie:</p>
+<ul>
+  <li>Tworzy folder <code>sites/[slug]/index.html</code></li>
+  <li>Wstawia kod strony</li>
+  <li>Dodaje wpis do galerii w <code>assets/js/sites.js</code></li>
+  <li>Commituje i pushuje do GitHub</li>
+</ul>
+<p>GitHub Actions deployuje stronę w ciągu 1–2 minut.</p>`
+    },
+    {
+      title: "Wyślij link klientowi do zatwierdzenia",
+      sub: "Zmień status na „Czeka na zatwierdzenie"",
+      html: `<p>Po deployu strona jest dostępna pod adresem:</p>
+<div class="pbox">
+<pre>https://maksymilianbronk-cmyk.github.io/www1/sites/[SLUG]/</pre>
+  <button class="copy-btn" onclick="cp(this)">Kopiuj</button>
+</div>
+<p>W CRM otwórz projekt → wstaw slug → skopiuj link. Zmień status na <strong>Czeka na zatwierdzenie</strong>.</p>
+<p>Wyślij link klientowi przez email / WhatsApp / Messenger.</p>
+<div class="tip"><strong>Formulacja dla klienta:</strong> „Przygotowałem/am pierwszą wersję Twojej strony. Sprawdź i napisz co zmienić."</div>
+<div class="ctas"><a class="cta primary" href="../katalog/" target="_blank">Otwórz CRM →</a></div>`
+    },
+    {
+      title: "Poprawki, zatwierdzenie i zamknięcie",
+      sub: "Iteruj → Zatwierdzone → Zakończone",
+      html: `<p>Jeśli klient ma uwagi — wróć do rozmowy z Claude (chat), nanieś zmiany, zaktualizuj plik poleceniem Claude Code.</p>
+<p>Gdy klient zatwierdza:</p>
+<ul>
+  <li>Zmień status na <strong>Zatwierdzone ✅</strong></li>
+  <li>Po dostarczeniu / płatności — zmień na <strong>Zakończone</strong></li>
+</ul>
+<div class="ok-box">Projekt zarchiwizowany. Link pozostaje aktywny — klient może do niego wrócić w dowolnej chwili.</div>
+<div class="ctas"><a class="cta primary" href="../katalog/" target="_blank">Otwórz CRM →</a></div>`
+    }
+  ],
+
+  nowa: [
+    {
+      title: "Ustal założenia projektu",
+      sub: "Branża, cel, grupa docelowa",
+      html: `<p>Przed startem porozmawiaj z klientem i ustal:</p>
+<ul>
+  <li>Czym się zajmuje i do kogo kieruje ofertę (<strong>branża + target</strong>)</li>
+  <li><strong>Cel strony</strong> — pozyskanie klientów? Sprzedaż? Portfolio? Rezerwacje online?</li>
+  <li>Jakie <strong>sekcje</strong> musi mieć strona (cennik, galeria, formularz, sklep…)</li>
+  <li>Czy ma już <strong>logo / kolory firmowe</strong> — jeśli tak, pobierz pliki</li>
+  <li>Przykłady stron które mu się podobają — <strong>2–3 linki</strong></li>
+  <li>Termin i budżet</li>
+</ul>
+<div class="tip"><strong>Złota zasada:</strong> Im więcej informacji teraz, tym mniej poprawek później. Nie zaczynaj bez przynajmniej punktów 1–4.</div>`
+    },
+    {
+      title: "Logo — ma czy nie ma?",
+      sub: "Dwie ścieżki w zależności od sytuacji",
+      html: `<p><strong>✅ Klient ma logo:</strong><br>Pobierz plik SVG lub PNG z przezroczystym tłem. Możesz go wbudować bezpośrednio w HTML jako base64 lub inline SVG.</p>
+<p><strong>❌ Klient nie ma logo (lub chce nowe):</strong><br>Wygeneruj propozycję promptem i pokaż kilka wariantów:</p>
+<div class="pbox-label">Prompt — generowanie logo SVG</div>
+<div class="pbox">
+<pre>Stwórz logo w formacie SVG dla firmy "[NAZWA]".
+Branża: [BRANŻA]
+Styl: [STYL — np. minimalistyczny, nowoczesny, elegancki, premium]
+Kolory: [np. "#2d6a9f i #ffffff" lub "zaproponuj pasujące"]
+Forma: [np. "ikona + nazwa firmy poziomo" / "tylko ikona" / "monogram"]
+
+Wymagania:
+• Czyste SVG, viewBox="0 0 240 80" (poziome) lub "0 0 80 80" (kwadratowe)
+• Brak zewnętrznych fontów — wbudowany text SVG lub tylko grafika
+• Nowoczesny, profesjonalny wygląd, skalowalne bez utraty jakości
+Zwróć tylko kod SVG — bez żadnych objaśnień.</pre>
+  <button class="copy-btn" onclick="cp(this)">Kopiuj</button>
+</div>
+<div class="tip"><strong>Wskazówka:</strong> Poproś Claude o 3 warianty kolorystyczne — daj klientowi wybór.</div>`
+    },
+    {
+      title: "Załóż projekt w CRM",
+      sub: "Katalog → Projekty → Nowy projekt",
+      html: `<p>Otwórz CRM i utwórz projekt z kompletem danych:</p>
+<ul>
+  <li><strong>Nazwa</strong> — np. <em>„Strona dla Cukierni Słodka Chwila"</em></li>
+  <li><strong>Klient</strong> — nazwa firmy lub imię</li>
+  <li><strong>Slug</strong> — np. <code>cukiernia-slodka-chwila</code></li>
+  <li><strong>Branża</strong> — gastronomia / cukiernia</li>
+  <li><strong>Styl</strong> — np. <em>„pastelowy, ciepłe kremowe kolory, przytulny"</em></li>
+  <li><strong>Kolory</strong> — np. <em>#f9e4c8, #c0392b, #fff</em></li>
+  <li><strong>Sekcje</strong> — zaznacz w checkboxach: hero, o nas, oferta, galeria, kontakt</li>
+</ul>
+<p>Im więcej wypełnisz, tym lepszy brief wygeneruje CRM.</p>
+<div class="ctas"><a class="cta primary" href="../katalog/" target="_blank">Otwórz CRM →</a></div>`
+    },
+    {
+      title: "Wybierz prompt branżowy lub wygeneruj brief",
+      sub: "Gotowe szablony w Bibliotece promptów",
+      html: `<p>Masz dwie opcje — wybierz wygodniejszą:</p>
+<p><strong>Opcja A — Brief z CRM:</strong> Kliknij <em>„📋 Generuj prompt"</em> przy projekcie. CRM wypełni wszystkie dane automatycznie.</p>
+<p><strong>Opcja B — Gotowy prompt branżowy:</strong> Przejdź do Biblioteki Promptów i wybierz kategorię (gastronomia, beauty, budownictwo…).</p>
+<div class="pbox-label">Prompt — nowa strona (ogólny szablon)</div>
+<div class="pbox">
+<pre>Stwórz nową stronę internetową.
+
+Firma / marka: [NAZWA]
+Branża: [BRANŻA]
+Cel strony: [CEL — np. "pozyskanie klientów lokalnych"]
+Grupa docelowa: [KTO — np. "kobiety 25–45, okolica miasta X"]
+Styl wizualny: [STYL]
+Kolory: [KOLORY]
+Sekcje: [LISTA — np. hero, o nas, usługi, cennik, galeria, kontakt]
+Logo: [mam — wbuduj / nie mam — stwórz minimalistyczne SVG]
+Dodatkowe informacje: [WSZYSTKO CO WAŻNE]
+
+Wymagania techniczne:
+• Kompletny, samodzielny plik HTML (CSS i JS wbudowane, bez CDN)
+• Responsywna (mobile-first), lang="pl", UTF-8
+• Nowoczesny design, animacje CSS (scroll reveal)
+• Formularz kontaktowy HTML5
+• Profesjonalne grafiki zastąp gradientami lub CSS art
+Zwróć TYLKO kod HTML.</pre>
+  <button class="copy-btn" onclick="cp(this)">Kopiuj</button>
+</div>
+<div class="ctas"><a class="cta sec" href="../prompty/" target="_blank">📋 Biblioteka promptów →</a></div>`
+    },
+    {
+      title: "Wyślij prompt do Claude — pobierz kod",
+      sub: "Nowa rozmowa, iteruj do satysfakcji",
+      html: `<p>Otwórz <strong>nową rozmowę z Claude</strong> i wklej prompt. Po chwili dostaniesz kompletny HTML.</p>
+<div class="tip"><strong>Iteruj na bieżąco:</strong> Zostań w tej rozmowie i doprecyzuj — „ciemniejsze tło", „więcej animacji", „zmień kolory na bardziej żywe". Claude pamięta kontekst całej rozmowy.</div>
+<div class="warn">Jeśli strona ma więcej podstron (np. oferta, cennik, blog) — zaplanuj je teraz i poproś Claude o każdą osobno. Spójny styl zachowa się w ramach tej samej rozmowy.</div>
+<p>Gdy jesteś zadowolony z wyglądu — skopiuj cały kod HTML.</p>`
+    },
+    {
+      title: "Umieść stronę w kolekcji",
+      sub: "Polecenie Claude Code tworzy folder i deployuje",
+      html: `<p>W <strong>Claude Code</strong> (to okno) wpisz:</p>
+<div class="pbox">
+<pre>nowa strona [slug]
+
+[WKLEJ KOD HTML]</pre>
+  <button class="copy-btn" onclick="cp(this)">Kopiuj</button>
+</div>
+<p>Claude Code zakłada folder, wstawia plik, commituje i pushuje. GitHub Actions deployuje w 1–2 minuty.</p>
+<p>Jeśli masz kilka podstron — powtórz polecenie dla każdej albo poproś Claude Code o dodanie ich do folderu klienta.</p>`
+    },
+    {
+      title: "Wyślij propozycję klientowi",
+      sub: "Zmień status na „Czeka na zatwierdzenie"",
+      html: `<p>Strona dostępna pod:</p>
+<div class="pbox">
+<pre>https://maksymilianbronk-cmyk.github.io/www1/sites/[SLUG]/</pre>
+  <button class="copy-btn" onclick="cp(this)">Kopiuj</button>
+</div>
+<p>W CRM otwórz projekt → wstaw slug → skopiuj link. Zmień status na <strong>Czeka na zatwierdzenie</strong>.</p>
+<div class="tip"><strong>Formulacja dla klienta:</strong> „Mam gotową pierwszą propozycję Twojej strony. Sprawdź i daj mi znać co zmienić — kolor, układ, treść, kolejność sekcji."</div>
+<div class="ctas"><a class="cta primary" href="../katalog/" target="_blank">Otwórz CRM →</a></div>`
+    },
+    {
+      title: "Poprawki i finalizacja",
+      sub: "Iteruj aż do zatwierdzenia → Zakończone",
+      html: `<p>Na każdą uwagę klienta wróć do rozmowy z Claude (chat) i wprowadź zmiany:</p>
+<ul>
+  <li>„Zmień kolor przycisków"</li>
+  <li>„Dodaj sekcję z opiniami"</li>
+  <li>„Napis w nagłówku: [nowy tekst]"</li>
+  <li>„Usuń sekcję cennika, zastąp ją formularzem kontaktowym"</li>
+</ul>
+<p>Zaktualizowany kod przekaż Claude Code: <em>„zaktualizuj sites/[slug]/index.html"</em> i wklej nowy HTML.</p>
+<p>Po zatwierdzeniu przez klienta:</p>
+<ul>
+  <li>Status → <strong>Zatwierdzone ✅</strong></li>
+  <li>Po dostarczeniu / zapłacie → <strong>Zakończone 🏁</strong></li>
+</ul>
+<div class="ok-box">Gotowe! Projekt zarchiwizowany, link aktywny na zawsze.</div>
+<div class="ctas"><a class="cta primary" href="../katalog/" target="_blank">Otwórz CRM →</a></div>`
+    }
+  ]
+};
+
+const done = { redesign: new Set(), nowa: new Set() };
+let active = null;
+
+function toggle(key) {
+  if (active === key) { close(key); return; }
+  if (active) close(active, false);
+  active = key;
+  document.getElementById('card-' + key).classList.add('open');
+  document.getElementById('hint-' + key).textContent = '▲ Zamknij';
+  build(key);
+  document.getElementById('panel-' + key).classList.add('open');
+  requestAnimationFrame(() =>
+    document.getElementById('panel-' + key).scrollIntoView({ behavior: 'smooth', block: 'start' })
+  );
+}
+
+function close(key, resetActive = true) {
+  document.getElementById('panel-' + key).classList.remove('open');
+  document.getElementById('card-' + key).classList.remove('open');
+  document.getElementById('hint-' + key).textContent = '▼ Pokaż instrukcję';
+  if (resetActive) active = null;
+}
+
+function build(key) {
+  const steps = STEPS[key];
+  const n = steps.length;
+
+  // progress
+  document.getElementById('prog-' + key).innerHTML =
+    steps.map((_, i) => `<div class="prog-dot ${done[key].has(i) ? 'done' : i === firstUndone(key) ? 'active' : ''}"></div>`).join('');
+
+  // steps
+  document.getElementById('body-' + key).innerHTML = steps.map((s, i) => {
+    const isDone = done[key].has(i);
+    const isFirst = i === firstUndone(key);
+    return `<div class="step ${isDone ? 'done' : isFirst ? 'current' : ''}" id="s-${key}-${i}">
+      <div class="step-head" onclick="toggleBody('${key}',${i})">
+        <div class="num">${isDone ? '✓' : i + 1}</div>
+        <div class="step-titles">
+          <div class="step-title">${s.title}</div>
+          <div class="step-sub">${s.sub}</div>
+        </div>
+        <div class="check" title="Oznacz jako zrobione" onclick="event.stopPropagation();mark('${key}',${i})">${isDone ? '✓' : ''}</div>
+      </div>
+      <div class="step-body ${isFirst ? 'open' : ''}" id="sb-${key}-${i}">${s.html}</div>
+    </div>`;
+  }).join('');
+}
+
+function firstUndone(key) {
+  const n = STEPS[key].length;
+  for (let i = 0; i < n; i++) if (!done[key].has(i)) return i;
+  return -1;
+}
+
+function toggleBody(key, i) {
+  const el = document.getElementById('sb-' + key + '-' + i);
+  el.classList.toggle('open');
+}
+
+function mark(key, i) {
+  if (done[key].has(i)) done[key].delete(i); else done[key].add(i);
+  build(key);
+  // auto-open next
+  const next = document.getElementById('sb-' + key + '-' + (i + 1));
+  if (next) next.classList.add('open');
+}
+
+function cp(btn) {
+  const pre = btn.closest('.pbox').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+    btn.textContent = '✓ Skopiowano';
+    setTimeout(() => btn.textContent = 'Kopiuj', 2200);
+  }).catch(() => {
+    prompt('Skopiuj ręcznie:', pre.textContent.trim());
+  });
+}
+</script>
+</body>
+</html>

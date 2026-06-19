@@ -80,20 +80,29 @@ main.content{padding:28px 32px;overflow:auto}
 /* ---------- Status badges ---------- */
 .status{display:inline-flex;align-items:center;gap:5px;font-size:.73rem;font-weight:700;padding:3px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em}
 .status::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-.status.szkic{background:rgba(136,136,160,.15);color:var(--text-dim)}
+.status.robocze{background:rgba(136,136,160,.15);color:var(--text-dim)}
 .status.w-toku{background:rgba(108,99,255,.18);color:#a095ff}
-.status.wysłany{background:rgba(74,179,255,.15);color:var(--info)}
-.status.gotowy{background:rgba(66,211,146,.15);color:var(--ok)}
+.status.czeka{background:rgba(245,166,35,.18);color:var(--warn)}
+.status.zatwierdzone{background:rgba(66,211,146,.15);color:var(--ok)}
+.status.zakonczone{background:rgba(255,92,108,.15);color:var(--danger)}
+
+/* ---------- Filter tabs ---------- */
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.ftab{padding:6px 14px;border-radius:99px;font-size:.78rem;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);cursor:pointer;transition:.15s}
+.ftab:hover{border-color:var(--accent-dim);color:var(--text)}
+.ftab.active{background:var(--accent-dim);border-color:var(--accent);color:#fff}
+.ftab .cnt{font-size:.7rem;opacity:.8;margin-left:4px}
 
 /* ---------- Project cards ---------- */
 .projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .proj-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .15s,transform .15s}
 .proj-card:hover{border-color:var(--accent-dim);transform:translateY(-2px)}
 .proj-card-bar{height:3px}
-.proj-card-bar.szkic{background:var(--text-muted)}
+.proj-card-bar.robocze{background:var(--text-muted)}
 .proj-card-bar.w-toku{background:var(--accent)}
-.proj-card-bar.wysłany{background:var(--info)}
-.proj-card-bar.gotowy{background:var(--ok)}
+.proj-card-bar.czeka{background:var(--warn)}
+.proj-card-bar.zatwierdzone{background:var(--ok)}
+.proj-card-bar.zakonczone{background:var(--danger)}
 .proj-card-body{padding:18px}
 .proj-client{font-size:.75rem;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
 .proj-name{font-size:1.05rem;font-weight:700;margin-bottom:8px}
@@ -193,6 +202,7 @@ tr:hover td{background:var(--surface-2)}
     </div>
     <div class="right">
       <a href="../../">← kolekcja</a>
+      <a href="../scenariusze/">🗺️ Scenariusze</a>
       <a href="../prompty/">📋 Prompty</a>
       <button class="btn-logout" id="logoutBtn">Wyloguj</button>
     </div>
@@ -211,6 +221,7 @@ tr:hover td{background:var(--surface-2)}
       <span class="ico">👥</span> Promotorzy <span class="count" id="cntPromoters">0</span>
     </div>
     <div class="side-footer">
+      <a href="../scenariusze/">🗺️ Scenariusze pracy</a>
       <a href="../prompty/">📋 Biblioteka promptów</a>
     </div>
   </aside>
@@ -225,7 +236,7 @@ tr:hover td{background:var(--surface-2)}
 "use strict";
 
 const PASSWORD = "maxik";
-const LS_KEY = "katalog_data_v2";
+const LS_KEY = "katalog_data_v3";
 const AUTH_KEY = "katalog_auth_v1";
 const PAGES_BASE = "https://maksymilianbronk-cmyk.github.io/www1/sites/";
 
@@ -250,16 +261,25 @@ const FileDB=(()=>{
 })();
 
 /* ---------- state ---------- */
+const STATUS_MIGRATE = {szkic:"robocze","w-toku":"w-toku",wysłany:"czeka",gotowy:"zatwierdzone"};
 let state = loadState();
+function migrateProjects(projects){
+  return (projects||[]).map(p=>({...p,status:STATUS_MIGRATE[p.status]||p.status||"robocze"}));
+}
 function loadState(){
   try{
     const raw=localStorage.getItem(LS_KEY);
-    if(raw) return JSON.parse(raw);
+    if(raw){ const d=JSON.parse(raw); return{projects:migrateProjects(d.projects),folders:d.folders||[],promoters:d.promoters||}; }
+  }catch(e){}
+  // migrate from v2
+  try{
+    const v2=localStorage.getItem("katalog_data_v2");
+    if(v2){ const d=JSON.parse(v2); return{projects:migrateProjects(d.projects),folders:d.folders||[],promoters:d.promoters||}; }
   }catch(e){}
   // migrate from v1
   try{
-    const old=localStorage.getItem("katalog_data_v1");
-    if(old){ const d=JSON.parse(old); return{projects:[],folders:d.folders||[],promoters:d.promoters||}; }
+    const v1=localStorage.getItem("katalog_data_v1");
+    if(v1){ const d=JSON.parse(v1); return{projects:[],folders:d.folders||[],promoters:d.promoters||}; }
   }catch(e){}
   return{projects:[],folders:[],promoters:[]};
 }
@@ -310,22 +330,41 @@ function render(){
 /* ================================================================
    PROJECTS
    ================================================================ */
-const STATUS_LABELS={szkic:"Szkic","w-toku":"W toku","wysłany":"Wysłany",gotowy:"Gotowy"};
+const STATUS_LABELS={robocze:"Robocze","w-toku":"W toku",czeka:"Czeka",zatwierdzone:"Zatwierdzone",zakonczone:"Zakończone"};
+const STATUS_ORDER=["robocze","w-toku","czeka","zatwierdzone","zakonczone"];
+let projFilter="all";
 const INDUSTRY_LIST=["agencja reklamowa","architektura","beauty / SPA","budownictwo","e-commerce","edukacja / kursy","finanse","fotografia","gabinet / klinika","gastronomia","hotel / turystyka","IT / software","nieruchomości","portfolio / freelancer","prawo","przemysł","siłownia / fitness","sklep lokalny","startup","transport / logistyka","ślub / eventy","usługi lokalne","inne"];
 const STYLE_LIST=["nowoczesny minimalistyczny","bold / energetyczny","elegancki / luksusowy","korporacyjny / profesjonalny","artystyczny / kreatywny","przyjazny / kolorowy","klasyczny / tradycyjny","dark / tech","jasny / pastelowy"];
 const SECTIONS_LIST=[["hero","Hero / banner"],["o-nas","O nas"],["usługi","Usługi"],["portfolio","Portfolio / realizacje"],["cennik","Cennik"],["opinie","Opinie klientów"],["galeria","Galeria"],["blog","Blog / artykuły"],["faq","FAQ"],["kontakt","Kontakt"],["sklep","Sklep"],["rezerwacja","Rezerwacja online"],["team","Nasz zespół"],["partnerzy","Partnerzy / loga"]];
 
 function renderProjects(){
-  const items=state.projects;
-  if(!items.length) return`
-    <div class="page-head">
-      <div><h2>Projekty klientów</h2><div class="sub">Zarządzaj zleceniami — generuj briefe, śledź statusy, wysyłaj linki</div></div>
-      <button class="btn" id="newProj">＋ Nowy projekt</button>
-    </div>
-    <div class="empty"><div class="big">🏗️</div><h3>Brak projektów</h3><p>Utwórz pierwszy projekt — wypełnij brief,<br>wygeneruj prompt dla Claude i opublikuj stronę dla klienta.</p></div>`;
+  const all=state.projects;
 
-  const cards=items.map(p=>{
-    const st=p.status||"szkic";
+  // count per status
+  const counts={all:all.length};
+  STATUS_ORDER.forEach(s=>{counts[s]=all.filter(p=>(p.status||"robocze")===s).length;});
+
+  const filtered=projFilter==="all"?all:all.filter(p=>(p.status||"robocze")===projFilter);
+
+  const tabsHtml=`<div class="filter-tabs">
+    <div class="ftab ${projFilter==="all"?"active":""}" data-filter="all">Wszystkie<span class="cnt">${counts.all}</span></div>
+    ${STATUS_ORDER.map(s=>`<div class="ftab ${projFilter===s?"active":""}" data-filter="${s}">${STATUS_LABELS[s]}<span class="cnt">${counts[s]}</span></div>`).join("")}
+  </div>`;
+
+  if(!filtered.length){
+    const emptyMsg=projFilter==="all"
+      ?`<div class="empty"><div class="big">🏗️</div><h3>Brak projektów</h3><p>Utwórz pierwszy projekt — wypełnij brief,<br>wygeneruj prompt dla Claude i opublikuj stronę dla klienta.</p></div>`
+      :`<div class="empty"><div class="big">📭</div><h3>Brak projektów w kategorii „${STATUS_LABELS[projFilter]}"</h3><p>Zmień filtr lub dodaj nowy projekt.</p></div>`;
+    return`
+      <div class="page-head">
+        <div><h2>Projekty klientów</h2><div class="sub">Zarządzaj zleceniami — generuj briefe, śledź statusy, wysyłaj linki</div></div>
+        <button class="btn" id="newProj">＋ Nowy projekt</button>
+      </div>
+      ${tabsHtml}${emptyMsg}`;
+  }
+
+  const cards=filtered.map(p=>{
+    const st=p.status||"robocze";
     const liveUrl=p.slug?`${PAGES_BASE}${p.slug}/`:"";
     const urlHtml=liveUrl
       ?`<div class="proj-url">
@@ -359,13 +398,17 @@ function renderProjects(){
 
   return`
     <div class="page-head">
-      <div><h2>Projekty klientów</h2><div class="sub">${items.length} projekt(ów) — kliknij „Generuj prompt" aby otworzyć brief dla Claude</div></div>
+      <div><h2>Projekty klientów</h2><div class="sub">${all.length} projekt(ów) — kliknij „Generuj prompt" aby otworzyć brief dla Claude</div></div>
       <button class="btn" id="newProj">＋ Nowy projekt</button>
     </div>
+    ${tabsHtml}
     <div class="projects-grid">${cards}</div>`;
 }
 
 document.getElementById("content").addEventListener("click",async e=>{
+  // filter tabs
+  const ft=e.target.closest("[data-filter]");
+  if(ft){projFilter=ft.dataset.filter;render();return;}
   // new project
   if(e.target.id==="newProj"){openProjectModal();return;}
   // edit project
@@ -411,7 +454,7 @@ function openProjectModal(existing){
 
   const industryOpts=INDUSTRY_LIST.map(i=>`<option ${existing?.industry===i?"selected":""}>${i}</option>`).join("");
   const styleOpts=STYLE_LIST.map(s=>`<option ${existing?.style===s?"selected":""}>${s}</option>`).join("");
-  const statusOpts=[["szkic","Szkic"],["w-toku","W toku"],["wysłany","Wysłany"],["gotowy","Gotowy"]].map(([v,l])=>`<option value="${v}" ${(existing?.status||"szkic")===v?"selected":""}>${l}</option>`).join("");
+  const statusOpts=[["robocze","Robocze"],["w-toku","W toku"],["czeka","Czeka na zatwierdzenie"],["zatwierdzone","Zatwierdzone"],["zakonczone","Zakończone"]].map(([v,l])=>`<option value="${v}" ${(existing?.status||"robocze")===v?"selected":""}>${l}</option>`).join("");
 
   const root=document.getElementById("modalRoot");
   root.innerHTML=`
@@ -455,7 +498,7 @@ function openProjectModal(existing){
       name:fd.get("name").trim(),client:fd.get("client").trim(),
       slug:slugify(fd.get("slug")||""),industry:fd.get("industry")||"",
       style:fd.get("style")||"",colors:fd.get("colors").trim(),
-      sections:secs,notes:fd.get("notes").trim(),status:fd.get("status")||"szkic"
+      sections:secs,notes:fd.get("notes").trim(),status:fd.get("status")||"robocze"
     };
     if(existing){Object.assign(existing,data);}
     else{state.projects.unshift({id:uid(),createdAt:Date.now(),...data});}
