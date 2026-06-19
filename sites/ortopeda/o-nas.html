@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>O nas — Dr Wiśniewski Ortopeda Warszawa</title>
+  <meta name="description" content="Dr hab. med. Marcin Wiśniewski — ortopeda i traumatolog, Warszawa. 18 lat doświadczenia, ponad 4200 operacji, wykładowca WUM. Poznaj nasz zespół.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Doctor bio 2-column layout ── */
+    .bio-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .bio-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+    }
+
+    /* ── Photo column ── */
+    .bio-photo-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .bio-photo {
+      width: 100%;
+      height: 520px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: var(--r-lg);
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .bio-photo {
+        height: 380px;
+      }
+    }
+
+    .bio-stat-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .bio-stat-pill {
+      flex: 1;
+      min-width: fit-content;
+      text-align: center;
+      padding: 10px 14px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: var(--r);
+      font-size: 0.73rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    /* ── Biography column ── */
+    .bio-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .bio-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    .bio-subtitle {
+      font-size: 0.82rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-top: -16px;
+    }
+
+    .bio-quote {
+      border-left: 3px solid var(--primary);
+      padding: 4px 0 4px 24px;
+      margin: 0;
+    }
+
+    .bio-quote p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1.7;
+    }
+
+    .bio-text p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .bio-text p + p {
+      margin-top: 16px;
+    }
+
+    .bio-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Timeline section ── */
+    .timeline-section {
+      background: var(--bg2);
+    }
+
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 64px;
+      margin-top: 48px;
+    }
+
+    @media (max-width: 700px) {
+      .timeline-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Team section ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    @media (max-width: 860px) {
+      .team-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Team card photo placeholder ── */
+    .team-card-photo-placeholder {
+      width: 100%;
+      height: 240px;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .team-card-photo-initials {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Awards section ── */
+    .awards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    @media (max-width: 620px) {
+      .awards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .award-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      background: var(--bg);
+      transition: box-shadow 0.3s;
+    }
+
+    .award-item:hover {
+      box-shadow: 0 4px 24px rgba(15, 25, 35, 0.06);
+    }
+
+    .award-acronym {
+      flex-shrink: 0;
+      width: 52px;
+      height: 52px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: var(--r);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .award-body {}
+
+    .award-title {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .award-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── Section bg alternation ── */
+    .section-bg2 {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════
+       NAV
+  ════════════════════════════════════ -->
+  <nav class="site-nav" id="site-nav">
+    <a class="nav-logo" href="index.html">
+      <div class="nav-logo-mark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 1v14M1 8h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="nav-brand">Dr <span>Wiśniewski</span></span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="specjalizacje.html">Specjalizacje</a></li>
+      <li><a href="o-nas.html" class="active">O nas</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+    <a class="nav-cta" href="kontakt.html">Umów wizytę</a>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ════════════════════════════════════
+       PAGE HERO
+  ════════════════════════════════════ -->
+  <header class="page-hero">
+    <p class="page-hero-label">Poznaj nas</p>
+    <h1 class="page-hero-title">Doświadczenie i pasja do leczenia</h1>
+    <p class="page-hero-sub">Zespół specjalistów ortopedii i traumatologii narządu ruchu. Ponad 18 lat praktyki klinicznej, setki satysfakcjonujących zabiegów rocznie.</p>
+  </header>
+
+  <main>
+
+    <!-- ════════════════════════════════════
+         DOCTOR BIO
+    ════════════════════════════════════ -->
+    <section class="section">
+      <div class="bio-grid">
+
+        <!-- Left: photo + stat pills -->
+        <div class="bio-photo-wrap rv">
+          <img
+            class="bio-photo"
+            src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=600&q=85"
+            alt="Dr hab. med. Marcin Wiśniewski — ortopeda Warszawa"
+            loading="lazy"
+          >
+          <div class="bio-stat-pills">
+            <span class="bio-stat-pill">18+ lat praktyki</span>
+            <span class="bio-stat-pill">4200+ operacji</span>
+            <span class="bio-stat-pill">28 publikacji</span>
+          </div>
+        </div>
+
+        <!-- Right: biography text -->
+        <div class="bio-content">
+          <div class="rv d1">
+            <span class="section-label">Główny specjalista</span>
+            <h2 class="bio-name">Dr hab. med. Marcin Wiśniewski</h2>
+            <p class="bio-subtitle">Specjalista ortopedii i traumatologii narządu ruchu, II stopień specjalizacji</p>
+          </div>
+
+          <blockquote class="bio-quote rv d2">
+            <p>Każdy pacjent przychodzi do mnie nie tylko z bólem — przychodzi z niemożnością życia tak, jak chce. Moją rolą jest to zmienić i przywrócić pełną sprawność.</p>
+          </blockquote>
+
+          <div class="bio-text rv d3">
+            <p>Absolwent Akademii Medycznej w Warszawie (2000), specjalizacja z ortopedii i traumatologii narządu ruchu I stopnia (2007) i II stopnia (2012). Doktor habilitowany nauk medycznych. Przez 3 lata odbywał staże kliniczne w Klinik für Orthopädie und Unfallchirurgie w Wiedniu oraz Hospital for Special Surgery w Nowym Jorku.</p>
+            <p>Autor 28 publikacji naukowych w recenzowanych czasopismach polskich i zagranicznych. Wykładowca akademicki na Warszawskim Uniwersytecie Medycznym. Członek zarządu Polskiego Towarzystwa Ortopedycznego i Traumatologicznego (PTOiTR) oraz Europejskiego Towarzystwa Artroskopii Stawów Kolana i Sportowej Traumatologii Ortopedycznej (ESSKA).</p>
+          </div>
+
+          <div class="bio-badges rv d4">
+            <span class="badge badge-primary">PTOiTR</span>
+            <span class="badge badge-primary">ESSKA</span>
+            <span class="badge badge-primary">EFORT</span>
+            <span class="badge badge-primary">ISO 9001</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════
+         EDUCATION TIMELINE
+    ════════════════════════════════════ -->
+    <div class="section-bg2">
+      <section class="section">
+        <span class="section-label rv">Wykształcenie i szkolenia</span>
+        <h2 class="section-h2 rv d1">Droga do <em>doskonałości</em></h2>
+
+        <div class="timeline-grid">
+          <div class="timeline">
+
+            <div class="timeline-item rv d1">
+              <div class="timeline-year">2000</div>
+              <div class="timeline-title">Dyplom lekarza medycyny</div>
+              <div class="timeline-desc">Akademia Medyczna w Warszawie, Wydział Lekarski</div>
+            </div>
+
+            <div class="timeline-item rv d2">
+              <div class="timeline-year">2004</div>
+              <div class="timeline-title">Staż kliniczny — Ortopedia i Traumatologia</div>
+              <div class="timeline-desc">Klinik für Orthopädie, Wiedeń (Austria)</div>
+            </div>
+
+            <div class="timeline-item rv d3">
+              <div class="timeline-year">2006</div>
+              <div class="timeline-title">Staż kliniczny — Artroskopia i Chirurgia Sportowa</div>
+              <div class="timeline-desc">Hospital for Special Surgery, Nowy Jork (USA)</div>
+            </div>
+
+            <div class="timeline-item rv d4">
+              <div class="timeline-year">2007</div>
+              <div class="timeline-title">Specjalizacja I stopnia z ortopedii i traumatologii</div>
+              <div class="timeline-desc">Centrum Medyczne Kształcenia Podyplomowego, Warszawa</div>
+            </div>
+
+          </div>
+
+          <div class="timeline">
+
+            <div class="timeline-item rv d1">
+              <div class="timeline-year">2012</div>
+              <div class="timeline-title">Specjalizacja II stopnia z ortopedii i traumatologii</div>
+              <div class="timeline-desc">Centrum Medyczne Kształcenia Podyplomowego, Warszawa</div>
+            </div>
+
+            <div class="timeline-item rv d2">
+              <div class="timeline-year">2015</div>
+              <div class="timeline-title">Doktorat — nauki medyczne</div>
+              <div class="timeline-desc">Warszawski Uniwersytet Medyczny</div>
+            </div>
+
+            <div class="timeline-item rv d3">
+              <div class="timeline-year">2018</div>
+              <div class="timeline-title">Doktor habilitowany nauk medycznych</div>
+              <div class="timeline-desc">Warszawski Uniwersytet Medyczny</div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ════════════════════════════════════
+         TEAM
+    ════════════════════════════════════ -->
+    <section class="section">
+      <span class="section-label rv">Nasz zespół</span>
+      <h2 class="section-h2 rv d1">Ludzie, na których <em>możesz polegać</em></h2>
+
+      <div class="team-grid">
+
+        <!-- Card 1 — Dr Wiśniewski -->
+        <div class="team-card rv d1">
+          <img
+            class="team-card-photo"
+            src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=400&q=85"
+            alt="Dr hab. med. Marcin Wiśniewski"
+            loading="lazy"
+          >
+          <div class="team-card-body">
+            <div class="team-card-name">Dr hab. med. Marcin Wiśniewski</div>
+            <div class="team-card-role">Ortopeda, Traumatolog</div>
+            <p class="team-card-desc">Specjalista II stopnia. Główny operator kliniczny. Przyjmuje w poniedziałki, środy i piątki.</p>
+          </div>
+        </div>
+
+        <!-- Card 2 — Dr Kowalska -->
+        <div class="team-card rv d2">
+          <img
+            class="team-card-photo"
+            src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=400&q=85"
+            alt="Dr Anna Kowalska"
+            loading="lazy"
+          >
+          <div class="team-card-body">
+            <div class="team-card-name">Dr Anna Kowalska</div>
+            <div class="team-card-role">Asystent ortopedii</div>
+            <p class="team-card-desc">Specjalista I stopnia. Zajmuje się rehabilitacją pooperacyjną i ortopedią dziecięcą. Przyjmuje we wtorki i czwartki.</p>
+          </div>
+        </div>
+
+        <!-- Card 3 — Magdalena Nowak (no photo) -->
+        <div class="team-card rv d3">
+          <div class="team-card-photo-placeholder">
+            <div class="team-card-photo-initials" aria-hidden="true">MN</div>
+          </div>
+          <div class="team-card-body">
+            <div class="team-card-name">Magdalena Nowak</div>
+            <div class="team-card-role">Kierownik rejestracji</div>
+            <p class="team-card-desc">Koordynuje harmonogram wizyt i pomaga pacjentom w przygotowaniu do zabiegów. Osiągalna pon–pt 8:00–18:00.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════
+         AWARDS / CERTIFICATIONS
+    ════════════════════════════════════ -->
+    <div class="section-bg2">
+      <section class="section">
+        <span class="section-label rv">Certyfikaty i nagrody</span>
+        <h2 class="section-h2 rv d1">Uznanie <em>środowiska medycznego</em></h2>
+
+        <div class="awards-grid">
+
+          <div class="award-item rv d1">
+            <div class="award-acronym">PTOiTR</div>
+            <div class="award-body">
+              <div class="award-title">Polskie Towarzystwo Ortopedyczne i Traumatologiczne</div>
+              <p class="award-desc">Członek Zarządu Polskiego Towarzystwa Ortopedycznego i Traumatologicznego od 2018 r.</p>
+            </div>
+          </div>
+
+          <div class="award-item rv d2">
+            <div class="award-acronym">ESSKA</div>
+            <div class="award-body">
+              <div class="award-title">European Society of Sports Traumatology</div>
+              <p class="award-desc">Pełny członek Europejskiego Towarzystwa Artroskopii Stawów Kolana i Sportowej Traumatologii Ortopedycznej.</p>
+            </div>
+          </div>
+
+          <div class="award-item rv d3">
+            <div class="award-acronym">EFORT</div>
+            <div class="award-body">
+              <div class="award-title">European Federation of Orthopaedic Traumatology</div>
+              <p class="award-desc">Członek Europejskiego Towarzystwa Ortopedii i Traumatologii — jednego z największych towarzystw ortopedycznych świata.</p>
+            </div>
+          </div>
+
+          <div class="award-item rv d4">
+            <div class="award-acronym">ISO<br>9001</div>
+            <div class="award-body">
+              <div class="award-title">Certyfikat jakości ISO 9001:2015</div>
+              <p class="award-desc">Klinika certyfikowana wg normy ISO 9001:2015 w zakresie świadczenia usług medycznych.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- ════════════════════════════════════
+         CTA BLOCK
+    ════════════════════════════════════ -->
+    <div class="cta-block">
+      <h2 class="cta-block-title">Poznaj nas osobiście</h2>
+      <p class="cta-block-sub">Umów wizytę konsultacyjną i przekonaj się, że Twoje zdrowie jest w dobrych rękach.</p>
+      <a class="btn-primary" href="kontakt.html">Zarezerwuj wizytę</a>
+    </div>
+
+  </main>
+
+  <!-- ════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div>
+      <div class="footer-brand">Dr Marcin Wiśniewski</div>
+      <div class="footer-tagline">Ortopedia i traumatologia narządu ruchu · Warszawa</div>
+    </div>
+    <div class="footer-links">
+      <a href="specjalizacje.html">Specjalizacje</a>
+      <a href="o-nas.html">O nas</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a class="footer-back" href="../../">← powrót do kolekcji</a>
+    </div>
+  </footer>
+
+  <script>
+    // Nav scroll
+    const nav = document.getElementById('site-nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, {passive: true});
+
+    // Hamburger
+    const hamburger = document.getElementById('nav-hamburger');
+    const navLinks = document.getElementById('nav-links');
+    hamburger.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+    });
+
+    // Scroll reveal
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
+    }, {threshold: 0.08});
+    document.querySelectorAll('.rv').forEach(el => io.observe(el));
+  </script>
+
+</body>
+</html>

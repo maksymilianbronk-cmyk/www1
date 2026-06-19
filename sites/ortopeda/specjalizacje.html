@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specjalizacje — Dr Wiśniewski Ortopeda Warszawa</title>
+  <meta name="description" content="Kompleksowe leczenie narządu ruchu: artroskopia kolana, endoprotezoplastyka, chirurgia kręgosłupa, urazy sportowe, ortopedia dziecięca. Dr Marcin Wiśniewski, Warszawa.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Specialization cards grid ── */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+
+    @media (max-width: 700px) {
+      .spec-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .spec-detail-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 36px 32px;
+      transition: box-shadow 0.3s, transform 0.3s;
+    }
+
+    .spec-detail-card:hover {
+      box-shadow: 0 8px 40px rgba(15, 25, 35, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .spec-detail-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary-light);
+      border-radius: var(--r);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .spec-conditions {
+      list-style: none;
+      padding: 0;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .spec-conditions li {
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .spec-conditions li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+    }
+
+    /* ── Section heading alignment ── */
+    .spec-header {
+      max-width: 600px;
+    }
+
+    /* ── FAQ section bg ── */
+    .faq-section {
+      background: var(--bg2);
+    }
+
+    .faq-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .faq-inner .section-label,
+    .faq-inner .section-h2 {
+      text-align: center;
+    }
+
+    .faq-inner .section-lead {
+      text-align: center;
+      max-width: 100%;
+    }
+
+    .accordion {
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════
+       NAV
+  ════════════════════════════════════ -->
+  <nav class="site-nav" id="site-nav">
+    <a class="nav-logo" href="index.html">
+      <div class="nav-logo-mark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 1v14M1 8h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="nav-brand">Dr <span>Wiśniewski</span></span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="specjalizacje.html" class="active">Specjalizacje</a></li>
+      <li><a href="o-nas.html">O nas</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+    <a class="nav-cta" href="kontakt.html">Umów wizytę</a>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ════════════════════════════════════
+       PAGE HERO
+  ════════════════════════════════════ -->
+  <header class="page-hero">
+    <p class="page-hero-label">Nasza oferta</p>
+    <h1 class="page-hero-title">Nasze specjalizacje</h1>
+    <p class="page-hero-sub">Kompleksowe leczenie narządu ruchu od diagnostyki po rehabilitację pooperacyjną. Stosujemy najnowocześniejsze techniki małoinwazyjne.</p>
+  </header>
+
+  <!-- ════════════════════════════════════
+       SPECIALIZATIONS GRID
+  ════════════════════════════════════ -->
+  <main>
+    <section class="section">
+      <div class="spec-header">
+        <span class="section-label">Obszary leczenia</span>
+        <h2 class="section-h2">Co leczymy</h2>
+        <p class="section-lead">Każdy pacjent otrzymuje spersonalizowany plan diagnostyki i terapii, oparty na najnowszych wytycznych klinicznych.</p>
+      </div>
+
+      <div class="spec-grid">
+
+        <!-- 1. Artroskopia kolana -->
+        <div class="spec-detail-card rv d1">
+          <div class="spec-detail-icon">🦵</div>
+          <h3 class="card-title">Artroskopia kolana</h3>
+          <p class="card-desc">Minimalnie inwazyjna procedura diagnostyczna i terapeutyczna stawu kolanowego. Przy użyciu artroskopii leczymy urazy sportowe i zmiany zwyrodnieniowe bez dużych nacięć.</p>
+          <ul class="spec-conditions">
+            <li>Uszkodzenie łąkotki</li>
+            <li>Zerwanie więzadła krzyżowego (ACL)</li>
+            <li>Chondromalacja rzepki</li>
+            <li>Wolne ciała w stawie</li>
+          </ul>
+        </div>
+
+        <!-- 2. Endoprotezoplastyka stawu biodrowego -->
+        <div class="spec-detail-card rv d2">
+          <div class="spec-detail-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <circle cx="10" cy="8" r="5" stroke="var(--primary)" stroke-width="1.8"/>
+              <path d="M10 13v5c0 2 1 3 3 4l3 2" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M16 22l2 4" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="card-title">Endoprotezoplastyka stawu biodrowego</h3>
+          <p class="card-desc">Całkowita lub częściowa wymiana stawu biodrowego przywraca pełną sprawność i eliminuje ból. Stosujemy implanty certyfikowane, dostosowane do indywidualnej anatomii pacjenta.</p>
+          <ul class="spec-conditions">
+            <li>Zaawansowana choroba zwyrodnieniowa stawu</li>
+            <li>Martwica głowy kości udowej</li>
+            <li>Złamania szyjki kości udowej</li>
+            <li>Dysplazja stawu biodrowego</li>
+          </ul>
+        </div>
+
+        <!-- 3. Endoprotezoplastyka stawu kolanowego -->
+        <div class="spec-detail-card rv d1">
+          <div class="spec-detail-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <path d="M9 2v9" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round"/>
+              <ellipse cx="14" cy="14" rx="6" ry="4" stroke="var(--primary)" stroke-width="1.8"/>
+              <path d="M19 14v12" stroke="var(--primary)" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M9 11l5 3" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M19 14l-5-3" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="card-title">Endoprotezoplastyka stawu kolanowego</h3>
+          <p class="card-desc">Wymiana uszkodzonego stawu kolanowego na implant metalowy lub ceramiczny. Zabieg przywraca mobilność i usuwa chroniczny ból ograniczający codzienne funkcjonowanie.</p>
+          <ul class="spec-conditions">
+            <li>Gonarthroza III i IV stopnia</li>
+            <li>Reumatoidalne zapalenie stawów</li>
+            <li>Postęp zmian po urazach</li>
+            <li>Nieskuteczność leczenia zachowawczego</li>
+          </ul>
+        </div>
+
+        <!-- 4. Chirurgia kręgosłupa -->
+        <div class="spec-detail-card rv d2">
+          <div class="spec-detail-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <rect x="11" y="2" width="6" height="4" rx="1" stroke="var(--primary)" stroke-width="1.8"/>
+              <rect x="11" y="8" width="6" height="4" rx="1" stroke="var(--primary)" stroke-width="1.8"/>
+              <rect x="11" y="14" width="6" height="4" rx="1" stroke="var(--primary)" stroke-width="1.8"/>
+              <rect x="11" y="20" width="6" height="4" rx="1" stroke="var(--primary)" stroke-width="1.8"/>
+              <line x1="14" y1="6" x2="14" y2="8" stroke="var(--primary)" stroke-width="1.8"/>
+              <line x1="14" y1="12" x2="14" y2="14" stroke="var(--primary)" stroke-width="1.8"/>
+              <line x1="14" y1="18" x2="14" y2="20" stroke="var(--primary)" stroke-width="1.8"/>
+            </svg>
+          </div>
+          <h3 class="card-title">Chirurgia kręgosłupa</h3>
+          <p class="card-desc">Leczenie operacyjne schorzeń kręgosłupa technikami małoinwazyjnymi — mikrodiscektomia, stabilizacja kręgosłupa, odbarczenie kanału kręgowego.</p>
+          <ul class="spec-conditions">
+            <li>Dyskopatia lędźwiowa i szyjna</li>
+            <li>Stenoza kanału kręgowego</li>
+            <li>Kręgozmyk (spondylolisteza)</li>
+            <li>Niestabilność kręgosłupa</li>
+          </ul>
+        </div>
+
+        <!-- 5. Urazy sportowe -->
+        <div class="spec-detail-card rv d1">
+          <div class="spec-detail-icon">🏃</div>
+          <h3 class="card-title">Urazy sportowe</h3>
+          <p class="card-desc">Diagnostyka i leczenie urazów narządu ruchu u sportowców amatorów i zawodowych. Celem jest jak najszybszy powrót do pełnej aktywności fizycznej.</p>
+          <ul class="spec-conditions">
+            <li>Zerwanie więzadła ACL, PCL, MCL</li>
+            <li>Uszkodzenia stożka rotatorów</li>
+            <li>Urazy stawu skokowego</li>
+            <li>Złamania zmęczeniowe</li>
+          </ul>
+        </div>
+
+        <!-- 6. Ortopedia dziecięca -->
+        <div class="spec-detail-card rv d2">
+          <div class="spec-detail-icon">👶</div>
+          <h3 class="card-title">Ortopedia dziecięca</h3>
+          <p class="card-desc">Diagnozowanie i leczenie wad postawy, skrzywień kręgosłupa i wad wrodzonych u dzieci i młodzieży. Wczesna interwencja zapobiega powikłaniom w dorosłości.</p>
+          <ul class="spec-conditions">
+            <li>Skolioza idiopatyczna</li>
+            <li>Dysplazja stawu biodrowego u niemowląt</li>
+            <li>Płaskostopie i koślawość</li>
+            <li>Choroba Perthesa</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════
+         FAQ ACCORDION
+    ════════════════════════════════════ -->
+    <section class="section-full faq-section" style="padding: 96px 64px;">
+      <div class="faq-inner">
+        <span class="section-label rv">Najczęstsze pytania</span>
+        <h2 class="section-h2 rv d1">FAQ</h2>
+        <p class="section-lead rv d2">Odpowiedzi na pytania, które zadaje nam większość pacjentów przed wizytą lub zabiegiem.</p>
+
+        <div class="accordion rv d3">
+
+          <div class="accordion-item">
+            <button class="accordion-btn" aria-expanded="false">
+              Jak długo trwa hospitalizacja po endoprotezoplastyce?
+              <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                Hospitalizacja po całkowitej endoprotezoplastyce stawu biodrowego lub kolanowego trwa zazwyczaj 3–5 dni. Po tym czasie pacjent wraca do domu i kontynuuje rehabilitację ambulatoryjnie lub w centrum rehabilitacji. Pełny powrót do samodzielności następuje zazwyczaj po 6–12 tygodniach.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-btn" aria-expanded="false">
+              Kiedy mogę wrócić do aktywności fizycznej po artroskopii?
+              <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                Po artroskopii diagnostycznej lub usunięciu wolnych ciał pacjent może obciążać nogę następnego dnia. Po rekonstrukcji więzadła ACL powrót do sportu kontaktowego zajmuje 6–9 miesięcy. Program rehabilitacji jest ustalany indywidualnie dla każdego pacjenta.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-btn" aria-expanded="false">
+              Czy zabiegi ortopedyczne są refundowane przez NFZ?
+              <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                Wiele procedur ortopedycznych jest objętych refundacją w ramach NFZ, jednak czas oczekiwania może wynosić od kilku miesięcy do kilku lat. W naszej klinice oferujemy zarówno wizyty prywatne, jak i w ramach umów z ubezpieczycielami prywatnymi (Medicover, LuxMed). Zapewniamy pełną transparentność cenową.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <button class="accordion-btn" aria-expanded="false">
+              Jakie badania należy zabrać na pierwszą wizytę?
+              <svg class="accordion-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                Na pierwszą wizytę zalecamy przyniesienie dostępnych wyników badań obrazowych: RTG, USG lub MRI. Jeśli nie posiadasz żadnych badań, doktor Wiśniewski oceni podczas wizyty, które badania są niezbędne do postawienia diagnozy. Ważne jest również zabranie listy aktualnie przyjmowanych leków.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════
+         CTA BLOCK
+    ════════════════════════════════════ -->
+    <div class="cta-block">
+      <h2 class="cta-block-title">Masz pytania dotyczące leczenia?</h2>
+      <p class="cta-block-sub">Umów wizytę konsultacyjną. Ocenimy stan zdrowia i zaproponujemy optymalną ścieżkę leczenia.</p>
+      <a class="btn-primary" href="kontakt.html">Zarezerwuj wizytę</a>
+    </div>
+
+  </main>
+
+  <!-- ════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div>
+      <div class="footer-brand">Dr Marcin Wiśniewski</div>
+      <div class="footer-tagline">Ortopedia i traumatologia narządu ruchu · Warszawa</div>
+    </div>
+    <div class="footer-links">
+      <a href="specjalizacje.html">Specjalizacje</a>
+      <a href="o-nas.html">O nas</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a class="footer-back" href="../../">← powrót do kolekcji</a>
+    </div>
+  </footer>
+
+  <script>
+    // Nav scroll
+    const nav = document.getElementById('site-nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, {passive: true});
+
+    // Hamburger
+    const hamburger = document.getElementById('nav-hamburger');
+    const navLinks = document.getElementById('nav-links');
+    hamburger.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+    });
+
+    // Scroll reveal
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
+    }, {threshold: 0.08});
+    document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+    // Accordion
+    document.querySelectorAll('.accordion-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        document.querySelectorAll('.accordion-btn').forEach(b => {
+          b.setAttribute('aria-expanded', 'false');
+          b.nextElementSibling.style.maxHeight = null;
+        });
+        if (!expanded) {
+          btn.setAttribute('aria-expanded', 'true');
+          btn.nextElementSibling.style.maxHeight = btn.nextElementSibling.scrollHeight + 'px';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
