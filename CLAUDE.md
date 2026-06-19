@@ -19,6 +19,9 @@ www1/
 
 ## Jak dodać nową stronę
 
+> Skrót: polecenie **„nowa strona"** uruchamia skill `nowa-strona`
+> (`.claude/skills/nowa-strona/`), który wykonuje poniższe kroki automatycznie.
+
 1. Utwórz folder `sites/<slug>/` i umieść w nim `index.html` (plus dowolne zasoby).
 2. Dodaj wpis do tablicy `SITES` w `assets/js/sites.js`:
 
