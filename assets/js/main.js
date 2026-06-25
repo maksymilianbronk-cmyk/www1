@@ -176,12 +176,40 @@ async function downloadZip(site, btn) {
   try {
     const zip = new JSZip();
     const folder = zip.folder(site.slug);
-    const files = site.meta?.files || ['index.html'];
-    await Promise.all(files.map(async file => {
-      const res = await fetch(`sites/${site.slug}/${file}`);
-      if (!res.ok) throw new Error(res.status);
-      folder.file(file, await res.blob());
+
+    // Fetch main HTML as text so we can rewrite image URLs
+    const htmlRes = await fetch(`sites/${site.slug}/index.html`);
+    if (!htmlRes.ok) throw new Error(htmlRes.status);
+    let html = await htmlRes.text();
+
+    // Find all Unsplash image URLs (absolute, including query strings)
+    const unsplashRe = /https:\/\/images\.unsplash\.com\/[^"'\s)\]>]+/g;
+    const imgUrls = [...new Set(html.match(unsplashRe) || [])];
+
+    // Fetch each image, add to zip/images/, build rewrite map
+    const imgMap = {};
+    await Promise.all(imgUrls.map(async url => {
+      try {
+        const pid = (url.match(/\/(photo-[a-zA-Z0-9_-]+)/) || [])[1] || ('img-' + Math.random().toString(36).slice(2, 8));
+        const local = `images/${pid}.jpg`;
+        const r = await fetch(url);
+        if (r.ok) { folder.file(local, await r.blob()); imgMap[url] = local; }
+      } catch {}
     }));
+
+    // Rewrite HTML so local images are used
+    for (const [orig, local] of Object.entries(imgMap)) {
+      html = html.split(orig).join(local);
+    }
+    folder.file('index.html', html);
+
+    // Extra declared files (CSS, sub-pages etc.)
+    const extras = (site.meta?.files || []).filter(f => f !== 'index.html');
+    await Promise.all(extras.map(async f => {
+      const r = await fetch(`sites/${site.slug}/${f}`);
+      if (r.ok) folder.file(f, await r.blob());
+    }));
+
     const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
     const a = Object.assign(document.createElement('a'), {
       href: URL.createObjectURL(blob),
