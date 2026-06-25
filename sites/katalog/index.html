@@ -225,6 +225,9 @@ tr:hover td{background:var(--surface-2)}
     <div class="nav-item" data-view="import">
       <span class="ico">📦</span> Import ZIP <span class="count" id="cntImported">0</span>
     </div>
+    <div class="nav-item" data-view="publish">
+      <span class="ico">🚀</span> Publikacja <span class="count" id="cntPublished">0</span>
+    </div>
     <div class="side-footer">
       <a href="../scenariusze/">🗺️ Scenariusze pracy</a>
       <a href="../prompty/">📋 Biblioteka promptów</a>
@@ -331,11 +334,13 @@ function render(){
   document.getElementById("cntFolders").textContent=state.folders.length;
   document.getElementById("cntPromoters").textContent=state.promoters.length;
   document.getElementById("cntImported").textContent=getImported().length;
+  document.getElementById("cntPublished").textContent=getPublished().length;
   const c=document.getElementById("content");
   if(view==="projects") c.innerHTML=renderProjects();
   else if(view==="files"){ c.innerHTML=openFolderId?renderFileManager():renderFolders(); if(openFolderId)wireFileManager(); }
   else if(view==="promoters") c.innerHTML=renderPromoters();
   else if(view==="import"){ c.innerHTML=renderImport(); wireImport(); }
+  else if(view==="publish"){ c.innerHTML=renderPublish(); wirePublish(); }
 }
 
 /* ================================================================
@@ -848,6 +853,303 @@ function wireImport(){
         </div>`;
         formWrap.classList.add("hidden");
         render();
+      });
+    }catch(err){
+      statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Błąd odczytu ZIP: ${esc(String(err.message||err))}</p>`;
+    }
+  }
+}
+
+/* ================================================================
+   PUBLISH — helpers
+   ================================================================ */
+function getPublished(){ try{return JSON.parse(localStorage.getItem("www1_published_v1")||"[]");}catch{return[];} }
+function savePublished(list){ localStorage.setItem("www1_published_v1",JSON.stringify(list)); }
+
+async function ghFetch(url, token, method, body){
+  if(!method) method="GET";
+  const res = await fetch(url, {
+    method,
+    headers:{
+      "Authorization":"token "+token,
+      "Accept":"application/vnd.github.v3+json",
+      "Content-Type":"application/json"
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if(!res.ok){
+    let msg = "HTTP "+res.status;
+    try{ const j=await res.json(); msg=j.message||msg; }catch{}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+async function ghUpdateSitesJs(slug,title,desc,icon,tag,token){
+  const owner="maksymilianbronk-cmyk",repo="www1",branch="main";
+  const path="assets/js/sites.js";
+  const existing=await ghFetch("https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path,token);
+  const currentText=decodeURIComponent(escape(atob(existing.content.replace(/\s/g,""))));
+  const entry="  {\n    slug: \""+slug+"\",\n    title: \""+title.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+"\",\n    desc: \""+desc.replace(/\\/g,"\\\\").replace(/"/g,'\\"')+"\",\n    icon: \""+icon+"\",\n    tag: \""+tag+"\",\n    preview: true,\n  },";
+  const updated=currentText.replace(/(\s*\];)(\s*)$/,"\n"+entry+"\n];");
+  await ghFetch("https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+path,token,"PUT",{
+    message:"feat: rejestruj "+slug+" w sites.js",
+    content:btoa(unescape(encodeURIComponent(updated))),
+    sha:existing.sha,
+    branch
+  });
+}
+
+/* ================================================================
+   PUBLISH — render
+   ================================================================ */
+function renderPublish(){
+  const published=getPublished();
+  const rows=published.map(s=>`
+    <div class="file-row">
+      <span class="fi">🚀</span>
+      <div class="info">
+        <div class="nm">${esc(s.title)}</div>
+        <div class="meta"><code style="font-size:.78rem">${esc(s.slug)}</code> · ${fmtDate(s.publishedAt)}</div>
+      </div>
+      <a href="${esc(s.url)}" target="_blank" class="icon-btn" title="Otwórz stronę" style="text-decoration:none">↗</a>
+      <button class="icon-btn del" data-rmpub="${esc(s.slug)}" title="Usuń wpis">🗑</button>
+    </div>`).join("");
+  return`
+    <div class="page-head">
+      <div><h2>🚀 Publikacja</h2><div class="sub">Wgraj ZIP i opublikuj stronę bezpośrednio na GitHub Pages</div></div>
+    </div>
+
+    <details open style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px">
+      <summary style="font-weight:600;cursor:pointer;user-select:none">🔑 GitHub Token</summary>
+      <div style="margin-top:14px">
+        <div class="field">
+          <label>Personal Access Token (PAT) — zakres: <code>repo</code></label>
+          <input type="password" id="ghPat" placeholder="ghp_…" value="${esc(sessionStorage.getItem('gh_pat')||'')}">
+        </div>
+        <div class="modal-actions" style="justify-content:flex-start;margin-top:10px;padding-top:10px">
+          <button class="btn sm" id="ghSaveToken">Zapisz token</button>
+          <button class="btn ghost sm" id="ghTestToken">Testuj połączenie</button>
+        </div>
+        <div id="ghStatus" style="margin-top:10px;font-size:.85rem;color:var(--text-dim)"></div>
+      </div>
+    </details>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px">
+      <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px">Nowa publikacja</h3>
+      <div class="dropzone" id="pubZone" style="cursor:pointer">
+        <div class="big">📦</div>
+        <div>Przeciągnij plik <strong>.zip</strong> ze stroną lub <label for="pubZip" style="cursor:pointer">wybierz z dysku</label></div>
+        <input type="file" id="pubZip" accept=".zip" class="hidden">
+      </div>
+      <div id="pubStatus"></div>
+      <div id="pubFormWrap" class="hidden"></div>
+    </div>
+
+    ${published.length?`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px">
+      <div class="page-head" style="margin-bottom:14px">
+        <div><h2 style="font-size:1.1rem;font-weight:600">Opublikowane strony (${published.length})</h2><div class="sub">Historia publikacji zapisana lokalnie</div></div>
+      </div>
+      <div id="publishedRows">${rows}</div>
+    </div>`:""}`;
+}
+
+/* ================================================================
+   PUBLISH — wire
+   ================================================================ */
+// Track whether listener was already attached to avoid duplicates
+let _publishListenerAttached=false;
+
+function wirePublish(){
+  const statusEl=document.getElementById("pubStatus");
+  const formWrap=document.getElementById("pubFormWrap");
+  const zone=document.getElementById("pubZone");
+  const input=document.getElementById("pubZip");
+
+  // ── Token section ──
+  const saveBtn=document.getElementById("ghSaveToken");
+  const testBtn=document.getElementById("ghTestToken");
+  const ghStatus=document.getElementById("ghStatus");
+
+  if(saveBtn) saveBtn.addEventListener("click",()=>{
+    const val=(document.getElementById("ghPat").value||"").trim();
+    if(!val){ghStatus.textContent="Wpisz token.";return;}
+    sessionStorage.setItem("gh_pat",val);
+    const orig=saveBtn.textContent;saveBtn.textContent="✅ Zapisano";setTimeout(()=>saveBtn.textContent=orig,1500);
+  });
+
+  if(testBtn) testBtn.addEventListener("click",async()=>{
+    const token=(document.getElementById("ghPat").value||sessionStorage.getItem("gh_pat")||"").trim();
+    if(!token){ghStatus.textContent="Brak tokena — wpisz i zapisz najpierw.";return;}
+    testBtn.disabled=true;ghStatus.textContent="Sprawdzam…";
+    try{
+      const user=await ghFetch("https://api.github.com/user",token);
+      ghStatus.innerHTML=`<span style="color:var(--ok)">✅ Połączono jako <strong>${esc(user.login)}</strong></span>`;
+    }catch(err){
+      ghStatus.innerHTML=`<span style="color:var(--danger)">❌ Błąd: ${esc(String(err.message||err))}</span>`;
+    }finally{testBtn.disabled=false;}
+  });
+
+  // ── Dropzone ──
+  if(zone&&input){
+    zone.addEventListener("click",e=>{ if(e.target===zone||e.target===zone.querySelector(".big")||e.target===zone.querySelector("div:not(label)"))input.click(); });
+    ["dragenter","dragover"].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add("drag");}));
+    ["dragleave","drop"].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove("drag");}));
+    zone.addEventListener("drop",e=>{ if(e.dataTransfer.files[0]) processPublishZip(e.dataTransfer.files[0]); });
+    input.addEventListener("change",()=>{ if(input.files[0]) processPublishZip(input.files[0]); });
+  }
+
+  // ── Content delegation for copy + delete (avoid duplicate listeners) ──
+  if(!_publishListenerAttached){
+    _publishListenerAttached=true;
+    document.getElementById("content").addEventListener("click",async e=>{
+      // copy button inside pubStatus
+      const copyBtn=e.target.closest("[data-copy]");
+      if(copyBtn&&document.getElementById("pubStatus")&&document.getElementById("pubStatus").contains(copyBtn)){
+        try{await navigator.clipboard.writeText(copyBtn.dataset.copy);}catch(err){prompt("Skopiuj ręcznie:",copyBtn.dataset.copy);return;}
+        const orig=copyBtn.textContent;copyBtn.textContent="✅";setTimeout(()=>copyBtn.textContent=orig,1500);
+        return;
+      }
+      // remove published entry
+      const rmpub=e.target.closest("[data-rmpub]");
+      if(rmpub){
+        const slug=rmpub.dataset.rmpub;
+        const found=getPublished().find(s=>s.slug===slug);
+        if(found&&confirm("Usunąć wpis „"+found.title+"" z historii publikacji?")){
+          savePublished(getPublished().filter(s=>s.slug!==slug));
+          render();
+        }
+        return;
+      }
+    });
+  }
+
+  // ── processPublishZip ──
+  async function processPublishZip(file){
+    if(!window.JSZip){statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Biblioteka JSZip nie załadowała się. Odśwież stronę i spróbuj ponownie.</p>`;return;}
+    statusEl.innerHTML=`<p style="color:var(--text-dim);margin:12px 0">⏳ Wczytuję <strong>${esc(file.name)}</strong>…</p>`;
+    formWrap.classList.add("hidden");
+    try{
+      const zip=await JSZip.loadAsync(file);
+      const allFiles=[];
+      zip.forEach((path,entry)=>{ if(!entry.dir) allFiles.push({path,entry}); });
+      if(!allFiles.length){statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Archiwum jest puste.</p>`;return;}
+
+      statusEl.innerHTML=`<div style="color:var(--ok);padding:10px 0">✅ Znaleziono <strong>${allFiles.length}</strong> plik(ów). Uzupełnij dane publikacji:</div>`;
+      formWrap.classList.remove("hidden");
+      const autoSlug=slugify(file.name.replace(/\.zip$/i,""));
+      formWrap.innerHTML=`
+        <form id="pubSaveForm" style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:22px;max-width:580px;margin-top:8px">
+          <div class="two-col">
+            <div class="field"><label>Tytuł strony *</label><input name="title" required placeholder="np. Strona Klienta ABC" id="pubTitle" autofocus></div>
+            <div class="field"><label>Slug (folder na GitHub) *</label><input name="slug" value="${esc(autoSlug)}" required placeholder="np. klient-abc" id="pubSlug"></div>
+          </div>
+          <div class="field"><label>Opis</label><input name="desc" placeholder="Krótki opis strony"></div>
+          <div class="two-col">
+            <div class="field"><label>Ikona (emoji)</label><input name="icon" value="🌐" maxlength="4" placeholder="🌐"></div>
+            <div class="field"><label>Tag kategorii</label><input name="tag" value="landing" placeholder="np. landing, portfolio"></div>
+          </div>
+          <div id="pubProgress" class="hidden" style="margin:10px 0;font-size:.85rem;color:var(--text-dim)"></div>
+          <div class="modal-actions" style="margin-top:14px;padding-top:14px">
+            <button type="button" class="btn ghost sm" id="pubCancel">Anuluj</button>
+            <button type="submit" class="btn" id="pubSubmit">🚀 Opublikuj na GitHub Pages</button>
+          </div>
+        </form>`;
+
+      document.getElementById("pubCancel").onclick=()=>{formWrap.classList.add("hidden");statusEl.innerHTML="";};
+
+      // auto-slugify title
+      document.getElementById("pubTitle").addEventListener("input",ev=>{
+        const s=document.getElementById("pubSlug");
+        if(!s._manual) s.value=slugify(ev.target.value);
+      });
+      document.getElementById("pubSlug").addEventListener("input",()=>{ document.getElementById("pubSlug")._manual=true; });
+
+      document.getElementById("pubSaveForm").addEventListener("submit",async e=>{
+        e.preventDefault();
+        const fd=new FormData(e.target);
+        const slug=slugify(fd.get("slug")||"");
+        const title=(fd.get("title")||slug).trim();
+        const desc=(fd.get("desc")||"").trim();
+        const icon=(fd.get("icon")||"🌐").trim();
+        const tag=(fd.get("tag")||"landing").trim();
+        if(!slug){alert("Podaj slug!");return;}
+
+        let token=(document.getElementById("ghPat").value||sessionStorage.getItem("gh_pat")||"").trim();
+        if(!token){token=prompt("Podaj GitHub Personal Access Token (zakres: repo):");}
+        if(!token){alert("Brak tokena — publikacja niemożliwa.");return;}
+
+        const submitBtn=document.getElementById("pubSubmit");
+        submitBtn.disabled=true;
+        const progressEl=document.getElementById("pubProgress");
+        progressEl.classList.remove("hidden");
+
+        // detect common root prefix
+        const paths=allFiles.map(f=>f.path);
+        let rootPrefix="";
+        if(paths.length>0){
+          const firstParts=paths[0].split("/");
+          if(firstParts.length>1){
+            const candidate=firstParts[0]+"/";
+            if(paths.every(p=>p.startsWith(candidate))) rootPrefix=candidate;
+          }
+        }
+
+        const owner="maksymilianbronk-cmyk";
+        const repo="www1";
+        const branch="main";
+        let done=0;
+        const total=allFiles.length;
+
+        try{
+          for(const {path,entry} of allFiles){
+            const localPath=rootPrefix&&path.startsWith(rootPrefix)?path.slice(rootPrefix.length):path;
+            if(!localPath) continue; // skip root dir entry itself
+            const ghPath="sites/"+slug+"/"+localPath;
+            progressEl.textContent="Wgrywam ("+done+"/"+total+"): "+localPath;
+
+            let sha=undefined;
+            try{
+              const existing=await ghFetch("https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+ghPath,token);
+              sha=existing.sha;
+            }catch(notFound){ sha=undefined; }
+
+            const content=await entry.async("base64");
+            const body={
+              message:"deploy: "+slug+" — "+localPath,
+              content,
+              branch
+            };
+            if(sha) body.sha=sha;
+            await ghFetch("https://api.github.com/repos/"+owner+"/"+repo+"/contents/"+ghPath,token,"PUT",body);
+            done++;
+          }
+
+          progressEl.textContent="Aktualizuję sites.js… ("+done+"/"+total+")";
+          await ghUpdateSitesJs(slug,title,desc,icon,tag,token);
+
+          const url="https://"+owner+".github.io/www1/sites/"+slug+"/";
+          savePublished([{slug,title,url,publishedAt:Date.now()},...getPublished().filter(s=>s.slug!==slug)]);
+
+          statusEl.innerHTML=`
+            <div style="background:rgba(66,211,146,.1);border:1px solid rgba(66,211,146,.3);border-radius:8px;padding:18px;margin-top:12px">
+              <p style="color:var(--ok);font-weight:600;margin-bottom:10px">✅ Strona „${esc(title)}" opublikowana!</p>
+              <div style="display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:10px">
+                <code style="flex:1;font-size:.82rem;color:var(--accent);word-break:break-all">${esc(url)}</code>
+                <button class="btn ghost sm" data-copy="${esc(url)}">📋 Kopiuj</button>
+                <a href="${esc(url)}" target="_blank" class="icon-btn" style="text-decoration:none" title="Otwórz">↗</a>
+              </div>
+              <p style="font-size:.82rem;color:var(--text-muted)">⏳ GitHub Pages odświeża się co ~2 minuty od wdrożenia.</p>
+            </div>`;
+          progressEl.classList.add("hidden");
+          formWrap.classList.add("hidden");
+          render();
+        }catch(err){
+          progressEl.classList.add("hidden");
+          statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Błąd publikacji: ${esc(String(err.message||err))}</p>`;
+          submitBtn.disabled=false;
+        }
       });
     }catch(err){
       statusEl.innerHTML=`<p style="color:var(--danger);margin:12px 0">❌ Błąd odczytu ZIP: ${esc(String(err.message||err))}</p>`;
