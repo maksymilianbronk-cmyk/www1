@@ -1016,7 +1016,7 @@ function wirePublish(){
       if(rmpub){
         const slug=rmpub.dataset.rmpub;
         const found=getPublished().find(s=>s.slug===slug);
-        if(found&&confirm("Usunąć wpis „"+found.title+"" z historii publikacji?")){
+        if(found&&confirm("Usunąć wpis „"+found.title+"” z historii publikacji?")){
           savePublished(getPublished().filter(s=>s.slug!==slug));
           render();
         }
