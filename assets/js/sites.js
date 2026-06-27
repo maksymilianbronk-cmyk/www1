@@ -16,8 +16,8 @@
 const SITES = [
   {
     slug: "barbershop",
-    title: "KLASYK — Barbershop",
-    desc: "Klasyczny męski barbershop — ciemny, vintage, złote akcenty. Hero, usługi, cennik, galeria, zespół i rezerwacja online. PL.",
+    title: "Sztuka Zarostu — Barbershop Rumia",
+    desc: "Strona barbershopu Sztuka Zarostu (Rumia). Dane firmy z profilu Facebook: kontakt, godziny, adres. Ciemny vintage landing z rezerwacją.",
     icon: "🪒",
     tag: "landing",
     preview: true,
