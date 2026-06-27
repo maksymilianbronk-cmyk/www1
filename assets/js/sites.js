@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "barbershop",
+    title: "Sztuka Zarostu — Barbershop Rumia",
+    desc: "Strona barbershopu Sztuka Zarostu (Rumia). Dane firmy z profilu Facebook: kontakt, godziny, adres. Ciemny vintage landing z rezerwacją.",
+    icon: "🪒",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#110f0c", "#17140f", "#c79a4b", "#a9302c", "#f3ece0"],
+      fonts: ["Bebas Neue", "Barlow", "Sacramento"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "ortopeda",
     title: "Ortopeda — Dr Wiśniewski",
     desc: "Ultra-lekki light-mode landing dla ortopedy. Animowany SVG kręgosłupa, split hero, statystyki, rezerwacja.",
