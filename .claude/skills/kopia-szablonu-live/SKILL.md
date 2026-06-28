@@ -13,10 +13,24 @@ pozostają **nietknięte** (1:1 jak oryginalny podgląd live).
 
 - **Nie zmieniaj designu** — żadnych poprawek layoutu, kolorów, czcionek, klas.
 - Zmieniasz **tylko** widoczny tekst (PL) i — jeśli sensowne — symbol waluty na `zł`.
-- Używaj wyłącznie szablonów **na wolnej licencji** (TemplateMo, ThemeWagon, HTML5UP,
-  Start Bootstrap itp.). **Zachowaj atrybucję autora** w stopce (link „Design/Projekt").
-- Render 1:1 uzyskujemy, ładując CSS/JS/obrazy z **oryginalnego hosta** szablonu
-  (przepięcie ścieżek względnych na absolutne) — nie modyfikujemy plików assetów.
+- **Licencja decyduje o sposobie.** Jeśli kopia ma być częścią publicznego katalogu
+  (redystrybucja), używaj WYŁĄCZNIE szablonów na licencji **MIT** (np. Start Bootstrap)
+  lub **CC BY** (np. HTML5UP) — one wprost zezwalają na kopiowanie/modyfikację/redystrybucję.
+  **Zachowaj plik `LICENSE`** w folderze szablonu oraz atrybucję autora (stopka).
+  Szablony, które zabraniają redystrybucji (część TemplateMo), nadają się tylko do
+  pojedynczego użycia na stronie klienta — nie do galerii „do rozdawania".
+
+### Metoda A (preferowana, legalna do galerii): wgraj pliki lokalnie + WebP
+- Pobierz CSS/JS jako tekst do `css/` i `js/` w folderze szablonu.
+- Pobierz obrazy; rastry (jpg/png) **skonwertuj do WebP** (Pillow, `quality≈82`),
+  SVG/ICO skopiuj 1:1. Zostaw ścieżki względne (`assets/...`, `css/...`, `js/...`).
+- W CSS podmień `url(... .jpg|.png)` → `.webp`; w HTML `src=".../x.jpg"` → `.webp`.
+- Biblioteki typu Bootstrap/Font Awesome/Google Fonts zostaw na publicznym CDN.
+- Wzorzec: `branze/restauracja/szablon-1` + skrypty `build_agency.py` / `translate_agency.py`.
+
+### Metoda B (tylko pojedyncza strona klienta): hotlink assetów z hosta oryginału
+- Przepnij ścieżki względne na absolutne (host oryginału) — szybkie, ale kruche
+  i bez prawa do redystrybucji. Wzorzec: `branze/fryzjer/szablon-1` (TemplateMo).
 
 ## Kroki
 
