@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "szablony-github",
+    title: "Szablony z GitHuba — 50 branż",
+    desc: "Katalog lekkich szablonów stron PL dla 50 popularnych branż, po 5 wariantów. Pilotaż: Restauracja (5 gotowych skinów).",
+    icon: "🗃️",
+    tag: "katalog",
+    preview: true,
+    meta: {
+      colors: ["#0d0d12", "#15151d", "#7c6cff", "#ff6b9d", "#43d9b8"],
+      fonts: ["Space Grotesk", "Inter"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "barbershop",
     title: "Sztuka Zarostu — Barbershop Rumia",
     desc: "Strona barbershopu Sztuka Zarostu (Rumia). Dane firmy z profilu Facebook: kontakt, godziny, adres. Ciemny vintage landing z rezerwacją.",
