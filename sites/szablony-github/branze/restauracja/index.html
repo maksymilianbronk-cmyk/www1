@@ -39,6 +39,7 @@
   .btn.primary:hover{background:#9384ff}
   .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
   footer{border-top:1px solid var(--line);padding:30px 0;color:var(--dim2);font-size:13px;text-align:center}
+.frame img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;background:var(--surface2)}
 </style>
 </head>
 <body>
@@ -64,7 +65,7 @@
   document.getElementById('tpls').innerHTML = T.map(t=>`
     <article class="tpl">
       <div class="frame">
-        <iframe src="${t.f}/index.html" loading="lazy" title="${t.h}"></iframe>
+        <img class="thumb" src="${t.f}/thumb.webp" alt="${t.h}" loading="lazy" onerror="this.style.opacity=0">
         <a class="open" href="${t.f}/index.html" aria-label="Otwórz ${t.h}"></a>
       </div>
       <div class="body">
@@ -73,7 +74,7 @@
         <p>${t.p}</p>
         <div class="links">
           <a class="btn primary" href="${t.f}/index.html">Otwórz szablon</a>
-          <a class="btn ghost" href="${t.f}/index.html" target="_blank" rel="noopener">Nowa karta ↗</a>
+          <a class="btn ghost" href="${t.f}/template.zip" download>Pobierz ZIP ↓</a>
         </div>
       </div>
     </article>`).join('');
