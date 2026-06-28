@@ -1,66 +1,508 @@
-<!DOCTYPE html><html lang="pl"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Barber House — Fryzjer / Barbershop · Elegancja</title><meta name="description" content="Strzyżenie męskie, modelowanie brody i golenie brzytwą. Klasyczne rzemiosło w nowoczesnym wydaniu.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#0e0c0a;--surface:#16130f;--gold:#c8a24a;--gold2:#e7cf91;--cream:#f3ecdd;--dim:#8a8170;--line:#2a2418}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--cream);font-family:'Jost',sans-serif;font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
-h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.05}
-.wrap{width:min(1140px,92vw);margin-inline:auto}
-.eyebrow{font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold)}
-.btn{display:inline-block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;padding:15px 32px;border:1px solid var(--gold);color:var(--gold);transition:.3s}.btn:hover{background:var(--gold);color:var(--bg)}
-nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:24px clamp(20px,5vw,56px);transition:.4s;border-bottom:1px solid transparent}
-nav.s{background:rgba(14,12,10,.9);backdrop-filter:blur(10px);border-bottom-color:var(--line);padding-block:14px}
-.brand{font-family:'Cormorant Garamond';font-size:28px;letter-spacing:.16em;color:var(--cream)}
-.nl{display:flex;gap:30px}.nl a{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.85;transition:.25s}.nl a:hover{color:var(--gold);opacity:1}
-@media(max-width:820px){.nl{display:none}}
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;isolation:isolate;padding:120px clamp(20px,5vw,56px) 60px}
-.hero::before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(rgba(14,12,10,.6),rgba(14,12,10,.86)),url("https://images.unsplash.com/photo-1503951914875-452162b0f3f1?q=80&w=1500&auto=format&fit=crop") center/cover;background-color:#0a0908}
-.hero h1{font-size:clamp(50px,9vw,108px);margin:14px 0 18px}.hero h1 .em{color:var(--gold2);font-style:italic}
-.hero p{max-width:520px;margin:0 auto 34px;color:#d8cfba;font-size:18px}
-.sec{padding:clamp(70px,11vw,118px) 0}
-.head{text-align:center;max-width:560px;margin:0 auto 52px}.head h2{font-size:clamp(34px,5.2vw,60px);margin-top:10px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}@media(max-width:760px){.cards{grid-template-columns:1fr}}
-.c{background:var(--surface);border:1px solid var(--line);padding:32px;text-align:center;transition:.3s}.c:hover{border-color:var(--gold)}
-.c .ic{font-size:34px}.c h3{font-size:25px;margin:12px 0 8px}.c p{color:var(--dim);font-size:15px}
-.menu{max-width:740px;margin:0 auto;display:grid;gap:6px}
-.row{display:flex;align-items:baseline;gap:16px;padding:15px 0;border-bottom:1px solid var(--line)}
-.row .n{font-family:'Cormorant Garamond';font-size:23px;color:var(--cream)}.row .d{font-size:13px;color:var(--dim)}
-.dots{flex:1;border-bottom:1px dotted #3a3324;transform:translateY(-5px)}.row .p{font-family:'Cormorant Garamond';font-size:23px;color:var(--gold)}
-.cta{background:var(--surface);border-block:1px solid var(--line);text-align:center}.cta h2{font-size:clamp(34px,5vw,58px);margin:12px 0 10px}.cta p{color:var(--dim);margin-bottom:28px}
-footer{padding:50px 0;text-align:center;color:var(--dim);font-size:14px;border-top:1px solid var(--line)}
-[data-r]{opacity:0;transform:translateY(26px);transition:.8s}[data-r].in{opacity:1;transform:none}
-</style></head><body>
-<nav id="nav"><a class="brand" href="#">Barber House</a>
-<div class="nl"><a href="#oferta">Oferta</a><a href="#cennik">Cennik</a><a href="#kontakt">Kontakt</a></div>
-<a class="btn" href="#kontakt" style="padding:11px 22px">Rezerwacja</a></nav>
-<header class="hero"><div>
-<span class="eyebrow" data-r>Fryzjer męski & Barber</span>
-<h1 data-r>Styl, który<br><span class="em">robi wrażenie</span></h1>
-<p data-r>Strzyżenie męskie, modelowanie brody i golenie brzytwą. Klasyczne rzemiosło w nowoczesnym wydaniu.</p><a class="btn" href="#kontakt" data-r>Rezerwacja</a>
-</div></header>
-<section class="sec" id="oferta"><div class="wrap">
-<div class="head" data-r><span class="eyebrow">Oferta</span><h2>Co dla Ciebie zrobimy</h2></div>
-<div class="cards"><div class="c" data-r><div class="ic">✂️</div><h3>Strzyżenie</h3><p>Klasyczne i nowoczesne fasony dopasowane do Ciebie.</p></div>
-      <div class="c" data-r><div class="ic">🧔</div><h3>Broda</h3><p>Modelowanie, trymowanie i pielęgnacja zarostu.</p></div>
-      <div class="c" data-r><div class="ic">🪒</div><h3>Golenie</h3><p>Tradycyjne golenie brzytwą z ciepłym ręcznikiem.</p></div></div></div></section>
-<section class="sec" id="cennik" style="background:var(--surface);border-block:1px solid var(--line)"><div class="wrap">
-<div class="head" data-r><span class="eyebrow">Cennik</span><h2>Cennik usług</h2></div>
-<div class="menu"><div class="row" data-r><span><span class="n">Strzyżenie włosów</span> <span class="d">maszynka + nożyczki</span></span><span class="dots"></span><span class="p">60 zł</span></div>
-      <div class="row" data-r><span><span class="n">Strzyżenie + broda</span> <span class="d">komplet</span></span><span class="dots"></span><span class="p">95 zł</span></div>
-      <div class="row" data-r><span><span class="n">Modelowanie brody</span> <span class="d">trymer + brzytwa</span></span><span class="dots"></span><span class="p">45 zł</span></div>
-      <div class="row" data-r><span><span class="n">Golenie brzytwą</span> <span class="d">ciepły ręcznik</span></span><span class="dots"></span><span class="p">55 zł</span></div>
-      <div class="row" data-r><span><span class="n">Strzyżenie juniora</span> <span class="d">do 12 lat</span></span><span class="dots"></span><span class="p">45 zł</span></div></div></div></section>
-<section class="sec cta" id="kontakt"><div class="wrap">
-<span class="eyebrow" data-r>Kontakt</span><h2 data-r>Umów się na wizytę</h2><p data-r>Pn–Pt 10:00–20:00 · Sob 9:00–15:00 · ul. Przykładowa 1</p>
-<a class="btn" href="tel:+48600100200" data-r>Zadzwoń: 600 100 200</a></div></section>
-<footer><div style="font-family:'Cormorant Garamond';font-size:24px;letter-spacing:.16em;margin-bottom:10px">Barber House</div>
-ul. Przykładowa 1, Warszawa · kontakt@barberhouse.pl<br><span style="color:#5a5343">© 2026 Barber House · szablon demonstracyjny (PL)</span></footer>
-<script>
-  const nav=document.getElementById('nav');addEventListener('scroll',()=>nav.classList.toggle('s',scrollY>40),{passive:true});
-  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
-  document.querySelectorAll('[data-r]').forEach(el=>io.observe(el));
-</script></body></html>
+<!doctype html>
+<html lang="pl">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Barber Shop — strona dla barbera</title>
+
+        <!-- CSS FILES -->        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500&display=swap" rel="stylesheet">
+
+        <link href="https://templatemo.com/templates/templatemo_585_barber_shop/css/bootstrap.min.css" rel="stylesheet">
+
+        <link href="https://templatemo.com/templates/templatemo_585_barber_shop/css/bootstrap-icons.css" rel="stylesheet">
+
+        <link href="https://templatemo.com/templates/templatemo_585_barber_shop/css/templatemo-barber-shop.css" rel="stylesheet">
+<!--
+
+TemplateMo 585 Barber Shop
+
+https://templatemo.com/tm-585-barber-shop
+
+-->
+    </head>
+    
+    <body>
+
+        <div class="container-fluid">
+            <div class="row">
+
+                <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <nav id="sidebarMenu" class="col-md-4 col-lg-3 d-md-block sidebar collapse p-0">
+
+                    <div class="position-sticky sidebar-sticky d-flex flex-column justify-content-center align-items-center">
+                        <a class="navbar-brand" href="index.html">
+                            <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/templatemo-barber-logo.png" class="logo-image img-fluid" align="">
+                        </a>
+
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_1">Start</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_2">O nas</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_3">Usługi</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_4">Cennik</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_5">Kontakt</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                
+                <div class="col-md-8 ms-sm-auto col-lg-9 p-0">
+                    <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
+
+                            <div class="container">
+                                <div class="row">
+
+                                    <div class="col-lg-8 col-12">
+                                        <h1 class="text-white mb-lg-3 mb-4"><strong>Barber <em>Shop</em></strong></h1>
+                                        <p class="text-black">Najbardziej profesjonalne strzyżenie dla Ciebie</p>
+                                        <br>
+                                        <a class="btn custom-btn custom-border-btn custom-btn-bg-white smoothscroll me-2 mb-2" href="#section_2">O nas</a>
+
+                                        <a class="btn custom-btn smoothscroll mb-2" href="#section_3">Co robimy</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="custom-block d-lg-flex flex-column justify-content-center align-items-center">
+                                <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/vintage-chair-barbershop.jpg" class="custom-block-image img-fluid" alt="">
+
+                                <h4><strong class="text-white">Nie czekaj! Umów się na dobre strzyżenie.</strong></h4>
+
+                                <a href="#booking-section" class="smoothscroll btn custom-btn custom-btn-italic mt-3">Zarezerwuj wizytę</a>
+                            </div>
+                    </section>
+
+
+                    <section class="about-section section-padding" id="section_2">
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="col-lg-12 col-12 mx-auto">
+                                    <h2 class="mb-4">Najlepsi fryzjerzy</h2>
+
+                                    <div class="border-bottom pb-3 mb-5">
+                                        <p>Gentlemen's Barber Shop to nowy szablon HTML CSS oparty na Bootstrap v5 autorstwa <a href="https://templatemo.com/page/1" target="_blank">TemplateMo</a> dla każdego. Boczne menu ułatwia nawigację po układzie jednostronicowym. Możesz dowolnie dostosować ten szablon do swojej firmy.</p>
+                                    </div>
+                                </div>
+
+                                    <h6 class="mb-5">Poznaj barberów</h6>
+
+                                        <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap me-lg-5 mb-5 mb-lg-0">
+                                            <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/barber/portrait-male-hairdresser-with-scissors.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
+
+                                            <div class="team-info d-flex align-items-center flex-wrap">
+                                                <p class="mb-0">Redo</p>
+
+                                                <ul class="social-icon ms-auto">
+                                                    <li class="social-icon-item">
+                                                        <a href="#" class="social-icon-link bi-facebook">
+                                                        </a>
+                                                    </li>
+
+                                                    <li class="social-icon-item">
+                                                        <a href="#" class="social-icon-link bi-instagram">
+                                                        </a>
+                                                    </li>
+
+                                                    <li class="social-icon-item">
+                                                        <a href="#" class="social-icon-link bi-whatsapp">
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap mt-4 mt-lg-0 mb-5 mb-lg-0">
+                                            <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/barber/portrait-mid-adult-bearded-male-barber-with-folded-arms.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
+
+                                            <div class="team-info d-flex align-items-center flex-wrap">
+                                                <p class="mb-0">Sam</p>
+
+                                                <ul class="social-icon ms-auto">
+                                                    <li class="social-icon-item">
+                                                        <a href="#" class="social-icon-link bi-facebook">
+                                                        </a>
+                                                    </li>
+
+                                                    <li class="social-icon-item">
+                                                        <a href="#" class="social-icon-link bi-instagram">
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="featured-section section-padding">
+                        <div class="section-overlay"></div>
+
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="col-lg-10 col-12 mx-auto">
+                                    <h2 class="mb-3">Zgarnij 32% rabatu</h2>
+
+                                    <p>w każdym drugim tygodniu miesiąca</p>
+
+                                    <strong>Kod promocyjny: BarBerMo</strong>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+
+
+                    <section class="services-section section-padding" id="section_3">
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="col-lg-12 col-12">
+                                    <h2 class="mb-5">Usługi</h2>
+                                </div>
+
+                                <div class="col-lg-6 col-12 mb-4">
+                                    <div class="services-thumb">
+                                        <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/services/woman-cutting-hair-man-salon.jpg" class="services-image img-fluid" alt="">
+
+                                        <div class="services-info d-flex align-items-end">
+                                            <h4 class="mb-0">Strzyżenie</h4>
+
+                                            <strong class="services-thumb-price">120 zł</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12 mb-4">
+                                    <div class="services-thumb">
+                                        <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/services/hairdresser-grooming-their-client.jpg" class="services-image img-fluid" alt="">
+
+                                        <div class="services-info d-flex align-items-end">
+                                            <h4 class="mb-0">Mycie</h4>
+
+                                            <strong class="services-thumb-price">90 zł</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12 mb-4 mb-lg-0">
+                                    <div class="services-thumb">
+                                        <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/services/hairdresser-grooming-client.jpg" class="services-image img-fluid" alt="">
+
+                                        <div class="services-info d-flex align-items-end">
+                                            <h4 class="mb-0">Golenie</h4>
+
+                                            <strong class="services-thumb-price">100 zł</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="services-thumb">
+                                        <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/services/boy-getting-haircut-salon-front-view.jpg" class="services-image img-fluid" alt="">
+
+                                        <div class="services-info d-flex align-items-end">
+                                            <h4 class="mb-0">Dla dzieci</h4>
+
+                                            <strong class="services-thumb-price">90 zł</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="booking-section section-padding" id="booking-section">
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="col-lg-10 col-12 mx-auto">
+                                <form action="#" method="post" class="custom-form booking-form" id="bb-booking-form" role="form">
+                                    <div class="text-center mb-5">
+                                        <h2 class="mb-1">Zarezerwuj wizytę</h2>
+
+                                        <p>Wypełnij formularz, a my się odezwiemy</p>
+                                    </div>
+
+                                    <div class="booking-form-body">
+                                        <div class="row">
+
+                                            <div class="col-lg-6 col-12">
+                                                <input type="text" name="bb-name" id="bb-name" class="form-control" placeholder="Imię i nazwisko" required>
+                                            </div>
+
+                                            <div class="col-lg-6 col-12">
+                                                <input type="tel" class="form-control" name="bb-phone" placeholder="Telefon 600-000-000" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required="">
+                                            </div>
+                                        
+                                            <div class="col-lg-6 col-12">
+                                                <input class="form-control" type="time" name="bb-time" value="18:30" />
+                                            </div>
+
+                                            <div class="col-lg-6 col-12">
+                                                <select class="form-select form-control" name="bb-branch" id="bb-branch" aria-label="Default select example">
+                                                    <option selected="">Wybierz oddział</option>
+                                                    <option value="Grünberger">Grünberger</option>
+                                                    <option value="Behrenstraße">Behrenstraße</option>
+                                                    <option value="Weinbergsweg">Weinbergsweg</option>
+                                                </select>
+
+                                            </div>
+                                            <div class="col-lg-6 col-12">
+                                                <input type="date" name="bb-date" id="bb-date" class="form-control" placeholder="Date" required>
+                                            </div>
+
+                                            <div class="col-lg-6 col-12">
+                                                <input type="number" name="bb-number" id="bb-number" class="form-control" placeholder="Liczba osób" required>
+                                            </div>
+                                        </div>
+
+                                        <textarea name="bb-message" rows="3" class="form-control" id="bb-message" placeholder="Uwagi (opcjonalnie)"></textarea>
+
+                                        <div class="col-lg-4 col-md-10 col-8 mx-auto">
+                                            <button type="submit" class="form-control">Wyślij</button>
+                                        </div>
+                                    </div>
+                                </form>
+                        </div>
+                    </div>
+                </section>
+
+
+                    <section class="price-list-section section-padding" id="section_4">
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="col-lg-8 col-12">
+                                    <div class="price-list-thumb-wrap">
+                                        <div class="mb-4">
+                                            <h2 class="mb-2">Cennik</h2>
+
+                                            <strong>Już od 90 zł</strong>
+                                        </div>
+
+                                        <div class="price-list-thumb">
+                                            <h6 class="d-flex">
+                                                Strzyżenie
+                                                <span class="price-list-thumb-divider"></span>
+
+                                                <strong>110 zł</strong>
+                                            </h6>
+                                        </div>
+
+                                        <div class="price-list-thumb">
+                                            <h6 class="d-flex">
+                                                Modelowanie brody
+                                                <span class="price-list-thumb-divider"></span>
+
+                                                <strong>95 zł</strong>
+                                            </h6>
+                                        </div>
+
+                                        <div class="price-list-thumb">
+                                            <h6 class="d-flex">
+                                                Strzyżenie brzytwą
+                                                <span class="price-list-thumb-divider"></span>
+
+                                                <strong>120 zł</strong>
+                                            </h6>
+                                        </div>
+
+                                        <div class="price-list-thumb">
+                                            <h6 class="d-flex">
+                                                Golenie
+                                                <span class="price-list-thumb-divider"></span>
+
+                                                <strong>100 zł</strong>
+                                            </h6>
+                                        </div>
+
+                                        <div class="price-list-thumb">
+                                            <h6 class="d-flex">
+                                                Stylizacja / Koloryzacja
+                                                <span class="price-list-thumb-divider"></span>
+
+                                                <strong>90 zł</strong>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-12 custom-block-bg-overlay-wrap mt-5 mb-5 mb-lg-0 mt-lg-0 pt-3 pt-lg-0">
+                                    <img src="https://templatemo.com/templates/templatemo_585_barber_shop/images/vintage-chair-barbershop.jpg" class="custom-block-bg-overlay-image img-fluid" alt="">
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+
+
+                <section class="contact-section" id="section_5">
+                    <div class="section-padding section-bg">
+                        <div class="container">
+                            <div class="row">   
+
+                                <div class="col-lg-8 col-12 mx-auto">
+                                    <h2 class="text-center">Przywitaj się</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-padding">
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="col-lg-6 col-12">
+                                    <h5 class="mb-3"><strong>Dane</strong> kontaktowe</h5>
+
+                                    <p class="text-white d-flex mb-1">
+                                        <a href="tel: 120-240-3600" class="site-footer-link">
+                                            (+49) 
+                                            120-240-3600
+                                        </a>
+                                    </p>
+
+                                    <p class="text-white d-flex">
+                                        <a href="/cdn-cgi/l/email-protection#cfa6a1a9a08fb6a0babda8a2aea6a3e1aca0a2" class="site-footer-link">
+                                            <span class="__cf_email__" data-cfemail="7f171a1313103f1d1e0d1d1a0d511d1a1e0a0b06">[email&#160;protected]</span>
+                                        </a>
+                                    </p>
+
+                                    <ul class="social-icon">
+                                        <li class="social-icon-item">
+                                            <a href="#" class="social-icon-link bi-facebook">
+                                            </a>
+                                        </li>
+            
+                                        <li class="social-icon-item">
+                                            <a href="#" class="social-icon-link bi-twitter">
+                                            </a>
+                                        </li>
+            
+                                        <li class="social-icon-item">
+                                            <a href="#" class="social-icon-link bi-instagram">
+                                            </a>
+                                        </li>
+
+                                        <li class="social-icon-item">
+                                            <a href="#" class="social-icon-link bi-youtube">
+                                            </a>
+                                        </li>
+
+                                        <li class="social-icon-item">
+                                            <a href="#" class="social-icon-link bi-whatsapp">
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="col-lg-5 col-12 contact-block-wrap mt-5 mt-lg-0 pt-4 pt-lg-0 mx-auto">
+                                    <div class="contact-block">
+                                        <h6 class="mb-0">
+                                            <i class="custom-icon bi-shop me-3"></i>
+
+                                            <strong>Otwarte codziennie</strong>
+
+                                            <span class="ms-auto">10:00 - 20:00</span>
+                                        </h6>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-12 mx-auto mt-5 pt-5">
+                                    <iframe class="google-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7702.122299518348!2d13.396786616231472!3d52.531268574169616!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47a85180d9075183%3A0xbba8c62c3dc41a7d!2sBarbabella%20Barbershop!5e1!3m2!1sen!2sth!4v1673886261201!5m2!1sen!2sth" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="site-footer">
+                    <div class="container">
+                        <div class="row">
+
+                            <div class="col-lg-12 col-12">
+                                <h4 class="site-footer-title mb-4">Nasze oddziały</h4>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-11">
+                                <div class="site-footer-thumb">
+                                    <strong class="mb-1">Grünberger</strong>
+
+                                    <p>Grünberger Str. 31, 10245 Berlin, Germany</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-11">
+                                <div class="site-footer-thumb">
+                                    <strong class="mb-1">Behrenstraße</strong>
+
+                                    <p>Behrenstraße 27, 10117 Berlin, Germany</p>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-11">
+                                <strong class="mb-1">Weinbergsweg</strong>
+
+                                <p>Weinbergsweg 23, 10119 Berlin, Germany</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="site-footer-bottom">
+                        <div class="container">
+                            <div class="row align-items-center">
+
+                                <div class="col-lg-8 col-12 mt-4">
+                                    <p class="copyright-text mb-0">Copyright © 2036 Barber Shop 
+                                    - Projekt: <a href="https://templatemo.com" rel="nofollow" target="_blank">TemplateMo</a></p>
+                                </div>
+
+                                <div class="col-lg-2 col-md-3 col-3 mt-lg-4 ms-auto">
+                                    <a href="#section_1" class="back-top-icon smoothscroll" title="Do góry">
+                                        <i class="bi-arrow-up-circle"></i>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+
+        <!-- JAVASCRIPT FILES -->
+        <script data-cfasync="false" src="https://templatemo.com/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://templatemo.com/templates/templatemo_585_barber_shop/js/jquery.min.js"></script>
+        <script src="https://templatemo.com/templates/templatemo_585_barber_shop/js/bootstrap.min.js"></script>
+        <script src="https://templatemo.com/templates/templatemo_585_barber_shop/js/click-scroll.js"></script>
+        <script src="https://templatemo.com/templates/templatemo_585_barber_shop/js/custom.js"></script>
+
+    </body>
+</html>
