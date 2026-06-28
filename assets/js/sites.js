@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "szablony-github",
     title: "Szablony z GitHuba — 50 branż",
-    desc: "Katalog lekkich szablonów stron PL dla 50 popularnych branż, po 5 wariantów. Pilotaż: Restauracja (5 gotowych skinów).",
+    desc: "Katalog 250 lekkich szablonów stron PL: 50 popularnych branż × 5 skinów. Wyszukiwarka, podglądy, gotowe do podmiany treści.",
     icon: "🗃️",
     tag: "katalog",
     preview: true,
