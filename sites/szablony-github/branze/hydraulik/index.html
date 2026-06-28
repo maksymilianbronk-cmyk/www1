@@ -22,6 +22,7 @@ header.top h1{font-size:clamp(32px,5.5vw,58px);margin:16px 0 12px}header.top p{m
 .tpl .body{padding:20px 22px 24px}.tpl .k{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim2)}.tpl h3{font-size:21px;margin:6px 0 6px}.tpl p{font-size:14px;color:var(--dim);margin-bottom:16px;min-height:40px}
 .links{display:flex;gap:10px}.btn{display:inline-flex;align-items:center;gap:7px;font-family:'Space Grotesk';font-weight:600;font-size:13px;padding:11px 18px;border-radius:10px;border:1px solid var(--line);transition:.25s}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:#9384ff}.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
 footer{border-top:1px solid var(--line);padding:30px 0;color:var(--dim2);font-size:13px;text-align:center}
+.frame img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;background:var(--surface2)}
 </style></head><body>
 <div class="wrap crumbs"><a href="../../index.html">← Szablony z GitHuba</a> / Hydraulik</div>
 <header class="top wrap"><span class="eyebrow">Branża · Hydraulik</span>
@@ -38,7 +39,7 @@ const T=[
     {f:"szablon-5", k:"Skin 05 · Naturalny", h:"Naturalny", p:"Ziemiste barwy, naturalny klimat — ciepło i autentycznie."}
   ];
 document.getElementById('tpls').innerHTML=T.map(t=>`
-<article class="tpl"><div class="frame"><iframe src="${t.f}/index.html" loading="lazy" title="${t.h}"></iframe><a class="open" href="${t.f}/index.html" aria-label="Otwórz ${t.h}"></a></div>
+<article class="tpl"><div class="frame"><img class="thumb" src="${t.f}/thumb.webp" alt="${t.h}" loading="lazy" onerror="this.style.opacity=0"><a class="open" href="${t.f}/index.html" aria-label="Otwórz ${t.h}"></a></div>
 <div class="body"><div class="k">${t.k}</div><h3>${t.h}</h3><p>${t.p}</p>
-<div class="links"><a class="btn primary" href="${t.f}/index.html">Otwórz szablon</a><a class="btn ghost" href="${t.f}/index.html" target="_blank" rel="noopener">Nowa karta ↗</a></div></div></article>`).join('');
+<div class="links"><a class="btn primary" href="${t.f}/index.html">Otwórz szablon</a><a class="btn ghost" href="${t.f}/template.zip" download>Pobierz ZIP ↓</a></div></div></article>`).join('');
 </script></body></html>
