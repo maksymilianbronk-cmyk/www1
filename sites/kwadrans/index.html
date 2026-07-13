@@ -9,9 +9,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Manrope:wght@300;400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+  <meta property="og:title" content="Kwadrans — Catering &amp; Obiady Domowe | Pabianice">
+  <meta property="og:description" content="Obiady domowe jak u mamy — codziennie świeże menu, catering i imprezy do 50 osób. Pabianice, ul. Jana Pawła II 36/40.">
+  <meta property="og:image" content="https://maksymilianbronk-cmyk.github.io/www1/sites/kwadrans/assets/foto/hero.webp">
+  <meta property="og:type" content="website">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+  <!-- intro -->
+  <div id="intro" aria-hidden="true"><span class="in-t">jak u mamy…</span></div>
+  <div id="prog" aria-hidden="true"></div>
 
   <!-- ═══════ NAV ═══════ -->
   <nav class="nav" id="nav">
@@ -142,6 +150,7 @@
               <select id="bkOcc"><option>Urodziny 🎂</option><option>Komunia</option><option>Chrzciny</option><option>Stypa</option><option>Impreza firmowa</option><option>Inna okazja</option></select>
             </div>
             <div class="bk-field bk-wide" id="noteWrap" style="display:none"><label for="bkNote">Ilu gości? Powiedz nam więcej</label><input id="bkNote" type="text" placeholder="np. 30 gości, sobota po południu, tort we własnym zakresie"></div>
+            <div class="bk-hint" id="bkHint">ℹ️ W weekendy bar jest zamknięty — stolik zarezerwujesz pn–pt. Imprezy okolicznościowe organizujemy również w weekendy (zakładka „Impreza / urodziny").</div>
           </div>
           <button class="btn bk-sub" type="submit" id="bkSub">Rezerwuję ✨</button>
           <p class="bk-note">To demo rezerwacji — zgłoszenia nie są nigdzie wysyłane. Docelowo: telefon / e-mail / system rezerwacji.</p>
@@ -256,8 +265,46 @@
     </div>
   </footer>
 
+  <!-- lightbox -->
+  <div id="lb" aria-hidden="true">
+    <button class="lb-x" aria-label="Zamknij">×</button>
+    <img src="" alt="">
+    <span class="lb-cap"></span>
+  </div>
+
   <script src="app.js"></script>
   <script>
+    // ── kurtyna intro ──
+    const intro = document.getElementById('intro');
+    setTimeout(() => intro.classList.add('done'), 950);
+    setTimeout(() => intro.remove(), 1900);
+
+    // ── tilt 3D zdjęcia hero ──
+    const hm = document.querySelector('.hero-media');
+    const hph = hm.querySelector('.ph');
+    if (matchMedia('(hover:hover)').matches) {
+      hm.addEventListener('mousemove', e => {
+        const r = hm.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - .5;
+        const y = (e.clientY - r.top) / r.height - .5;
+        hph.style.transform = `rotateY(${x*7}deg) rotateX(${-y*6}deg)`;
+      });
+      hm.addEventListener('mouseleave', () => hph.style.transform = '');
+    }
+
+    // ── lightbox galerii ──
+    const lb = document.getElementById('lb');
+    const lbImg = lb.querySelector('img');
+    const lbCap = lb.querySelector('.lb-cap');
+    document.querySelectorAll('.snap').forEach(s => s.addEventListener('click', () => {
+      lbImg.src = s.querySelector('img').src;
+      lbCap.textContent = (s.querySelector('.cap')?.textContent) || '';
+      lb.classList.add('on');
+    }));
+    const lbClose = () => lb.classList.remove('on');
+    lb.addEventListener('click', lbClose);
+    addEventListener('keydown', e => { if (e.key === 'Escape') lbClose(); });
+
     // ── podgląd dania przy kursorze ──
     const peek = document.getElementById('peek');
     const peekImg = peek.querySelector('img');
@@ -284,7 +331,20 @@
       const ev = mode === 'impreza';
       occWrap.style.display = ev ? '' : 'none';
       noteWrap.style.display = ev ? '' : 'none';
+      weekendCheck();
     }));
+
+    // ── sprytna data: min dziś + ostrzeżenie weekendowe (stolik) ──
+    const bkDate = document.getElementById('bkDate');
+    const bkHint = document.getElementById('bkHint');
+    bkDate.min = new Date().toISOString().slice(0,10);
+    function weekendCheck(){
+      if (!bkDate.value) { bkHint.classList.remove('show'); return; }
+      const day = new Date(bkDate.value).getDay();
+      const wk = (day === 0 || day === 6);
+      bkHint.classList.toggle('show', wk && mode === 'stolik');
+    }
+    bkDate.addEventListener('change', weekendCheck);
 
     const form = document.getElementById('bkForm');
     const okBox = document.getElementById('bkOk');
