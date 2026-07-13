@@ -23,7 +23,8 @@
   --paper-ink: #14291f;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{overflow-x:clip}
 body{
   background:var(--bg);
   color:var(--ink);
@@ -79,7 +80,7 @@ h1,h2,h3,.serif{font-family:'Fraunces',serif;font-weight:600;line-height:1.02;le
 .nav-links a.active{opacity:1;color:var(--herb)}
 .nav-links a.active::after{width:100%}
 .nav-cta{display:inline-flex;padding:13px 24px}
-.burger{display:none;flex-direction:column;gap:6px;background:none;border:0;cursor:pointer;padding:8px}
+.burger{display:none;flex-direction:column;justify-content:center;gap:6px;background:none;border:0;cursor:pointer;padding:12px;min-width:48px;min-height:48px}
 .burger span{width:26px;height:2px;background:var(--ink);border-radius:2px}
 
 /* ═══════ HERO (index) ═══════ */
