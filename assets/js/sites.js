@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "kwadrans",
+    title: "Kwadrans — Obiady Domowe, Pabianice",
+    desc: "Zielony landing dla baru Kwadrans (Pabianice). Dane i logo z Facebooka + wizytówki Google: menu, cennik na wagę, catering, kontakt.",
+    icon: "🍲",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#f7f4ea", "#14503a", "#6da544", "#c9a24b", "#1c2a22"],
+      fonts: ["Fraunces", "Manrope", "Yellowtail"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "szablony-github",
     title: "Szablony z GitHuba — 50 branż",
     desc: "Katalog 250 lekkich szablonów stron PL: 50 popularnych branż × 5 skinów. Wyszukiwarka, podglądy, gotowe do podmiany treści.",
