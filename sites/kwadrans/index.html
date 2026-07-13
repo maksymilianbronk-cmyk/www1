@@ -8,251 +8,21 @@
   <link rel="icon" href="assets/logo_fb.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=Yellowtail&display=swap" rel="stylesheet">
-  <style>
-    /* ═══════════════════════════════════════════════
-       KWADRANS — DESIGN SYSTEM
-       Paleta: głęboka butelkowa zieleń #14503a
-               + świeża zieleń ziół #6da544
-               + krem #f7f4ea (jak lniany obrus)
-       Typografia: Fraunces (serif display)
-                   + Manrope (body)
-                   + Yellowtail (skrypt — echo logo)
-    ═══════════════════════════════════════════════ */
-    :root{
-      --green:      #14503a;
-      --green-deep: #0d3a29;
-      --green-soft: #1e6a4d;
-      --herb:       #6da544;
-      --herb-soft:  #eaf3e0;
-      --cream:      #f7f4ea;
-      --paper:      #fffdf6;
-      --ink:        #1c2a22;
-      --dim:        #5f7265;
-      --line:       #e3ddc9;
-      --gold:       #c9a24b;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{
-      background:var(--cream);
-      color:var(--ink);
-      font-family:'Manrope',system-ui,sans-serif;
-      font-weight:400;
-      line-height:1.65;
-      overflow-x:hidden;
-      -webkit-font-smoothing:antialiased;
-    }
-    img{display:block;max-width:100%}
-    a{color:inherit;text-decoration:none}
-    h1,h2,h3,.serif{font-family:'Fraunces',serif;font-weight:600;line-height:1.06;letter-spacing:-.01em}
-    .script{font-family:'Yellowtail',cursive;font-weight:400;color:var(--herb)}
-    .wrap{width:min(1160px,92vw);margin-inline:auto}
-    .eyebrow{
-      display:inline-flex;align-items:center;gap:12px;
-      font-size:12px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--green-soft);
-    }
-    .eyebrow::before{content:"";width:32px;height:2px;background:var(--herb);border-radius:2px}
-    .btn{
-      display:inline-flex;align-items:center;gap:10px;
-      font-weight:700;font-size:14px;letter-spacing:.04em;
-      padding:16px 30px;border-radius:100px;
-      background:var(--green);color:#fff;border:2px solid var(--green);
-      transition:transform .2s, box-shadow .3s, background .25s;
-    }
-    .btn:hover{background:var(--green-soft);border-color:var(--green-soft);transform:translateY(-2px);box-shadow:0 16px 30px -16px rgba(20,80,58,.55)}
-    .btn.ghost{background:transparent;color:var(--green);border-color:var(--green)}
-    .btn.ghost:hover{background:var(--green);color:#fff}
-
-    /* ═══════ NAV ═══════ */
-    .nav{
-      position:fixed;inset:0 0 auto;z-index:200;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:18px clamp(20px,5vw,60px);
-      transition:background .35s, box-shadow .35s, padding .3s;
-    }
-    .nav.scrolled{background:rgba(247,244,234,.92);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line);padding-block:10px}
-    .brand img{height:64px;width:auto;mix-blend-mode:multiply;transition:height .3s}
-    .nav.scrolled .brand img{height:52px}
-    .nav-links{display:flex;align-items:center;gap:30px}
-    .nav-links a{font-size:14px;font-weight:600;color:var(--ink);opacity:.8;position:relative;transition:.25s}
-    .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--herb);border-radius:2px;transition:width .28s}
-    .nav-links a:hover{color:var(--green);opacity:1}
-    .nav-links a:hover::after{width:100%}
-    .nav-cta{display:inline-flex}
-    .burger{display:none;flex-direction:column;gap:6px;background:none;border:0;cursor:pointer;padding:8px}
-    .burger span{width:26px;height:2px;background:var(--green);border-radius:2px}
-
-    /* ═══════ HERO ═══════ */
-    .hero{
-      position:relative;min-height:100svh;
-      display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(28px,5vw,72px);
-      padding:130px clamp(20px,5vw,60px) 70px;
-      isolation:isolate;
-    }
-    .hero::before{
-      content:"";position:absolute;inset:0;z-index:-1;
-      background:
-        radial-gradient(55% 60% at 8% 12%, var(--herb-soft) 0%, transparent 70%),
-        radial-gradient(40% 45% at 96% 88%, #efe9d5 0%, transparent 70%);
-    }
-    .hero-copy .script{font-size:clamp(30px,4vw,46px);display:block;margin-bottom:6px}
-    .hero-copy h1{font-size:clamp(46px,7.2vw,92px);color:var(--green-deep);margin-bottom:22px}
-    .hero-copy h1 em{font-style:italic;font-weight:400;color:var(--herb)}
-    .hero-copy p{font-size:clamp(16px,1.5vw,19px);color:var(--dim);max-width:520px;margin-bottom:34px}
-    .hero-cta{display:flex;flex-wrap:wrap;gap:14px}
-    .hero-note{margin-top:26px;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--dim)}
-    .hero-note b{color:var(--green)}
-    .hero-media{position:relative}
-    .hero-media .ph{
-      aspect-ratio:4/4.6;border-radius:32px;overflow:hidden;
-      box-shadow:0 40px 80px -40px rgba(13,58,41,.5);
-      border:6px solid var(--paper);
-    }
-    .hero-media .ph img{width:100%;height:100%;object-fit:cover}
-    .float-card{
-      position:absolute;left:-28px;bottom:34px;
-      background:var(--paper);border:1px solid var(--line);border-radius:20px;
-      padding:16px 22px;box-shadow:0 24px 50px -28px rgba(13,58,41,.4);
-      display:flex;align-items:center;gap:14px;
-    }
-    .float-card .num{font-family:'Fraunces';font-size:34px;font-weight:700;color:var(--green)}
-    .float-card small{font-size:12px;letter-spacing:.06em;color:var(--dim);line-height:1.4;display:block}
-    .clock-badge{
-      position:absolute;top:-22px;right:-10px;
-      width:104px;height:104px;border-radius:50%;
-      background:var(--green);color:var(--cream);
-      display:grid;place-items:center;text-align:center;
-      font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;line-height:1.5;
-      box-shadow:0 20px 44px -20px rgba(13,58,41,.6);
-      animation:spin-slow 26s linear infinite;
-    }
-    @keyframes spin-slow{to{transform:rotate(360deg)}}
-
-    /* ═══════ TICKER ═══════ */
-    .ticker{background:var(--green);color:#e9f2e4;overflow:hidden;padding:14px 0;border-block:1px solid var(--green-deep)}
-    .ticker-track{display:flex;gap:48px;white-space:nowrap;animation:tick 30s linear infinite;width:max-content}
-    @keyframes tick{to{transform:translateX(-50%)}}
-    .ticker span{font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;display:inline-flex;align-items:center;gap:48px}
-    .ticker i{font-style:normal;color:var(--herb)}
-
-    /* ═══════ SECTIONS ═══════ */
-    .pad{padding:clamp(72px,10vw,120px) 0}
-    .head{max-width:640px;margin-bottom:52px}
-    .head h2{font-size:clamp(36px,5.4vw,64px);color:var(--green-deep);margin-top:14px}
-    .head h2 em{font-style:italic;font-weight:400;color:var(--herb)}
-    .head.center{margin-inline:auto;text-align:center}
-    .head.center .eyebrow::before{display:none}
-
-    /* menu dnia */
-    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .m-col{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:34px 30px;position:relative;overflow:hidden;transition:transform .3s, box-shadow .35s}
-    .m-col:hover{transform:translateY(-6px);box-shadow:0 30px 60px -34px rgba(13,58,41,.35)}
-    .m-col::before{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,var(--herb),var(--green))}
-    .m-col .ic{font-size:34px;margin-bottom:14px}
-    .m-col h3{font-size:26px;color:var(--green-deep);margin-bottom:16px}
-    .m-col ul{list-style:none;display:grid;gap:10px}
-    .m-col li{display:flex;gap:10px;align-items:baseline;font-size:15px;color:var(--ink)}
-    .m-col li::before{content:"◆";font-size:8px;color:var(--herb);transform:translateY(-2px)}
-    .m-col .note{margin-top:18px;font-size:13px;color:var(--dim);font-style:italic}
-
-    /* pricing */
-    .price-band{background:var(--green);color:var(--cream);border-radius:32px;padding:clamp(40px,6vw,64px);position:relative;overflow:hidden}
-    .price-band::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;border:1px solid rgba(233,242,228,.16);right:-120px;top:-160px}
-    .price-band::after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;border:1px solid rgba(233,242,228,.12);right:60px;bottom:-140px}
-    .price-band .script{color:#a8d17f;font-size:30px}
-    .price-band h2{font-size:clamp(32px,4.6vw,54px);margin:6px 0 34px}
-    .price-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;position:relative;z-index:1}
-    .p-card{background:rgba(255,255,255,.07);border:1px solid rgba(233,242,228,.18);border-radius:20px;padding:28px;backdrop-filter:blur(4px)}
-    .p-card .val{font-family:'Fraunces';font-size:clamp(34px,4vw,48px);font-weight:700;color:#cde8ae;line-height:1}
-    .p-card .val small{font-size:16px;font-weight:400;color:#9dbfa8}
-    .p-card .lab{margin-top:10px;font-size:14px;font-weight:600;letter-spacing:.04em}
-    .p-card p{margin-top:6px;font-size:13px;color:#b9cfbf}
-
-    /* catering */
-    .cat-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(30px,5vw,70px);align-items:center}
-    .cat-media{position:relative}
-    .cat-media img{border-radius:28px;height:480px;width:100%;object-fit:cover;border:6px solid var(--paper);box-shadow:0 36px 70px -40px rgba(13,58,41,.5)}
-    .cat-media .stamp{
-      position:absolute;right:-16px;top:-16px;background:var(--gold);color:#fff;
-      border-radius:16px;padding:14px 20px;font-weight:700;font-size:13px;letter-spacing:.06em;
-      box-shadow:0 18px 36px -18px rgba(201,162,75,.7);transform:rotate(3deg);
-    }
-    .cat-list{list-style:none;display:grid;gap:16px;margin-top:26px}
-    .cat-list li{display:flex;gap:14px;align-items:flex-start;font-size:16px}
-    .cat-list .dot{flex:none;width:30px;height:30px;border-radius:50%;background:var(--herb-soft);color:var(--green);display:grid;place-items:center;font-size:14px;font-weight:800}
-
-    /* opinie */
-    .rev-band{background:var(--paper);border-block:1px solid var(--line)}
-    .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .rev{background:var(--cream);border:1px solid var(--line);border-radius:22px;padding:30px}
-    .rev .stars{color:var(--gold);letter-spacing:4px;font-size:15px;margin-bottom:14px}
-    .rev p{font-size:15px;color:var(--ink);font-style:italic}
-    .rev .who{margin-top:16px;font-size:13px;font-weight:700;color:var(--dim);letter-spacing:.04em}
-    .rev-sum{text-align:center;margin-top:36px;color:var(--dim);font-size:14px}
-    .rev-sum b{color:var(--green);font-family:'Fraunces';font-size:22px}
-
-    /* kontakt */
-    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,60px);align-items:start}
-    .c-card{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:34px}
-    .c-card h3{font-size:24px;color:var(--green-deep);margin-bottom:20px}
-    .hours{list-style:none}
-    .hours li{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px dashed var(--line);font-size:15px}
-    .hours li:last-child{border:0}
-    .hours .d{font-weight:600}
-    .hours .h{color:var(--dim)}
-    .c-line{display:flex;gap:14px;align-items:center;padding:12px 0;font-size:16px;font-weight:600;color:var(--ink);transition:color .25s}
-    .c-line:hover{color:var(--green)}
-    .c-line .ico{flex:none;width:44px;height:44px;border-radius:14px;background:var(--herb-soft);display:grid;place-items:center;color:var(--green)}
-    .map-cta{margin-top:18px}
-
-    /* footer */
-    footer{background:var(--green-deep);color:#bcd4c4;padding:56px 0 30px}
-    .f-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:36px;padding-bottom:36px;border-bottom:1px solid rgba(233,242,228,.12)}
-    .f-logo{background:var(--cream);border-radius:18px;padding:12px;display:inline-block}
-    .f-logo img{height:72px;mix-blend-mode:multiply}
-    .f-grid p{font-size:14px;margin-top:16px;max-width:300px}
-    .f-col h4{color:#e9f2e4;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:18px;font-family:'Manrope';font-weight:700}
-    .f-col a{display:block;padding:5px 0;font-size:15px;transition:color .25s}
-    .f-col a:hover{color:#fff}
-    .f-bottom{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-top:24px;font-size:13px;color:#7fa18c}
-
-    /* reveal */
-    [data-r]{opacity:0;transform:translateY(28px);transition:opacity .7s ease, transform .7s ease}
-    [data-r].in{opacity:1;transform:none}
-
-    /* ═══════ RESPONSIVE ═══════ */
-    @media(max-width:960px){
-      .nav-links,.nav-cta{display:none}
-      .nav-links.open{
-        display:flex;flex-direction:column;position:absolute;inset:100% 0 auto;
-        background:rgba(247,244,234,.98);backdrop-filter:blur(10px);
-        padding:26px clamp(20px,5vw,60px);gap:18px;box-shadow:0 20px 40px -20px rgba(13,58,41,.3);
-      }
-      .burger{display:flex}
-      .hero{grid-template-columns:1fr;padding-top:120px;min-height:auto}
-      .hero-media{max-width:520px}
-      .float-card{left:8px}
-      .menu-grid,.price-row,.rev-grid{grid-template-columns:1fr}
-      .cat-grid,.contact-grid{grid-template-columns:1fr}
-      .cat-media img{height:340px}
-      .f-grid{grid-template-columns:1fr}
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Manrope:wght@300;400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <!-- ═══════ NAV ═══════ -->
   <nav class="nav" id="nav">
-    <a class="brand" href="#start"><img src="assets/logo_fb.jpg" alt="Kwadrans — Catering & Obiady Domowe"></a>
+    <a class="brand" href="index.html"><img src="assets/logo_fb.jpg" alt="Kwadrans — Catering & Obiady Domowe"></a>
     <div class="nav-links" id="navLinks">
-      <a href="#menu">Menu dnia</a>
-      <a href="#cennik">Cennik</a>
-      <a href="#catering">Catering &amp; imprezy</a>
-      <a href="#opinie">Opinie</a>
-      <a href="#kontakt">Kontakt</a>
+      <a href="index.html" class="active">Start</a>
+      <a href="menu.html">Menu i cennik</a>
+      <a href="catering.html">Catering &amp; imprezy</a>
+      <a href="kontakt.html">Kontakt</a>
     </div>
-    <a class="btn nav-cta" href="tel:+48422110904">📞 42 211 09 04</a>
+    <a class="btn nav-cta" href="#rezerwacja">Zarezerwuj</a>
     <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
   </nav>
 
@@ -260,126 +30,171 @@
   <header class="hero" id="start">
     <div class="hero-copy">
       <span class="script" data-r>jak u mamy…</span>
-      <h1 data-r>Obiady domowe<br>w <em>kwadrans</em></h1>
-      <p data-r>Codziennie świeże, domowe menu — zupy, kotlety, pierogi i dania, które pachną niedzielą u rodziny. Zjedz na miejscu, weź na wynos albo zamów z dostawą na terenie Pabianic.</p>
+      <h1 data-r>Obiady<br><span class="outline">domowe</span><br>w&nbsp;<em>kwadrans</em></h1>
+      <p data-r>Codziennie świeże, domowe menu — zupy, kotlety i pierogi, które pachną niedzielą u rodziny. Na miejscu, na wynos albo z dostawą po Pabianicach.</p>
       <div class="hero-cta" data-r>
-        <a class="btn" href="#menu">Zobacz menu dnia</a>
-        <a class="btn ghost" href="#catering">Catering na uroczystość</a>
+        <a class="btn" href="#rezerwacja">🍽 Zarezerwuj stolik</a>
+        <a class="btn ghost" href="menu.html">Menu dnia →</a>
       </div>
-      <div class="hero-note" data-r>⭐ <span><b>4,3/5</b> w Google — 276 opinii gości · z nami zjesz uczciwie i domowo</span></div>
+      <div class="hero-note" data-r>⭐ <span><b>4,3/5</b> w Google — 276 opinii · uczciwie i domowo od lat</span></div>
     </div>
     <div class="hero-media" data-r>
-      <div class="ph"><img src="https://images.unsplash.com/photo-1547573854-74d2a71d0826?q=80&w=900&auto=format&fit=crop" alt="Domowy obiad — pierogi"></div>
-      <div class="clock-badge">świeżo ·  codziennie · od ręki ·</div>
+      <div class="ph"><img src="assets/foto/hero.webp" alt="Domowy obiad w Kwadransie — schabowy z ziemniakami i surówką"></div>
+      <div class="steam" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="clock-badge">świeżo · codziennie · od ręki ·</div>
       <div class="float-card">
         <span class="num">5 zł</span>
         <small><b>dostawa</b><br>na terenie Pabianic</small>
       </div>
     </div>
+    <div class="scroll-cue" aria-hidden="true"><i></i> przewiń</div>
   </header>
 
-  <!-- ═══════ TICKER ═══════ -->
+  <!-- ═══════ MARQUEE ═══════ -->
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track">
-      <span>Kuchnia polska <i>◆</i> Obiady na wagę <i>◆</i> Zestaw dnia z zupą <i>◆</i> Catering <i>◆</i> Imprezy do 50 osób <i>◆</i> Dostawa w Pabianicach <i>◆</i></span>
-      <span>Kuchnia polska <i>◆</i> Obiady na wagę <i>◆</i> Zestaw dnia z zupą <i>◆</i> Catering <i>◆</i> Imprezy do 50 osób <i>◆</i> Dostawa w Pabianicach <i>◆</i></span>
+      <span>Kuchnia polska <i>✦</i> Obiady na wagę <i>✦</i> Zestaw dnia z zupą <i>✦</i> Catering <i>✦</i> Imprezy do 50 osób <i>✦</i> Dostawa w Pabianicach <i>✦</i></span>
+      <span>Kuchnia polska <i>✦</i> Obiady na wagę <i>✦</i> Zestaw dnia z zupą <i>✦</i> Catering <i>✦</i> Imprezy do 50 osób <i>✦</i> Dostawa w Pabianicach <i>✦</i></span>
     </div>
   </div>
 
-  <!-- ═══════ MENU DNIA ═══════ -->
-  <section class="pad" id="menu">
+  <!-- ═══════ LICZNIKI ═══════ -->
+  <section class="pad" style="padding-bottom:0">
+    <div class="wrap stats-strip" data-r>
+      <div class="stat-x"><div class="n"><span data-count="4.3" data-dec="1">4,3</span><small>/5</small></div><div class="l">Ocena Google</div></div>
+      <div class="stat-x"><div class="n"><span data-count="276">276</span></div><div class="l">Opinii gości</div></div>
+      <div class="stat-x"><div class="n"><span data-count="50">50</span></div><div class="l">Osób na imprezie</div></div>
+      <div class="stat-x"><div class="n"><span data-count="15">15</span><small> min</small></div><div class="l">I obiad na stole</div></div>
+    </div>
+  </section>
+
+  <!-- ═══════ WIELKIE MENU ═══════ -->
+  <section class="pad">
+    <div class="wrap">
+      <div class="head" data-r>
+        <span class="eyebrow">Dziś na talerzu</span>
+        <h2>Najedz się <em>klasyki</em></h2>
+      </div>
+      <div class="dish-list" data-r>
+        <a class="dish-row" href="menu.html" data-img="assets/foto/kotlet.webp">
+          <span class="no">01</span>
+          <span class="nm">Schabowy z pieczarkami</span>
+          <span class="tag">Hit gości ⭐</span>
+          <span class="pr">na wagę</span>
+        </a>
+        <a class="dish-row" href="menu.html" data-img="assets/foto/pierogi.webp">
+          <span class="no">02</span>
+          <span class="nm">Pierogi ruskie z okrasą</span>
+          <span class="tag">Lepione ręcznie</span>
+          <span class="pr">na wagę</span>
+        </a>
+        <a class="dish-row" href="menu.html" data-img="assets/foto/hero.webp">
+          <span class="no">03</span>
+          <span class="nm">Zestaw dnia z zupą</span>
+          <span class="tag">Zupa + drugie</span>
+          <span class="pr">21 zł</span>
+        </a>
+        <a class="dish-row" href="menu.html" data-img="assets/foto/przekaski.webp">
+          <span class="no">04</span>
+          <span class="nm">Kapuśniak z prażokami</span>
+          <span class="tag">Regionalnie</span>
+          <span class="pr">na wagę</span>
+        </a>
+        <a class="dish-row" href="menu.html" data-img="assets/foto/sala.webp">
+          <span class="no">05</span>
+          <span class="nm">Talerz komponujesz sam</span>
+          <span class="tag">Ty decydujesz</span>
+          <span class="pr">4,10 zł/100 g</span>
+        </a>
+      </div>
+      <div class="dish-cta" data-r><a class="btn ghost" href="menu.html">Pełne menu i cennik →</a></div>
+    </div>
+  </section>
+  <div id="peek" aria-hidden="true"><img src="assets/foto/kotlet.webp" alt=""></div>
+
+  <!-- ═══════ REZERWACJA (DEMO) ═══════ -->
+  <section class="pad book-sec" id="rezerwacja">
+    <div class="wrap">
+      <div class="book-card" data-r>
+        <div class="book-head">
+          <span class="script">zaklep sobie miejsce…</span>
+          <h2>Rezerwacja</h2>
+        </div>
+        <div class="tabs" role="tablist">
+          <button class="tab on" type="button" data-mode="stolik">🍽 Stolik</button>
+          <button class="tab" type="button" data-mode="impreza">🎉 Impreza / urodziny</button>
+        </div>
+        <form id="bkForm" novalidate>
+          <div class="bk-grid">
+            <div class="bk-field"><label for="bkName">Imię</label><input id="bkName" type="text" placeholder="Jan" required></div>
+            <div class="bk-field"><label for="bkTel">Telefon</label><input id="bkTel" type="tel" placeholder="600 000 000" required></div>
+            <div class="bk-field"><label for="bkDate">Data</label><input id="bkDate" type="date"></div>
+            <div class="bk-field"><label for="bkTime">Godzina</label>
+              <select id="bkTime">
+                <option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option>
+                <option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option><option>16:00</option>
+              </select>
+            </div>
+            <div class="bk-field"><label for="bkPpl">Liczba osób</label>
+              <select id="bkPpl"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6+</option></select>
+            </div>
+            <div class="bk-field" id="occWrap" style="display:none"><label for="bkOcc">Okazja</label>
+              <select id="bkOcc"><option>Urodziny 🎂</option><option>Komunia</option><option>Chrzciny</option><option>Stypa</option><option>Impreza firmowa</option><option>Inna okazja</option></select>
+            </div>
+            <div class="bk-field bk-wide" id="noteWrap" style="display:none"><label for="bkNote">Ilu gości? Powiedz nam więcej</label><input id="bkNote" type="text" placeholder="np. 30 gości, sobota po południu, tort we własnym zakresie"></div>
+          </div>
+          <button class="btn bk-sub" type="submit" id="bkSub">Rezerwuję ✨</button>
+          <p class="bk-note">To demo rezerwacji — zgłoszenia nie są nigdzie wysyłane. Docelowo: telefon / e-mail / system rezerwacji.</p>
+        </form>
+        <div class="bk-ok" id="bkOk">
+          <div>
+            <div class="check">✓</div>
+            <h3>Zarezerwowane!</h3>
+            <p id="bkSum">Do zobaczenia w Kwadransie!</p>
+            <button class="btn" type="button" id="bkAgain" style="background:var(--paper-ink);border-color:var(--paper-ink);color:var(--paper)">Nowa rezerwacja</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ GALERIA ═══════ -->
+  <section class="pad" style="padding-top:0">
     <div class="wrap">
       <div class="head center" data-r>
-        <span class="eyebrow">Co dziś gotujemy</span>
-        <h2>Menu, które <em>zmienia się</em> codziennie</h2>
+        <span class="eyebrow">Z naszej kuchni</span>
+        <h2>Zobacz, co <em>gotujemy</em></h2>
       </div>
-      <div class="menu-grid">
-        <div class="m-col" data-r>
-          <div class="ic">🥣</div>
-          <h3>Zupy</h3>
-          <ul>
-            <li>Kapuśniak z prażokami</li>
-            <li>Zupa pomidorowa</li>
-            <li>Zalewajka</li>
-            <li>Barszcz czerwony</li>
-            <li>Zupa jarzynowa</li>
-          </ul>
-          <div class="note">…każdego dnia inna, zawsze na domowym wywarze</div>
-        </div>
-        <div class="m-col" data-r>
-          <div class="ic">🍖</div>
-          <h3>Dania główne</h3>
-          <ul>
-            <li>Schabowy z pieczarkami — hit gości ⭐</li>
-            <li>Kotlet mielony, de volaille, szwajcar</li>
-            <li>Pieczeń, żeberka, gulasz</li>
-            <li>Roladki schabowe</li>
-            <li>Pierogi ruskie, gołąbki, naleśniki</li>
-          </ul>
-          <div class="note">…klasyka polskiej kuchni w najlepszym wydaniu</div>
-        </div>
-        <div class="m-col" data-r>
-          <div class="ic">🥔</div>
-          <h3>Dodatki &amp; surówki</h3>
-          <ul>
-            <li>Ziemniaki z koperkiem</li>
-            <li>Kluski śląskie, kopytka</li>
-            <li>Kasza, ryż</li>
-            <li>Zestaw świeżych surówek</li>
-            <li>Kompot jak u babci</li>
-          </ul>
-          <div class="note">…komponujesz talerz dokładnie tak, jak lubisz</div>
-        </div>
+      <div class="strip" data-r>
+        <div class="snap"><img src="assets/foto/pierogi.webp" alt="Pierogi ruskie z okrasą"><span class="cap">Pierogi ruskie</span></div>
+        <div class="snap"><img src="assets/foto/kotlet.webp" alt="Kotlet z puree i warzywami"><span class="cap">Zestaw dnia</span></div>
+        <div class="snap"><img src="assets/foto/przekaski.webp" alt="Półmiski przekąsek na przyjęcie"><span class="cap">Catering — przekąski</span></div>
+        <div class="snap"><img src="assets/foto/sala.webp" alt="Udekorowana sala na przyjęcie"><span class="cap">Nasza sala</span></div>
       </div>
     </div>
   </section>
 
-  <!-- ═══════ CENNIK ═══════ -->
-  <section class="pad" id="cennik" style="padding-top:0">
-    <div class="wrap">
-      <div class="price-band" data-r>
-        <span class="script">proste zasady…</span>
-        <h2>Płacisz za to, co nałożysz</h2>
-        <div class="price-row">
-          <div class="p-card">
-            <div class="val">4,10 <small>zł / 100 g</small></div>
-            <div class="lab">Obiady na wagę</div>
-            <p>Nakładasz ile chcesz — płacisz tylko za wagę talerza.</p>
-          </div>
-          <div class="p-card">
-            <div class="val">21 <small>zł</small></div>
-            <div class="lab">Zestaw dnia z zupą</div>
-            <p>Zupa + danie główne w stałej, uczciwej cenie.</p>
-          </div>
-          <div class="p-card">
-            <div class="val">5 <small>zł</small></div>
-            <div class="lab">Dostawa — Pabianice</div>
-            <p>Ciepły obiad pod Twoje drzwi. Zamów telefonicznie.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════ CATERING ═══════ -->
-  <section class="pad" id="catering" style="padding-top:0">
-    <div class="wrap cat-grid">
-      <div class="cat-media" data-r>
-        <img src="https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=900&auto=format&fit=crop" alt="Catering — stół z daniami">
-        <div class="stamp">imprezy do 50 osób</div>
-      </div>
-      <div data-r>
-        <span class="eyebrow">Catering &amp; uroczystości</span>
-        <h2 class="serif" style="font-size:clamp(34px,4.8vw,56px);color:var(--green-deep);margin:14px 0 18px">Twoja uroczystość,<br><em class="script" style="font-size:.8em">nasza kuchnia</em></h2>
-        <p style="color:var(--dim);max-width:480px">Komunia, urodziny, stypa, spotkanie firmowe? Ugotujemy, przywieziemy i zadbamy o to, żeby nikt nie wyszedł głodny. Obsługujemy imprezy okolicznościowe w naszej sali i catering na wynos.</p>
-        <ul class="cat-list">
-          <li><span class="dot">✓</span> Imprezy okolicznościowe <b>do 50 osób</b> w naszej sali</li>
-          <li><span class="dot">✓</span> Catering na Twoją uroczystość — dowozimy gotowe dania</li>
-          <li><span class="dot">✓</span> Menu układane wspólnie z Tobą, pod budżet</li>
-          <li><span class="dot">✓</span> Domowa kuchnia polska — bez półproduktów</li>
-        </ul>
-        <div style="margin-top:30px"><a class="btn" href="tel:+48422110904">Zapytaj o termin — 42 211 09 04</a></div>
-      </div>
+  <!-- ═══════ KAFLE ═══════ -->
+  <section class="pad" style="padding-top:0">
+    <div class="wrap tiles">
+      <a class="tile" href="menu.html" data-r>
+        <span class="ic">🥣</span>
+        <h3>Menu dnia i cennik</h3>
+        <p>Codziennie inne zupy i dania główne. Na wagę — płacisz za to, co nałożysz.</p>
+        <span class="go">Zobacz menu →</span>
+      </a>
+      <a class="tile" href="catering.html" data-r>
+        <span class="ic">🎉</span>
+        <h3>Catering &amp; imprezy</h3>
+        <p>Komunie, urodziny, stypy i firmy — w naszej sali do 50 osób albo z dowozem.</p>
+        <span class="go">Sprawdź ofertę →</span>
+      </a>
+      <a class="tile" href="kontakt.html" data-r>
+        <span class="ic">📍</span>
+        <h3>Kontakt i dojazd</h3>
+        <p>ul. Jana Pawła II 36/40, Pabianice. Pn–pt 12:00–16:30. Dostawa po mieście.</p>
+        <span class="go">Znajdź nas →</span>
+      </a>
     </div>
   </section>
 
@@ -411,35 +226,9 @@
     </div>
   </section>
 
-  <!-- ═══════ KONTAKT ═══════ -->
-  <section class="pad" id="kontakt">
-    <div class="wrap">
-      <div class="head" data-r>
-        <span class="eyebrow">Kontakt</span>
-        <h2>Wpadnij na <em>obiad</em></h2>
-      </div>
-      <div class="contact-grid">
-        <div class="c-card" data-r>
-          <h3>Godziny wydawania obiadów</h3>
-          <ul class="hours">
-            <li><span class="d">Poniedziałek – Piątek</span><span class="h">12:00 – 16:30</span></li>
-            <li><span class="d">Sobota – Niedziela</span><span class="h" style="color:#b3543f">Zamknięte</span></li>
-          </ul>
-          <p style="margin-top:16px;font-size:13px;color:var(--dim)">Menu dnia publikujemy na naszym Facebooku — sprawdź, co dziś gotujemy, zanim przyjdziesz.</p>
-        </div>
-        <div class="c-card" data-r>
-          <h3>Znajdź nas</h3>
-          <a class="c-line" href="tel:+48422110904"><span class="ico">📞</span> 42 211 09 04</a>
-          <a class="c-line" href="https://maps.google.com/?q=Jana+Paw%C5%82a+II+36/40,+95-200+Pabianice" target="_blank" rel="noopener"><span class="ico">📍</span> ul. Jana Pawła II 36/40, Pabianice</a>
-          <a class="c-line" href="https://www.facebook.com/kwadranspabianice" target="_blank" rel="noopener"><span class="ico">👍</span> Kwadrans na Facebooku</a>
-          <div class="map-cta"><a class="btn ghost" href="https://maps.google.com/?q=Jana+Paw%C5%82a+II+36/40,+95-200+Pabianice" target="_blank" rel="noopener">Prowadź do Kwadransa →</a></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ═══════ FOOTER ═══════ -->
   <footer>
+    <div class="f-word" aria-hidden="true">Kwadrans</div>
     <div class="wrap">
       <div class="f-grid">
         <div>
@@ -448,10 +237,10 @@
         </div>
         <div class="f-col">
           <h4>Na skróty</h4>
-          <a href="#menu">Menu dnia</a>
-          <a href="#cennik">Cennik</a>
-          <a href="#catering">Catering &amp; imprezy</a>
-          <a href="#opinie">Opinie</a>
+          <a href="menu.html">Menu i cennik</a>
+          <a href="catering.html">Catering &amp; imprezy</a>
+          <a href="kontakt.html">Kontakt</a>
+          <a href="#rezerwacja">Rezerwacja</a>
         </div>
         <div class="f-col">
           <h4>Kontakt</h4>
@@ -467,22 +256,75 @@
     </div>
   </footer>
 
+  <script src="app.js"></script>
   <script>
-    // nav scroll
-    const nav = document.getElementById('nav');
-    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 40);
-    onScroll();
-    window.addEventListener('scroll', onScroll, {passive:true});
-    // mobile menu
-    const burger = document.getElementById('burger');
-    const links = document.getElementById('navLinks');
-    burger.addEventListener('click', () => links.classList.toggle('open'));
-    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
-    // reveal
-    const io = new IntersectionObserver(es => es.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-    }), {threshold:.12});
-    document.querySelectorAll('[data-r]').forEach(el => io.observe(el));
+    // ── podgląd dania przy kursorze ──
+    const peek = document.getElementById('peek');
+    const peekImg = peek.querySelector('img');
+    if (matchMedia('(hover:hover)').matches) {
+      document.querySelectorAll('.dish-row').forEach(row => {
+        row.addEventListener('mouseenter', () => { peekImg.src = row.dataset.img; peek.classList.add('on'); });
+        row.addEventListener('mouseleave', () => peek.classList.remove('on'));
+        row.addEventListener('mousemove', e => {
+          peek.style.left = (e.clientX + 28) + 'px';
+          peek.style.top  = (e.clientY - 130) + 'px';
+        });
+      });
+    }
+
+    // ── demo rezerwacji ──
+    const tabs = document.querySelectorAll('.tab');
+    const occWrap = document.getElementById('occWrap');
+    const noteWrap = document.getElementById('noteWrap');
+    let mode = 'stolik';
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      mode = t.dataset.mode;
+      const ev = mode === 'impreza';
+      occWrap.style.display = ev ? '' : 'none';
+      noteWrap.style.display = ev ? '' : 'none';
+    }));
+
+    const form = document.getElementById('bkForm');
+    const okBox = document.getElementById('bkOk');
+    const card = document.querySelector('.book-card');
+    const COLORS = ['#a8d95e','#d9b25f','#1c5b40','#f4eeda','#6da544'];
+    function confetti(){
+      for (let i = 0; i < 60; i++) {
+        const c = document.createElement('i');
+        c.className = 'conf';
+        c.style.left = Math.random()*100 + '%';
+        c.style.width = (6+Math.random()*7) + 'px';
+        c.style.height = (10+Math.random()*8) + 'px';
+        c.style.background = COLORS[i % COLORS.length];
+        c.style.animationDelay = (Math.random()*.7) + 's';
+        c.style.animationDuration = (2.2+Math.random()*1.4) + 's';
+        card.appendChild(c);
+        setTimeout(() => c.remove(), 4200);
+      }
+    }
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('bkName').value.trim();
+      const tel  = document.getElementById('bkTel').value.trim();
+      if (!name || !tel) { form.reportValidity(); return; }
+      const d = document.getElementById('bkDate').value || 'najbliższy termin';
+      const t = document.getElementById('bkTime').value;
+      const p = document.getElementById('bkPpl').value;
+      let sum = `${name}, stolik dla ${p} os. — ${d}, godz. ${t}. Oddzwonimy na ${tel}, by potwierdzić.`;
+      if (mode === 'impreza') {
+        const occ = document.getElementById('bkOcc').value;
+        sum = `${name}, ${occ} — ${d}. Odezwiemy się na ${tel}, by dograć szczegóły imprezy.`;
+      }
+      document.getElementById('bkSum').textContent = sum;
+      okBox.classList.add('show');
+      confetti();
+    });
+    document.getElementById('bkAgain').addEventListener('click', () => {
+      okBox.classList.remove('show');
+      form.reset();
+    });
   </script>
 </body>
 </html>

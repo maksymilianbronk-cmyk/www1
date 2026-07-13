@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "kwadrans",
     title: "Kwadrans — Obiady Domowe, Pabianice",
-    desc: "Zielony landing dla baru Kwadrans (Pabianice). Dane i logo z Facebooka + wizytówki Google: menu, cennik na wagę, catering, kontakt.",
+    desc: "Wielostronicowy serwis premium dla baru Kwadrans (Pabianice): editorial design, prawdziwe zdjęcia i dane z wizytówki Google, demo rezerwacji stolika/imprez.",
     icon: "🍲",
     tag: "landing",
     preview: true,
