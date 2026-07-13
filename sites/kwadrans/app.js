@@ -49,3 +49,27 @@ if (matchMedia('(hover:hover)').matches) {
     el.addEventListener('mouseleave', () => document.body.classList.remove('cur-hover'));
   });
 }
+
+// ── magnetyczne przyciski ──
+if (matchMedia('(hover:hover)').matches) {
+  document.querySelectorAll('.btn').forEach(b => {
+    b.addEventListener('mousemove', e => {
+      const r = b.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width/2);
+      const dy = e.clientY - (r.top + r.height/2);
+      b.style.transform = `translate(${dx*.18}px, ${dy*.28}px)`;
+    });
+    b.addEventListener('mouseleave', () => b.style.transform = '');
+  });
+}
+
+// ── pasek postępu scrolla ──
+const prog = document.getElementById('prog');
+if (prog) {
+  const upd = () => {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    prog.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+  };
+  addEventListener('scroll', upd, { passive: true }); upd();
+}
