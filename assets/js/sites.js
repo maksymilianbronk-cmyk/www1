@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "hotel-court",
     title: "Hotel Court*** Wellness & SPA — Kędzierzyn-Koźle",
-    desc: "Wielostronicowy serwis premium dla Hotelu Court (redesign court.pl): złoto-biel-pastele, 7 podstron — pokoje, restauracja d'Oro, SPA d'Oro, korty, uroczystości, kontakt. Dane z wizytówki Google, Booksy i Booking.",
+    desc: "Wielostronicowy serwis premium dla Hotelu Court (redesign court.pl): złoto-biel-pastele, 10 podstron — pokoje, rezerwacje, restauracja d'Oro, SPA d'Oro, korty, uroczystości, aktualności, blog, kontakt. Prawdziwe logo, dane z wizytówki Google, Booksy i Booking.",
     icon: "🏨",
     tag: "hotel",
     preview: true,

@@ -217,6 +217,7 @@
         "</svg>"
     );
   document.querySelectorAll("img").forEach(function (img) {
+    if (img.classList.contains("brand__logo") || img.classList.contains("footer__logo")) return;
     img.addEventListener("error", function () {
       if (img.src !== FALLBACK) img.src = FALLBACK;
     });
