@@ -152,9 +152,9 @@ const SITES = [
     tag: "narzędzie",
     preview: true,
     meta: {
-      colors: ["#0b0d14", "#151827", "#1877f2", "#3b82f6", "#e8eaf3"],
-      fonts: ["Segoe UI", "system-ui"],
-      tech: ["HTML", "CSS", "Vanilla JS", "Facebook Graph API"],
+      colors: ["#070a12", "#111524", "#1877f2", "#38d6e0", "#eef1fb"],
+      fonts: ["Space Grotesk", "Inter"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Facebook Graph API", "Google Fonts"],
     },
   },
   {
