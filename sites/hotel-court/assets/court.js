@@ -264,6 +264,33 @@
     probe.src = m[1];
   });
 
+  /* ---------- back to top ---------- */
+  var toTop = document.createElement("button");
+  toTop.className = "to-top";
+  toTop.innerHTML = "↑";
+  toTop.setAttribute("aria-label", "Wróć na górę");
+  document.body.appendChild(toTop);
+  toTop.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  window.addEventListener("scroll", function () {
+    toTop.classList.toggle("show", window.scrollY > 650);
+  }, { passive: true });
+
+  /* ---------- 3D tilt na kartach filarów ---------- */
+  if (window.matchMedia("(pointer: fine)").matches) {
+    document.querySelectorAll(".pillar").forEach(function (p) {
+      p.style.transition = "transform 0.25s ease-out";
+      p.addEventListener("mousemove", function (e) {
+        var r = p.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - 0.5;
+        var y = (e.clientY - r.top) / r.height - 0.5;
+        p.style.transform = "perspective(900px) rotateY(" + (x * 6).toFixed(2) + "deg) rotateX(" + (-y * 6).toFixed(2) + "deg) translateY(-4px)";
+      });
+      p.addEventListener("mouseleave", function () { p.style.transform = ""; });
+    });
+  }
+
   /* ---------- rok w stopce ---------- */
   document.querySelectorAll("[data-year]").forEach(function (el) {
     el.textContent = new Date().getFullYear();
