@@ -86,6 +86,38 @@
   <div class="hero__scroll">Przewiń</div>
 </section>
 
+<!-- ============ MODUŁ REZERWACJI ============ -->
+<div class="booking-wrap">
+  <div class="container">
+    <form class="booking-bar" data-booking>
+      <div class="field">
+        <label for="bb-in"><i>◆</i> Przyjazd</label>
+        <input id="bb-in" type="date" required>
+      </div>
+      <div class="field">
+        <label for="bb-out"><i>◆</i> Wyjazd</label>
+        <input id="bb-out" type="date" required>
+      </div>
+      <div class="field">
+        <label for="bb-guests"><i>◆</i> Goście</label>
+        <select id="bb-guests">
+          <option value="1">1 osoba</option>
+          <option value="2" selected>2 osoby</option>
+          <option value="3">3 osoby</option>
+          <option value="4">4 osoby</option>
+          <option value="5">5+ osób</option>
+        </select>
+      </div>
+      <button class="btn btn--solid" type="submit">Sprawdź dostępność <span class="btn__arrow">→</span></button>
+    </form>
+    <p class="booking-note">
+      <span>Najlepsza cena przy rezerwacji bezpośredniej</span>
+      <span>Strefa saun w cenie pobytu</span>
+      <span>Bezpłatny parking i Wi-Fi</span>
+    </p>
+  </div>
+</div>
+
 <!-- ============ MARQUEE ============ -->
 <div class="marquee" aria-hidden="true">
   <div class="marquee__track">

@@ -167,6 +167,35 @@
     });
   }
 
+  /* ---------- moduł rezerwacji (hero) ---------- */
+  var bb = document.querySelector("form[data-booking]");
+  if (bb) {
+    var bbIn = bb.querySelector("#bb-in");
+    var bbOut = bb.querySelector("#bb-out");
+    var DAY = 86400000;
+    function iso(d) { return d.toISOString().slice(0, 10); }
+    var now = new Date();
+    bbIn.min = iso(now);
+    bbIn.value = iso(new Date(now.getTime() + 7 * DAY));
+    bbOut.value = iso(new Date(now.getTime() + 8 * DAY));
+    bbOut.min = bbOut.value;
+    bbIn.addEventListener("change", function () {
+      if (!bbIn.value) return;
+      var next = iso(new Date(new Date(bbIn.value).getTime() + DAY));
+      bbOut.min = next;
+      if (bbOut.value <= bbIn.value) bbOut.value = next;
+    });
+    bb.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var url =
+        "https://booking.profitroom.com/pl/hotelcourt/home" +
+        "?checkIn=" + encodeURIComponent(bbIn.value) +
+        "&checkOut=" + encodeURIComponent(bbOut.value) +
+        "&adults=" + encodeURIComponent(bb.querySelector("#bb-guests").value);
+      window.open(url, "_blank", "noopener");
+    });
+  }
+
   /* ---------- demo form ---------- */
   document.querySelectorAll("form[data-demo]").forEach(function (f) {
     f.addEventListener("submit", function (e) {
