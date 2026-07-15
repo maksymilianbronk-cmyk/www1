@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "hotel-court",
+    title: "Hotel Court*** Wellness & SPA — Kędzierzyn-Koźle",
+    desc: "Wielostronicowy serwis premium dla Hotelu Court (redesign court.pl): złoto-biel-pastele, 7 podstron — pokoje, restauracja d'Oro, SPA d'Oro, korty, uroczystości, kontakt. Dane z wizytówki Google, Booksy i Booking.",
+    icon: "🏨",
+    tag: "hotel",
+    preview: true,
+    meta: {
+      colors: ["#fbf8f2", "#f4eee1", "#b08a47", "#f0e1da", "#2e2a23"],
+      fonts: ["Cormorant Garamond", "Jost", "Pinyon Script"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "kwadrans",
     title: "Kwadrans — Obiady Domowe, Pabianice",
     desc: "Wielostronicowy serwis premium dla baru Kwadrans (Pabianice): editorial design, prawdziwe zdjęcia i dane z wizytówki Google, demo rezerwacji stolika/imprez.",
