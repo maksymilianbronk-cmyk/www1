@@ -40,12 +40,43 @@
         var cat = chip.getAttribute("data-filter");
         chips.forEach(function (c) { c.classList.remove("active"); });
         chip.classList.add("active");
-        document.querySelectorAll(".tile").forEach(function (t) {
+        document.querySelectorAll("[data-cat]").forEach(function (t) {
           var show = cat === "all" || t.getAttribute("data-cat") === cat;
           t.style.display = show ? "" : "none";
         });
       });
     });
+  }
+
+  // Lightbox (kliknięcie w zdjęcie z atrybutem data-lb)
+  var lbxEls = document.querySelectorAll("[data-lb]");
+  if (lbxEls.length) {
+    var box = document.createElement("div");
+    box.className = "lbx";
+    box.innerHTML = '<figure><button class="x" aria-label="Zamknij">✕</button>' +
+                    '<img alt=""><figcaption></figcaption></figure>';
+    document.body.appendChild(box);
+    var bImg = box.querySelector("img");
+    var bCap = box.querySelector("figcaption");
+    function openLb(src, cap) {
+      bImg.src = src; bImg.alt = cap || "";
+      bCap.textContent = cap || "";
+      box.classList.add("show");
+    }
+    function closeLb() { box.classList.remove("show"); bImg.src = ""; }
+    lbxEls.forEach(function (el) {
+      el.addEventListener("click", function () {
+        var img = el.tagName === "IMG" ? el : el.querySelector("img");
+        var cap = el.getAttribute("data-cap") ||
+                  (el.querySelector(".cap") ? el.querySelector(".cap").textContent : "") ||
+                  (img ? img.alt : "");
+        if (img) openLb(img.getAttribute("src"), cap);
+      });
+    });
+    box.addEventListener("click", function (e) {
+      if (e.target === box || e.target.classList.contains("x") || e.target.tagName === "FIGURE") closeLb();
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeLb(); });
   }
 
   // Formularz kontaktowy (demo — bez backendu)

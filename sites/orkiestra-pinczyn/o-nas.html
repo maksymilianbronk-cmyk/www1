@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/jpeg" href="img/logo.jpg" />
 </head>
 <body>
 
@@ -43,7 +44,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <a class="brand" href="index.html" aria-label="Strona główna">
-      <svg class="emblem"><use href="#god-emblem"/></svg>
+      <img class="emblem" src="img/logo.jpg" alt="Godło OSP Pinczyn" width="46" height="46">
       <span class="brandname"><b>Orkiestra Dęta</b><span>OSP Pinczyn</span></span>
     </a>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
@@ -75,13 +76,14 @@
       <span class="eyebrow">Nasza historia</span>
       <h2 class="section-t">Orkiestra przy Ochotniczej Straży Pożarnej</h2>
       <p class="section-lead">Gminna Orkiestra Dęta działa przy OSP w Pinczynie — łącząc dwie piękne tradycje: strażacką służbę na rzecz społeczności i wspólne muzykowanie. To właśnie przy remizie od pokoleń rodzi się orkiestrowy zapał.</p>
-      <p style="margin-top:14px;color:var(--ink-2)">Gramy dla mieszkańców gminy Zblewo podczas najważniejszych chwil — tych podniosłych i tych radosnych. Jesteśmy tam, gdzie potrzebna jest dęta oprawa: w kościele, na placu festynowym i podczas uroczystości.</p>
-      <div class="note-box" style="margin-top:22px"><b>Do uzupełnienia przez orkiestrę:</b> rok założenia, nazwisko kapelmistrza oraz krótki rys historyczny — chętnie wstawimy je w to miejsce.</div>
+      <p style="margin-top:14px;color:var(--ink-2)">Gramy dla mieszkańców gminy Zblewo podczas najważniejszych chwil — tych podniosłych i tych radosnych. Jesteśmy tam, gdzie potrzebna jest dęta oprawa: w kościele, na placu festynowym i podczas uroczystości. Nasze mundury zdobi <b>haft kaszubski</b> — znak przywiązania do regionu.</p>
+      <p style="margin-top:14px;color:var(--ink-2)">Orkiestra to zespół wielopokoleniowy — grają w niej dzieci, młodzież i dorośli, ramię w ramię. Reprezentujemy gminę na przeglądach i turniejach, zdobywając wyróżnienia takie jak <b>„Muzyczna Perła Regionów”</b>.</p>
+      <div class="note-box" style="margin-top:22px"><b>Do uzupełnienia przez orkiestrę:</b> rok założenia i nazwisko kapelmistrza — chętnie wstawimy je w to miejsce.</div>
     </div>
-    <div class="plate reveal">
-      <svg class="emblem"><use href="#god-emblem"/></svg>
-      <span class="plate-note">OSP Pinczyn · Gmina Zblewo</span>
-    </div>
+    <figure class="media tall reveal" data-lb data-cap="Gminna Orkiestra Dęta przy OSP Pinczyn — wspólne zdjęcie zespołu">
+      <img src="img/zespol-boisko.jpg" alt="Muzycy Gminnej Orkiestry Dętej przy OSP Pinczyn pozują z instrumentami" loading="lazy" />
+      <figcaption>Zespół orkiestry · Pinczyn</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -114,6 +116,23 @@
   </div>
 </section>
 
+<!-- Galeria składu -->
+<section style="background:var(--cream);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="container">
+    <div class="tc" style="margin-bottom:34px">
+      <span class="eyebrow">Nasi muzycy</span>
+      <h2 class="section-t">Ludzie orkiestry</h2>
+    </div>
+    <div class="photostrip reveal">
+      <div class="ptile" data-lb><img src="img/klarnecisci.jpg" alt="Dwoje klarnecistów orkiestry" loading="lazy"><span class="cap">Sekcja klarnetów</span></div>
+      <div class="ptile" data-lb><img src="img/saksofon-formacja.jpg" alt="Saksofonistka w mundurze z haftem kaszubskim" loading="lazy"><span class="cap">Haft kaszubski</span></div>
+      <div class="ptile" data-lb><img src="img/tuba-deszcz.jpg" alt="Muzyk grający na tubie w deszczu" loading="lazy"><span class="cap">Gramy mimo deszczu</span></div>
+      <div class="ptile" data-lb><img src="img/koncert-trabki.jpg" alt="Sekcja trąbek podczas koncertu" loading="lazy"><span class="cap">Sekcja trąbek</span></div>
+    </div>
+    <div class="tc" style="margin-top:30px"><a href="galeria.html" class="btn btn-ghost">Więcej zdjęć w galerii →</a></div>
+  </div>
+</section>
+
 <!-- Dołącz -->
 <section>
   <div class="container">
@@ -134,7 +153,7 @@
     <div class="foot-grid">
       <div>
         <div class="foot-brand">
-          <svg class="emblem"><use href="#god-emblem"/></svg>
+          <img class="emblem" src="img/logo.jpg" alt="Godło OSP Pinczyn" width="46" height="46">
           <b>Gminna Orkiestra Dęta<br>przy OSP Pinczyn</b>
         </div>
         <p style="max-width:38ch">Dęta oprawa muzyczna uroczystości w Pinczynie i gminie Zblewo — od muzyki kościelnej po rozrywkową.</p>
