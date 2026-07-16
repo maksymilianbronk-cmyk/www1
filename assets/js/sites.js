@@ -145,6 +145,19 @@ const SITES = [
     },
   },
   {
+    slug: "orkiestra-pinczyn",
+    title: "Gminna Orkiestra Dęta przy OSP Pinczyn",
+    desc: "Wielostronicowy serwis orkiestry dętej z Pinczyna (Gmina Zblewo): ceremonialny motyw strażacka czerwień + mosiężne złoto, odtworzony emblemat OSP jako grafika wektorowa. 6 podstron — Start, O nas, Repertuar, Galeria, Wydarzenia, Kontakt. Prawdziwe dane z profilu Facebook: tel. 728 301 411, e-mail, lokalizacja.",
+    icon: "🎺",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#fffaf1", "#f7f0e2", "#a4201d", "#b8912c", "#241d15"],
+      fonts: ["Oswald", "Lora"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts"],
+    },
+  },
+  {
     slug: "scraper-facebook",
     title: "Inteligentny Scraper Facebooka",
     desc: "Narzędzie do pobierania najważniejszych danych i zdjęć ze stron (fanpage) na Facebooku przez oficjalne Graph API: opis, kategoria, kontakt, adres, godziny otwarcia, galeria zdjęć z zapisem na dysk i eksportem do JSON. Tryb demo bez tokenu. Wszystko po stronie przeglądarki.",
