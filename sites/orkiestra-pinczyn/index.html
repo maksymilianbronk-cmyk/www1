@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/jpeg" href="img/logo.jpg" />
 </head>
 <body>
 
@@ -45,7 +46,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <a class="brand" href="index.html" aria-label="Strona główna">
-      <svg class="emblem"><use href="#god-emblem"/></svg>
+      <img class="emblem" src="img/logo.jpg" alt="Godło OSP Pinczyn" width="46" height="46">
       <span class="brandname"><b>Orkiestra Dęta</b><span>OSP Pinczyn</span></span>
     </a>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
@@ -78,7 +79,7 @@
       <div style="margin-top:26px"><span class="loc-badge">📍 <b>Pinczyn</b> · Gmina Zblewo</span></div>
     </div>
     <div class="hero-emblem">
-      <svg class="emblem emblem-xl"><use href="#god-emblem"/></svg>
+      <img class="emblem emblem-xl" src="img/logo.jpg" alt="Godło Gminnej Orkiestry Dętej przy OSP Pinczyn — czerwono-złoty emblemat straży pożarnej z lirą" />
     </div>
   </div>
 </header>
@@ -98,10 +99,10 @@
 <!-- O nas skrót -->
 <section>
   <div class="container split">
-    <div class="plate reveal">
-      <svg class="emblem"><use href="#god-emblem"/></svg>
-      <span class="plate-note">Est. przy OSP Pinczyn</span>
-    </div>
+    <figure class="media tall reveal" data-lb data-cap="Orkiestra pod Pałacem w Wilanowie — z flagami Gminy Zblewo i Powiatu Starogardzkiego">
+      <img src="img/wilanow-zespol.jpg" alt="Gminna Orkiestra Dęta przy OSP Pinczyn w komplecie przed Pałacem w Wilanowie" loading="lazy" />
+      <figcaption>Orkiestra w komplecie · Wilanów</figcaption>
+    </figure>
     <div class="reveal">
       <span class="eyebrow">Kim jesteśmy</span>
       <h2 class="section-t">Muzyka, która łączy pokolenia</h2>
@@ -132,19 +133,45 @@
   </div>
 </section>
 
-<!-- Wyróżnienie -->
+<!-- Osiągnięcia -->
 <section>
-  <div class="container">
-    <div class="feature reveal">
-      <span class="eyebrow">Z dumą reprezentujemy gminę</span>
-      <h2>Naszą orkiestrę słychać nie tylko w Pinczynie</h2>
-      <p>Występujemy podczas uroczystości w gminie Zblewo i poza jej granicami — reprezentując lokalną społeczność tam, gdzie potrzebna jest prawdziwa, dęta oprawa. Bo dobra orkiestra to duma całej okolicy.</p>
+  <div class="container split">
+    <figure class="media reveal" data-lb data-cap="Nagroda „Muzyczna Perła Regionów” i dyplom turnieju „Królewska Złota Nuta” — Warszawa, Wilanów">
+      <img src="img/nagroda-wilanow.jpg" alt="Muzycy orkiestry z dyplomami i statuetką pod Pałacem w Wilanowie" loading="lazy" />
+      <figcaption>Dyplomy i statuetka · Warszawa</figcaption>
+    </figure>
+    <div class="reveal">
+      <span class="eyebrow">Nasze osiągnięcia</span>
+      <h2 class="section-t">Nagradzana orkiestra z charakterem</h2>
+      <p class="section-lead">Reprezentujemy gminę Zblewo i powiat starogardzki na przeglądach i turniejach orkiestr dętych — także w Warszawie, u stóp Pałacu w Wilanowie.</p>
+      <div class="awards" style="margin-top:24px">
+        <div class="award"><div class="aw-ic">🏆</div><div><h3>Muzyczna Perła Regionów</h3><p>Wyróżnienie dla Gminnej Orkiestry Dętej przy OSP Pinczyn.</p></div></div>
+        <div class="award"><div class="aw-ic">🎼</div><div><h3>Królewska Złota Nuta</h3><p>Udział w turnieju orkiestr dętych w Warszawie.</p></div></div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Cytat / opinie -->
+<!-- Galeria — zapowiedź -->
 <section style="background:var(--cream);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="container">
+    <div class="tc" style="margin-bottom:36px">
+      <span class="eyebrow">Galeria</span>
+      <h2 class="section-t">Orkiestra w kadrze</h2>
+      <p class="section-lead">Przemarsze, koncerty, festyny i wyjazdy — kilka chwil z życia zespołu.</p>
+    </div>
+    <div class="photostrip reveal">
+      <div class="ptile" data-lb><img src="img/marsz-ulica.jpg" alt="Przemarsz ulicą — na czele flecistka" loading="lazy"><span class="cap">Przemarsz</span></div>
+      <div class="ptile" data-lb><img src="img/koncert-park.jpg" alt="Koncert w parku — sekcja puzonów" loading="lazy"><span class="cap">Koncert w parku</span></div>
+      <div class="ptile" data-lb><img src="img/bemben.jpg" alt="Muzyk z wielkim bębnem orkiestry" loading="lazy"><span class="cap">Wielki bęben</span></div>
+      <div class="ptile" data-lb><img src="img/mlodzi-usmiech.jpg" alt="Młode muzyczki orkiestry z instrumentami" loading="lazy"><span class="cap">Młode pokolenie</span></div>
+    </div>
+    <div class="tc" style="margin-top:32px"><a href="galeria.html" class="btn btn-gold">Zobacz całą galerię →</a></div>
+  </div>
+</section>
+
+<!-- Cytat / opinie -->
+<section>
   <div class="container quote reveal">
     <div class="stars">★ ★ ★ ★ ★</div>
     <blockquote>„Festyn, urodziny czy ślub — nic nam nie straszne."</blockquote>
@@ -174,7 +201,7 @@
     <div class="foot-grid">
       <div>
         <div class="foot-brand">
-          <svg class="emblem"><use href="#god-emblem"/></svg>
+          <img class="emblem" src="img/logo.jpg" alt="Godło OSP Pinczyn" width="46" height="46">
           <b>Gminna Orkiestra Dęta<br>przy OSP Pinczyn</b>
         </div>
         <p style="max-width:38ch">Dęta oprawa muzyczna uroczystości w Pinczynie i gminie Zblewo — od muzyki kościelnej po rozrywkową.</p>

@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css" />
+<link rel="icon" type="image/jpeg" href="img/logo.jpg" />
 </head>
 <body>
 
@@ -43,7 +44,7 @@
 <nav class="nav">
   <div class="nav-inner">
     <a class="brand" href="index.html" aria-label="Strona główna">
-      <svg class="emblem"><use href="#god-emblem"/></svg>
+      <img class="emblem" src="img/logo.jpg" alt="Godło OSP Pinczyn" width="46" height="46">
       <span class="brandname"><b>Orkiestra Dęta</b><span>OSP Pinczyn</span></span>
     </a>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
@@ -71,32 +72,34 @@
 
 <section style="padding-top:16px">
   <div class="container">
-    <div class="note-box reveal" style="margin-bottom:32px">
-      <b>Miejsce na Wasze zdjęcia.</b> Poniższe kafelki to szablony gotowe do podmiany na prawdziwe fotografie z profilu na Facebooku. Prześlij zdjęcia, a wstawimy je w galerię. Możesz też pobrać je z Facebooka narzędziem <a href="../scraper-facebook/">Inteligentny Scraper Facebooka</a> dostępnym w tej kolekcji.
-    </div>
+    <p class="section-lead reveal" style="margin:0 auto 30px;text-align:center;max-width:56ch">Kliknij zdjęcie, aby powiększyć. Filtruj według rodzaju wydarzenia.</p>
 
     <div class="filters reveal">
       <button class="chip active" data-filter="all">Wszystko</button>
       <button class="chip" data-filter="koncerty">Koncerty</button>
+      <button class="chip" data-filter="przemarsze">Przemarsze</button>
       <button class="chip" data-filter="festyny">Festyny</button>
-      <button class="chip" data-filter="sluby">Śluby</button>
-      <button class="chip" data-filter="koscielne">Kościelne</button>
       <button class="chip" data-filter="wyjazdy">Wyjazdy</button>
+      <button class="chip" data-filter="muzycy">Muzycy</button>
+      <button class="chip" data-filter="nagrody">Nagrody</button>
     </div>
 
-    <div class="gallery reveal">
-      <div class="tile g1" data-cat="koncerty"><span class="ti">🎺</span><span class="tl">Koncert plenerowy</span></div>
-      <div class="tile g2" data-cat="festyny"><span class="ti">🎪</span><span class="tl">Festyn gminny</span></div>
-      <div class="tile g3" data-cat="sluby"><span class="ti">💍</span><span class="tl">Oprawa ślubu</span></div>
-      <div class="tile g4" data-cat="koscielne"><span class="ti">⛪</span><span class="tl">Procesja</span></div>
-      <div class="tile g5" data-cat="wyjazdy"><span class="ti">🏰</span><span class="tl">Wyjazd — Wilanów</span></div>
-      <div class="tile g6" data-cat="festyny"><span class="ti">🥁</span><span class="tl">Dożynki</span></div>
-      <div class="tile g2" data-cat="koncerty"><span class="ti">🎶</span><span class="tl">Koncert kolęd</span></div>
-      <div class="tile g1" data-cat="koscielne"><span class="ti">🕯️</span><span class="tl">Uroczystość kościelna</span></div>
-      <div class="tile g3" data-cat="wyjazdy"><span class="ti">🚌</span><span class="tl">Przegląd orkiestr</span></div>
-      <div class="tile g5" data-cat="festyny"><span class="ti">🎷</span><span class="tl">Piknik rodzinny</span></div>
-      <div class="tile g4" data-cat="sluby"><span class="ti">🎊</span><span class="tl">Powitanie pary młodej</span></div>
-      <div class="tile g6" data-cat="koncerty"><span class="ti">🎼</span><span class="tl">Capstrzyk OSP</span></div>
+    <div class="pgallery reveal">
+      <div class="ptile" data-cat="wyjazdy" data-lb><img src="img/wilanow-zespol.jpg" alt="Orkiestra przed Pałacem w Wilanowie z flagami Gminy Zblewo i Powiatu Starogardzkiego" loading="lazy"><span class="cap">Pałac w Wilanowie</span></div>
+      <div class="ptile" data-cat="koncerty" data-lb><img src="img/koncert-park.jpg" alt="Sekcja puzonów podczas koncertu w parku" loading="lazy"><span class="cap">Koncert w parku</span></div>
+      <div class="ptile" data-cat="przemarsze" data-lb><img src="img/marsz-ulica.jpg" alt="Przemarsz ulicą, na czele flecistka" loading="lazy"><span class="cap">Przemarsz ulicą</span></div>
+      <div class="ptile" data-cat="nagrody" data-lb><img src="img/nagroda-wilanow.jpg" alt="Muzycy z dyplomami Muzyczna Perła Regionów i statuetką" loading="lazy"><span class="cap">Muzyczna Perła Regionów</span></div>
+      <div class="ptile" data-cat="festyny" data-lb><img src="img/zespol-boisko.jpg" alt="Zespół orkiestry z medalami na boisku" loading="lazy"><span class="cap">Zespół na festynie</span></div>
+      <div class="ptile" data-cat="muzycy" data-lb><img src="img/bemben.jpg" alt="Muzyk z wielkim bębnem z napisem Gminna Orkiestra Dęta OSP Pinczyn" loading="lazy"><span class="cap">Wielki bęben</span></div>
+      <div class="ptile" data-cat="koncerty" data-lb><img src="img/koncert-trabki.jpg" alt="Sekcja trąbek podczas koncertu" loading="lazy"><span class="cap">Sekcja trąbek</span></div>
+      <div class="ptile" data-cat="przemarsze" data-lb><img src="img/marsz-park.jpg" alt="Przemarsz orkiestry w parku zdrojowym" loading="lazy"><span class="cap">Przemarsz w parku</span></div>
+      <div class="ptile" data-cat="muzycy" data-lb><img src="img/mlodzi-usmiech.jpg" alt="Dwie młode muzyczki orkiestry z uśmiechem" loading="lazy"><span class="cap">Młode pokolenie</span></div>
+      <div class="ptile" data-cat="wyjazdy" data-lb><img src="img/trabki-wielkie.jpg" alt="Orkiestra pod banerem Gmina Trąbki Wielkie" loading="lazy"><span class="cap">Przegląd — Trąbki Wielkie</span></div>
+      <div class="ptile" data-cat="muzycy" data-lb><img src="img/tuba-deszcz.jpg" alt="Muzyk grający na tubie w deszczu" loading="lazy"><span class="cap">Tuba w deszczu</span></div>
+      <div class="ptile" data-cat="festyny" data-lb><img src="img/festyn-trabki.jpg" alt="Muzycy z trąbkami podczas festynu o zachodzie słońca" loading="lazy"><span class="cap">Festyn wieczorem</span></div>
+      <div class="ptile" data-cat="muzycy" data-lb><img src="img/saksofon-formacja.jpg" alt="Saksofonistka w mundurze z haftem kaszubskim" loading="lazy"><span class="cap">Saksofon w szeregu</span></div>
+      <div class="ptile" data-cat="wyjazdy" data-lb><img src="img/saksofon-wyjazd.jpg" alt="Saksofonistka przy autokarze przed wyjazdem na występ" loading="lazy"><span class="cap">Wyjazd na występ</span></div>
+      <div class="ptile" data-cat="muzycy" data-lb><img src="img/klarnecisci.jpg" alt="Dwoje klarnecistów orkiestry, młodsza i starszy muzyk" loading="lazy"><span class="cap">Sekcja klarnetów</span></div>
     </div>
   </div>
 </section>
@@ -119,7 +122,7 @@
     <div class="foot-grid">
       <div>
         <div class="foot-brand">
-          <svg class="emblem"><use href="#god-emblem"/></svg>
+          <img class="emblem" src="img/logo.jpg" alt="Godło OSP Pinczyn" width="46" height="46">
           <b>Gminna Orkiestra Dęta<br>przy OSP Pinczyn</b>
         </div>
         <p style="max-width:38ch">Dęta oprawa muzyczna uroczystości w Pinczynie i gminie Zblewo — od muzyki kościelnej po rozrywkową.</p>
