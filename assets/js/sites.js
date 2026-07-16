@@ -134,12 +134,12 @@ const SITES = [
   {
     slug: "luksus-i-fryz",
     title: "Luksus i Fryz — Salon Asi, Rumia",
-    desc: "Butikowy salon fryzjerski Asi z Rumi: noir + szampańskie złoto, animowane pasma włosów na canvasie, katalog 8 fryzur (ilustracje SVG do podmiany na zdjęcia), rytuał all inclusive, rezerwacja demo. Font Italiana osadzony w pliku — zero zależności sieciowych.",
+    desc: "Butikowy salon fryzjerski Asi z Rumi: jasna paleta kość słoniowa + złoto + róż, zdjęcie Asi w sekcji O Asi, animowane pasma włosów na canvasie, katalog 8 fryzur (ilustracje SVG do podmiany na zdjęcia), rytuał all inclusive, rezerwacja demo. Font Italiana osadzony w pliku.",
     icon: "💇‍♀️",
     tag: "landing",
     preview: true,
     meta: {
-      colors: ["#140d13", "#221521", "#d8b072", "#e3a4b5", "#f7f0e6"],
+      colors: ["#faf5ec", "#fffdf8", "#b18445", "#c96f8d", "#2b1a26"],
       fonts: ["Italiana (embedded)", "Segoe UI / system-ui"],
       tech: ["HTML", "CSS", "SVG", "Canvas", "Vanilla JS"],
     },
