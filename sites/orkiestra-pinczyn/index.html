@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gminna Orkiestra Dęta przy OSP Pinczyn — muzyka od kościelnej po rozrywkową</title>
+<meta name="description" content="Gminna Orkiestra Dęta przy OSP Pinczyn (Gmina Zblewo). Oprawa muzyczna: uroczystości kościelne, śluby, festyny, dożynki, jubileusze. Zamów orkiestrę — tel. 728 301 411." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- Emblemat (definicja SVG, używana przez <use>) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="godGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8c974"/><stop offset=".5" stop-color="#b8912c"/><stop offset="1" stop-color="#7c5f18"/>
+    </linearGradient>
+    <path id="godRing" d="M50,50 m0,-42 a42,42 0 1,1 0,84 a42,42 0 1,1 0,-84" fill="none"/>
+    <symbol id="god-emblem" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="49" fill="url(#godGold)"/>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#7c5f18" stroke-width="0.6"/>
+      <circle cx="50" cy="50" r="41.5" fill="#a4201d"/>
+      <text font-family="Oswald,sans-serif" font-size="7" font-weight="600" fill="#f7f0e2" letter-spacing="0.8">
+        <textPath href="#godRing" startOffset="0">★ GMINNA ORKIESTRA DĘTA ★ OSP PINCZYN </textPath>
+      </text>
+      <circle cx="50" cy="51" r="30" fill="#f7f0e2"/>
+      <circle cx="50" cy="51" r="30" fill="none" stroke="#b8912c" stroke-width="1.4"/>
+      <g fill="none" stroke="#8a6b1c" stroke-width="1.7" stroke-linecap="round">
+        <path d="M41,60 C34,50 37,41 45,40"/><path d="M59,60 C66,50 63,41 55,40"/>
+        <path d="M44,40 L56,40"/><path d="M41,60 L59,60"/>
+        <path d="M47,43 L46,58"/><path d="M50,42.5 L50,58.5"/><path d="M53,43 L54,58"/>
+      </g>
+      <circle cx="45" cy="40" r="2.1" fill="#b8912c"/><circle cx="55" cy="40" r="2.1" fill="#b8912c"/>
+      <rect x="31" y="66" width="38" height="12" rx="2" fill="#b8912c"/>
+      <rect x="31" y="66" width="38" height="12" rx="2" fill="none" stroke="#7c5f18" stroke-width="0.6"/>
+      <text x="50" y="74.6" text-anchor="middle" font-family="Oswald,sans-serif" font-size="7.4" font-weight="700" fill="#5a1010" letter-spacing="1">PINCZYN</text>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- Nawigacja -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html" aria-label="Strona główna">
+      <svg class="emblem"><use href="#god-emblem"/></svg>
+      <span class="brandname"><b>Orkiestra Dęta</b><span>OSP Pinczyn</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="nav-links">
+      <a href="index.html" class="active">Start</a>
+      <a href="o-nas.html">O nas</a>
+      <a href="repertuar.html">Repertuar</a>
+      <a href="galeria.html">Galeria</a>
+      <a href="wydarzenia.html">Wydarzenia</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a href="kontakt.html" class="btn btn-primary nav-cta">Zamów orkiestrę</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">Orkiestra • Pinczyn • Gmina Zblewo</span>
+      <h1>Gminna Orkiestra Dęta<br><span class="u">przy OSP Pinczyn</span></h1>
+      <p class="kicker">„Gramy muzykę od kościelnej po rozrywkową."</p>
+      <p class="lead">Festyn, urodziny czy ślub — nic nam nie straszne. Dęta oprawa muzyczna z sercem, która nadaje rangę każdej uroczystości.</p>
+      <div class="cta-row">
+        <a href="kontakt.html" class="btn btn-primary">Zamów orkiestrę</a>
+        <a href="repertuar.html" class="btn btn-ghost">Poznaj repertuar</a>
+      </div>
+      <div style="margin-top:26px"><span class="loc-badge">📍 <b>Pinczyn</b> · Gmina Zblewo</span></div>
+    </div>
+    <div class="hero-emblem">
+      <svg class="emblem emblem-xl"><use href="#god-emblem"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- Statystyki -->
+<section style="padding-top:10px">
+  <div class="container">
+    <div class="stats reveal">
+      <div class="stat"><div class="stat-n">1,7&nbsp;tys.</div><div class="stat-l">Obserwujących</div></div>
+      <div class="stat"><div class="stat-n">413</div><div class="stat-l">Publikacji na FB</div></div>
+      <div class="stat"><div class="stat-n">100%</div><div class="stat-l">poleca nas</div></div>
+      <div class="stat"><div class="stat-n">8 ★</div><div class="stat-l">Opinii</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- O nas skrót -->
+<section>
+  <div class="container split">
+    <div class="plate reveal">
+      <svg class="emblem"><use href="#god-emblem"/></svg>
+      <span class="plate-note">Est. przy OSP Pinczyn</span>
+    </div>
+    <div class="reveal">
+      <span class="eyebrow">Kim jesteśmy</span>
+      <h2 class="section-t">Muzyka, która łączy pokolenia</h2>
+      <p class="section-lead">Jesteśmy gminną orkiestrą dętą działającą przy Ochotniczej Straży Pożarnej w Pinczynie. Tworzą nas mieszkańcy gminy Zblewo — od młodzieży po doświadczonych muzyków — których łączy pasja do wspólnego grania.</p>
+      <p style="margin-top:14px;color:var(--ink-2)">Repertuar prowadzimy od muzyki kościelnej i liturgicznej, przez marsze i utwory patriotyczne, aż po muzykę rozrywkową i biesiadną. Dzięki temu odnajdujemy się zarówno na mszy, jak i na wiejskim festynie.</p>
+      <div style="margin-top:24px"><a href="o-nas.html" class="btn btn-ghost">Poznaj orkiestrę →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- Na jakie okazje -->
+<section style="background:var(--cream);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="container">
+    <div class="tc" style="margin-bottom:44px">
+      <span class="eyebrow">Oprawa muzyczna</span>
+      <h2 class="section-t">Na jakie okazje gramy</h2>
+      <p class="section-lead">Od podniosłej ceremonii po huczną zabawę — dobierzemy repertuar do charakteru Waszego wydarzenia.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card reveal"><div class="ico">⛪</div><h3 class="card-t">Uroczystości kościelne</h3><p>Msze, procesje, odpusty i święta parafialne — godna oprawa liturgiczna.</p></div>
+      <div class="card reveal"><div class="ico">💍</div><h3 class="card-t">Śluby</h3><p>Uświetnimy ceremonię, powitanie oraz przyjęcie pary młodej.</p></div>
+      <div class="card reveal"><div class="ico">🎪</div><h3 class="card-t">Festyny i dożynki</h3><p>Muzyka rozrywkowa i biesiadna, która porywa do wspólnej zabawy.</p></div>
+      <div class="card reveal"><div class="ico">🎂</div><h3 class="card-t">Jubileusze i urodziny</h3><p>Muzyczna niespodzianka na okrągłe rocznice i rodzinne święta.</p></div>
+      <div class="card reveal"><div class="ico">🚒</div><h3 class="card-t">Uroczystości OSP i państwowe</h3><p>Marsze, hymny, capstrzyki oraz obchody świąt narodowych.</p></div>
+      <div class="card reveal"><div class="ico">🎺</div><h3 class="card-t">Koncerty okolicznościowe</h3><p>Koncerty kolęd, występy plenerowe i wydarzenia tematyczne.</p></div>
+    </div>
+    <div class="tc" style="margin-top:38px"><a href="repertuar.html" class="btn btn-gold">Zobacz pełną ofertę i repertuar →</a></div>
+  </div>
+</section>
+
+<!-- Wyróżnienie -->
+<section>
+  <div class="container">
+    <div class="feature reveal">
+      <span class="eyebrow">Z dumą reprezentujemy gminę</span>
+      <h2>Naszą orkiestrę słychać nie tylko w Pinczynie</h2>
+      <p>Występujemy podczas uroczystości w gminie Zblewo i poza jej granicami — reprezentując lokalną społeczność tam, gdzie potrzebna jest prawdziwa, dęta oprawa. Bo dobra orkiestra to duma całej okolicy.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Cytat / opinie -->
+<section style="background:var(--cream);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="container quote reveal">
+    <div class="stars">★ ★ ★ ★ ★</div>
+    <blockquote>„Festyn, urodziny czy ślub — nic nam nie straszne."</blockquote>
+    <cite>Nasze motto · 100% poleceń w 8 opiniach na Facebooku</cite>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="container">
+    <div class="cta-band reveal">
+      <span class="eyebrow" style="color:var(--brass-2);justify-content:center">Zaproś nas</span>
+      <h2>Zaproś orkiestrę na swoją uroczystość</h2>
+      <p>Planujesz ślub, festyn, jubileusz albo uroczystość kościelną? Zadzwoń lub napisz — ustalimy repertuar i szczegóły występu.</p>
+      <div class="cta-row">
+        <a href="tel:+48728301411" class="btn btn-gold">📞 728 301 411</a>
+        <a href="kontakt.html" class="btn btn-ghost">Formularz kontaktowy</a>
+        <a href="https://www.facebook.com/GodOspPinczyn" target="_blank" rel="noopener" class="btn btn-ghost">Facebook</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stopka -->
+<footer class="site">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg class="emblem"><use href="#god-emblem"/></svg>
+          <b>Gminna Orkiestra Dęta<br>przy OSP Pinczyn</b>
+        </div>
+        <p style="max-width:38ch">Dęta oprawa muzyczna uroczystości w Pinczynie i gminie Zblewo — od muzyki kościelnej po rozrywkową.</p>
+      </div>
+      <div>
+        <h4>Nawigacja</h4>
+        <div class="foot-links">
+          <a href="index.html">Start</a>
+          <a href="o-nas.html">O nas</a>
+          <a href="repertuar.html">Repertuar</a>
+          <a href="galeria.html">Galeria</a>
+          <a href="wydarzenia.html">Wydarzenia</a>
+          <a href="kontakt.html">Kontakt</a>
+        </div>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <div class="foot-contact">
+          <span>📞 <a href="tel:+48728301411">728 301 411</a></span>
+          <span>✉️ <a href="mailto:rogi9@wp.pl">rogi9@wp.pl</a></span>
+          <span>📍 Pinczyn, Gmina Zblewo</span>
+          <span>👍 <a href="https://www.facebook.com/GodOspPinczyn" target="_blank" rel="noopener">facebook.com/GodOspPinczyn</a></span>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span data-year>2026</span> Gminna Orkiestra Dęta przy OSP Pinczyn</span>
+      <span><a href="../../">← wróć do kolekcji stron</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
