@@ -145,6 +145,19 @@ const SITES = [
     },
   },
   {
+    slug: "scraper-facebook",
+    title: "Inteligentny Scraper Facebooka",
+    desc: "Narzędzie do pobierania najważniejszych danych i zdjęć ze stron (fanpage) na Facebooku przez oficjalne Graph API: opis, kategoria, kontakt, adres, godziny otwarcia, galeria zdjęć z zapisem na dysk i eksportem do JSON. Tryb demo bez tokenu. Wszystko po stronie przeglądarki.",
+    icon: "📘",
+    tag: "narzędzie",
+    preview: true,
+    meta: {
+      colors: ["#070a12", "#111524", "#1877f2", "#38d6e0", "#eef1fb"],
+      fonts: ["Space Grotesk", "Inter"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Facebook Graph API", "Google Fonts"],
+    },
+  },
+  {
     slug: "katalog",
     title: "Katalog stron — CRM",
     desc: "Panel z logowaniem: foldery stron, manager plików i baza promotorów.",

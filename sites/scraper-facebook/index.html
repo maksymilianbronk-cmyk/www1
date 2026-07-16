@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inteligentny Scraper Facebooka — narzędzie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070a12;
+    --bg2:#0c101c;
+    --card:#111524;
+    --card2:#161b2e;
+    --glass:rgba(22,27,46,.55);
+    --line:#232a42;
+    --line2:#2c3454;
+    --fg:#eef1fb;
+    --muted:#98a0c0;
+    --muted2:#6f78a0;
+    --fb:#1877f2;
+    --fb2:#0a6bff;
+    --accent:#4b9bff;
+    --cyan:#38d6e0;
+    --good:#34e08a;
+    --bad:#ff5f6e;
+    --warn:#ffb648;
+    --r:20px;
+    --shadow:0 30px 70px -20px rgba(0,0,0,.7);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.6;font-size:16px;
+    min-height:100vh;overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* animowane tło */
+  .bgfx{position:fixed;inset:0;z-index:-1;overflow:hidden}
+  .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5;animation:float 18s ease-in-out infinite}
+  .orb.a{width:520px;height:520px;background:radial-gradient(circle,#1877f2,transparent 70%);top:-160px;left:-100px}
+  .orb.b{width:480px;height:480px;background:radial-gradient(circle,#38d6e0,transparent 70%);top:-80px;right:-140px;animation-delay:-6s;opacity:.32}
+  .orb.c{width:420px;height:420px;background:radial-gradient(circle,#6a4bff,transparent 70%);top:520px;left:40%;animation-delay:-11s;opacity:.28}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,50px) scale(1.08)}66%{transform:translate(-30px,20px) scale(.96)}}
+  .grid-bg{position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(120,140,220,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(120,140,220,.035) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at 50% 20%,#000,transparent 75%)}
+
+  h1,h2,h3,.pn,.brand-t,.stat-n{font-family:"Space Grotesk",system-ui,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+  a{color:var(--accent);text-decoration:none;transition:.15s}
+  a:hover{color:#7fbcff}
+
+  /* HEADER */
+  header{padding:22px 0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:13px}
+  .logo{
+    width:46px;height:46px;border-radius:14px;flex:0 0 auto;position:relative;
+    background:linear-gradient(135deg,#1877f2,#4aa4ff);
+    display:grid;place-items:center;font:800 26px/1 "Space Grotesk";color:#fff;
+    box-shadow:0 10px 30px rgba(24,119,242,.45);
+  }
+  .logo::after{content:"";position:absolute;inset:0;border-radius:14px;border:1px solid rgba(255,255,255,.25)}
+  .brand-t{font-weight:700;font-size:17px;letter-spacing:.2px}
+  .brand small{display:block;font-family:"Inter";font-weight:450;color:var(--muted);font-size:12px;letter-spacing:.3px}
+  .back{font-size:14px;color:var(--muted);padding:9px 15px;border:1px solid var(--line);border-radius:10px;background:var(--glass);backdrop-filter:blur(10px)}
+  .back:hover{border-color:var(--line2);color:var(--fg)}
+
+  /* HERO */
+  .hero{padding:64px 0 40px;text-align:center;position:relative}
+  .badge{
+    display:inline-flex;align-items:center;gap:9px;
+    background:var(--glass);border:1px solid var(--line2);backdrop-filter:blur(12px);
+    color:#a9c9ff;font-size:13px;font-weight:500;padding:8px 16px;border-radius:999px;margin-bottom:26px;
+  }
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(52,224,138,.6);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(52,224,138,.55)}70%{box-shadow:0 0 0 9px rgba(52,224,138,0)}100%{box-shadow:0 0 0 0 rgba(52,224,138,0)}}
+  h1{font-size:clamp(34px,6vw,62px);line-height:1.04;font-weight:700;letter-spacing:-1.2px}
+  h1 .grad{background:linear-gradient(110deg,#4b9bff,#38d6e0 55%,#8ad2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{max-width:660px;margin:22px auto 0;color:var(--muted);font-size:clamp(15px,2vw,19px)}
+  .cta{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;cursor:pointer;border:none;font-family:inherit;
+    font-size:15px;font-weight:600;padding:14px 24px;border-radius:13px;transition:.2s;position:relative;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:linear-gradient(135deg,#1877f2,#0a6bff);color:#fff;box-shadow:0 14px 34px -8px rgba(24,119,242,.6)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 44px -8px rgba(24,119,242,.7)}
+  .btn-ghost{background:var(--glass);color:var(--fg);border:1px solid var(--line2);backdrop-filter:blur(10px)}
+  .btn-ghost:hover{transform:translateY(-2px);border-color:#3a4570}
+  .btn-sm{padding:10px 16px;font-size:13.5px;border-radius:11px}
+
+  .stats{display:flex;gap:34px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+  .stat{text-align:center}
+  .stat-n{font-size:30px;font-weight:700;background:linear-gradient(120deg,#fff,#a9c9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat-l{font-size:12.5px;color:var(--muted2);letter-spacing:.4px;text-transform:uppercase}
+
+  section{padding:34px 0}
+  .h2{font-family:"Space Grotesk";font-size:26px;font-weight:700;letter-spacing:-.4px;margin-bottom:6px}
+  .h2s{color:var(--muted);font-size:15px;margin-bottom:24px;max-width:640px}
+
+  /* PANEL */
+  .panel{background:linear-gradient(180deg,rgba(20,25,42,.85),rgba(11,15,26,.85));border:1px solid var(--line);border-radius:var(--r);padding:30px;box-shadow:var(--shadow);backdrop-filter:blur(14px);position:relative;overflow:hidden}
+  .panel::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(120,180,255,.5),transparent)}
+  .panel-h{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+  .panel-h .pi{width:34px;height:34px;border-radius:10px;background:rgba(24,119,242,.14);border:1px solid rgba(24,119,242,.3);display:grid;place-items:center;font-size:17px}
+  .panel-h h2{font-size:19px;font-weight:600}
+  .panel .sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+
+  .field{margin-bottom:17px}
+  .field label{display:block;font-size:13px;font-weight:600;color:#c7cdea;margin-bottom:8px}
+  .field label .opt{color:var(--muted2);font-weight:450}
+  .inwrap{position:relative}
+  .inwrap .pre{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:15px;pointer-events:none}
+  .input{
+    width:100%;background:#0a0e1a;border:1px solid var(--line);color:var(--fg);
+    font-size:15px;padding:14px 15px;border-radius:12px;transition:.18s;font-family:inherit;
+  }
+  .input.pad{padding-left:38px}
+  .input:focus{outline:none;border-color:var(--fb);box-shadow:0 0 0 4px rgba(24,119,242,.16);background:#0b1020}
+  .input::placeholder{color:#535b7e}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+  @media(max-width:620px){.row{grid-template-columns:1fr}}
+  .hint{font-size:12.5px;color:var(--muted2);margin-top:7px}
+  .hint code,.step code{background:#0a0e1a;border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:12.5px;color:#8fc0ff;font-family:"Space Grotesk",monospace}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;align-items:center}
+
+  .status{font-size:14px;margin-top:18px;padding:13px 16px;border-radius:12px;display:none;align-items:flex-start;gap:8px}
+  .status.show{display:flex}
+  .status.info{background:rgba(24,119,242,.10);border:1px solid rgba(24,119,242,.3);color:#a9c9ff}
+  .status.err{background:rgba(255,95,110,.10);border:1px solid rgba(255,95,110,.35);color:#ffa3ab}
+  .status.ok{background:rgba(52,224,138,.10);border:1px solid rgba(52,224,138,.35);color:#8ff0bd}
+  .spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.28);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex:0 0 auto;margin-top:3px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* RESULTS */
+  #results{display:none;margin-top:28px}
+  #results.show{display:block;animation:fade .45s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  .card-fb{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:var(--shadow)}
+  .cover{height:200px;background:linear-gradient(120deg,#0d2a58,#1877f2 60%,#38d6e0);background-size:cover;background-position:center;position:relative}
+  .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(17,21,36,.9))}
+  .profile{display:flex;gap:20px;align-items:flex-end;padding:0 26px 22px;margin-top:-56px;position:relative;z-index:1;flex-wrap:wrap}
+  .avatar{width:112px;height:112px;border-radius:24px;object-fit:cover;border:4px solid var(--card);background:#0a0e1a;flex:0 0 auto;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+  .profile .pinfo{padding-bottom:6px}
+  .profile .pn{font-size:26px;font-weight:700;letter-spacing:-.4px}
+  .profile .cat{color:#a9c9ff;font-size:14px;font-weight:500;margin-top:2px}
+  .verified{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--fb);color:#fff;font-size:12px;margin-left:7px;vertical-align:middle}
+
+  .grid-info{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:13px;padding:4px 26px 24px}
+  .info{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:15px 16px;transition:.18s}
+  .info:hover{border-color:var(--line2);transform:translateY(-2px)}
+  .info .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted2);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .info .v{font-size:15px;font-weight:600;word-break:break-word}
+  .info .v.small{font-weight:500;font-size:14px}
+
+  .tabs{display:flex;gap:4px;margin:6px 26px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tab{background:none;border:none;color:var(--muted);font-family:"Space Grotesk";font-size:15px;font-weight:600;padding:13px 15px;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;margin-bottom:-1px}
+  .tab:hover{color:var(--fg)}
+  .tab.active{color:#fff;border-bottom-color:var(--fb)}
+  .tab .count{background:var(--card2);border:1px solid var(--line);border-radius:999px;font-size:11px;padding:1px 8px;margin-left:6px;vertical-align:1px;font-family:"Inter"}
+  .pane{display:none;padding:22px 26px 8px}
+  .pane.active{display:block;animation:fade .3s ease}
+
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:13px}
+  .photo{position:relative;border-radius:15px;overflow:hidden;aspect-ratio:1;background:#0a0e1a;border:1px solid var(--line);cursor:pointer}
+  .photo img{width:100%;height:100%;object-fit:cover;transition:.35s}
+  .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.5));opacity:0;transition:.25s}
+  .photo:hover img{transform:scale(1.08)}
+  .photo:hover::after{opacity:1}
+  .photo .dl{
+    position:absolute;right:9px;bottom:9px;background:rgba(10,14,26,.85);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:600;
+    display:flex;align-items:center;gap:5px;opacity:0;transform:translateY(6px);transition:.22s;z-index:1;
+  }
+  .photo:hover .dl{opacity:1;transform:none}
+
+  .posts{display:flex;flex-direction:column;gap:14px}
+  .post{background:var(--card2);border:1px solid var(--line);border-radius:15px;padding:17px 18px;transition:.18s}
+  .post:hover{border-color:var(--line2)}
+  .post .meta{font-size:12.5px;color:var(--muted2);margin-bottom:9px}
+  .post .txt{font-size:14.5px}
+  .post img{margin-top:11px;max-width:100%;border-radius:11px}
+  .post .st{margin-top:12px;font-size:13px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap}
+
+  .export{display:flex;gap:12px;flex-wrap:wrap;margin:8px 26px 26px;padding-top:22px;border-top:1px solid var(--line)}
+
+  /* skeleton */
+  .skel{display:none;padding:26px}
+  .skel.show{display:block;animation:fade .3s}
+  .sk{background:linear-gradient(90deg,#141a2b 25%,#1c2338 50%,#141a2b 75%);background-size:400% 100%;animation:sh 1.4s infinite;border-radius:12px}
+  @keyframes sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
+  .sk-cover{height:150px;margin-bottom:20px}
+  .sk-row{display:flex;gap:16px;margin-bottom:22px}
+  .sk-av{width:90px;height:90px;border-radius:20px;flex:0 0 auto}
+  .sk-l{height:20px;margin-bottom:10px}
+  .sk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+  .sk-ph{aspect-ratio:1;border-radius:14px}
+  @media(max-width:620px){.sk-grid{grid-template-columns:repeat(2,1fr)}}
+
+  /* LIGHTBOX */
+  .lb{position:fixed;inset:0;background:rgba(4,6,12,.94);backdrop-filter:blur(8px);display:none;place-items:center;z-index:60;padding:26px}
+  .lb.show{display:grid;animation:fade .25s}
+  .lb img{max-width:92vw;max-height:80vh;border-radius:16px;box-shadow:0 40px 90px rgba(0,0,0,.7)}
+  .lb .lbbar{position:absolute;top:22px;right:26px;display:flex;gap:10px}
+  .lb .lbbtn{background:var(--glass);backdrop-filter:blur(12px);border:1px solid var(--line2);color:#fff;border-radius:11px;padding:11px 15px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .lb .lbbtn:hover{background:var(--card2)}
+
+  /* FEATURES */
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:16px}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;transition:.2s;position:relative;overflow:hidden}
+  .feat:hover{transform:translateY(-4px);border-color:var(--line2)}
+  .feat .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:23px;margin-bottom:14px;background:rgba(24,119,242,.12);border:1px solid rgba(24,119,242,.24)}
+  .feat h3{font-size:16.5px;font-weight:600;margin-bottom:7px}
+  .feat p{color:var(--muted);font-size:14px}
+
+  .steps{display:grid;gap:13px}
+  .step{display:flex;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px 20px;transition:.18s}
+  .step:hover{border-color:var(--line2)}
+  .step .n{flex:0 0 auto;width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#1877f2,#0a6bff);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px;font-family:"Space Grotesk";box-shadow:0 8px 20px -6px rgba(24,119,242,.6)}
+  .step h3{font-size:15.5px;font-weight:600;margin-bottom:3px}
+  .step p{color:var(--muted);font-size:14px}
+
+  .note{background:linear-gradient(180deg,rgba(255,182,72,.08),rgba(255,182,72,.03));border:1px solid rgba(255,182,72,.28);border-radius:16px;padding:20px 22px;color:#ffd79a;font-size:14px}
+  .note b{color:#ffe9c4}
+  .note .nh{font-family:"Space Grotesk";font-weight:700;font-size:15px;color:#ffe9c4;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+
+  footer{padding:46px 0 64px;text-align:center;color:var(--muted2);font-size:14px;border-top:1px solid var(--line);margin-top:24px}
+  footer .fb{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="bgfx"><span class="orb a"></span><span class="orb b"></span><span class="orb c"></span></div>
+<div class="grid-bg"></div>
+
+<div class="wrap">
+
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">f</div>
+        <div><div class="brand-t">Scraper Facebooka</div><small>Inteligentne pobieranie danych i zdjęć</small></div>
+      </div>
+      <a class="back" href="../../">← wróć do kolekcji</a>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="badge"><span class="dot"></span> Oficjalne Graph API · dane nie opuszczają Twojej przeglądarki</div>
+    <h1>Pobierz <span class="grad">najważniejsze dane</span><br>ze strony na Facebooku</h1>
+    <p class="lead">Wklej adres fanpage'a i pobierz opis, kategorię, kontakt, adres, godziny otwarcia oraz pełną galerię zdjęć — z zapisem na dysk i eksportem do JSON.</p>
+    <div class="cta">
+      <button class="btn btn-primary" onclick="document.getElementById('tool').scrollIntoView()">⚡ Uruchom scraper</button>
+      <button class="btn btn-ghost" onclick="runDemo()">✨ Zobacz demo na żywo</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n" id="hs-1">15+</div><div class="stat-l">pól danych</div></div>
+      <div class="stat"><div class="stat-n">100</div><div class="stat-l">zdjęć / zapytanie</div></div>
+      <div class="stat"><div class="stat-n">JSON</div><div class="stat-l">eksport danych</div></div>
+      <div class="stat"><div class="stat-n">0</div><div class="stat-l">danych na serwer</div></div>
+    </div>
+  </div>
+
+  <section id="tool">
+    <div class="panel">
+      <div class="panel-h"><div class="pi">🔎</div><h2>Konfiguracja</h2></div>
+      <p class="sub">Podaj adres strony (fanpage). Aby pobrać prawdziwe dane, dołącz token Graph API — bez niego uruchomi się tryb demo.</p>
+
+      <div class="field">
+        <label for="url">Adres strony lub nazwa fanpage'a</label>
+        <div class="inwrap">
+          <span class="pre">🔗</span>
+          <input class="input pad" id="url" placeholder="https://www.facebook.com/nazwastrony  ·  lub sama nazwa" />
+        </div>
+        <div class="hint">Obsługiwane: pełny URL, <code>facebook.com/nazwa</code>, sama nazwa lub ID strony. Linki <code>/share/xxxx</code> są prywatne i wymagają logowania — podaj publiczną nazwę strony.</div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="token">Token Graph API <span class="opt">(opcjonalny)</span></label>
+          <div class="inwrap"><span class="pre">🔑</span>
+          <input class="input pad" id="token" type="password" placeholder="EAAB… — Access Token" /></div>
+          <div class="hint">Zdobądź w <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">Graph API Explorer</a>.</div>
+        </div>
+        <div class="field">
+          <label for="limit">Liczba zdjęć</label>
+          <div class="inwrap"><span class="pre">🖼️</span>
+          <input class="input pad" id="limit" type="number" min="1" max="100" value="24" /></div>
+          <div class="hint">Maks. 100 na zapytanie.</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="go" onclick="run()">⬇ Pobierz dane</button>
+        <button class="btn btn-ghost btn-sm" onclick="runDemo()">Tryb demo</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearAll()">Wyczyść</button>
+      </div>
+
+      <div class="status" id="status"></div>
+
+      <!-- skeleton -->
+      <div class="skel" id="skel">
+        <div class="sk sk-cover"></div>
+        <div class="sk-row"><div class="sk sk-av"></div><div style="flex:1"><div class="sk sk-l" style="width:45%"></div><div class="sk sk-l" style="width:30%;height:14px"></div></div></div>
+        <div class="sk-grid"><div class="sk sk-ph"></div><div class="sk sk-ph"></div><div class="sk sk-ph"></div><div class="sk sk-ph"></div></div>
+      </div>
+
+      <div id="results">
+        <div class="card-fb">
+          <div class="cover" id="r-cover"></div>
+          <div class="profile">
+            <img class="avatar" id="r-avatar" alt="Zdjęcie profilowe" />
+            <div class="pinfo">
+              <div class="pn" id="r-name">—</div>
+              <div class="cat" id="r-cat">—</div>
+            </div>
+          </div>
+
+          <div class="grid-info" id="r-info"></div>
+
+          <div class="tabs">
+            <button class="tab active" data-pane="pane-photos">📷 Zdjęcia <span class="count" id="c-photos">0</span></button>
+            <button class="tab" data-pane="pane-posts">📝 Wpisy <span class="count" id="c-posts">0</span></button>
+            <button class="tab" data-pane="pane-about">ℹ️ O stronie</button>
+          </div>
+
+          <div class="pane active" id="pane-photos"><div class="gallery" id="r-gallery"></div></div>
+          <div class="pane" id="pane-posts"><div class="posts" id="r-posts"></div></div>
+          <div class="pane" id="pane-about"><div class="info"><div class="k">📄 Pełny opis</div><div class="v small" id="r-about">—</div></div></div>
+
+          <div class="export">
+            <button class="btn btn-primary btn-sm" onclick="downloadAllPhotos()">⬇ Pobierz wszystkie zdjęcia</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportJSON()">📦 Eksportuj JSON</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyJSON()">📋 Kopiuj dane</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h2">Co potrafi to narzędzie</div>
+    <p class="h2s">Cztery filary: inteligentne porządkowanie danych, galeria z zapisem, eksport i pełna prywatność.</p>
+    <div class="features">
+      <div class="feat"><div class="ic">🧠</div><h3>Inteligentne parsowanie</h3><p>Rozpoznaje nazwę, kategorię, kontakt, adres i godziny otwarcia — automatycznie porządkuje pola w czytelne karty.</p></div>
+      <div class="feat"><div class="ic">🖼️</div><h3>Galeria zdjęć</h3><p>Pobiera zdjęcia w najlepszej dostępnej rozdzielczości, z podglądem w lightboxie i zapisem pojedynczo lub hurtowo.</p></div>
+      <div class="feat"><div class="ic">📊</div><h3>Eksport danych</h3><p>Zapisz wszystko do pliku JSON lub skopiuj do schowka — gotowe do CRM, arkusza czy dalszej automatyzacji.</p></div>
+      <div class="feat"><div class="ic">🔒</div><h3>Pełna prywatność</h3><p>Działa przez oficjalne Graph API. Token ani pobrane dane nigdy nie trafiają na żaden serwer — wszystko w przeglądarce.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h2">Jak zdobyć token — 4 kroki, 2 minuty</div>
+    <p class="h2s"></p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div><h3>Otwórz Graph API Explorer</h3><p>Wejdź na <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">developers.facebook.com/tools/explorer</a> i zaloguj się.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h3>Wygeneruj token</h3><p>Kliknij <b>„Generate Access Token"</b> i zaznacz uprawnienia <code>pages_read_engagement</code> oraz <code>public_profile</code>.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h3>Wklej token wyżej</h3><p>Skopiuj wartość z pola <code>Access Token</code> i wklej ją w polu „Token Graph API".</p></div></div>
+      <div class="step"><div class="n">4</div><div><h3>Wpisz nazwę strony i pobierz</h3><p>Podaj adres fanpage'a i kliknij <b>„Pobierz dane"</b>. Dane i zdjęcia pojawią się poniżej.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="note">
+      <div class="nh">⚖️ Legalność i ograniczenia</div>
+      To narzędzie korzysta wyłącznie z <b>oficjalnego Graph API Facebooka</b> i pobiera tylko <b>publicznie dostępne</b> dane stron (fanpage). Nie omija logowania, nie pobiera prywatnych profili osób ani treści chronionych. Ręczne „scrapowanie" HTML Facebooka łamie regulamin serwisu i grozi blokadą — dlatego świadomie go tu nie stosujemy. Odpowiadasz za zgodność wykorzystania danych z RODO i regulaminem Facebooka. Link typu <code>/share/…</code> jest prywatnym skrótem i wymaga zalogowania — podaj publiczną nazwę strony.
+    </div>
+  </section>
+
+  <footer>
+    <div>Inteligentny Scraper Facebooka · część kolekcji stron www</div>
+    <div class="fb"><a href="../../">← wróć do kolekcji</a></div>
+  </footer>
+</div>
+
+<div class="lb" id="lb" onclick="closeLb(event)">
+  <div class="lbbar">
+    <button class="lbbtn" onclick="downloadCurrent(event)">⬇ Pobierz</button>
+    <button class="lbbtn" onclick="closeLb(event)">✕ Zamknij</button>
+  </div>
+  <img id="lb-img" alt="Podgląd zdjęcia" />
+</div>
+
+<script>
+"use strict";
+
+let DATA = null;
+let currentLbUrl = null;
+
+function $(id){return document.getElementById(id)}
+function setStatus(msg, type){
+  const s = $("status");
+  s.className = "status show " + (type||"info");
+  s.innerHTML = msg;
+}
+function hideStatus(){ $("status").className = "status"; }
+
+function parseTarget(raw){
+  raw = (raw||"").trim();
+  if(!raw) return "";
+  try{
+    if(/facebook\.com/i.test(raw)){
+      const u = new URL(raw.startsWith("http")?raw:"https://"+raw);
+      const idParam = u.searchParams.get("id");
+      if(idParam) return idParam;
+      let path = u.pathname.replace(/^\/+|\/+$/g,"");
+      const seg = path.split("/")[0];
+      if(seg && seg!=="share" && seg!=="pages") return seg;
+      return path.split("/").pop() || seg;
+    }
+  }catch(e){}
+  return raw.replace(/^@/,"");
+}
+
+async function run(){
+  const rawUrl = $("url").value;
+  const target = parseTarget(rawUrl);
+  const token  = $("token").value.trim();
+  const limit  = Math.max(1, Math.min(100, parseInt($("limit").value)||24));
+
+  if(!target){ setStatus("⚠️ Podaj adres strony lub nazwę fanpage'a.", "err"); return; }
+
+  if(/\/share\//i.test(rawUrl)){
+    setStatus("⚠️ Link <code>/share/…</code> to prywatny skrót i wymaga zalogowania. Podaj publiczną nazwę strony (np. <code>facebook.com/nazwastrony</code>).", "err");
+    return;
+  }
+
+  if(!token){
+    setStatus("ℹ️ Brak tokenu Graph API — uruchamiam <b>tryb demo</b>. Dodaj token, aby pobrać prawdziwe dane.", "info");
+    setTimeout(runDemo, 400);
+    return;
+  }
+
+  const btn = $("go"); btn.disabled = true;
+  $("results").classList.remove("show");
+  $("skel").classList.add("show");
+  setStatus('<span class="spinner"></span> Łączę z Graph API i pobieram dane strony…', "info");
+
+  try{
+    const fields = [
+      "id","name","username","about","description","category","category_list",
+      "fan_count","followers_count","link","website","phone","emails",
+      "single_line_address","location","hours","verification_status",
+      "picture.width(400).height(400){url}",
+      "cover{source}",
+      "photos.limit("+limit+"){images,created_time,name}",
+      "posts.limit(6){message,created_time,full_picture,permalink_url,shares,comments.summary(true),reactions.summary(true)}"
+    ].join(",");
+
+    const api = "https://graph.facebook.com/v19.0/"+encodeURIComponent(target)+
+                "?fields="+encodeURIComponent(fields)+"&access_token="+encodeURIComponent(token);
+
+    const res = await fetch(api);
+    const json = await res.json();
+    $("skel").classList.remove("show");
+
+    if(json.error){
+      setStatus("❌ Błąd Graph API: <b>"+ escapeHtml(json.error.message||"nieznany") +
+                "</b><br><span style='font-size:13px'>Sprawdź, czy token jest ważny i ma uprawnienia oraz czy strona jest publiczna.</span>", "err");
+      btn.disabled = false; return;
+    }
+
+    DATA = normalize(json);
+    render(DATA);
+    setStatus("✅ Pobrano dane strony <b>"+escapeHtml(DATA.name)+"</b> — "+DATA.photos.length+" zdjęć, "+DATA.posts.length+" wpisów.", "ok");
+  }catch(err){
+    $("skel").classList.remove("show");
+    setStatus("❌ Nie udało się połączyć: "+escapeHtml(err.message)+
+      ".<br><span style='font-size:13px'>Najczęstsza przyczyna to nieprawidłowy token lub blokada CORS. Wygeneruj token ponownie.</span>", "err");
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function normalize(j){
+  const photos = (j.photos && j.photos.data || []).map(p=>{
+    const imgs = (p.images||[]).slice().sort((a,b)=> (b.width*b.height)-(a.width*a.height));
+    const best = imgs[0] || {};
+    return { url: best.source||best.url, thumb: (imgs[imgs.length-1]||best).source, name: p.name||"", time: p.created_time };
+  }).filter(p=>p.url);
+
+  const posts = (j.posts && j.posts.data || []).map(p=>({
+    message: p.message||"(bez treści tekstowej)",
+    time: p.created_time, image: p.full_picture, link: p.permalink_url,
+    reactions: p.reactions && p.reactions.summary && p.reactions.summary.total_count || 0,
+    comments: p.comments && p.comments.summary && p.comments.summary.total_count || 0,
+    shares: p.shares && p.shares.count || 0
+  }));
+
+  const hours = j.hours ? formatHours(j.hours) : null;
+  const cat = j.category || (j.category_list && j.category_list[0] && j.category_list[0].name) || "Strona";
+
+  return {
+    id:j.id, name:j.name||"(bez nazwy)", username:j.username||"",
+    category:cat, about:j.about||j.description||"", description:j.description||"",
+    fans:j.fan_count, followers:j.followers_count,
+    link:j.link, website:j.website, phone:j.phone,
+    email:(j.emails&&j.emails[0])||"",
+    address:j.single_line_address || addr(j.location),
+    hours, verified:(j.verification_status && j.verification_status!=="not_verified"),
+    avatar:(j.picture&&j.picture.data&&j.picture.data.url)||"",
+    cover:(j.cover&&j.cover.source)||"",
+    photos, posts
+  };
+}
+function addr(loc){ if(!loc) return ""; return [loc.street, loc.zip, loc.city, loc.country].filter(Boolean).join(", "); }
+function formatHours(h){
+  const days={mon:"Pon",tue:"Wt",wed:"Śr",thu:"Czw",fri:"Pt",sat:"Sob",sun:"Nd"};
+  const out={};
+  Object.keys(h).forEach(k=>{
+    const m=k.match(/^(mon|tue|wed|thu|fri|sat|sun)_\d_(open|close)$/);
+    if(m){ const d=days[m[1]]; out[d]=out[d]||{}; out[d][m[2]]=h[k]; }
+  });
+  return Object.keys(out).map(d=>d+" "+(out[d].open||"?")+"–"+(out[d].close||"?")).join(" · ");
+}
+
+function render(d){
+  $("r-cover").style.backgroundImage = d.cover ? "url('"+escapeAttr(d.cover)+"')" : "";
+  $("r-name").innerHTML = escapeHtml(d.name) + (d.verified?' <span class="verified" title="Zweryfikowana">✔</span>':'');
+  $("r-cat").textContent = d.category + (d.username? " · @"+d.username : "");
+  $("r-avatar").src = d.avatar || placeholderImg(d.name);
+  $("r-avatar").onerror = function(){ this.src = placeholderImg(d.name); };
+
+  const info = [];
+  if(d.followers!=null||d.fans!=null) info.push(["👥 Obserwujący", fmtNum(d.followers ?? d.fans)]);
+  if(d.fans!=null) info.push(["👍 Polubienia", fmtNum(d.fans)]);
+  if(d.phone) info.push(["📞 Telefon", escapeHtml(d.phone)]);
+  if(d.email) info.push(["✉️ E-mail", escapeHtml(d.email)]);
+  if(d.address) info.push(["📍 Adres", escapeHtml(d.address)]);
+  if(d.website||d.link) info.push(["🌐 Strona WWW", linkOut(d.website||d.link)]);
+  if(d.hours) info.push(["🕒 Godziny otwarcia", escapeHtml(d.hours)]);
+  info.push(["🆔 ID strony", escapeHtml(d.id||"—")]);
+
+  $("r-info").innerHTML = info.map(([k,v])=>
+    '<div class="info"><div class="k">'+k+'</div><div class="v small">'+v+'</div></div>').join("");
+
+  $("c-photos").textContent = d.photos.length;
+  $("r-gallery").innerHTML = d.photos.map((p,i)=>
+    '<div class="photo" onclick="openLb(\''+encodeURI(p.url)+'\')">'+
+      '<img loading="lazy" src="'+escapeAttr(p.thumb||p.url)+'" alt="'+escapeAttr(p.name||("Zdjęcie "+(i+1)))+'" onerror="this.style.opacity=.25">'+
+      '<span class="dl" onclick="event.stopPropagation();downloadPhoto(\''+encodeURI(p.url)+'\',\'fb_'+(i+1)+'.jpg\')">⬇ Pobierz</span>'+
+    '</div>').join("") || '<p style="color:var(--muted)">Brak dostępnych zdjęć.</p>';
+
+  $("c-posts").textContent = d.posts.length;
+  $("r-posts").innerHTML = d.posts.map(p=>
+    '<div class="post">'+
+      '<div class="meta">'+fmtDate(p.time)+(p.link&&p.link!=="#"?' · <a href="'+escapeAttr(p.link)+'" target="_blank" rel="noopener">otwórz wpis ↗</a>':'')+'</div>'+
+      '<div class="txt">'+escapeHtml(p.message)+'</div>'+
+      (p.image?'<img src="'+escapeAttr(p.image)+'" loading="lazy">':'')+
+      '<div class="st"><span>👍 '+fmtNum(p.reactions)+'</span><span>💬 '+fmtNum(p.comments)+'</span><span>↗ '+fmtNum(p.shares)+'</span></div>'+
+    '</div>').join("") || '<p style="color:var(--muted)">Brak dostępnych wpisów.</p>';
+
+  $("r-about").textContent = d.about || d.description || "Brak opisu.";
+
+  $("results").classList.add("show");
+  $("results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+async function downloadPhoto(url, name){
+  url = decodeURI(url);
+  try{
+    const res = await fetch(url, {mode:"cors"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name||"facebook.jpg";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  }catch(e){
+    window.open(url, "_blank", "noopener");
+    setStatus("ℹ️ Zdjęcie otwarto w nowej karcie (Facebook zablokował bezpośredni zapis). Kliknij prawym → „Zapisz obraz jako…”.", "info");
+  }
+}
+async function downloadAllPhotos(){
+  if(!DATA || !DATA.photos.length){ setStatus("⚠️ Brak zdjęć do pobrania.", "err"); return; }
+  setStatus('<span class="spinner"></span> Pobieram '+DATA.photos.length+' zdjęć…', "info");
+  for(let i=0;i<DATA.photos.length;i++){
+    await downloadPhoto(DATA.photos[i].url, "fb_"+String(i+1).padStart(2,"0")+".jpg");
+    await new Promise(r=>setTimeout(r,350));
+  }
+  setStatus("✅ Zakończono pobieranie zdjęć.", "ok");
+}
+
+function openLb(url){ currentLbUrl=decodeURI(url); $("lb-img").src=currentLbUrl; $("lb").classList.add("show"); }
+function closeLb(e){ if(e && e.target && e.target.id==="lb-img") return; $("lb").classList.remove("show"); }
+function downloadCurrent(e){ e.stopPropagation(); if(currentLbUrl) downloadPhoto(currentLbUrl,"facebook.jpg"); }
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") $("lb").classList.remove("show"); });
+
+function exportJSON(){
+  if(!DATA){ setStatus("⚠️ Najpierw pobierz dane.", "err"); return; }
+  const blob = new Blob([JSON.stringify(DATA,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=(DATA.username||DATA.name||"facebook").replace(/\W+/g,"_").toLowerCase()+".json";
+  a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  setStatus("✅ Wyeksportowano dane do pliku JSON.", "ok");
+}
+async function copyJSON(){
+  if(!DATA){ setStatus("⚠️ Najpierw pobierz dane.", "err"); return; }
+  try{ await navigator.clipboard.writeText(JSON.stringify(DATA,null,2)); setStatus("✅ Skopiowano dane do schowka.", "ok"); }
+  catch(e){ setStatus("⚠️ Nie udało się skopiować (przeglądarka zablokowała schowek).", "err"); }
+}
+
+function fmtNum(n){ if(n==null||isNaN(n)) return "—"; return Number(n).toLocaleString("pl-PL"); }
+function fmtDate(t){ if(!t) return ""; try{ return new Date(t).toLocaleDateString("pl-PL",{day:"numeric",month:"long",year:"numeric"}); }catch(e){ return t; } }
+function linkOut(u){ if(!u) return "—"; const s=escapeAttr(u); const t=escapeHtml(u.replace(/^https?:\/\//,"").slice(0,40)); return '<a href="'+s+'" target="_blank" rel="noopener">'+t+' ↗</a>'; }
+function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeAttr(s){ return escapeHtml(s); }
+function placeholderImg(name){
+  const L=(name||"?").trim().charAt(0).toUpperCase();
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1877f2"/><stop offset="1" stop-color="#38d6e0"/></linearGradient></defs><rect width="200" height="200" fill="url(#g)"/><text x="100" y="132" font-size="96" font-family="Segoe UI,Arial" fill="#fff" text-anchor="middle">'+L+'</text></svg>';
+  return "data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+}
+
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".pane").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  $(t.dataset.pane).classList.add("active");
+}));
+
+function clearAll(){
+  $("url").value=""; $("token").value="";
+  $("results").classList.remove("show"); $("skel").classList.remove("show"); hideStatus(); DATA=null;
+}
+
+/* DEMO */
+function runDemo(){ DATA = demoData(); render(DATA); setStatus("✨ Tryb demo — przykładowe dane. Dodaj token Graph API, aby pobrać prawdziwą stronę.", "info"); }
+function demoData(){
+  const pics = ["1e3a5f","1877f2","0f3d6b","2a6fbf","123c66","3b82f6","0a4a8f","4293ff","0d2a58","1a5fb0","2673cc","0e4a8f"];
+  const photos = pics.map((c,i)=>{
+    const svg='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="600" height="600" fill="#'+c+'"/><circle cx="300" cy="235" r="120" fill="rgba(255,255,255,.13)"/><circle cx="300" cy="235" r="70" fill="rgba(255,255,255,.10)"/><text x="300" y="470" font-size="38" fill="#fff" font-family="Segoe UI,Arial" text-anchor="middle">Zdjęcie '+(i+1)+'</text></svg>';
+    const url="data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+    return {url, thumb:url, name:"Przykładowe zdjęcie "+(i+1), time:"2026-0"+((i%6)+1)+"-1"+i+"T10:00:00+0000"};
+  });
+  const cover="data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400"><defs><linearGradient id="c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d2a58"/><stop offset="0.6" stop-color="#1877f2"/><stop offset="1" stop-color="#38d6e0"/></linearGradient></defs><rect width="1200" height="400" fill="url(#c)"/><circle cx="980" cy="120" r="160" fill="rgba(255,255,255,.08)"/><circle cx="200" cy="330" r="120" fill="rgba(255,255,255,.06)"/></svg>');
+  return {
+    id:"1000000000000", name:"Przykładowa Strona Demo", username:"przyklad.demo",
+    category:"Firma lokalna · Usługi", about:"To jest przykładowa strona wygenerowana w trybie demo. Pokazuje, jak scraper prezentuje pobrane dane: opis, kontakt, godziny otwarcia oraz galerię zdjęć w najlepszej rozdzielczości.",
+    description:"Przykładowa firma prezentująca możliwości narzędzia.",
+    fans:12840, followers:13520,
+    link:"https://facebook.com/przyklad.demo", website:"https://przyklad-demo.pl",
+    phone:"+48 500 600 700", email:"kontakt@przyklad-demo.pl",
+    address:"ul. Przykładowa 12, 00-001 Warszawa, Polska",
+    hours:"Pon 09:00–17:00 · Wt 09:00–17:00 · Śr 09:00–17:00 · Czw 09:00–17:00 · Pt 09:00–15:00",
+    verified:true, avatar:placeholderImg("Demo"), cover,
+    photos,
+    posts:[
+      {message:"Witamy na naszej stronie! 🎉 Zapraszamy do zapoznania się z ofertą i galerią realizacji.", time:"2026-07-10T12:00:00+0000", image:photos[0].url, link:"#", reactions:342, comments:28, shares:12},
+      {message:"Nowa dostawa już dostępna. Sprawdź szczegóły na naszej stronie WWW.", time:"2026-07-05T09:30:00+0000", image:photos[3].url, link:"#", reactions:198, comments:15, shares:7},
+      {message:"Dziękujemy za ponad 12 000 obserwujących! 🙏 To dla nas ogromna motywacja.", time:"2026-06-28T18:15:00+0000", image:"", link:"#", reactions:874, comments:63, shares:41}
+    ]
+  };
+}
+</script>
+</body>
+</html>
