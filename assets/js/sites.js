@@ -15,6 +15,20 @@
  */
 const SITES = [
   {
+    slug: "livekid",
+    title: "KidBloom — system dla żłobków i przedszkoli",
+    desc: "Odwrotna inżynieria systemu LiveKid: samodzielna aplikacja SPA (HTML/CSS/vanilla JS) z 3 rolami (Rodzic, Nauczyciel, Dyrektor). Moduły: dziennik elektroniczny, ewidencja obecności i godzin, raporty dzienne, zgłaszanie nieobecności, jadłospis i zamawianie posiłków, galeria, czaty, ogłoszenia, kalendarz, rozliczenia i faktury (auto z obecności), płatności online, kadry, rekrutacja, eksport CSV, generowanie treści AI (demo). Mock backend na localStorage.",
+    icon: "🌱",
+    tag: "system",
+    preview: true,
+    meta: {
+      colors: ["#0eb39e", "#123a3a", "#ff7a6b", "#ffb340", "#eef5f3"],
+      fonts: ["Nunito"],
+      tech: ["HTML", "CSS", "Vanilla JS", "SPA", "localStorage", "Google Fonts"],
+      files: ["index.html", "assets/css/app.css", "assets/js/seed.js", "assets/js/app.js", "DOKUMENTACJA.md"],
+    },
+  },
+  {
     slug: "powerfit",
     title: "POWERFIT Gym & Fitness",
     desc: "Wielostronicowy serwis siłowni POWERFIT Brusy: prawdziwe logo klubu i 13 zdjęć trenerki Iwony Dulskiej (galeria, sekcje, tła), kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron, rezerwacja online w stylu Booksy z kropkami dostępności, prawdziwe profile social media, fotograficzne tła z parallaxą.",
