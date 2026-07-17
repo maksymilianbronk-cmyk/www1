@@ -398,3 +398,45 @@ img.emblem-xl{width:230px;height:230px;border-radius:26px;box-shadow:var(--shado
 .nav-links a.btn-primary:hover{color:#fff;background:var(--red-deep)}
 .nav-links a.btn-primary.active{color:#fff}
 .nav-links a.btn-primary.active::after{display:none}
+
+/* ============================================================
+   PODKRĘCONE EFEKTY + CZYTELNOŚĆ (przebieg 2)
+   ============================================================ */
+
+/* delikatny „oddech" logo w hero */
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.hero-emblem img{animation:floaty 5.5s ease-in-out infinite}
+
+/* zdjęcia media: powiększenie i kursor lupy */
+.media{cursor:zoom-in}
+.media img{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.media:hover img:not([data-parallax]){transform:scale(1.045)}
+/* parallax na zdjęciach — nadmiarowa wysokość, by ruch nie odsłaniał krawędzi */
+@media(prefers-reduced-motion:no-preference){
+  .media img[data-parallax]{height:120%;position:relative;top:-10%}
+}
+
+/* animowane podkreślenie linków nav (poza przyciskiem) */
+.nav-links a:not(.btn)::after{content:"";position:absolute;left:14px;right:14px;bottom:2px;height:2px;
+  background:var(--brass);transform:scaleX(0);transform-origin:left;transition:transform .28s ease}
+.nav-links a:not(.btn):hover::after,
+.nav-links a.active::after{transform:scaleX(1)}
+
+/* mocniejszy hover kart i „awardów" */
+.card{transition:.22s cubic-bezier(.2,.7,.2,1)}
+.card:hover,.feat:hover{box-shadow:0 32px 62px -32px rgba(58,30,10,.62)}
+.award{transition:.2s cubic-bezier(.2,.7,.2,1)}
+
+/* podniesiona czytelność */
+.stat-l{color:rgba(247,240,226,.82)}
+.media figcaption,.ptile .cap{text-shadow:0 1px 5px rgba(0,0,0,.6)}
+.foot-contact span,.foot-links a{color:rgba(247,240,226,.86)}
+.event .tagline{font-weight:600}
+
+/* kicker — nieco mocniejszy kontrast */
+.hero .kicker{color:#7a5c14}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-emblem img{animation:none}
+  .media img,.media:hover img{transition:none;transform:none}
+}
