@@ -63,13 +63,19 @@ Nadzór nad wieloma placówkami, rozliczanie dotacji, raporty zbiorcze. *(poza z
 ```
 sites/livekid/
 ├── index.html              # powłoka SPA + ekran logowania
+├── o-systemie.html         # strona marketingowa (landing) systemu
 ├── assets/
-│   ├── css/app.css         # design system (motyw mięta/teal, karty, komponenty)
+│   ├── css/app.css         # design system (motyw mięta/teal, karty, wykresy, kalendarz)
 │   └── js/
-│       ├── seed.js         # model danych + „store" na localStorage + dane demo
-│       └── app.js          # router SPA, widoki dla ról, logika modułów
+│       ├── seed.js         # model danych + „store" na localStorage + dane demo (v2)
+│       ├── ui.js           # komponenty UI: wykresy SVG, kalendarz, wydruk
+│       └── app.js          # router SPA, ~35 widoków dla 4 ról, logika modułów
 └── DOKUMENTACJA.md         # ten dokument
 ```
+
+Wersja rozbudowana obejmuje **4 role** i ~**35 ekranów**, wykresy (słupkowy/liniowy/
+donut w czystym SVG), kalendarz miesięczny, powiadomienia, wydruk faktur/dokumentów
+(PDF przez `window.print`), wyszukiwarkę, zakładki oraz import/eksport danych JSON.
 
 - **Warstwa danych:** `KB.store` — CRUD na `localStorage` (klucz `kidbloom_v1`),
   z ziarnem danych (`seed.js`) generowanym przy pierwszym uruchomieniu.
@@ -83,9 +89,10 @@ sites/livekid/
 
 | Rola | Login | Co widzi |
 |---|---|---|
-| Rodzic | Anna Kowalska | dziecko Zosia (grupa Motylki): raport, nieobecności, posiłki, galeria, czat, płatności |
-| Nauczyciel | Magda Nowak | grupa Motylki: obecność, raporty dzienne, dziennik, galeria, jadłospis |
-| Dyrektor | Ewa Zielińska | cała placówka: KPI, dzieci/umowy, rozliczenia, raporty, kadry, rekrutacja |
+| Rodzic | Anna Kowalska | dwoje dzieci (Zosia, Antek): pulpit z wykresami, profil, nieobecności z kalendarzem, posiłki, rozwój i obserwacje, galeria, czaty, ogłoszenia, kalendarz, płatności z wydrukiem faktur, dokumenty i zgody RODO |
+| Nauczyciel | Magda Nowak | grupa Motylki: obecność (+ „zaznacz wszystkich"), raporty dzienne, dziennik, plan dnia, obserwacje, galeria, jadłospis (edycja), czaty |
+| Dyrektor | Ewa Zielińska | cała placówka: pulpit z wykresami/trendami, dzieci (wyszukiwarka, dodawanie), grupy, kadry (grafik, nieobecności), rozliczenia wielomiesięczne, raporty, rekrutacja, ogłoszenia, kalendarz, dokumenty, ustawienia + import/eksport |
+| Samorząd | Wydział Edukacji | nadzór nad 3 placówkami: pulpit zbiorczy, lista placówek, dotacje, raporty zbiorcze |
 
 ## 5. Import własnych danych (docelowo)
 
