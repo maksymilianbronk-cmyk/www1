@@ -722,6 +722,22 @@ h3 { font-size: 1.25rem; font-weight: 600; }
   margin-bottom: 1rem;
 }
 .footer-logo img { height: 56px; width: auto; }
+.footer-social {
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+}
+.footer-social a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--steel);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.footer-social a:hover { color: #fff; transform: translateX(3px); }
+.footer-social svg { flex: none; color: var(--red); }
+
 .site-footer h4 {
   color: #fff;
   font-size: 0.95rem;
@@ -1183,6 +1199,33 @@ h3 { font-size: 1.25rem; font-weight: 600; }
   text-decoration: line-through;
 }
 .slots-empty { color: var(--steel-dark); font-size: 0.95rem; padding: 0.5rem 0; }
+
+/* kropki dostępności (Booksy): czerwona → zielona */
+.avail-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7) inset;
+}
+.avail-dot--off { background: var(--steel-light); }
+.day-chip .avail-dot { display: block; margin: 0.35rem auto 0; }
+.day-chip.active .avail-dot { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9); }
+.day-chip:disabled .avail-dot { background: var(--steel-light) !important; }
+.slot-chip { display: inline-flex; align-items: center; gap: 0.5rem; }
+.slot-chip .avail-dot { width: 8px; height: 8px; }
+.slot-chip small { text-align: left; }
+.slot-chip:disabled .avail-dot { background: var(--steel-light) !important; }
+.avail-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  margin: 0.2rem 0 0.4rem;
+  font-size: 0.82rem;
+  color: var(--steel-dark);
+}
+.avail-legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
 
 /* krok 3: dane + podsumowanie */
 .booking-grid {
