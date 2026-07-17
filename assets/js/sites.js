@@ -17,14 +17,14 @@ const SITES = [
   {
     slug: "powerfit",
     title: "POWERFIT Gym & Fitness",
-    desc: "Wielostronicowy serwis siłowni POWERFIT: prawdziwe logo klubu i zdjęcie trenerki Iwony, kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron — Start, O nas, Oferta z grafikiem zajęć, Cennik karnetów i pakietów personalnych, Galeria z lightboxem, Kontakt z formularzem demo.",
+    desc: "Wielostronicowy serwis siłowni POWERFIT: prawdziwe logo klubu i zdjęcie trenerki Iwony, kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron — Start, O nas, Oferta z grafikiem zajęć, Cennik karnetów i pakietów personalnych, Galeria z lightboxem, Kontakt z formularzem demo. Fotograficzne tła z parallaxą, wstęga marquee, pasek postępu scrolla, animacje wejścia.",
     icon: "🏋️",
     tag: "landing",
     preview: true,
     meta: {
       colors: ["#101013", "#9ea3ab", "#cf1220", "#f6f6f7", "#ffffff"],
       fonts: ["Oswald", "Barlow"],
-      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash", "Pexels", "Pixabay"],
     },
   },
   {

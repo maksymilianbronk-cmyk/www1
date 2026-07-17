@@ -26,6 +26,17 @@
     if (href === current) a.classList.add("active");
   });
 
+  /* --- kaskadowe opóźnienia reveal wewnątrz siatek --- */
+  document
+    .querySelectorAll(".cards-grid, .stats-grid, .quotes-grid, .pricing-grid, .gallery-grid")
+    .forEach((grid) => {
+      Array.from(grid.children).forEach((el, i) => {
+        if (el.classList.contains("reveal")) {
+          el.style.transitionDelay = (i % 4) * 90 + "ms";
+        }
+      });
+    });
+
   /* --- animacje reveal przy scrollu --- */
   const revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && revealEls.length) {
@@ -110,6 +121,42 @@
       e.preventDefault();
       showToast("Dziękujemy! To wersja demo — Twoja wiadomość nie została jeszcze nigdzie wysłana.");
       form.reset();
+    });
+  });
+
+  /* --- pasek postępu scrolla --- */
+  const progress = document.createElement("div");
+  progress.className = "scroll-progress";
+  document.body.appendChild(progress);
+
+  /* --- przycisk „do góry" --- */
+  const toTop = document.createElement("button");
+  toTop.className = "to-top";
+  toTop.setAttribute("aria-label", "Przewiń do góry");
+  toTop.innerHTML =
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  document.body.appendChild(toTop);
+  toTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  const onScroll = () => {
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    progress.style.width = max > 0 ? (doc.scrollTop / max) * 100 + "%" : "0";
+    toTop.classList.toggle("show", doc.scrollTop > 600);
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  /* --- płynne pojawianie się obrazów + ukrywanie uszkodzonych w galerii --- */
+  document.querySelectorAll("main img").forEach((img) => {
+    img.classList.add("img-fade");
+    const done = () => img.classList.add("loaded");
+    if (img.complete && img.naturalWidth > 0) done();
+    else img.addEventListener("load", done);
+    img.addEventListener("error", () => {
+      img.classList.add("loaded");
+      const fig = img.closest(".gallery-grid figure");
+      if (fig) fig.remove(); // uszkodzony hotlink nie zostawia dziury w galerii
     });
   });
 })();
