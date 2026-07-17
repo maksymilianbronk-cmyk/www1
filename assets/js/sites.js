@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "powerfit",
     title: "POWERFIT Gym & Fitness",
-    desc: "Wielostronicowy serwis siłowni POWERFIT: prawdziwe logo klubu i zdjęcie trenerki Iwony, kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron — Start, O nas, Oferta z grafikiem zajęć, Cennik karnetów i pakietów personalnych, Galeria z lightboxem, Kontakt z formularzem demo. Fotograficzne tła z parallaxą, wstęga marquee, pasek postępu scrolla, animacje wejścia.",
+    desc: "Wielostronicowy serwis siłowni POWERFIT Brusy: prawdziwe logo klubu i 13 zdjęć trenerki Iwony Dulskiej (galeria, sekcje, tła), kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron, rezerwacja online w stylu Booksy z kropkami dostępności, prawdziwe profile social media, fotograficzne tła z parallaxą.",
     icon: "🏋️",
     tag: "landing",
     preview: true,
