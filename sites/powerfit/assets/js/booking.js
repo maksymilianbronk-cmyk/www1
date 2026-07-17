@@ -117,6 +117,22 @@
 
   const dayHasSlots = (svc, d) => slotsFor(svc, iso(d), d.getDay()).some((s) => s.seatsLeft > 0);
 
+  /* kropki dostępności jak w Booksy: 0 = czerwona, 1 = zielona */
+  const availColor = (ratio) => "hsl(" + Math.round(Math.max(0, Math.min(1, ratio)) * 120) + ", 72%, 42%)";
+  const dot = (ratio, extraClass) =>
+    '<span class="avail-dot ' + (extraClass || "") + '" style="background:' + availColor(ratio) + '"></span>';
+
+  // dostępność całego dnia: średnia dostępność slotów (grupowe: miejsca/pojemność, personalne: odsetek wolnych godzin)
+  const dayRatio = (svc, d) => {
+    const slots = slotsFor(svc, iso(d), d.getDay());
+    if (!slots.length) return null;
+    if (svc.type === "group") {
+      const best = Math.max(...slots.map((s) => s.seatsLeft));
+      return best / CAPACITY;
+    }
+    return slots.filter((s) => s.seatsLeft > 0).length / slots.length;
+  };
+
   /* ---------- pasek kroków ---------- */
   const stepsEl = document.getElementById("bookingSteps");
   const paintSteps = () => {
@@ -221,12 +237,15 @@
     const dayChips = days
       .map((d) => {
         const dIso = iso(d);
-        const ok = dayHasSlots(svc, d);
+        const ratio = dayRatio(svc, d);
+        const ok = ratio !== null && dayHasSlots(svc, d);
+        const dDot = ratio === null ? '<span class="avail-dot avail-dot--off"></span>' : dot(ok ? ratio : 0);
         return `
           <button type="button" class="day-chip ${dIso === state.date ? "active" : ""}" data-date="${dIso}" ${ok ? "" : "disabled"}>
             <span class="dow">${DOW[d.getDay()]}</span>
             <span class="dnum">${d.getDate()}</span>
             <span class="mon">${MON[d.getMonth()]}</span>
+            ${dDot}
           </button>`;
       })
       .join("");
@@ -248,9 +267,10 @@
           <div class="slots">
             ${arr.map((s) => {
               const dis = s.seatsLeft <= 0;
+              const ratio = svc.type === "group" ? s.seatsLeft / CAPACITY : (dis ? 0 : 1);
               const seats = svc.type === "group" && !dis ? `<small>wolne: ${s.seatsLeft}/${CAPACITY}</small>` : "";
               const mine = s.mine ? `<small>masz rezerwację</small>` : "";
-              return `<button type="button" class="slot-chip ${s.time === state.time ? "active" : ""}" data-time="${s.time}" ${dis ? "disabled" : ""}>${s.time}${mine || seats}</button>`;
+              return `<button type="button" class="slot-chip ${s.time === state.time ? "active" : ""}" data-time="${s.time}" ${dis ? "disabled" : ""}>${dot(dis ? 0 : ratio)}${s.time}${mine || seats}</button>`;
             }).join("")}
           </div>
         </div>`;
@@ -264,6 +284,12 @@
         <button type="button" class="chg" id="chgSvc">zmień usługę</button>
       </div>
       <div class="day-strip">${dayChips}</div>
+      <div class="avail-legend">
+        <span>${dot(1)} dużo wolnych miejsc</span>
+        <span>${dot(0.5)} zostaje niewiele</span>
+        <span>${dot(0.15)} ostatnie miejsca</span>
+        <span><span class="avail-dot avail-dot--off"></span> brak zajęć / komplet</span>
+      </div>
       ${slotsHtml}
       <div class="booking-actions">
         <button type="button" class="btn btn--back" id="backTo1">← Wstecz</button>
