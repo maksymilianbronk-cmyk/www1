@@ -392,3 +392,9 @@ img.emblem-xl{width:230px;height:230px;border-radius:26px;box-shadow:var(--shado
 .stars .ico-svg{width:22px;height:22px;color:var(--brass)}
 .pin .ico-svg{width:42px;height:42px;color:var(--red)}
 .event .tagline .ico-svg{width:.95em;height:.95em}
+
+/* Czytelny przycisk CTA w nawigacji (nadpisanie koloru z .nav-links a) */
+.nav-links a.btn-primary{color:#fff;background:var(--red)}
+.nav-links a.btn-primary:hover{color:#fff;background:var(--red-deep)}
+.nav-links a.btn-primary.active{color:#fff}
+.nav-links a.btn-primary.active::after{display:none}
