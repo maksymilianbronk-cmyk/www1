@@ -5,6 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AXIO1 Mobilny Detailing — Detailing z dojazdem | Mazowieckie</title>
 <meta name="description" content="AXIO1 Mobilny Detailing — profesjonalny detailing samochodów, kamperów i łodzi z dojazdem do klienta na terenie woj. mazowieckiego. Mycie detailingowe, pranie tapicerki, ozonowanie, impregnacja skóry. Tel. +48 514 841 191.">
+<meta name="theme-color" content="#0a0a0b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AXIO1 Mobilny Detailing — detailing z dojazdem | Mazowieckie">
+<meta property="og:description" content="Salon detailingu pod Twoim domem: mycie detailingowe, pranie tapicerki, ozonowanie, impregnacja skóry, detailing kamperów i łodzi. Warszawa i woj. mazowieckie. Tel. +48 514 841 191.">
+<meta property="og:locale" content="pl_PL">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0b'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='34' font-weight='bold' text-anchor='middle' fill='%23d4af37'%3EA1%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoWash",
+  "name": "AXIO1 Mobilny Detailing",
+  "description": "Mobilny detailing samochodów, kamperów i łodzi z dojazdem do klienta na terenie województwa mazowieckiego.",
+  "telephone": "+48514841191",
+  "email": "d.gawryszewski@icloud.com",
+  "areaServed": "Województwo mazowieckie",
+  "priceRange": "wycena indywidualna",
+  "openingHours": "Mo-Su 08:00-20:00"
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -35,6 +54,7 @@
   .kicker::before{content:"";width:34px;height:1px;background:var(--gold)}
   h1,h2,h3{font-family:var(--serif);font-weight:600;color:var(--white)}
   .sec{padding:6.5rem 0}
+  section[id]{scroll-margin-top:96px}
   .sec-head{max-width:640px;margin-bottom:3.2rem}
   .sec-head h2{font-size:clamp(1.9rem,3.6vw,2.7rem);margin:.7rem 0 .9rem;line-height:1.15}
   .sec-head p{color:var(--mut)}
@@ -43,7 +63,7 @@
   /* ---------- topbar ---------- */
   .topbar{background:#000;border-bottom:1px solid rgba(255,255,255,.06);font-size:.8rem;color:var(--mut)}
   .topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.45rem 0;flex-wrap:wrap}
-  .topbar a{color:var(--ivory)}
+  .topbar a{color:var(--ivory);display:inline-block;padding:.3rem 0}
   .topbar a:hover{color:var(--gold)}
   .topbar .tb-l{display:flex;gap:1.4rem;flex-wrap:wrap}
   .topbar .dot{color:var(--gold)}
@@ -56,8 +76,9 @@
   .logo b i{font-style:normal;color:var(--gold)}
   .logo span{font-size:.58rem;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-top:.3rem}
   .menu{display:flex;gap:2rem;list-style:none;align-items:center}
-  .menu a{font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory);transition:color .2s}
+  .menu a{display:inline-block;padding:.55rem 0;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory);transition:color .2s}
   .menu a:hover{color:var(--gold)}
+  .nav-phone{display:none;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--gold);color:var(--gold);font-size:1.05rem}
   .btn{display:inline-block;padding:.85rem 2rem;border:1px solid var(--gold);color:var(--gold);letter-spacing:.18em;text-transform:uppercase;font-size:.78rem;font-weight:500;transition:.25s;background:transparent;cursor:pointer;font-family:var(--sans)}
   .btn:hover{background:var(--gold);color:var(--black)}
   .btn.solid{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--black);border:none}
@@ -157,11 +178,13 @@
   .con-item svg{flex:0 0 26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.4;margin-top:.2rem}
   .con-item small{display:block;letter-spacing:.24em;text-transform:uppercase;font-size:.64rem;color:var(--mut)}
   .con-item a,.con-item b{font-family:var(--serif);font-size:1.15rem;color:var(--white);font-weight:500}
+  .con-item a{display:inline-block;padding:.35rem 0}
   .con-item a:hover{color:var(--gold)}
   form{display:grid;grid-template-columns:1fr 1fr;gap:1rem;background:var(--panel);border:1px solid rgba(255,255,255,.05);padding:2.2rem}
   form .full{grid-column:1/-1}
   label{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:.4rem}
-  input,select,textarea{width:100%;background:#0d0d0f;border:1px solid rgba(255,255,255,.09);color:var(--ivory);padding:.85rem 1rem;font-family:var(--sans);font-size:.92rem;outline:none;transition:border .2s}
+  /* 16px = brak auto-zoomu przy fokusie na iOS */
+  input,select,textarea{width:100%;background:#0d0d0f;border:1px solid rgba(255,255,255,.09);color:var(--ivory);padding:.85rem 1rem;font-family:var(--sans);font-size:1rem;outline:none;transition:border .2s}
   input:focus,select:focus,textarea:focus{border-color:var(--gold)}
   textarea{resize:vertical;min-height:110px}
   .form-note{grid-column:1/-1;font-size:.76rem;color:var(--mut)}
@@ -170,8 +193,9 @@
   /* ---------- footer ---------- */
   footer{background:#000;border-top:1px solid var(--line);padding:3rem 0 2rem;font-size:.82rem;color:var(--mut)}
   .foot{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;align-items:center}
+  .foot a{display:inline-block;padding:.45rem .1rem}
   .foot a:hover{color:var(--gold)}
-  .back{display:inline-block;margin-top:1.6rem;color:var(--mut);font-size:.78rem;letter-spacing:.08em}
+  .back{display:inline-block;margin-top:1.2rem;padding:.5rem 0;color:var(--mut);font-size:.78rem;letter-spacing:.08em}
   .back:hover{color:var(--gold)}
 
   /* ---------- reveal ---------- */
@@ -188,10 +212,16 @@
     .gal{grid-template-columns:1fr 1fr}
   }
   @media(max-width:640px){
-    .menu{position:fixed;inset:64px 0 auto 0;background:#0a0a0bfa;flex-direction:column;padding:1.6rem 0 2rem;gap:1.3rem;border-bottom:1px solid var(--line);transform:translateY(-130%);transition:.3s;z-index:99}
-    .menu.open{transform:none}
-    .burger{display:block}
+    /* menu jako panel absolutny pod headerem — fixed wewnątrz backdrop-filter
+       tworzy własny containing block i prześwitywał; tło w pełni kryjące */
+    header{background:var(--black)}
+    .nav{position:relative}
+    .menu{position:absolute;top:100%;left:0;right:0;background:var(--black);flex-direction:column;padding:1rem 0 1.6rem;gap:.4rem;border-bottom:1px solid var(--line);box-shadow:0 24px 40px rgba(0,0,0,.6);display:none;z-index:99}
+    .menu.open{display:flex}
+    .menu a{padding:.7rem 1.4rem}
+    .burger{display:block;min-width:44px;min-height:44px}
     .nav .btn{display:none}
+    .nav-phone{display:inline-flex;margin-left:auto;margin-right:.7rem}
     .grid-serv,.gal,.usp .wrap,.proc-grid,form{grid-template-columns:1fr}
     .topbar .tb-r{display:none}
     .hero{min-height:88vh}
@@ -232,7 +262,8 @@
       </ul>
     </nav>
     <a class="btn" href="#kontakt">Bezpłatna wycena</a>
-    <button class="burger" id="burger" aria-label="Menu">☰</button>
+    <a class="nav-phone" href="tel:+48514841191" aria-label="Zadzwoń: +48 514 841 191">☎</a>
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="menu">☰</button>
   </div>
 </header>
 
@@ -617,8 +648,13 @@
   // Menu mobilne
   const burger = document.getElementById("burger");
   const menu = document.getElementById("menu");
-  burger.addEventListener("click", () => menu.classList.toggle("open"));
-  menu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => menu.classList.remove("open")));
+  const setMenu = open => {
+    menu.classList.toggle("open", open);
+    burger.setAttribute("aria-expanded", open);
+    burger.textContent = open ? "✕" : "☰";
+  };
+  burger.addEventListener("click", () => setMenu(!menu.classList.contains("open")));
+  menu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setMenu(false)));
 
   // Animacje wejścia
   const io = new IntersectionObserver(entries => {
