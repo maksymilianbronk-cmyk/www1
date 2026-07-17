@@ -15,6 +15,32 @@
  */
 const SITES = [
   {
+    slug: "powerfit",
+    title: "POWERFIT Gym & Fitness",
+    desc: "Wielostronicowy serwis siłowni POWERFIT Brusy: prawdziwe logo klubu i 13 zdjęć trenerki Iwony Dulskiej (galeria, sekcje, tła), kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron, rezerwacja online w stylu Booksy z kropkami dostępności, prawdziwe profile social media, fotograficzne tła z parallaxą.",
+    icon: "🏋️",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#101013", "#9ea3ab", "#cf1220", "#f6f6f7", "#ffffff"],
+      fonts: ["Oswald", "Barlow"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash", "Pexels", "Pixabay"],
+    },
+  },
+  {
+    slug: "hotel-court",
+    title: "Hotel Court*** Wellness & SPA — Kędzierzyn-Koźle",
+    desc: "Wielostronicowy serwis premium dla Hotelu Court (redesign court.pl): złoto-biel-pastele, 10 podstron — pokoje, rezerwacje, restauracja d'Oro, SPA d'Oro, korty, uroczystości, aktualności, blog, kontakt. Prawdziwe logo, dane z wizytówki Google, Booksy i Booking.",
+    icon: "🏨",
+    tag: "hotel",
+    preview: true,
+    meta: {
+      colors: ["#fbf8f2", "#f4eee1", "#b08a47", "#f0e1da", "#2e2a23"],
+      fonts: ["Cormorant Garamond", "Jost", "Pinyon Script"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "kwadrans",
     title: "Kwadrans — Obiady Domowe, Pabianice",
     desc: "Wielostronicowy serwis premium dla baru Kwadrans (Pabianice): editorial design, prawdziwe zdjęcia i dane z wizytówki Google, demo rezerwacji stolika/imprez.",
@@ -116,6 +142,58 @@ const SITES = [
       colors: ["#0f0f13", "#1a1a22", "#6c63ff", "#ff6b9d", "#f5a623"],
       fonts: ["system-ui", "monospace"],
       tech: ["HTML", "CSS", "Vanilla JS", "localStorage"],
+    },
+  },
+  {
+    slug: "luksus-i-fryz",
+    title: "Luksus i Fryz — Salon Asi, Rumia",
+    desc: "Butikowy salon fryzjerski Asi z Rumi: jasna paleta kość słoniowa + złoto + róż, zdjęcie Asi w sekcji O Asi, animowane pasma włosów na canvasie, katalog 8 fryzur (ilustracje SVG do podmiany na zdjęcia), rytuał all inclusive, rezerwacja demo. Font Italiana osadzony w pliku.",
+    icon: "💇‍♀️",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#faf5ec", "#fffdf8", "#b18445", "#c96f8d", "#2b1a26"],
+      fonts: ["Italiana (embedded)", "Segoe UI / system-ui"],
+      tech: ["HTML", "CSS", "SVG", "Canvas", "Vanilla JS"],
+    },
+  },
+  {
+    slug: "orkiestra-pinczyn",
+    title: "Gminna Orkiestra Dęta przy OSP Pinczyn",
+    desc: "Wielostronicowy serwis orkiestry dętej z Pinczyna (Gmina Zblewo): ceremonialny motyw strażacka czerwień + mosiężne złoto, odtworzony emblemat OSP jako grafika wektorowa. 6 podstron — Start, O nas, Repertuar, Galeria, Wydarzenia, Kontakt. Prawdziwe dane z profilu Facebook: tel. 728 301 411, e-mail, lokalizacja.",
+    icon: "🎺",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#fffaf1", "#f7f0e2", "#a4201d", "#b8912c", "#241d15"],
+      fonts: ["Oswald", "Lora"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts"],
+    },
+  },
+  {
+    slug: "scraper-facebook",
+    title: "Inteligentny Scraper Facebooka",
+    desc: "Narzędzie do pobierania najważniejszych danych i zdjęć ze stron (fanpage) na Facebooku przez oficjalne Graph API: opis, kategoria, kontakt, adres, godziny otwarcia, galeria zdjęć z zapisem na dysk i eksportem do JSON. Tryb demo bez tokenu. Wszystko po stronie przeglądarki.",
+    icon: "📘",
+    tag: "narzędzie",
+    preview: true,
+    meta: {
+      colors: ["#070a12", "#111524", "#1877f2", "#38d6e0", "#eef1fb"],
+      fonts: ["Space Grotesk", "Inter"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Facebook Graph API", "Google Fonts"],
+    },
+  },
+  {
+    slug: "axio1-detailing",
+    title: "AXIO1 Mobilny Detailing — Mazowieckie",
+    desc: "Luksusowy czarno-złoty landing dla firmy AXIO1 mobilny detailing (Dominik Gawryszewski, woj. mazowieckie): 6 usług z formularza leada — mycie detailingowe, pranie tapicerki, czyszczenie wnętrza, ozonowanie, impregnacja skóry, detailing kamperów i łodzi. Zdjęcia Pixabay z kaskadą zapasowych źródeł, formularz wyceny (mailto), prawdziwy telefon i e-mail.",
+    icon: "🚘",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#0a0a0b", "#161618", "#d4af37", "#f0d67c", "#f4f0e6"],
+      fonts: ["Playfair Display", "Jost"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Pixabay", "Unsplash", "Pexels"],
     },
   },
   {
