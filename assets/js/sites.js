@@ -184,6 +184,19 @@ const SITES = [
     },
   },
   {
+    slug: "axio1-detailing",
+    title: "AXIO1 Mobilny Detailing — Mazowieckie",
+    desc: "Luksusowy czarno-złoty landing dla firmy AXIO1 mobilny detailing (Dominik Gawryszewski, woj. mazowieckie): 6 usług z formularza leada — mycie detailingowe, pranie tapicerki, czyszczenie wnętrza, ozonowanie, impregnacja skóry, detailing kamperów i łodzi. Zdjęcia Pixabay z kaskadą zapasowych źródeł, formularz wyceny (mailto), prawdziwy telefon i e-mail.",
+    icon: "🚘",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#0a0a0b", "#161618", "#d4af37", "#f0d67c", "#f4f0e6"],
+      fonts: ["Playfair Display", "Jost"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Pixabay", "Unsplash", "Pexels"],
+    },
+  },
+  {
     slug: "katalog",
     title: "Katalog stron — CRM",
     desc: "Panel z logowaniem: foldery stron, manager plików i baza promotorów.",
