@@ -23,7 +23,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 
 body {
   font-family: var(--font-body);
@@ -197,6 +197,7 @@ h3 { font-size: 1.25rem; font-weight: 600; }
   border-radius: 2px;
   transition: transform 0.25s ease, opacity 0.25s ease;
 }
+.nav-toggle.open span { background: #fff; }
 .nav-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
@@ -1339,22 +1340,49 @@ h3 { font-size: 1.25rem; font-weight: 600; }
 }
 
 @media (max-width: 760px) {
-  .nav-toggle { display: flex; }
+  .nav-toggle { display: flex; position: relative; z-index: 120; }
+  /* backdrop-filter na nagłówku robił z niego containing block dla
+     position:fixed — menu pozycjonowało się względem paska (74px)
+     i poniżej nie miało tła (wyglądało na przezroczyste) */
+  .site-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #fff;
+  }
   .main-nav {
     position: fixed;
-    inset: 0 0 0 auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
     width: min(320px, 82vw);
+    height: 100dvh;
     background: var(--ink);
     padding: 5.5rem 2rem 2rem;
     transform: translateX(100%);
     transition: transform 0.28s ease;
-    z-index: 90;
+    z-index: 110;
+    overflow-y: auto;
   }
   .main-nav.open { transform: none; box-shadow: -20px 0 60px rgba(0, 0, 0, 0.45); }
   .main-nav ul { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
   .main-nav a { color: var(--steel-light); font-size: 1.05rem; }
+  .main-nav a.active { color: #ff5563; }
+  /* przyciemnienie strony pod otwartym menu + blokada scrolla */
+  body.nav-open { overflow: hidden; }
+  body.nav-open::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 10, 12, 0.55);
+    z-index: 95; /* pod nagłówkiem (100), w którym żyje menu */
+  }
   .topbar { display: none; }
   .form-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .cta-band .container { flex-direction: column; text-align: center; }
+  /* czerwona ramka zdjęć nie wystaje poza ekran */
+  .split-photo::after { inset: 0.8rem -0.5rem -0.5rem 0.8rem; }
+  /* parallaxa off na mobile (płynność) */
+  .hero, .page-hero, .section--dark.has-bg, .cta-band { background-attachment: scroll; }
 }

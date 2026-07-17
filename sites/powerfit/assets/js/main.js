@@ -6,17 +6,23 @@
   const toggle = document.querySelector(".nav-toggle");
   const nav = document.querySelector(".main-nav");
   if (toggle && nav) {
-    toggle.addEventListener("click", () => {
-      const open = nav.classList.toggle("open");
+    const setNav = (open) => {
+      nav.classList.toggle("open", open);
       toggle.classList.toggle("open", open);
+      document.body.classList.toggle("nav-open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setNav(!nav.classList.contains("open"));
     });
-    nav.querySelectorAll("a").forEach((a) =>
-      a.addEventListener("click", () => {
-        nav.classList.remove("open");
-        toggle.classList.remove("open");
-      })
-    );
+    nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setNav(false)));
+    document.addEventListener("click", (e) => {
+      if (nav.classList.contains("open") && !nav.contains(e.target)) setNav(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setNav(false);
+    });
   }
 
   /* --- podświetlenie aktywnej pozycji menu --- */
