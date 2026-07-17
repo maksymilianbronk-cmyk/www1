@@ -353,3 +353,42 @@ img.emblem-xl{width:230px;height:230px;border-radius:26px;box-shadow:var(--shado
 .lbx figcaption{color:#f7f0e2;font-family:"Oswald",sans-serif;font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin-top:14px;text-align:center}
 .lbx .x{position:absolute;top:-52px;right:0;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:11px;width:44px;height:44px;font-size:20px;cursor:pointer;line-height:1}
 @media(max-width:600px){.lbx .x{top:auto;bottom:-54px;right:calc(50% - 22px)}}
+
+/* ============================================================
+   EFEKTY PRZEWIJANIA + IKONY SVG
+   ============================================================ */
+
+/* pasek postępu przewijania */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--red),var(--brass) 60%,var(--brass-2));
+  box-shadow:0 0 10px rgba(184,145,44,.5);transition:width .08s linear}
+
+/* warianty odsłaniania */
+.reveal[data-reveal="left"]{transform:translateX(-40px)}
+.reveal[data-reveal="right"]{transform:translateX(40px)}
+.reveal[data-reveal="zoom"]{transform:scale(.94)}
+.split .media.reveal{transform:translateX(-38px)}
+.reveal.in{opacity:1 !important;transform:none !important}
+[data-parallax]{will-change:transform}
+
+@media(prefers-reduced-motion:reduce){
+  #progress{display:none}
+  [data-parallax]{transform:none !important}
+}
+
+/* ---------- Ikony SVG ---------- */
+.ico-svg{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.16em;flex:0 0 auto}
+.ico{color:var(--red)}
+.ico .ico-svg{width:27px;height:27px}
+.ci{color:var(--red)}
+.ci .ico-svg{width:23px;height:23px}
+.aw-ic{color:#3a2c08}
+.aw-ic .ico-svg{width:26px;height:26px}
+.loc-badge .ico-svg{color:var(--red)}
+.foot-contact .ico-svg{color:var(--brass-2);margin-right:3px}
+.btn .ico-svg{width:1.05em;height:1.05em}
+.stat-n .ico-svg{width:.72em;height:.72em;color:var(--brass-2);vertical-align:-.05em}
+.stars{display:flex;justify-content:center;gap:6px}
+.stars .ico-svg{width:22px;height:22px;color:var(--brass)}
+.pin .ico-svg{width:42px;height:42px;color:var(--red)}
+.event .tagline .ico-svg{width:.95em;height:.95em}
