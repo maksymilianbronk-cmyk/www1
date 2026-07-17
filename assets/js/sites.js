@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "powerfit",
+    title: "POWERFIT Gym & Fitness",
+    desc: "Wielostronicowy serwis siłowni POWERFIT: prawdziwe logo klubu i zdjęcie trenerki Iwony, kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron — Start, O nas, Oferta z grafikiem zajęć, Cennik karnetów i pakietów personalnych, Galeria z lightboxem, Kontakt z formularzem demo.",
+    icon: "🏋️",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#101013", "#9ea3ab", "#cf1220", "#f6f6f7", "#ffffff"],
+      fonts: ["Oswald", "Barlow"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
+  {
     slug: "hotel-court",
     title: "Hotel Court*** Wellness & SPA — Kędzierzyn-Koźle",
     desc: "Wielostronicowy serwis premium dla Hotelu Court (redesign court.pl): złoto-biel-pastele, 10 podstron — pokoje, rezerwacje, restauracja d'Oro, SPA d'Oro, korty, uroczystości, aktualności, blog, kontakt. Prawdziwe logo, dane z wizytówki Google, Booksy i Booking.",
