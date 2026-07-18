@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Drzewo genealogiczne rodziny von Bronk (Niepoczołowski)</title>
+<style>
+  :root{
+    --ink:#1c2b4a;
+    --ink-soft:#3d517c;
+    --paper:#f3efe4;
+    --paper-deep:#e9e3d2;
+    --box:#ffffff;
+    --box-line:#8fa0c4;
+    --accent:#8c6a2f;
+    --lit:#b3541e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  /* ---------- pasek górny ---------- */
+  header{
+    position:fixed;inset:0 0 auto 0;z-index:20;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:10px 16px;
+    background:linear-gradient(180deg,#16223c 0%,#1c2b4a 100%);
+    color:#f2ecdd;box-shadow:0 2px 14px rgba(20,30,60,.35);
+  }
+  header h1{
+    font-size:15px;letter-spacing:.06em;font-weight:600;
+    display:flex;align-items:center;gap:9px;white-space:nowrap;
+  }
+  header h1 .crest{font-size:20px}
+  header h1 small{
+    display:block;font-size:10.5px;font-weight:400;letter-spacing:.12em;
+    color:#c9bfa4;text-transform:uppercase;
+  }
+  .tools{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+  .tools input[type=search]{
+    width:min(280px,60vw);padding:7px 12px;border-radius:8px;border:1px solid #46598a;
+    background:#0f1930;color:#f2ecdd;font-size:13px;outline:none;
+  }
+  .tools input[type=search]::placeholder{color:#8b97b8}
+  .tools button{
+    min-width:34px;height:34px;padding:0 10px;border-radius:8px;border:1px solid #46598a;
+    background:#26375e;color:#f2ecdd;font-size:15px;cursor:pointer;line-height:1;
+  }
+  .tools button:hover{background:#33477a}
+  .tools button.txt{font-size:12px;letter-spacing:.04em}
+  /* ---------- scena ---------- */
+  #stage{position:fixed;inset:0;cursor:grab;touch-action:none}
+  #stage.panning{cursor:grabbing}
+  svg{width:100%;height:100%;display:block}
+  /* ---------- węzły ---------- */
+  .node rect{
+    fill:var(--box);stroke:var(--box-line);stroke-width:1.1;
+    rx:6;
+  }
+  .node .genbar{stroke:none}
+  .node text{fill:var(--ink);pointer-events:none}
+  .node .nm{font-size:11.5px;font-weight:600}
+  .node .dt{font-size:9.3px;fill:var(--ink-soft)}
+  .node{cursor:pointer}
+  .node:hover rect.card{stroke:var(--accent);stroke-width:1.6}
+  .edge{stroke:#93856a;stroke-width:1.4;fill:none}
+  .mline{stroke:#93856a;stroke-width:1.1;fill:none}
+  .glabel{font-size:26px;font-weight:700;fill:#c9bda0;letter-spacing:.1em}
+  .fragbox{fill:none;stroke:#b3a37e;stroke-dasharray:7 6;stroke-width:1.6;rx:14}
+  .fraglabel{font-size:15px;font-weight:600;fill:#8c6a2f;letter-spacing:.05em}
+  /* podświetlenie linii krwi */
+  .dimmed .node,.dimmed .edge,.dimmed .mline{opacity:.16}
+  .dimmed .node.lit,.dimmed .edge.lit,.dimmed .mline.lit{opacity:1}
+  .node.lit rect.card{stroke:var(--lit);stroke-width:2}
+  .edge.lit{stroke:var(--lit);stroke-width:2.2}
+  .node.found rect.card{stroke:var(--lit);stroke-width:2.6;filter:drop-shadow(0 0 6px rgba(179,84,30,.8))}
+  /* ---------- panel informacyjny ---------- */
+  #info{
+    position:fixed;right:14px;bottom:14px;z-index:20;width:min(360px,calc(100vw - 28px));
+    background:#fffdf6;border:1px solid #d6c9a8;border-radius:12px;
+    box-shadow:0 8px 30px rgba(40,30,10,.18);
+    padding:14px 16px;font-size:12.5px;line-height:1.55;color:#43405a;
+    display:none;
+  }
+  #info.open{display:block}
+  #info h2{font-size:13.5px;color:var(--ink);margin-bottom:6px}
+  #info p{margin-bottom:7px}
+  #info .sym{display:inline-block;min-width:30px;font-weight:700;color:var(--ink)}
+  #info .close{
+    position:absolute;top:8px;right:10px;border:0;background:none;font-size:16px;
+    cursor:pointer;color:#8a8060;
+  }
+  #hint{
+    position:fixed;left:14px;bottom:14px;z-index:15;
+    background:rgba(28,43,74,.85);color:#e8e0cb;border-radius:10px;
+    padding:8px 13px;font-size:11.5px;letter-spacing:.03em;pointer-events:none;
+    transition:opacity .6s;
+  }
+  header h1 .short{display:none}
+  @media(max-width:640px){
+    header h1 span.full{display:none}
+    header h1 .short{display:inline}
+    #hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="crest">🦌</span>
+    <span>
+      <span class="full">Drzewo genealogiczne rodziny von Bronk</span><span class="short">Rodzina von Bronk</span>
+      <small>Niepoczołowski · herb: jeleń w studni · 1721 → dziś</small>
+    </span>
+  </h1>
+  <div class="tools">
+    <input type="search" id="q" list="names" placeholder="🔍 Szukaj osoby…" autocomplete="off">
+    <datalist id="names"></datalist>
+    <button id="zi" title="Przybliż">+</button>
+    <button id="zo" title="Oddal">−</button>
+    <button id="fit" class="txt" title="Pokaż całość">⤢ całość</button>
+    <button id="root" class="txt" title="Pokaż korzeń rodu">⌂ korzeń</button>
+    <button id="inf" class="txt" title="Legenda">ℹ️</button>
+  </div>
+</header>
+
+<div id="stage"><svg id="svg" preserveAspectRatio="xMidYMid meet"></svg></div>
+
+<div id="hint">Przeciągaj, aby przesuwać · kółko / szczypnięcie = zoom · kliknij osobę = linia krwi</div>
+
+<div id="info">
+  <button class="close" id="infx">✕</button>
+  <h2>Jak czytać to drzewo</h2>
+  <p><span class="sym">ur./zm.</span> daty urodzenia i śmierci (format z oryginalnego wydruku)</p>
+  <p><span class="sym">=</span> linia pozioma między kartami — małżeństwo / związek</p>
+  <p><span class="sym">?</span> odczyt z fotografii niepewny (kadr nieostry lub zasłonięty)</p>
+  <p><span class="sym">🖱</span> kliknięcie osoby podświetla jej przodków i potomków; kliknięcie tła wyłącza podświetlenie</p>
+  <p style="border-top:1px dashed #d6c9a8;padding-top:7px">
+    Drzewo odtworzono z 11 fotografii wydruku <em>„Drzewo genealogiczne rodziny von Bronk (Niepoczołowski)"</em>.
+    Fragmenty nieczytelne na zdjęciach (m.in. część gałęzi Otto Bonawentury, rodzin Warta, Grabalnego i Kuc
+    oraz pojedyncze daty) pominięto lub oznaczono „?". Dane łatwo poprawić — wszystkie osoby są w jednej
+    strukturze <code>DANE</code> w kodzie strony.
+  </p>
+  <p id="stat" style="color:#8c6a2f;font-weight:600"></p>
+</div>
+
+<script>
+/* ==========================================================================
+   DANE — odtworzone z fotografii wydruku.
+   n = imię i nazwisko, b = ur., d = zm., s = małżonkowie, c = dzieci, note = uwaga
+   "?" przy dacie / nazwisku = odczyt niepewny.
+   ========================================================================== */
+const DANE = {
+n:"Michał Piotr von Bronk", b:"04.05.1721", d:"1787", s:[{n:"Anna von Kostka-Podjaska"}], c:[
+ {n:"Katarzyna Bronk", b:"1749", d:"1812?"},
+ {n:"Jakub Wawrzyniec Bronk", b:"26.08.1753", d:"1816", s:[{n:"Zofia Grabowska"}], c:[
+  {n:"Piotr Lorenc Bronk", b:"03.08.1791", d:"13.03.1851", s:[{n:"Elżbieta Życzkowska", b:"18.11.1793", d:"17.06.1865"}], c:[
+
+   /* ---- linia Antoniego Tomasza ---- */
+   {n:"Antoni Tomasz Bronk", b:"21.01.1819", d:"19.01.1891", s:[{n:"Karolina von Prądzyńska", b:"10.01.1832"}], c:[
+
+    {n:"Jan Bronk", b:"13.08.1858", d:"1915", s:[{n:"Cecylia Lange", b:"1859", d:"1915"}], c:[
+     {n:"Franciszek Bronk", b:"1887", d:"1914"},
+     {n:"Józef Bronk", b:"1899", s:[{n:"(?) Liban"}]}]},
+
+    {n:"Otylia Bronk", b:"1859", d:"1901", s:[{n:"Johan Lawrenc"}]},
+
+    {n:"Marceli Bronk", b:"21.02.1861", d:"02.07.1924", s:[{n:"Maria von Węsierska", b:"11.07.1862?"}], c:[
+     {n:"Juliusz Bronk", b:"29.04.1894", s:[{n:"Wanda Widemann"}]},
+     {n:"Wiktor Bronk", b:"26.08.1896", s:[{n:"Monika Bojanowska", b:"18.01.1896"}]},
+     {n:"Anna Bronk", b:"22.08.1898", s:[{n:"R. Labuda"}]}]},
+
+    {n:"Bazyli Bronk", b:"08.06.1862", s:[{n:"Augusta Wieczba"}], c:[
+     {n:"Józef Bronk"},{n:"Anna Bronk"},{n:"Helena Bronk"}]},
+
+    /* ---- linia Teofila Franciszka ---- */
+    {n:"Teofil Franciszek Bronk", b:"20.10.1864", d:"21.05.1914",
+     s:[{n:"Gertruda Paulina Górna", b:"10.09.1867", d:"18.09.1945"}], c:[
+     {n:"Marta Bronk", b:"12.01.1891"},
+     {n:"Otylia Bronk", b:"21.04.1894", s:[{n:"Wincenty Domański"}]},
+     {n:"Józef Bronk", b:"1896", d:"1902"},
+
+     {n:"Jan Bronk", b:"30.06.1898", d:"18.11.1978", s:[{n:"Marta Kaliszewska", b:"01.10.1901", d:"06.12.1986"}], c:[
+      {n:"Irena Bronk", b:"10.04.1929", d:"10.09.2002", s:[{n:"(?) Sadecki"}]},
+      {n:"Stefan Bronk", b:"04.02.1934", d:"22.02.2007", s:[{n:"Iwona Murawska", b:"07.12.1939"}], c:[
+       {n:"Michał Bronk", b:"1958"},
+       {n:"Magdalena Katarzyna Bronk", s:[{n:"(?) Łopuszko"}]},
+       {n:"Renata Elżbieta Bronk", b:"21.07.1974", s:[{n:"Krzysztof Lasota", b:"09.02.1974"}], c:[
+        {n:"Weronika Nicole Lasota", b:"16.08.1998"},
+        {n:"Jakub Krzysztof Lasota", b:"25.01.2001"},
+        {n:"Agnieszka Maria Lasota", b:"20.07.2004"},
+        {n:"Zofia Antonina Lasota", b:"15.03.2007"}]}]},
+      {n:"Hubert Aleksander Bronk", b:"16.05.1940", s:[{n:"R. Palenska"}]},
+      {n:"Małgorzata (Rita) Bronk", b:"26.01.1942", s:[{n:"Witosław Nikewski"}]},
+      {n:"Agnieszka Bronk", b:"31.03.1946", note:"siostra zakonna (pallotynka)"},
+      {n:"Mieczysław Bronk", b:"01.01.1948", s:[{n:"Halina Gojtowska", b:"05.03.1950"}], c:[
+       {n:"Barbara Bronk", b:"27.11.1975", s:[{n:"Piotr Szulta", b:"21.10.1974"}], c:[
+        {n:"Kasper Szulta", b:"20.08.1999"},{n:"Agata Szulta", b:"18.06.2001"},{n:"Filip Szulta", b:"22.10.2003"}]},
+       {n:"Mirosława Beata Bronk", b:"20.05.1977"},
+       {n:"Marek Bronk", b:"18.11.1978", s:[{n:"Karolina Walaszkowska", b:"07.07.1982"}], c:[
+        {n:"Barbara Bronk", b:"09.01.2015"}]},
+       {n:"Anna Bronk", b:"09.12.1979", s:[{n:"Marek Szulta", b:"29.03.1976"}], c:[
+        {n:"Kinga Szulta", b:"06.08.2002"},{n:"Kamil Szulta", b:"27.04.2007"},{n:"Tomasz Szulta", b:"27.11.2011"}]},
+       {n:"Bernadeta Bronk", b:"02.11.1981", s:[{n:"Maciej Dorau", b:"16.07.1981"}]},
+       {n:"Agnieszka Bronk", b:"24.01.1984", s:[{n:"Bartłomiej Domaszk", b:"10.05.1981"}], c:[
+        {n:"Kornelia Domaszk", b:"17.05.2005"},{n:"Aleksandra Domaszk", b:"06.05.2007"},{n:"Alicja Domaszk", b:"24.01.2009"}]},
+       {n:"Alicja Bronk", b:"19.10.1987"},
+       {n:"Jolanta Maria Bronk", b:"04.05.1994"}]}]},
+
+     {n:"Izydor Bronk", b:"1900", d:"1902"},
+     {n:"Władysław Bronk", b:"24.09.1901", d:"01.10.1985", s:[{n:"Maria Gołębiowska", b:"12.02.1902", d:"10.03.1970"}]},
+     {n:"Antoni Bronk", b:"18.12.1902", d:"31.01.1987"},
+
+     {n:"Leon Bronk", b:"25.02.1904", d:"02.03.1981", s:[{n:"Elżbieta Bigus", b:"29.03.1917", d:"01.02.2008"}], c:[
+      {n:"Teresa Bronk", b:"24.04.1949", s:[{n:"Henryk Klasa", b:"12.10.1958"}], c:[
+       {n:"Lucyna Klasa", b:"24.06.1973", s:[{n:"Marek Czaja", b:"12.08.1968"}], c:[
+        {n:"Paweł Czaja", b:"30.06.2001"},{n:"Małgorzata Czaja", b:"08.03.2010"}]},
+       {n:"Leszek Klasa", b:"09.01.1975", s:[{n:"Marta Okrój", b:"08.03.1980"}], c:[
+        {n:"Igor Klasa", b:"07.01.2008"},{n:"Wiktor Klasa", b:"06.03.2012"}]},
+       {n:"Piotr Klasa", b:"08.05.1979", s:[{n:"Joanna Zbierajewska", b:"24.03.1979"}], c:[
+        {n:"Karolina Klasa", b:"21.08.2009"},{n:"Oliwier Klasa", b:"21.02.2012"}]},
+       {n:"Łukasz Klasa", b:"24.12.1980", s:[{n:"Maria Kowalewska", b:"21.02.1980"}], c:[
+        {n:"Krzysztof Klasa", b:"26.08.2010"},{n:"Bartłomiej Klasa", b:"14.02.2012"}]}]},
+      {n:"Jan Bronk", b:"03.06.1951", s:[{n:"Bernadetta Klasa", b:"22.03.1953"}], c:[
+       {n:"Waldemar Bronk", b:"13.04.1977", s:[{n:"Alicja Wilma", b:"26.01.1986"}], c:[
+        {n:"Lidia Bronk", b:"01.08.2009?"},{n:"Jan Waldemar Bronk", b:"29.06.2010"},{n:"Bartłomiej Adam Bronk", b:"08.07.2014"}]},
+       {n:"Grzegorz Bronk", b:"22.03.1979", s:[{n:"Hanna Bronk", b:"22.12.1982"}]},
+       {n:"Roman Bronk", b:"17.09.1984", s:[{n:"Mirosława Elwart", b:"25.01.1984"}], c:[
+        {n:"Oliwia Weronika Bronk", b:"22.10.2009"},{n:"Wiktor Jakub Bronk", b:"05.02.2015"}]}]},
+      {n:"Bernard Bronk", b:"31.12.1953", s:[{n:"Magdalena Tandek", b:"19.09.1958"}], c:[
+       {n:"Adam Bronk", b:"09.01.1980", s:[{n:"Magdalena Pysz", b:"07.05.1980"}], c:[
+        {n:"Natalia Bronk", b:"08.08.2007"},{n:"Jakub Bronk", b:"13.09.2009"},{n:"Alicja Bronk", b:"10.06.2013"}]},
+       {n:"Sławomir Bronk", b:"13.05.1981"},
+       {n:"Bernadeta Bronk", b:"01.04.1984", s:[{n:"Krzysztof Labuda", b:"10.07.1976"}], c:[
+        {n:"Roksana Labuda", b:"31.01.2006"},{n:"Paweł Labuda", b:"24.05.2009"},{n:"Helena Labuda", b:"27.01.2011"},{n:"Gabriel Labuda", b:"11.02.2015"}]},
+       {n:"Michał Bronk", b:"01.09.1989"}]},
+      {n:"Stanisław Bronk", b:"20.02.1959", s:[{n:"Beata Galand", b:"28.01.1959"}], c:[
+       {n:"Michał Bronk", b:"13.09.1996"},{n:"Agnieszka Bronk", b:"24.07.1998"},{n:"Mateusz Bronk", b:"08.05.2000"}]}]}]},
+
+    /* ---- linia Józefa Wincentego ---- */
+    {n:"Józef Wincenty Bronk", b:"20.09.1872", d:"20.10.1943", s:[{n:"Otylia Sobisz", b:"11.07.1881", d:"02.01.1954"}], c:[
+     {n:"Dorota Bronk", b:"02.02.1906", d:"05.12.1951"},
+     {n:"Anna Bronk", b:"12.11.1907", d:"15.04.1997"},
+
+     {n:"Jan Bronk", b:"04.09.1909", d:"25.12.2011", s:[{n:"Kazimiera Waleska Jaskulska", b:"06.06.1913", d:"08.07.2001"}], c:[
+      {n:"Andrzej Kazimierz Bronk", b:"30.11.1947", s:[{n:"Elżbieta Anastazja Potrac", b:"10.03.1954"}], c:[
+       {n:"Luiza Joanna Bronk", b:"22.03.1977", s:[{n:"Paweł Kostrzewa", b:"08.05.1977"},{n:"Wojciech Buniek", b:"09.01.1970"}], c:[
+        {n:"Zuzanna Małgorzata Kostrzewa", b:"10.06.2001"},{n:"Julia Kostrzewa", b:"01.07.2007"},{n:"Jakub Kostrzewa", b:"06.2015"}]},
+       {n:"Aleksandra Kazimiera Bronk", b:"12.07.1978", s:[{n:"Wojciech Brzozowski", b:"15.07.1974"}], c:[
+        {n:"Mikołaj Brzozowski", b:"21.03.2012"}]},
+       {n:"Daria Maria Bronk", b:"02.02.1985", s:[{n:"Piotr Knitter", b:"08.05.1977"}]},
+       {n:"Mateusz Bronk", b:"22.12.1986"}]},
+      {n:"Roman Bronk", b:"09.05.1949", s:[{n:"Krystyna Włodarczyk", b:"19.09.1951"},{n:"Judita Wojtaś", b:"05.02.1953"}]},
+      {n:"Joanna Kazimiera Bronk", b:"04.11.1950", s:[{n:"Jan Ludwikowski", b:"12.08.1943"}]},
+      {n:"Maria Irena Bronk", b:"25.07.1952", s:[{n:"Roman Rutyna", b:"20.02.1939"}], c:[
+       {n:"Roman Rutyna", b:"07.11.1988"}]},
+      {n:"Paweł Bronk", b:"28.04.1954", s:[{n:"Elżbieta Piotrowska", b:"14.12.1954"}]}]},
+
+     {n:"Gertruda Bronk", b:"22.10.1910", d:"21.06.1980"},
+
+     {n:"Bernard Bronk", b:"20.02.1912", d:"20.03.1983", s:[{n:"Eryka Grunt", b:"09.12.1926", d:"15.05.1989"}], c:[
+      {n:"Henryk Arkadiusz Bronk", b:"12.01.1949", s:[{n:"Danuta Ploch", b:"18.07.1948", d:"19.12.2007"}], c:[
+       {n:"Tomasz Bronk", b:"01.07.1981", s:[{n:"Natalia Młyńska", b:"25.09.1984"}], c:[
+        {n:"Wiktor Bronk", b:"29.11.2006"},{n:"Matylda Bronk", b:"02.02.2009"}]},
+       {n:"Barbara Bronk", b:"01.11.1982", s:[{n:"Paweł Skowroński", b:"01.01.1979"}], c:[
+        {n:"Aleksandra Skowrońska", b:"11.08.2009"}]}]},
+      {n:"Emilia Apolonia Bronk", b:"09.02.1950", s:[{n:"Tadeusz Daniel Bronk", b:"11.12.1951", d:"25.09.1982"}]},
+      {n:"Regina Barbara Bronk", b:"25.12.1952", s:[{n:"Janusz Fengler", b:"18.08.1951"}], c:[
+       {n:"Dorota Małgorzata Fengler", b:"15.03.1978", s:[{n:"Krzysztof Kasperowicz", b:"02.05.1972"}], c:[
+        {n:"Dariusz Paweł Kasperowicz", b:"02.04.1998"}]},
+       {n:"Agnieszka Fengler", b:"30.08.1979", s:[{n:"Arkadiusz Lewandowski", b:"27.09.1978"}]}]},
+      {n:"Hubert Klemens Bronk", b:"23.11.1954"}]},
+
+     {n:"Alojzy Bronk", b:"12.03.1914", d:"19.02.1996", s:[{n:"Maria Treder", b:"27.07.1914", d:"13.11.1995"}], c:[
+      {n:"Zygfryd Bronk", b:"10.06.1942", s:[{n:"Teresa Lewańczyk", b:"29.05.1945"}], c:[
+       {n:"Zenon Bronk", b:"09.12.1967", s:[{n:"Iwona Puzdrowska", b:"05.02.1970"}], c:[
+        {n:"Julia Bronk", b:"10.09.2000"}]},
+       {n:"Witold Bronk", b:"21.04.1970", s:[{n:"Alina Rychert", b:"09.03.1971"}], c:[
+        {n:"Katarzyna Bronk", b:"02.01.1998"},{n:"Zuzanna Bronk", b:"29.07.2002"},{n:"Kacper Bronk", b:"19.03.2008"}]},
+       {n:"Grzegorz Bronk", b:"16.05.1975", s:[{n:"Elżbieta Gojtowska", b:"15.09.1976"}], c:[
+        {n:"Angelika Bronk", b:"12.07.1998"},{n:"Nikola Bronk", b:"03.10.2004"}]}]},
+      {n:"Urszula Bronk", b:"24.09.1945", s:[{n:"Józef Hildebrandt", b:"12.11.1942", d:"17.05.1987"}], c:[
+       {n:"Anna Hildebrandt", b:"26.06.1973", s:[{n:"Jan Skorupka", b:"29.11.1971"}], c:[
+        {n:"Alicja Skorupka", b:"10.02.1992"},{n:"Tomasz Skorupka", b:"15.08.1995"}]},
+       {n:"Karol Hildebrandt", b:"26.02.1975", s:[{n:"Lucyna Baranowska", b:"25.03.1973"}], c:[
+        {n:"Martyna Hildebrandt", b:"03.04.2001"}]}]},
+      {n:"Jerzy Bronk", b:"27.11.1949", s:[{n:"Małgorzata Labuda", b:"08.02.1951"}], c:[
+       {n:"Sabina Bronk", b:"25.07.1973", s:[{n:"Wiesław Plotka", b:"20.12.1972"}], c:[
+        {n:"Daria Plotka", b:"30.08.1995"},{n:"Mateusz Plotka", b:"21.11.1996"}]},
+       {n:"Janusz Bronk", b:"05.07.1975", s:[{n:"Agnieszka Wetzel", b:"05.09.1981"}], c:[
+        {n:"Szymon Bronk", b:"05.05.2007"},{n:"Radosław Bronk", b:"31.03.2010"}]},
+       {n:"Mariusz Bronk", b:"20.12.1983", s:[{n:"Agnieszka Korda", b:"12.10.1989"}]}]}]},
+
+     {n:"Rozalia Bronk", b:"11.08.1915", d:"07.04.2005", s:[{n:"Stanisław Naczk", b:"05.11.1908", d:"18.02.1988"}], c:[
+      {n:"Zygfryd Naczk", b:"25.04.1941", s:[{n:"Marta Malek", b:"21.05.1937", d:"19.05.2010"}], c:[
+       {n:"Tomasz Naczk", b:"07.10.1965?"},
+       {n:"Izabela Naczk", b:"19.11.1970", s:[{n:"Krystian Rasmus"}], c:[
+        {n:"Kosma Rasmus", b:"19.03.2000"}]}]},
+      {n:"Brunon Naczk", b:"25.04.1941?", s:[{n:"Mirosława Strzyczyńska", b:"05.03.1939"},{n:"Irena Zwolińska", b:"14.07.1946", d:"14.09.1991"}]},
+      {n:"Krystyna Naczk", b:"06.12.1944", d:"02.02.1945"},
+      {n:"Gabriela Maria Naczk", b:"12.02.1949", s:[{n:"Burghard Graner", b:"14.07.1944", d:"24.10.2013"},{n:"Roland Bethke", b:"23.11.1931"}], c:[
+       {n:"Aleksandra Bethke-Graner", b:"15.11.1983", s:[{n:"Ewen Zimatrys", b:"25.08.1972?"}]}]}]},
+
+     {n:"Franciszek Bronk", b:"08.10.1916", d:"02.10.2000", s:[{n:"Rozalia Lemka", b:"30.08.1916", d:"22.08.1996"}], c:[
+      {n:"Małgorzata Bronk", b:"15.03.1953", s:[{n:"Filip Wolski", b:"02.01.1947"}]}]},
+
+     {n:"Stanisław Bronk", b:"04.09.1919", s:[{n:"Bernadeta Kujawska", b:"23.04.1927", d:"13.01.2007"}], c:[
+      {n:"Janina Bronk", b:"23.12.1948", s:[{n:"Henryk Formela", b:"19.04.1946", d:"13.06.1996"}], c:[
+       {n:"Zofia Formela", b:"22.03.1970", s:[{n:"Andrzej Trato", b:"11.03.1975?"}], c:[
+        {n:"Marta Trato", b:"06.07.2006"},{n:"Monika Trato", b:"29.08.2013"}]},
+       {n:"Krzysztof Formela", b:"25.12.1970?"},
+       {n:"Joanna Formela", b:"16.07.1973", s:[{n:"Jarosław Maszota", b:"03.09.1968"}], c:[
+        {n:"Magdalena Maszota", b:"22.09.1997"},{n:"Karolina Maszota", b:"07.04.2001"},
+        {n:"Agnieszka Maszota", b:"27.11.2003"},{n:"Krzysztof Maszota", b:"03.07.2005"}]},
+       {n:"Barbara Formela", b:"10.11.1975", s:[{n:"Paweł Kempfert", b:"29.03.1979"}], c:[
+        {n:"Filip Kempfert", b:"14.12.2006"},{n:"Wiktor Kempfert", b:"04.09.2009"}]},
+       {n:"Maciej Formela", b:"08.05.1981"}]},
+      {n:"Ludbella (?) Bronk", b:"13.05.1950", s:[{n:"Mieczysław Koszałka", b:"29.06.1951"}], c:[
+       {n:"Zbigniew Koszałka", b:"12.08.1971?", s:[{n:"Dorota Koszałka", b:"05.11.1975?"}], c:[
+        {n:"Wiktoria Koszałka", b:"09.08.2000"},{n:"Michał Koszałka", b:"30.04.2003"}]},
+       {n:"Ewa Koszałka", b:"26.10.1979", s:[{n:"Paweł Stencel", b:"05.06.1975"}], c:[
+        {n:"Julia Stencel", b:"05.01.2005?"},{n:"Paweł Stencel", b:"?"}]}]},
+      {n:"Stefania Bronk", b:"12.03.1953", c:[
+       {n:"Aleksandra Bronk", b:"21.08.1986?", s:[{n:"Eugeniusz Kobiela", b:"13.02.1979?"}], c:[
+        {n:"Anna Kobiela", b:"28.05.2013"},{n:"Alicja Kobiela", b:"30.06.2014"}]}]},
+      {n:"Bernadeta Bronk", b:"21.03.1954", s:[{n:"Zbigniew Rac", b:"09.05.1951"}], c:[
+       {n:"Monika Rac", b:"21.03.1979?", s:[{n:"Marek Miedzki", b:"17.05.1982?"}]}]},
+      {n:"Stanisława Bronk", b:"14.01.1957", s:[{n:"Roman Rybowski", b:"18.11.1958"}], c:[
+       {n:"Marek Rybowski", b:"19.08.1977", s:[{n:"Izabela Nowicka", b:"25.08.1979"}], c:[
+        {n:"Hubert Rybowski", b:"24.11.2000"},{n:"Igor Rybowski", b:"18.09.2008"}]},
+       {n:"Grzegorz Rybowski", b:"17.02.1981", s:[{n:"Magdalena Stachelek", b:"12.05.1983"}], c:[
+        {n:"Zuzanna Rybowska", b:"15.12.2008"}]}]}]}]},
+
+    {n:"Juliusz Bronk", d:"1927"}]},
+
+   /* ---- linia Franciszka Ksawerego (gałąź „von") ---- */
+   {n:"Franciszek Ksawery Bronk", b:"07.02.1823", d:"13.04.1880", s:[{n:"Wielanda von Kalkstejn", b:"06.10.1834", d:"07.11.1897"}], c:[
+    {n:"Oskar Franc Johan Bronk", b:"1856?"},
+    {n:"Emil Bronk", b:"1860?"},
+    {n:"Ida Rozalia Marianna Bronk", b:"1862?"},
+    {n:"Hugo Seweryn Bronk", b:"1865?", d:"1939?"},
+    {n:"Rudolf Konrad Bronk", b:"18.02.1871", d:"04.03.1946?", s:[{n:"Marta Gersch", b:"08.10.1878", d:"13.02.1952?"}], c:[
+     {n:"Beata Modesta Bronk", b:"1911", d:"1912"},
+     {n:"Hinz Bronk", b:"1912?", d:"1942?"},
+     {n:"Elżbieta W. Berta Helena Bronk", b:"09.02.1913", d:"30.10.1942", s:[{n:"Werner von Bronk"}]},
+     {n:"Józef Bonifacy Bronk", b:"11.02.1927?", d:"1945?"},
+     {n:"Otylia Bronk", b:"04.11.1934", s:[{n:"Stanisław Koszałka", b:"29.02.1923", d:"20.02.1991"}], c:[
+      {n:"Jan Koszałka", b:"11.06.1951", s:[{n:"Maria Laskowska", b:"10.12.1958"}], c:[
+       {n:"Anna Koszałka", b:"04.05.1982", s:[{n:"Karol Lewandowski", b:"14.05.1981"}], c:[
+        {n:"Zofia Lewandowska", b:"26.05.2013"},{n:"Michał Lewandowski", b:"17.08.2014"}]},
+       {n:"Piotr Koszałka", b:"20.11.1984"},
+       {n:"Aleksandra Koszałka", b:"14.11.1988"}]},
+      {n:"Kazimierz Koszałka", b:"30.09.1953", s:[{n:"Elżbieta Orywa", b:"14.04.1955"}], c:[
+       {n:"Bogdan Koszałka", b:"12.01.1977", s:[{n:"Aleksandra Treder", b:"28.12.1979"}], c:[
+        {n:"Julia Koszałka", b:"07.11.2007"},{n:"Olga Koszałka", b:"27.01.2015"}]},
+       {n:"Joanna Koszałka", b:"07.02.1979", s:[{n:"Radosław Sildatk", b:"03.06.1977"}], c:[
+        {n:"Szymon Sildatk", b:"03.06.2008"},{n:"Dawid Sildatk", b:"03.11.2011"}]},
+       {n:"Robert Koszałka", b:"13.06.1985", s:[{n:"Michalina Telega", b:"09.10.1989"}], c:[
+        {n:"Kalina Koszałka", b:"21.07.2009"},{n:"Igor Koszałka", b:"13.10.2013"}]}]},
+      {n:"Henryk Koszałka", b:"08.01.1955", s:[{n:"Halina Pągielska", b:"29.04.1957"}], c:[
+       {n:"Lucjan Koszałka", b:"23.11.1978", s:[{n:"Katarzyna Kutkowska", b:"17.05.1981"}], c:[
+        {n:"Zofia Koszałka", b:"20.06.2007"},{n:"Antoni Koszałka", b:"06.04.2010"},{n:"Ignacy Koszałka", b:"21.07.2013"}]},
+       {n:"Grzegorz Koszałka", b:"11.06.1980"},
+       {n:"Adrian Koszałka", b:"30.08.1986"},
+       {n:"Magda Koszałka", b:"16.03.1988"}]},
+      {n:"Irena Koszałka", b:"08.10.1957?"}]}]},
+    {n:"Otto Bonawentura Bronk", b:"20.02.1873", d:"05.08.1951?", s:[{n:"Wanda Paschal", b:"1875?"}]},
+    {n:"Klara Agata Bella Bronk", b:"1874?"},
+    {n:"Johanna Modesta M. A. Bronk", b:"1877?"},
+    {n:"Teodor Lucjan Bronk", b:"1879?"},
+    {n:"Alfons Marian Bronk", b:"1883?"}]},
+
+   {n:"Augustyna Bronk", b:"12.06.1825", s:[{n:"Franciszek von Dułak", b:"12.12.1821", d:"12.12.1867"}]},
+   {n:"Jozefina Otylia Bronk", b:"21.02.1828"},
+   {n:"Nepomucena Brygida Bronk", b:"23.12.1829", d:"13.02.1898?"},
+   {n:"Józef Teodor Bronk", b:"14.01.1834?", d:"26.06.1912?"},
+   {n:"Kordula Bronk", b:"1836?", d:"1912?"}]}]}]};
+
+/* Gałęzie widoczne na zdjęciach, których powiązania z pniem nie dało się
+   jednoznacznie odczytać — pokazane obok jako osobne fragmenty. */
+const FRAGMENTY = [
+ {label:"Fragment o niepewnym powiązaniu (prawdopodobnie linia Franciszka Ksawerego)",
+  tree:{n:"Alfons Bronk", b:"06.02.1921", d:"26.02.1999", s:[{n:"Anastazja (nazwisko nieczytelne)", b:"10.04.1928"}], c:[
+   {n:"Grzegorz Bronk", b:"05.07.1956?", s:[{n:"Alina (nazwisko nieczytelne)"}]},
+   {n:"Andrzej von Bronk", b:"01.03.1964", s:[{n:"Kamila Adamczyk", b:"09.12.1968"}], c:[
+    {n:"Andrzej von Bronk", b:"23.11.1988?", c:[{n:"Julia von Bronk", b:"05.11.2013?"}]},
+    {n:"Martin von Bronk", b:"23.09.2003?"}]}]}},
+ {label:"Fragment o niepewnym powiązaniu — rodzina Warta",
+  tree:{n:"Genowefa Bronk", b:"18.04.1938?", s:[{n:"Andrzej Warta", b:"22.04.1940?"}], c:[
+   {n:"Tomasz Warta", b:"24.06.1965?"}]}},
+];
+
+/* ==========================================================================
+   UKŁAD I RYSOWANIE
+   ========================================================================== */
+const BOX_W=168, BOX_H=76, SP_GAP=14, SIB_GAP=30, LEVEL_H=190, PAD=120;
+const GEN_COLORS=["#8c6a2f","#1c2b4a","#5b7553","#7a4a63","#2f6f8c","#a3552e","#4f5d8c","#6d7a3a","#8c2f45","#3a6d6a","#555555"];
+
+const svg=document.getElementById('svg');
+const NS="http://www.w3.org/2000/svg";
+let units=[], edges=[], maxDepth=0;
+let idSeq=0;
+
+function measure(node){                       // szerokość poddrzewa
+  node.id=idSeq++;
+  const sp=node.s?node.s.length:0;
+  node.unitW=BOX_W*(1+sp)+SP_GAP*sp;
+  let cw=0;
+  if(node.c&&node.c.length){
+    node.c.forEach(ch=>{ch.parent=node;cw+=measure(ch)+SIB_GAP;});
+    cw-=SIB_GAP;
+  }
+  node.subW=Math.max(node.unitW,cw||0);
+  return node.subW;
+}
+function place(node,x0,depth){                // pozycje
+  maxDepth=Math.max(maxDepth,depth);
+  node.depth=depth;
+  let cw=0;
+  if(node.c&&node.c.length){
+    node.c.forEach(ch=>cw+=ch.subW+SIB_GAP); cw-=SIB_GAP;
+    let cx=x0+(node.subW-cw)/2;
+    node.c.forEach(ch=>{place(ch,cx,depth+1);cx+=ch.subW+SIB_GAP;});
+  }
+  node.ux=x0+(node.subW-node.unitW)/2;        // lewy brzeg zestawu kart
+  node.uy=depth*LEVEL_H;
+  units.push(node);
+  if(node.c&&node.c.length){
+    const jx=node.s&&node.s.length? node.ux+BOX_W+SP_GAP/2 : node.ux+BOX_W/2;
+    const jy=node.uy+BOX_H;
+    const railY=jy+ (LEVEL_H-BOX_H)/2;
+    node.c.forEach(ch=>{
+      const cxm=ch.ux+(ch.s&&ch.s.length?BOX_W/2:BOX_W/2); // zawsze środek karty dziecka
+      edges.push({from:node,to:ch,d:`M${jx},${jy} V${railY} H${ch.ux+BOX_W/2} V${ch.uy}`});
+    });
+  }
+}
+
+function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function wrapName(name){
+  if(name.length<=19)return [name];
+  const w=name.split(" ");
+  let l1="",l2="";
+  w.forEach(word=>{ if((l1+" "+word).trim().length<=19&&!l2) l1=(l1+" "+word).trim(); else l2=(l2+" "+word).trim();});
+  if(l2.length>21){l2=l2.slice(0,20)+"…";}
+  return [l1,l2];
+}
+function cardSVG(p,x,y,gen,isSpouse){
+  const col=GEN_COLORS[gen%GEN_COLORS.length];
+  const lines=wrapName(p.n);
+  let ty=y+(lines.length===1?24:19);
+  let t=`<g class="node" data-id="${p.uid}" transform="translate(${x},${y})">`;
+  t+=`<rect class="card" width="${BOX_W}" height="${BOX_H}"/>`;
+  t+=`<rect class="genbar" x="0" y="0" width="5" height="${BOX_H}" fill="${col}"/>`;
+  let yy=lines.length===1?26:20;
+  lines.forEach(l=>{t+=`<text class="nm" x="${BOX_W/2+2}" y="${yy}" text-anchor="middle">${esc(l)}</text>`;yy+=14;});
+  const dts=[];
+  if(p.b)dts.push("ur. "+p.b);
+  if(p.d)dts.push("zm. "+p.d);
+  if(dts.length)t+=`<text class="dt" x="${BOX_W/2+2}" y="${yy+2}" text-anchor="middle">${esc(dts.join("  ·  "))}</text>`;
+  if(p.note)t+=`<text class="dt" x="${BOX_W/2+2}" y="${yy+15}" text-anchor="middle" font-style="italic">${esc(p.note)}</text>`;
+  t+=`<title>${esc(p.n)}${p.b?"\nur. "+p.b:""}${p.d?"\nzm. "+p.d:""}${p.note?"\n"+p.note:""}</title></g>`;
+  return t;
+}
+
+let personSeq=0, personIndex=[];   // [uid,name,dates,x,y,nodeRef]
+function unitSVG(node){
+  let t="", x=node.ux, gen=node.depth;
+  node.uid="p"+(personSeq++);
+  personIndex.push({uid:node.uid,n:node.n,b:node.b,x:node.ux+node.unitW/2,y:node.uy+BOX_H/2,node});
+  t+=cardSVG({...node,uid:node.uid},x,node.uy,gen,false);
+  if(node.s)node.s.forEach((sp,i)=>{
+    const sx=x+(BOX_W+SP_GAP)*(i+1);
+    sp.uid="p"+(personSeq++);
+    personIndex.push({uid:sp.uid,n:sp.n,b:sp.b,x:sx+BOX_W/2,y:node.uy+BOX_H/2,node});
+    t+=`<path class="mline" d="M${sx-SP_GAP},${node.uy+BOX_H/2-4} h${SP_GAP} M${sx-SP_GAP},${node.uy+BOX_H/2+4} h${SP_GAP}"/>`;
+    t+=cardSVG({...sp,uid:sp.uid},sx,node.uy,gen,true);
+  });
+  return t;
+}
+
+/* ---- budowa sceny ---- */
+measure(DANE);
+place(DANE,PAD,0);
+let mainW=DANE.subW+PAD*2;
+
+/* fragmenty po prawej */
+let fragSVG="", fx=mainW+260;
+FRAGMENTY.forEach(f=>{
+  measure(f.tree);
+  const fw=f.tree.subW;
+  place(f.tree,fx,6);
+  fragSVG+=`<rect class="fragbox" x="${fx-40}" y="${6*LEVEL_H-70}" width="${fw+80}" height="${LEVEL_H*4.2}" rx="14"/>`;
+  fragSVG+=`<text class="fraglabel" x="${fx-24}" y="${6*LEVEL_H-88}">${esc(f.label)}</text>`;
+  fx+=fw+220;
+});
+const totalW=fx+PAD, totalH=(maxDepth+1)*LEVEL_H+PAD*2;
+
+let body="";
+edges.forEach((e,i)=>{body+=`<path class="edge" data-f="${e.from.id}" data-t="${e.to.id}" d="${e.d}"/>`;});
+units.forEach(u=>{body+=unitSVG(u);});
+/* etykiety pokoleń */
+let glab="";
+for(let g=0;g<=maxDepth;g++){
+  glab+=`<text class="glabel" x="${PAD-90}" y="${g*LEVEL_H+BOX_H/2+9}">${["I","II","III","IV","V","VI","VII","VIII","IX","X","XI"][g]||g+1}</text>`;
+}
+svg.innerHTML=`<g id="world">${glab}${fragSVG}${body}</g>`;
+
+/* liczba osób */
+document.getElementById('stat').textContent=
+  `Na planszy: ${personIndex.length} osób, ${maxDepth+1} pokoleń.`;
+
+/* ==========================================================================
+   PAN / ZOOM
+   ========================================================================== */
+let vb={x:0,y:0,w:totalW,h:totalH};
+function applyVB(){svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);}
+function fitAll(){
+  const ar=innerWidth/innerHeight, car=totalW/totalH;
+  if(car>ar){vb.w=totalW;vb.h=totalW/ar;vb.x=0;vb.y=(totalH-vb.h)/2;}
+  else{vb.h=totalH;vb.w=totalH*ar;vb.y=0;vb.x=(totalW-vb.w)/2;}
+  applyVB();
+}
+function centerOn(x,y,w){
+  const ar=innerWidth/innerHeight;
+  vb.w=w;vb.h=w/ar;vb.x=x-vb.w/2;vb.y=y-vb.h/2;applyVB();
+}
+function screenToSVG(px,py){
+  return {x:vb.x+px/innerWidth*vb.w, y:vb.y+py/innerHeight*vb.h};
+}
+function zoomAt(px,py,f){
+  const p=screenToSVG(px,py);
+  vb.w*=f;vb.h*=f;
+  vb.x=p.x-(p.x-vb.x)*f;
+  vb.y=p.y-(p.y-vb.y)*f;
+  applyVB();
+}
+const stage=document.getElementById('stage');
+stage.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,e.deltaY<0?0.87:1.15);},{passive:false});
+
+const pts=new Map();
+let panStart=null,pinchStart=null,moved=false;
+stage.addEventListener('pointerdown',e=>{
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  stage.setPointerCapture(e.pointerId);
+  moved=false;
+  if(pts.size===1){panStart={px:e.clientX,py:e.clientY,vx:vb.x,vy:vb.y};stage.classList.add('panning');}
+  else if(pts.size===2){
+    const[a,b]=[...pts.values()];
+    pinchStart={d:Math.hypot(a.x-b.x,a.y-b.y),vb:{...vb},mid:{x:(a.x+b.x)/2,y:(a.y+b.y)/2}};
+    panStart=null;
+  }
+});
+stage.addEventListener('pointermove',e=>{
+  if(!pts.has(e.pointerId))return;
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===1&&panStart){
+    const dx=(e.clientX-panStart.px)/innerWidth*vb.w, dy=(e.clientY-panStart.py)/innerHeight*vb.h;
+    if(Math.abs(e.clientX-panStart.px)+Math.abs(e.clientY-panStart.py)>4)moved=true;
+    vb.x=panStart.vx-dx;vb.y=panStart.vy-dy;applyVB();
+  }else if(pts.size===2&&pinchStart){
+    const[a,b]=[...pts.values()];
+    const d=Math.hypot(a.x-b.x,a.y-b.y);
+    const f=pinchStart.d/d;
+    vb.w=pinchStart.vb.w*f;vb.h=pinchStart.vb.h*f;
+    const m={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+    const sp={x:pinchStart.vb.x+pinchStart.mid.x/innerWidth*pinchStart.vb.w,
+              y:pinchStart.vb.y+pinchStart.mid.y/innerHeight*pinchStart.vb.h};
+    vb.x=sp.x-m.x/innerWidth*vb.w;
+    vb.y=sp.y-m.y/innerHeight*vb.h;
+    applyVB();moved=true;
+  }
+});
+function endPtr(e){
+  pts.delete(e.pointerId);
+  if(pts.size===0){stage.classList.remove('panning');panStart=null;pinchStart=null;}
+}
+stage.addEventListener('pointerup',endPtr);
+stage.addEventListener('pointercancel',endPtr);
+
+document.getElementById('zi').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,0.8);
+document.getElementById('zo').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1.25);
+document.getElementById('fit').onclick=fitAll;
+const ROOT_PI=personIndex.find(p=>p.node===DANE);
+document.getElementById('root').onclick=()=>{
+  centerOn(ROOT_PI.x,ROOT_PI.y+LEVEL_H,2200);
+};
+addEventListener('resize',applyVB);
+
+/* ==========================================================================
+   PODŚWIETLANIE LINII KRWI + WYSZUKIWARKA
+   ========================================================================== */
+const world=document.getElementById('world');
+const uidMap=new Map(personIndex.map(p=>[p.uid,p]));
+function clearLit(){
+  world.classList.remove('dimmed');
+  world.querySelectorAll('.lit,.found').forEach(el=>el.classList.remove('lit','found'));
+}
+function lightUnit(node){
+  // przodkowie
+  const ids=new Set(), edgeKeys=new Set();
+  let cur=node;
+  while(cur){ids.add(cur.id);if(cur.parent)edgeKeys.add(cur.parent.id+"-"+cur.id);cur=cur.parent;}
+  (function down(nd){ids.add(nd.id);(nd.c||[]).forEach(ch=>{edgeKeys.add(nd.id+"-"+ch.id);down(ch);});})(node);
+  world.classList.add('dimmed');
+  world.querySelectorAll('.node').forEach(el=>{
+    const pi=uidMap.get(el.dataset.id);
+    if(pi&&ids.has(pi.node.id))el.classList.add('lit');
+  });
+  world.querySelectorAll('.edge').forEach(el=>{
+    if(edgeKeys.has(el.dataset.f+"-"+el.dataset.t))el.classList.add('lit');
+  });
+}
+svg.addEventListener('click',e=>{
+  if(moved)return;
+  const g=e.target.closest('.node');
+  if(!g){clearLit();return;}
+  clearLit();
+  const pi=uidMap.get(g.dataset.id);
+  if(pi){lightUnit(pi.node);g.classList.add('found');}
+});
+
+/* wyszukiwarka */
+const dl=document.getElementById('names'), q=document.getElementById('q');
+personIndex.forEach(p=>{
+  const o=document.createElement('option');
+  o.value=p.n+(p.b?" ("+p.b+")":"");
+  dl.appendChild(o);
+});
+function searchGo(){
+  const v=q.value.trim().toLowerCase();
+  if(!v)return;
+  const hit=personIndex.find(p=>(p.n+(p.b?" ("+p.b+")":"")).toLowerCase()===v)
+        ||personIndex.find(p=>p.n.toLowerCase().includes(v));
+  if(hit){
+    centerOn(hit.x,hit.y,1500);
+    clearLit();lightUnit(hit.node);
+    const el=world.querySelector(`.node[data-id="${hit.uid}"]`);
+    if(el)el.classList.add('found');
+  }
+}
+q.addEventListener('change',searchGo);
+q.addEventListener('keydown',e=>{if(e.key==="Enter")searchGo();});
+
+/* panel info */
+const info=document.getElementById('info');
+document.getElementById('inf').onclick=()=>info.classList.toggle('open');
+document.getElementById('infx').onclick=()=>info.classList.remove('open');
+
+/* start: widok korzenia */
+fitAll();
+centerOn(ROOT_PI.x, ROOT_PI.y+LEVEL_H*1.2, 2600);
+setTimeout(()=>{const h=document.getElementById('hint');if(h)h.style.opacity=0;},9000);
+</script>
+</body>
+</html>
