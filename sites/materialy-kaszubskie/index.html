@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Materiały kaszubskie do pobrania — publikacje cyfrowe ZKP</title>
-<meta name="description" content="Zebrane w jednym miejscu źródła darmowych kaszubskich materiałów PDF: Bałtycka Biblioteka Cyfrowa, Skarbnica Kaszubska, Kaszëbskô Czëtnica i Rada Języka Kaszubskiego.">
+<title>Materiały kaszubskie do pobrania — publikacje cyfrowe, słowniki, czasopisma</title>
+<meta name="description" content="10 sprawdzonych źródeł darmowych kaszubskich materiałów: biblioteki cyfrowe, archiwum miesięcznika Pomerania, słowniki online, portale edukacyjne i zbiory muzealne.">
 <style>
   :root {
     --bg: #0f0f13;
@@ -31,7 +31,7 @@
     line-height: 1.65;
     min-height: 100vh;
   }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 1.25rem; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 1.25rem; }
 
   /* pasek w barwach haftu kaszubskiego */
   .kaszuby-bar { display: flex; height: 6px; }
@@ -45,7 +45,7 @@
   .kaszuby-bar .c7 { background: #111; }
 
   header {
-    padding: 4rem 0 2.5rem;
+    padding: 4rem 0 2.2rem;
     text-align: center;
     background:
       radial-gradient(ellipse 60% 50% at 50% 0%, rgba(47, 111, 208, 0.18), transparent 70%),
@@ -69,13 +69,23 @@
   }
   h1 .hl { color: var(--k-blue-light); }
   .lead {
-    max-width: 640px;
+    max-width: 680px;
     margin: 0 auto;
     color: var(--text-dim);
     font-size: 1.05rem;
   }
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.2rem;
+    margin-top: 1.8rem;
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat b { display: block; font-size: 1.5rem; color: var(--k-blue-light); }
+  .stat span { font-size: 0.82rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
 
-  main { padding: 1.5rem 0 3rem; }
+  main { padding: 1rem 0 3rem; }
   section { margin-bottom: 3rem; }
   h2 {
     font-size: 1.4rem;
@@ -91,9 +101,35 @@
     background: linear-gradient(90deg, var(--border), transparent);
   }
 
+  /* filtry kategorii */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.4rem;
+  }
+  .chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font: inherit;
+    font-size: 0.88rem;
+    padding: 0.42rem 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--text); }
+  .chip.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.2rem;
   }
   .card {
@@ -106,6 +142,7 @@
     gap: 0.75rem;
     transition: transform 0.2s, border-color 0.2s, background 0.2s;
   }
+  .card.hidden { display: none; }
   .card:hover {
     transform: translateY(-3px);
     background: var(--bg-card-hover);
@@ -121,14 +158,14 @@
     background: color-mix(in srgb, var(--card-accent, var(--accent)) 16%, transparent);
     border: 1px solid color-mix(in srgb, var(--card-accent, var(--accent)) 40%, transparent);
   }
-  .card h3 { font-size: 1.12rem; line-height: 1.3; }
+  .card h3 { font-size: 1.1rem; line-height: 1.3; }
   .card .type {
-    font-size: 0.75rem;
+    font-size: 0.73rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--card-accent, var(--accent));
   }
-  .card p { color: var(--text-dim); font-size: 0.95rem; flex: 1; }
+  .card p { color: var(--text-dim); font-size: 0.94rem; }
   .card ul {
     list-style: none;
     color: var(--text-dim);
@@ -163,18 +200,21 @@
     font-size: 0.95rem;
     padding: 0.65rem 1.2rem;
     border-radius: 10px;
+    margin-top: auto;
     transition: filter 0.2s, transform 0.1s;
   }
   .btn:hover { filter: brightness(1.15); }
   .btn:active { transform: scale(0.98); }
   .btn .arrow { transition: transform 0.2s; }
   .btn:hover .arrow { transform: translateX(3px); }
+  .btn.gold { color: #1c1608; }
 
-  .card.bbc { --card-accent: var(--k-blue); }
-  .card.skarbnica { --card-accent: var(--k-yellow); }
-  .card.skarbnica .btn { color: #1c1608; }
-  .card.czetnica { --card-accent: var(--k-red); }
-  .card.rjk { --card-accent: var(--k-green); }
+  .card.acc-blue    { --card-accent: var(--k-blue); }
+  .card.acc-bluedk  { --card-accent: #4a6fd0; }
+  .card.acc-gold    { --card-accent: var(--k-yellow); }
+  .card.acc-red     { --card-accent: var(--k-red); }
+  .card.acc-green   { --card-accent: var(--k-green); }
+  .card.acc-violet  { --card-accent: var(--accent); }
 
   .note {
     background: var(--bg-card);
@@ -233,8 +273,9 @@
   footer .back:hover { text-decoration: underline; }
 
   @media (max-width: 560px) {
-    header { padding: 2.8rem 0 2rem; }
+    header { padding: 2.8rem 0 1.8rem; }
     .note { padding: 1.2rem 1.3rem; }
+    .stats { gap: 1.4rem; }
   }
 </style>
 </head>
@@ -248,34 +289,50 @@
 
 <header>
   <div class="wrap">
-    <div class="badge">Zrzeszenie Kaszubsko-Pomorskie</div>
+    <div class="badge">Kaszuby · Kultura · Język · Historia</div>
     <h1>Materiały <span class="hl">kaszubskie</span><br>do pobrania</h1>
     <p class="lead">
-      Darmowe publikacje cyfrowe o kulturze, historii, języku i sztuce ludowej Kaszub —
-      cztery sprawdzone źródła z setkami plików PDF i DjVu, wydawanych przez ZKP
-      lub przy jego współpracy.
+      Darmowe publikacje cyfrowe o kulturze, historii, języku i sztuce ludowej Kaszub.
+      Biblioteki cyfrowe, archiwa czasopism, słowniki online, portale edukacyjne
+      i zbiory muzealne — zebrane w jednym miejscu.
     </p>
+    <div class="stats">
+      <div class="stat"><b>10</b><span>źródeł</span></div>
+      <div class="stat"><b>setki</b><span>plików PDF i DjVu</span></div>
+      <div class="stat"><b>100%</b><span>darmowe</span></div>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
 
   <section>
-    <h2>📚 Gdzie pobierać</h2>
-    <div class="grid">
+    <h2>📚 Gdzie pobierać i czytać online</h2>
 
-      <article class="card bbc">
+    <div class="filters" role="group" aria-label="Filtruj źródła według kategorii">
+      <button class="chip active" data-filter="all">Wszystkie</button>
+      <button class="chip" data-filter="biblioteka">Biblioteki cyfrowe</button>
+      <button class="chip" data-filter="czasopismo">Czasopisma</button>
+      <button class="chip" data-filter="edukacja">Edukacja</button>
+      <button class="chip" data-filter="slownik">Słowniki i język</button>
+      <button class="chip" data-filter="muzeum">Muzea i archiwa</button>
+    </div>
+
+    <div class="grid" id="sources">
+
+      <article class="card acc-blue" data-cat="biblioteka">
         <div class="card-top">
           <div class="card-icon">🏛️</div>
           <div>
-            <div class="type">Repozytorium cyfrowe</div>
+            <div class="type">Biblioteka cyfrowa</div>
             <h3>Bałtycka Biblioteka Cyfrowa</h3>
           </div>
         </div>
         <p>
-          Największe repozytorium cyfrowe regionu. ZKP udostępnia tu zdigitalizowane
-          czasopisma, biuletyny (m.in. historyczne numery <em>Biuletynu Zrzeszenia
-          Kaszubsko-Pomorskiego</em>) oraz starsze monografie i kroniki oddziałów.
+          Największe repozytorium cyfrowe regionu słupskiego i Pomorza Środkowego.
+          Zrzeszenie Kaszubsko-Pomorskie udostępnia tu zdigitalizowane czasopisma,
+          biuletyny (m.in. historyczne numery <em>Biuletynu ZKP</em>) oraz starsze
+          monografie i kroniki oddziałów.
         </p>
         <div class="hint">
           <strong>Jak szukać:</strong> wpisz w wyszukiwarkę
@@ -287,7 +344,53 @@
         </a>
       </article>
 
-      <article class="card skarbnica">
+      <article class="card acc-bluedk" data-cat="biblioteka">
+        <div class="card-top">
+          <div class="card-icon">⚓</div>
+          <div>
+            <div class="type">Biblioteka cyfrowa</div>
+            <h3>Pomorska Biblioteka Cyfrowa</h3>
+          </div>
+        </div>
+        <p>
+          Wspólny projekt bibliotek Trójmiasta i Pomorza Gdańskiego. Dziedzictwo
+          kulturowe i naukowe regionu: starodruki, czasopisma, regionalia
+          i osobne <strong>kolekcje kaszubskie</strong>.
+        </p>
+        <ul>
+          <li>archiwalne numery „Pomeranii" (od 1963 r.)</li>
+          <li>„Gazeta Kaszubska" z lat 20. XX w.</li>
+          <li>zbiory Muzeum Piśmiennictwa w Wejherowie</li>
+        </ul>
+        <a class="btn" href="https://pbc.gda.pl/dlibra" target="_blank" rel="noopener">
+          Przejdź do biblioteki <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <article class="card acc-red" data-cat="czasopismo">
+        <div class="card-top">
+          <div class="card-icon">📰</div>
+          <div>
+            <div class="type">Miesięcznik ZKP</div>
+            <h3>„Pomerania" — archiwum PDF</h3>
+          </div>
+        </div>
+        <p>
+          Miesięcznik społeczno-kulturalny wydawany od 1963 r. przez Zarząd Główny ZKP.
+          W internetowym archiwum kolejne roczniki w formacie PDF — docelowo
+          wszystkie wydane numery.
+        </p>
+        <ul>
+          <li>numery „Pomeranii" z ostatnich lat</li>
+          <li>dodatek literacki „Stegna" (po kaszubsku)</li>
+          <li>dodatek edukacyjny „Najô Ùczba"</li>
+        </ul>
+        <a class="btn" href="https://www.miesiecznikpomerania.pl/index.php/archiwum" target="_blank" rel="noopener">
+          Otwórz archiwum <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <article class="card acc-gold" data-cat="edukacja">
         <div class="card-top">
           <div class="card-icon">🎓</div>
           <div>
@@ -300,17 +403,39 @@
           zainteresowanych kulturą Kaszub. Darmowe PDF-y o tematyce regionalnej.
         </p>
         <ul>
-          <li>elementarze i słowniki</li>
-          <li>scenariusze lekcji</li>
-          <li>historyczne książki kucharskie</li>
-          <li>przewodniki regionalne</li>
+          <li>elementarze i podręczniki</li>
+          <li>„Słownik polsko-kaszubski" E. Gołąbka (PDF)</li>
+          <li>scenariusze lekcji dla szkół</li>
+          <li>historyczne książki kucharskie i przewodniki</li>
         </ul>
-        <a class="btn" href="http://skarbnicakaszubska.pl" target="_blank" rel="noopener">
+        <a class="btn gold" href="http://skarbnicakaszubska.pl" target="_blank" rel="noopener">
           Otwórz Skarbnicę <span class="arrow">→</span>
         </a>
       </article>
 
-      <article class="card czetnica">
+      <article class="card acc-gold" data-cat="edukacja">
+        <div class="card-top">
+          <div class="card-icon">🧭</div>
+          <div>
+            <div class="type">Kompendium wiedzy</div>
+            <h3>Kaszuby ONLINE</h3>
+          </div>
+        </div>
+        <p>
+          Edukacyjno-popularyzatorski portal zbierający w jednym miejscu wiedzę
+          o kulturze, języku, historii i turystyce Kaszub.
+        </p>
+        <ul>
+          <li>baza publikacji naukowych i popularnych</li>
+          <li>materiały do nauki języka kaszubskiego</li>
+          <li>kalendarium najważniejszych dat</li>
+        </ul>
+        <a class="btn gold" href="https://www.kaszubyonline.pl/baza-wiedzy/publikacje/" target="_blank" rel="noopener">
+          Przeglądaj bazę <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <article class="card acc-red" data-cat="edukacja">
         <div class="card-top">
           <div class="card-icon">📖</div>
           <div>
@@ -333,7 +458,7 @@
         </a>
       </article>
 
-      <article class="card rjk">
+      <article class="card acc-green" data-cat="slownik">
         <div class="card-top">
           <div class="card-icon">🗣️</div>
           <div>
@@ -351,6 +476,60 @@
         </ul>
         <a class="btn" href="https://rjk.org.pl" target="_blank" rel="noopener">
           Strona Rady <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <article class="card acc-green" data-cat="slownik">
+        <div class="card-top">
+          <div class="card-icon">📔</div>
+          <div>
+            <div class="type">Słownik online</div>
+            <h3>Sloworz — Internetowi Słowôrz</h3>
+          </div>
+        </div>
+        <p>
+          Internetowy Słowôrz Kaszëbsczégò Jãzëka — darmowy słownik języka
+          kaszubskiego stworzony przez Fundację Kaszuby, dostępny bez rejestracji
+          prosto z przeglądarki.
+        </p>
+        <a class="btn" href="https://sloworz.org" target="_blank" rel="noopener">
+          Otwórz słownik <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <article class="card acc-green" data-cat="slownik">
+        <div class="card-top">
+          <div class="card-icon">🔄</div>
+          <div>
+            <div class="type">Tłumacz online</div>
+            <h3>Kaszebe.org</h3>
+          </div>
+        </div>
+        <p>
+          Bezpłatny, interaktywny tłumacz i słownik polsko-kaszubski oraz
+          kaszubsko-polski. Przydatny do szybkiego sprawdzania słów
+          i prostych zwrotów.
+        </p>
+        <a class="btn" href="https://kaszebe.org" target="_blank" rel="noopener">
+          Otwórz tłumacza <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <article class="card acc-violet" data-cat="muzeum">
+        <div class="card-top">
+          <div class="card-icon">🏺</div>
+          <div>
+            <div class="type">Zbiory muzealne</div>
+            <h3>Muzeum Piśmiennictwa i Muzyki<br>Kaszubsko-Pomorskiej</h3>
+          </div>
+        </div>
+        <p>
+          Muzeum w Wejherowie gromadzi pierwodruki dzieł w języku kaszubskim,
+          cenne czasopisma, śpiewniki i spuścizny twórców (m.in. Aleksandra
+          Majkowskiego). Wybrane zbiory zdigitalizowano i udostępniono online.
+        </p>
+        <a class="btn" href="https://www.muzeum.wejherowo.pl/zbiory-w-internecie/zbiory-cyfrowe/" target="_blank" rel="noopener">
+          Zbiory cyfrowe <span class="arrow">→</span>
         </a>
       </article>
 
@@ -372,21 +551,29 @@
         Teki składają się z barwnych i czarno-białych plansz (kalki do przenoszenia
         wzorów), które najlepiej sprawdzają się w druku na dużym formacie. Można je
         nabyć w formie fizycznej lub przeglądać wybrane reprodukcje w regionalnych
-        bibliotekach i na blogach poświęconych sztuce ludowej.
+        bibliotekach i na blogach poświęconych sztuce ludowej. Historyczne wzorniki
+        i opracowania o hafcie warto też wyszukiwać w Bałtyckiej i Pomorskiej
+        Bibliotece Cyfrowej.
       </p>
     </div>
   </section>
 
   <section>
-    <h2>🔎 Jak zacząć — 3 kroki</h2>
+    <h2>🔎 Jak zacząć — 4 kroki</h2>
     <div class="steps">
       <div class="step">
-        <p><strong>Wejdź do Bałtyckiej Biblioteki Cyfrowej</strong> i wyszukaj frazę
-        „Zrzeszenie Kaszubsko-Pomorskie" — to najszybsza droga do setek darmowych publikacji.</p>
+        <p><strong>Wejdź do Bałtyckiej lub Pomorskiej Biblioteki Cyfrowej</strong> i wyszukaj
+        frazę „Zrzeszenie Kaszubsko-Pomorskie" albo „kaszubski" — to najszybsza droga
+        do setek darmowych publikacji.</p>
       </div>
       <div class="step">
-        <p><strong>Szukasz materiałów do nauki?</strong> Skarbnica Kaszubska ma gotowe
-        elementarze, słowniki i scenariusze lekcji dla szkół.</p>
+        <p><strong>Chcesz czytać na bieżąco?</strong> W archiwum miesięcznika „Pomerania"
+        pobierzesz numery w PDF razem z dodatkami „Stegna" i „Najô Ùczba".</p>
+      </div>
+      <div class="step">
+        <p><strong>Szukasz materiałów do nauki?</strong> Skarbnica Kaszubska i Kaszuby ONLINE
+        mają elementarze, słowniki i scenariusze lekcji, a Sloworz i Kaszebe.org
+        pomogą ze słownictwem.</p>
       </div>
       <div class="step">
         <p><strong>Interesuje Cię język i literatura?</strong> Zajrzyj do Kaszëbsczi Czëtnicy
@@ -404,12 +591,28 @@
       <span class="c4"></span><span class="c5"></span><span class="c6"></span>
       <span class="c7"></span>
     </div>
-    Zestawienie źródeł publikacji cyfrowych Zrzeszenia Kaszubsko-Pomorskiego.<br>
-    Wszystkie materiały należą do ich wydawców i są udostępniane na ich stronach.
+    Zestawienie źródeł darmowych kaszubskich publikacji cyfrowych.
+    Wszystkie materiały należą do ich wydawców i są udostępniane na ich stronach —
+    linki otwierają się w nowej karcie.
     <br>
     <a class="back" href="../../">← wróć do kolekcji</a>
   </div>
 </footer>
+
+<script>
+  const chips = document.querySelectorAll(".chip");
+  const cards = document.querySelectorAll("#sources .card");
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      chips.forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      const f = chip.dataset.filter;
+      cards.forEach((card) => {
+        card.classList.toggle("hidden", f !== "all" && card.dataset.cat !== f);
+      });
+    });
+  });
+</script>
 
 </body>
 </html>

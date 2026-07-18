@@ -212,7 +212,7 @@ const SITES = [
   {
     slug: "materialy-kaszubskie",
     title: "Materiały kaszubskie do pobrania",
-    desc: "Zestawienie darmowych publikacji cyfrowych o Kaszubach: Bałtycka Biblioteka Cyfrowa, Skarbnica Kaszubska, Kaszëbskô Czëtnica i Rada Języka Kaszubskiego — setki PDF-ów ZKP o kulturze, języku i historii, plus informacje o tekach haftu kaszubskiego (szkoła pucka). Karty źródeł w tradycyjnych barwach haftu kaszubskiego.",
+    desc: "10 sprawdzonych źródeł darmowych kaszubskich materiałów cyfrowych z filtrowaniem po kategoriach: biblioteki cyfrowe (Bałtycka i Pomorska), archiwum PDF miesięcznika „Pomerania” z dodatkami Stegna i Najô Ùczba, Skarbnica Kaszubska, Kaszuby ONLINE, Kaszëbskô Czëtnica, Rada Języka Kaszubskiego, słowniki online Sloworz i Kaszebe.org oraz zbiory cyfrowe Muzeum Piśmiennictwa w Wejherowie. Plus sekcja o tekach haftu kaszubskiego (szkoła pucka). Karty w tradycyjnych barwach haftu.",
     icon: "📚",
     tag: "katalog",
     preview: true,
