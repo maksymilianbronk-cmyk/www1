@@ -155,6 +155,44 @@
   .wood-chip b{display:block;font-family:var(--serif);font-size:1.05rem;margin-bottom:2px}
   .wood-chip span{font-size:.75rem;opacity:.8}
 
+  /* ── sklep ── */
+  .size-products{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:12px}
+  .prod{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 14px;
+    text-align:center;transition:border-color .2s}
+  .prod:hover{border-color:var(--gold)}
+  .prod .p-ikona{display:flex;align-items:flex-end;justify-content:center;height:64px;margin-bottom:8px}
+  .prod .p-tarcza{background:linear-gradient(160deg,#b98a55,#8a5f33);border:2px solid var(--gold);
+    border-radius:6px 6px 50% 50%/6px 6px 46% 46%}
+  .prod b{display:block;font-family:var(--serif);font-size:1.15rem;color:var(--gold2)}
+  .prod span{color:var(--muted);font-size:.8rem;display:block}
+  .prod em{display:block;font-style:normal;font-family:var(--serif);font-size:1.35rem;color:var(--gold);margin-top:6px}
+  .size-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .size-tile{position:relative;border:1px solid var(--line);border-radius:12px;padding:10px 6px;
+    text-align:center;cursor:pointer;transition:.2s;background:var(--bg)}
+  .size-tile input{position:absolute;opacity:0;pointer-events:none}
+  .size-tile b{display:block;font-size:.85rem;color:var(--txt)}
+  .size-tile span{color:var(--muted);font-size:.75rem;display:block}
+  .size-tile em{font-style:normal;color:var(--gold2);font-size:.9rem;font-family:var(--serif)}
+  .size-tile.on{border-color:var(--gold);background:rgba(212,175,55,.08);box-shadow:0 0 0 1px var(--gold)}
+  .chk{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:.87rem;
+    margin:4px 0 14px;cursor:pointer}
+  .chk input{width:17px;height:17px;accent-color:var(--gold)}
+  .price-line{display:flex;justify-content:space-between;align-items:center;margin:6px 0 14px;
+    padding:10px 14px;border:1px dashed var(--gold);border-radius:10px;color:var(--muted);font-size:.9rem}
+  .price-line b{font-family:var(--serif);font-size:1.5rem;color:var(--gold)}
+  .cart{margin-top:16px}
+  .cart-row{display:flex;justify-content:space-between;gap:10px;align-items:center;
+    padding:9px 0;border-bottom:1px solid var(--line);font-size:.86rem;color:var(--muted)}
+  .cart-row b{color:var(--txt);font-weight:600}
+  .cart-row .c-cena{color:var(--gold2);font-family:var(--serif);white-space:nowrap}
+  .cart-row button{background:none;border:none;color:#ff5c6c;cursor:pointer;font-size:1rem;padding:2px 6px}
+  .cart-total{display:flex;justify-content:space-between;padding:12px 0;font-size:.95rem;color:var(--txt)}
+  .cart-total b{font-family:var(--serif);font-size:1.4rem;color:var(--gold)}
+  .cart-empty{color:var(--muted);font-size:.85rem;text-align:center;padding:10px;border:1px dashed var(--line);border-radius:10px}
+  .btn-line{width:100%;padding:12px;border-radius:999px;cursor:pointer;background:none;
+    border:1px solid var(--gold);color:var(--gold);font-size:.95rem;letter-spacing:.04em;margin-bottom:10px;transition:.2s}
+  .btn-line:hover{background:rgba(212,175,55,.12)}
+
   /* ── stopka ── */
   footer{padding:44px 20px;text-align:center;color:var(--muted);font-size:.88rem}
   footer .back{display:inline-block;margin-top:14px;color:var(--accent)}
@@ -243,15 +281,17 @@
           <li><span class="n">5</span><div><b>Dostawa.</b> Bezpieczna wysyłka kurierem
             w ciągu 3–6 tygodni od akceptacji projektu.</div></li>
         </ol>
-        <h3>Cennik orientacyjny</h3>
-        <table class="price-table">
-          <tr><th>Wariant</th><th>Wymiary</th><th>Cena od</th></tr>
-          <tr><td>Herb mały (płaskorzeźba)</td><td>ok. 25 × 30 cm</td><td>od 590 zł</td></tr>
-          <tr><td>Herb klasyczny</td><td>ok. 35 × 45 cm</td><td>od 990 zł</td></tr>
-          <tr><td>Herb reprezentacyjny</td><td>ok. 50 × 65 cm</td><td>od 1 890 zł</td></tr>
-          <tr><td>Herb polichromowany + złocenia</td><td>dowolne</td><td>+30–50%</td></tr>
-          <tr><td>Projekt herbu (sama grafika)</td><td>plik PDF/PNG</td><td>od 190 zł</td></tr>
-        </table>
+        <h3>Rozmiary i ceny</h3>
+        <div class="size-products">
+          <div class="prod"><div class="p-ikona"><div class="p-tarcza" style="width:26px;height:32px"></div></div>
+            <b>Malutki</b><span>ok. 20 cm — na biurko i półkę</span><em>800 zł</em></div>
+          <div class="prod"><div class="p-ikona"><div class="p-tarcza" style="width:42px;height:52px"></div></div>
+            <b>Średni</b><span>ok. 40 cm — do salonu i gabinetu</span><em>1 500 zł</em></div>
+          <div class="prod"><div class="p-ikona"><div class="p-tarcza" style="width:54px;height:66px"></div></div>
+            <b>Duży</b><span>ok. 50 cm — reprezentacyjny</span><em>2 500 zł</em></div>
+        </div>
+        <p style="margin-top:10px">Wersja polichromowana (pełne barwy heraldyczne + złocenia) <b style="color:var(--gold2)">+40%</b>.
+           Każdy herb rzeźbiony jest na zamówienie według wzoru z naszej biblioteki.</p>
         <h3>Gatunki drewna</h3>
         <div class="wood-samples">
           <div class="wood-chip" style="background:linear-gradient(135deg,#caa472,#a87e4f);color:#2a1c0e">
@@ -265,31 +305,37 @@
         </div>
       </div>
       <form class="order-form" id="zamowienie" autocomplete="on">
-        <h3>Zamów wycenę herbu</h3>
-        <p class="of-sub">Bez zobowiązań — odpowiadamy w 1–2 dni robocze.</p>
+        <h3>🛒 Sklep — herb z drewna</h3>
+        <p class="of-sub">Skonfiguruj herb, dodaj do koszyka i złóż zamówienie.</p>
         <div class="field">
-          <label for="f-herb">Herb / nazwisko rodu *</label>
-          <input id="f-herb" required placeholder="np. herb Ostoja / rodzina Zarembów">
+          <label for="f-herb">Herb (z biblioteki lub własny wzór) *</label>
+          <input id="f-herb" list="lista-herbow" placeholder="np. Ostoja, Leliwa…">
+          <datalist id="lista-herbow"></datalist>
         </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="f-wariant">Wariant</label>
-            <select id="f-wariant">
-              <option>Herb mały (25×30 cm)</option>
-              <option selected>Herb klasyczny (35×45 cm)</option>
-              <option>Herb reprezentacyjny (50×65 cm)</option>
-              <option>Sam projekt graficzny</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="f-drewno">Drewno</label>
-            <select id="f-drewno">
-              <option selected>Lipa</option><option>Dąb</option>
-              <option>Orzech</option><option>Jesion</option>
-            </select>
+        <div class="field">
+          <label>Rozmiar</label>
+          <div class="size-grid" id="rozmiary">
+            <label class="size-tile"><input type="radio" name="rozmiar" value="20 cm" data-cena="800">
+              <b>Malutki</b><span>20 cm</span><em>800 zł</em></label>
+            <label class="size-tile on"><input type="radio" name="rozmiar" value="40 cm" data-cena="1500" checked>
+              <b>Średni</b><span>40 cm</span><em>1 500 zł</em></label>
+            <label class="size-tile"><input type="radio" name="rozmiar" value="50 cm" data-cena="2500">
+              <b>Duży</b><span>50 cm</span><em>2 500 zł</em></label>
           </div>
         </div>
-        <div class="field-row">
+        <div class="field">
+          <label for="f-drewno">Gatunek drewna</label>
+          <select id="f-drewno">
+            <option selected>Lipa</option><option>Dąb</option>
+            <option>Orzech</option><option>Jesion</option>
+          </select>
+        </div>
+        <label class="chk"><input type="checkbox" id="f-poli">
+          Polichromia i złocenia (+40%)</label>
+        <div class="price-line"><span>Cena egzemplarza:</span><b id="cena">1 500 zł</b></div>
+        <button class="btn-line" type="button" id="dodaj">＋ Dodaj do koszyka</button>
+        <div class="cart" id="koszyk"></div>
+        <div class="field-row" style="margin-top:16px">
           <div class="field">
             <label for="f-imie">Imię i nazwisko *</label>
             <input id="f-imie" required placeholder="Jan Kowalski">
@@ -300,10 +346,10 @@
           </div>
         </div>
         <div class="field">
-          <label for="f-uwagi">Uwagi (kolory, złocenia, termin…)</label>
-          <textarea id="f-uwagi" placeholder="np. wersja polichromowana, prezent na 60. urodziny"></textarea>
+          <label for="f-uwagi">Uwagi do zamówienia</label>
+          <textarea id="f-uwagi" placeholder="np. dedykacja na odwrocie, termin na rocznicę…"></textarea>
         </div>
-        <button class="btn-gold" type="submit">Wyślij zapytanie o wycenę</button>
+        <button class="btn-gold" type="submit">Złóż zamówienie</button>
         <div class="order-ok" id="order-ok"></div>
       </form>
     </div>
@@ -320,6 +366,7 @@
 </footer>
 
 <script src="herby.js"></script>
+<script src="nazwiska.js"></script>
 
 <script>
 /* ── pomocnicze ── */
@@ -457,26 +504,87 @@ document.addEventListener("click", e => {
   const order = e.target.closest(".herb-order");
   if(order){
     const f = document.getElementById("f-herb");
-    f.value = "herb " + order.dataset.herb;
+    f.value = order.dataset.herb;
     document.getElementById("zamowienie").scrollIntoView({behavior:"smooth"});
     setTimeout(()=>f.focus({preventScroll:true}), 600);
   }
 });
 
-/* ── formularz zamówienia ── */
+/* ── sklep: cena, koszyk, zamówienie ── */
+const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0") + " zł";
+const herbInput = document.getElementById("f-herb");
+document.getElementById("lista-herbow").innerHTML =
+  HERBY.map(x => `<option value="${x.n}">`).join("");
+
+const rozmiary = document.getElementById("rozmiary");
+const poli = document.getElementById("f-poli");
+function cenaJedn(){
+  let c = +rozmiary.querySelector("input:checked").dataset.cena;
+  if(poli.checked) c = Math.round(c * 1.4);
+  return c;
+}
+function refreshCena(){
+  rozmiary.querySelectorAll(".size-tile").forEach(t =>
+    t.classList.toggle("on", t.querySelector("input").checked));
+  document.getElementById("cena").textContent = fmt(cenaJedn());
+}
+rozmiary.addEventListener("change", refreshCena);
+poli.addEventListener("change", refreshCena);
+refreshCena();
+
+let koszyk = [];
+try { koszyk = JSON.parse(localStorage.getItem("herbarz-koszyk") || "[]"); } catch(e) {}
+const koszykEl = document.getElementById("koszyk");
+const saveKoszyk = () => localStorage.setItem("herbarz-koszyk", JSON.stringify(koszyk));
+function renderKoszyk(){
+  if(!koszyk.length){
+    koszykEl.innerHTML = '<div class="cart-empty">Koszyk jest pusty — wybierz herb i rozmiar.</div>';
+    return;
+  }
+  const suma = koszyk.reduce((s,p) => s + p.cena, 0);
+  koszykEl.innerHTML = koszyk.map((p,i) =>
+    `<div class="cart-row"><span><b>${esc(p.herb)}</b> · ${p.rozmiar} · ${esc(p.drewno)}${p.poli ? " · polichromia" : ""}</span><span class="c-cena">${fmt(p.cena)}</span><button type="button" data-del="${i}" title="Usuń z koszyka">✕</button></div>`).join("")
+    + `<div class="cart-total"><span>Razem (${koszyk.length} szt.):</span><b>${fmt(suma)}</b></div>`;
+}
+koszykEl.addEventListener("click", e => {
+  const b = e.target.closest("[data-del]");
+  if(!b) return;
+  koszyk.splice(+b.dataset.del, 1);
+  saveKoszyk(); renderKoszyk();
+});
+document.getElementById("dodaj").addEventListener("click", () => {
+  const herb = herbInput.value.trim();
+  if(!herb){
+    herbInput.focus();
+    herbInput.style.borderColor = "#ff5c6c";
+    setTimeout(() => herbInput.style.borderColor = "", 1200);
+    return;
+  }
+  koszyk.push({ herb, rozmiar: rozmiary.querySelector("input:checked").value,
+    drewno: document.getElementById("f-drewno").value, poli: poli.checked, cena: cenaJedn() });
+  saveKoszyk(); renderKoszyk();
+});
+renderKoszyk();
+
 document.getElementById("zamowienie").addEventListener("submit", e => {
   e.preventDefault();
   const v = id => document.getElementById(id).value.trim();
-  const subject = encodeURIComponent(`Wycena herbu z drewna — ${v("f-herb")}`);
-  const body = encodeURIComponent(
-    `Herb / ród: ${v("f-herb")}\nWariant: ${v("f-wariant")}\nDrewno: ${v("f-drewno")}\n` +
-    `Zamawiający: ${v("f-imie")} <${v("f-mail")}>\nUwagi: ${v("f-uwagi") || "—"}`);
   const ok = document.getElementById("order-ok");
-  ok.innerHTML = `Dziękujemy! Zapytanie przygotowane — kliknij, aby wysłać je e-mailem:
-    <a href="mailto:zamowienia@herbarz.example?subject=${subject}&body=${body}">
-    otwórz wiadomość w programie pocztowym</a>. Odpowiadamy w 1–2 dni robocze.`;
   ok.classList.add("show");
-  ok.scrollIntoView({behavior:"smooth", block:"nearest"});
+  if(!koszyk.length){
+    ok.innerHTML = "Koszyk jest pusty — najpierw dodaj herb do koszyka.";
+    return;
+  }
+  const suma = koszyk.reduce((s,p) => s + p.cena, 0);
+  const pozycje = koszyk.map((p,i) =>
+    `${i+1}. Herb ${p.herb}, ${p.rozmiar}, ${p.drewno}${p.poli ? ", polichromia" : ""} — ${p.cena} zł`).join("\n");
+  const subject = encodeURIComponent(`Zamówienie herbów z drewna (${koszyk.length} szt., ${suma} zł)`);
+  const body = encodeURIComponent(
+    `Zamówienie:\n${pozycje}\n\nRazem: ${suma} zł\n\nZamawiający: ${v("f-imie")} <${v("f-mail")}>\nUwagi: ${v("f-uwagi") || "—"}`);
+  ok.innerHTML = `Dziękujemy! Zamówienie na <b>${fmt(suma)}</b> przygotowane —
+    <a href="mailto:zamowienia@herbarz.example?subject=${subject}&body=${body}">kliknij, aby wysłać je e-mailem</a>.
+    Potwierdzimy wycenę i termin realizacji w 1–2 dni robocze.`;
+  ok.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
 </script>
 </body>

@@ -225,7 +225,7 @@ const SITES = [
   {
     slug: "herbarz-polski",
     title: "Herbarz Polski — herby i nazwiska",
-    desc: "Biblioteka 83 polskich herbów szlacheckich w pełni wektorowych (kartusz z koroną, ~50 godeł heraldycznych: podkowy, lilie, gryfy, żubry, łabędzie…) i wyszukiwarka ponad 1160 nazwisk herbowych z obsługą form żeńskich i polskich znaków. Katalog alfabetyczny, blazonowania oraz usługa zamówienia ręcznie rzeźbionego herbu z drewna: proces w 5 krokach, cennik, gatunki drewna i formularz wyceny.",
+    desc: "Biblioteka 83 polskich herbów szlacheckich w pełni wektorowych (kartusz z koroną, ~50 godeł heraldycznych: podkowy, lilie, gryfy, żubry, łabędzie…) i wyszukiwarka prawie 1700 nazwisk herbowych z obsługą form żeńskich i polskich znaków. Katalog alfabetyczny, blazonowania oraz sklep z herbami rzeźbionymi w drewnie: rozmiary 20/40/50 cm (800/1500/2500 zł), polichromia +40%, koszyk z localStorage i zamówienie e-mail.",
     icon: "🛡️",
     tag: "katalog",
     preview: true,
