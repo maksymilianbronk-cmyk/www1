@@ -225,7 +225,7 @@ const SITES = [
   {
     slug: "herbarz-polski",
     title: "Herbarz Polski — herby i nazwiska",
-    desc: "Wyszukiwarka polskich nazwisk szlacheckich i 52 herbów rodowych z blazonowaniem i tarczami SVG. Szukanie po nazwisku lub nazwie herbu (obsługa form żeńskich i polskich znaków), katalog alfabetyczny oraz usługa zamówienia ręcznie rzeźbionego herbu z drewna: proces w 5 krokach, cennik, gatunki drewna i formularz wyceny.",
+    desc: "Biblioteka 83 polskich herbów szlacheckich w pełni wektorowych (kartusz z koroną, ~50 godeł heraldycznych: podkowy, lilie, gryfy, żubry, łabędzie…) i wyszukiwarka ponad 1160 nazwisk herbowych z obsługą form żeńskich i polskich znaków. Katalog alfabetyczny, blazonowania oraz usługa zamówienia ręcznie rzeźbionego herbu z drewna: proces w 5 krokach, cennik, gatunki drewna i formularz wyceny.",
     icon: "🛡️",
     tag: "katalog",
     preview: true,

@@ -80,7 +80,7 @@
     transition:transform .2s,border-color .2s}
   .herb-card:hover{transform:translateY(-4px);border-color:var(--gold)}
   .herb-head{display:flex;gap:16px;align-items:center}
-  .herb-shield{width:74px;height:88px;flex:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+  .herb-shield{width:90px;height:117px;flex:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
   .herb-name{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--gold2)}
   .herb-alias{color:var(--muted);font-size:.82rem}
   .herb-blazon{font-size:.9rem;color:var(--txt);opacity:.9;font-style:italic;
@@ -188,9 +188,9 @@
   <div class="crown">☙ ❧</div>
   <h1>Herbarz <em>Polski</em></h1>
   <div class="ornament">✦</div>
-  <p class="sub">Wyszukiwarka polskich nazwisk szlacheckich i herbów rodowych.
-     Wpisz nazwisko, aby sprawdzić, do jakiego herbu było przypisane —
-     albo przeglądaj herby alfabetycznie.</p>
+  <p class="sub">Biblioteka polskich herbów szlacheckich rysowanych wektorowo
+     i ponad tysiąc nazwisk herbowych. Wpisz nazwisko, aby sprawdzić, do jakiego
+     herbu było przypisane — albo przeglądaj katalog alfabetycznie.</p>
   <div class="searchbox">
     <input id="q" type="search" autocomplete="off" spellcheck="false"
            placeholder="Wpisz nazwisko lub nazwę herbu, np. Zaremba, Ostoja, Kowalski…">
@@ -211,9 +211,10 @@
 <section id="herby">
   <div class="wrap">
     <div class="sec-head">
-      <h2>Katalog <span>herbów rodowych</span></h2>
-      <p>Najbardziej znane polskie herby szlacheckie wraz z blazonowaniem
-         (opisem heraldycznym) i przykładami rodów pieczętujących się danym herbem.</p>
+      <h2>Biblioteka <span>herbów rodowych</span></h2>
+      <p>Polskie herby szlacheckie w wiernych rekonstrukcjach wektorowych —
+         każda tarcza z koroną, blazonowaniem (opisem heraldycznym)
+         i listą rodów pieczętujących się danym herbem.</p>
     </div>
     <div class="alpha-bar" id="alpha"></div>
     <div class="grid" id="katalog"></div>
@@ -318,64 +319,7 @@
   <a class="back" href="../../">← wróć do kolekcji</a>
 </footer>
 
-<script>
-/* ── Baza herbów: n=nazwa, a=inne nazwy, b=blazonowanie, f=barwa pola,
-     s=godło (symbol), sc=barwa godła, fam=rody/nazwiska ── */
-const HERBY = [
- {n:"Abdank",a:"Awdaniec, Habdank",b:"W polu czerwonym srebrna łękawica (litera W).",f:"#9e1b1b",s:"W",sc:"#e8ecf2",fam:["Ankwicz","Białobrzeski","Bogucki","Buczacki","Chądzyński","Doliński","Górski","Kaczkowski","Konarski","Kossowski","Kowalski","Machowski","Rogowski","Skarbek","Warszycki"]},
- {n:"Bończa",b:"W polu błękitnym jednorożec srebrny.",f:"#1e4f9e",s:"♘",sc:"#e8ecf2",fam:["Bończa","Brzeski","Bystrzycki","Fredro","Miaskowski","Osiński","Siemiątkowski","Tomaszewski"]},
- {n:"Ciołek",b:"W polu srebrnym ciołek czerwony.",f:"#dfe3ea",s:"♉",sc:"#9e1b1b",fam:["Ciołek","Ciołkowski","Czerski","Drzewiecki","Ostrołęcki","Poniatowski","Wilski","Żelechowski"]},
- {n:"Dąbrowa",b:"W polu błękitnym podkowa srebrna z trzema krzyżami.",f:"#1e4f9e",s:"∩",sc:"#e8ecf2",fam:["Chojnowski","Cichocki","Dąbrowski","Kołakowski","Uszyński","Wnorowski","Zaniewski"]},
- {n:"Doliwa",b:"W polu błękitnym skos srebrny z trzema różami czerwonymi.",f:"#1e4f9e",s:"❀",sc:"#e8ecf2",fam:["Doliwa","Smogulecki","Starczewski","Strzałkowski","Wilkowski","Wyganowski"]},
- {n:"Dołęga",b:"W polu błękitnym podkowa srebrna z krzyżem i strzałą.",f:"#1e4f9e",s:"∩↓",sc:"#e8ecf2",fam:["Chełmicki","Dołęga","Głowiński","Kretkowski","Lasocki","Lewandowski","Mniszewski","Narzymski","Orłowski","Osiecki"]},
- {n:"Drzewica",b:"W polu błękitnym półksiężyc z dwiema gwiazdami złotymi.",f:"#1e4f9e",s:"☽★",sc:"#d4af37",fam:["Cieszkowski","Drzewicki","Goły","Machnicki"]},
- {n:"Godziemba",b:"W polu czerwonym sosna zielona o trzech wierzchołkach.",f:"#9e1b1b",s:"↟",sc:"#3fae6a",fam:["Dąmbski","Godziemba","Lubrański","Pigłowski","Sosnowski"]},
- {n:"Gozdawa",b:"W polu czerwonym podwójna lilia srebrna.",f:"#9e1b1b",s:"⚜",sc:"#e8ecf2",fam:["Bieniewski","Gozdawski","Krzywiński","Mikołajewski","Pac","Russocki"]},
- {n:"Gryf",a:"Jaksa",b:"W polu czerwonym gryf srebrny wspięty.",f:"#9e1b1b",s:"G",sc:"#e8ecf2",fam:["Branicki","Chmielecki","Gryfita","Jaksa","Mielecki","Ślizień","Żmigrodzki"]},
- {n:"Grzymała",b:"W polu złotym mur czerwony z trzema wieżami.",f:"#c9a227",s:"♜",sc:"#9e1b1b",fam:["Bukowiecki","Grudziński","Grzymała","Kosmowski","Potulicki","Przyjemski","Słupski"]},
- {n:"Janina",b:"W polu czerwonym tarcza (pawęż) srebrna.",f:"#9e1b1b",s:"⛨",sc:"#e8ecf2",fam:["Janiński","Sobieski","Strzemeski","Suchodolski","Wielopolski"]},
- {n:"Jastrzębiec",a:"Boleścic, Zarazy",b:"W polu błękitnym podkowa złota z krzyżem, na hełmie jastrząb.",f:"#1e4f9e",s:"∩✚",sc:"#d4af37",fam:["Bełżecki","Boratyński","Gąsiorowski","Jastrzębski","Kozłowski","Łubieński","Myszkowski","Niemojewski","Ostrowski","Rzeszowski","Zaborowski","Zborowski"]},
- {n:"Jelita",a:"Koźlarogi",b:"W polu czerwonym trzy kopie złote w gwiazdę.",f:"#9e1b1b",s:"⋔",sc:"#d4af37",fam:["Borzęcki","Kurdwanowski","Mokrski","Płaza","Romer","Zamoyski","Żeromski"]},
- {n:"Junosza",b:"W polu czerwonym baran srebrny na murawie.",f:"#9e1b1b",s:"♈",sc:"#e8ecf2",fam:["Bielski","Junosza","Karnkowski","Piaseczyński","Piotrowski","Podoski","Rościszewski","Załuski"]},
- {n:"Korab",b:"W polu czerwonym korab złoty z masztem-wieżą.",f:"#9e1b1b",s:"⚓",sc:"#d4af37",fam:["Kobierzycki","Korab","Kowalski","Łaski","Wierusz","Zapolski"]},
- {n:"Korczak",b:"W polu czerwonym trzy wręby srebrne.",f:"#9e1b1b",s:"☰",sc:"#e8ecf2",fam:["Bałaban","Braniecki","Hulewicz","Komorowski","Korczak","Krupski","Radecki"]},
- {n:"Kościesza",a:"Strzegomia",b:"W polu czerwonym rogacina rozdarta srebrna z krzyżem.",f:"#9e1b1b",s:"↑",sc:"#e8ecf2",fam:["Chodkiewicz","Gosławski","Kościesza","Piłsudski","Strzegomski","Wysocki"]},
- {n:"Leliwa",b:"W polu błękitnym półksiężyc złoty, nad nim gwiazda złota.",f:"#1e4f9e",s:"☽★",sc:"#d4af37",fam:["Czapski","Granowski","Hlebowicz","Melsztyński","Morsztyn","Pilecki","Sieniawski","Tarnowski","Tyszkiewicz"]},
- {n:"Lis",a:"Mzura",b:"W polu czerwonym strzała srebrna dwukrotnie przekrzyżowana.",f:"#9e1b1b",s:"‡",sc:"#e8ecf2",fam:["Lisowski","Mzurowski","Sapieha","Świętorzecki","Wierzbięta"]},
- {n:"Lubicz",b:"W polu błękitnym podkowa srebrna z dwoma krzyżami.",f:"#1e4f9e",s:"∩✚",sc:"#e8ecf2",fam:["Grabowski","Kuczyński","Lubowidzki","Lubicz","Milewski","Perkowski","Rekowski","Szepietowski","Wysocki","Żórawski"]},
- {n:"Łabędź",b:"W polu czerwonym łabędź srebrny.",f:"#9e1b1b",s:"Ł",sc:"#e8ecf2",fam:["Dunin","Duninowski","Modliszewski","Rzuchowski","Skrzyński","Szpotański"]},
- {n:"Łodzia",b:"W polu czerwonym łódź złota.",f:"#9e1b1b",s:"◡",sc:"#d4af37",fam:["Bniński","Górka","Łodzia","Opaliński","Ponikiewski","Rogaliński","Szołdrski"]},
- {n:"Nałęcz",b:"W polu czerwonym nałęczka srebrna zawiązana.",f:"#9e1b1b",s:"◠",sc:"#e8ecf2",fam:["Czarnkowski","Gembicki","Małachowski","Moszczeński","Nałęcz","Ostroróg","Raczyński","Sadowski","Szamotulski"]},
- {n:"Nieczuja",b:"W polu czerwonym ostrzew srebrny z krzyżem.",f:"#9e1b1b",s:"Y",sc:"#e8ecf2",fam:["Dembowski","Nieczuja","Ostrowski","Sieklicki","Urbański"]},
- {n:"Nowina",a:"Złotogoleńczyk",b:"W polu błękitnym ucho kotłowe srebrne z mieczem.",f:"#1e4f9e",s:"℧",sc:"#e8ecf2",fam:["Jankowski","Kwiatkowski","Nowicki","Nowina","Wilkoński","Złotnicki"]},
- {n:"Odrowąż",b:"W polu czerwonym strzała srebrna z zawiasami (wąsami).",f:"#9e1b1b",s:"Ψ",sc:"#e8ecf2",fam:["Białaczowski","Chlewicki","Odrowąż","Pieniążek","Sprowski","Szydłowiecki"]},
- {n:"Ogończyk",a:"Powała",b:"W polu czerwonym półpierścień srebrny ze strzałą.",f:"#9e1b1b",s:"◠↑",sc:"#e8ecf2",fam:["Działyński","Kościelecki","Kucharski","Ogończyk","Sierakowski","Zakrzewski"]},
- {n:"Oksza",b:"W polu czerwonym oksza (topór) srebrna.",f:"#9e1b1b",s:"⛏",sc:"#e8ecf2",fam:["Grabowski","Okszyc","Orzechowski","Rej","Rejowski","Włodkowic"]},
- {n:"Ostoja",b:"W polu czerwonym dwa półksiężyce złote i miecz.",f:"#9e1b1b",s:"☾†☽",sc:"#d4af37",fam:["Błociszewski","Bzowski","Chełmski","Czechowski","Danielecki","Ostaszewski","Ostoja","Ścibor"]},
- {n:"Pilawa",b:"W polu błękitnym półtrzecia krzyża srebrnego.",f:"#1e4f9e",s:"✞",sc:"#e8ecf2",fam:["Kamieniecki","Moskorzewski","Pilawski","Potocki"]},
- {n:"Pobóg",b:"W polu błękitnym podkowa srebrna z krzyżem zaćwieczonym.",f:"#1e4f9e",s:"∩†",sc:"#e8ecf2",fam:["Koniecpolski","Maciejowski","Pobóg","Poborski","Rokitnicki"]},
- {n:"Pomian",b:"W polu złotym głowa żubrza czarna przeszyta mieczem.",f:"#c9a227",s:"P",sc:"#1c1c22",fam:["Kossobudzki","Łukowski","Pomianowski","Rusiecki","Wichrowski"]},
- {n:"Poraj",a:"Róża",b:"W polu czerwonym róża srebrna pięciolistna.",f:"#9e1b1b",s:"✿",sc:"#e8ecf2",fam:["Bużeński","Chodakowski","Kurozwęcki","Poraj","Różycki"]},
- {n:"Prawdzic",b:"W polu błękitnym lew złoty z pierścieniem (prawdą).",f:"#1e4f9e",s:"♌",sc:"#d4af37",fam:["Grzybowski","Prawdzic","Szczawiński","Ujejski","Zapolski"]},
- {n:"Prus",a:"Prus I, Turzyna",b:"W polu czerwonym półtora krzyża srebrnego.",f:"#9e1b1b",s:"†",sc:"#e8ecf2",fam:["Głowacki","Obidziński","Prus","Windyka","Wiśniewski"]},
- {n:"Radwan",a:"Wierzbowa",b:"W polu czerwonym chorągiew kościelna złota z krzyżem.",f:"#9e1b1b",s:"⚑",sc:"#d4af37",fam:["Babski","Judycki","Malczewski","Radwan","Radwański","Zebrzydowski"]},
- {n:"Rawicz",a:"Rawa",b:"W polu złotym panna w koronie na niedźwiedziu czarnym.",f:"#c9a227",s:"R",sc:"#1c1c22",fam:["Dembiński","Gawroński","Grotowski","Prażmowski","Rawicz","Warszewicki"]},
- {n:"Rogala",b:"W polu srebrnym róg jeleni czerwony i róg bawoli czarny.",f:"#dfe3ea",s:"⋎",sc:"#9e1b1b",fam:["Kownacki","Rogala","Rogalski","Wężyk","Zawadzki"]},
- {n:"Rola",b:"W polu czerwonym róża srebrna z trzema krojami.",f:"#9e1b1b",s:"❁",sc:"#e8ecf2",fam:["Nadolski","Rola","Rolicz","Szczawiński","Wilczewski"]},
- {n:"Sas",a:"Drag",b:"W polu błękitnym półksiężyc złoty, strzała i dwie gwiazdy.",f:"#1e4f9e",s:"★↑★",sc:"#d4af37",fam:["Baczyński","Bandrowski","Berezowski","Bilinski","Czajkowski","Dzieduszycki","Hoszowski","Ilnicki","Komarnicki","Kulczycki","Sozański","Tarnawski","Witwicki","Żurakowski"]},
- {n:"Sulima",b:"W polu dwudzielnym: pół orła czarnego w złocie, trzy kamienie w czerwieni.",f:"#1c1c22",s:"S",sc:"#d4af37",fam:["Gamrat","Oporowski","Sulimowski","Zawisza"]},
- {n:"Szeliga",b:"W polu czerwonym półksiężyc złoty z krzyżem.",f:"#9e1b1b",s:"☽✚",sc:"#d4af37",fam:["Szeliga","Szeligowski","Tłubicki","Żelski"]},
- {n:"Szreniawa",a:"Śreniawa, Krzywaśń",b:"W polu czerwonym krzywaśń (rzeka) srebrna z krzyżem.",f:"#9e1b1b",s:"≈",sc:"#e8ecf2",fam:["Kmita","Lubomirski","Rupniewski","Stadnicki","Szreniawski"]},
- {n:"Ślepowron",a:"Korwin ślepy",b:"W polu błękitnym podkowa z krzyżem, na nim kruk z pierścieniem.",f:"#1e4f9e",s:"∩✟",sc:"#e8ecf2",fam:["Gosiewski","Kamieński","Kamiński","Kossakowski","Krasiński","Milewski","Ślepowroński","Wąsowicz"]},
- {n:"Świnka",b:"W polu czerwonym głowa dzika srebrna.",f:"#9e1b1b",s:"Ś",sc:"#e8ecf2",fam:["Świnka","Zajączkowski","Zieliński","Żychliński"]},
- {n:"Topór",a:"Starża",b:"W polu czerwonym topór srebrny.",f:"#9e1b1b",s:"⚒",sc:"#e8ecf2",fam:["Balicki","Ossoliński","Tarło","Tęczyński","Toporczyk","Zaklika"]},
- {n:"Trąby",b:"W polu srebrnym trzy trąby czarne w gwiazdę.",f:"#dfe3ea",s:"T",sc:"#1c1c22",fam:["Brzuchowski","Jordan","Radziwiłł","Trąbski"]},
- {n:"Wczele",b:"Pole szachowane złoto-czarne (szachownica).",f:"#c9a227",s:"▦",sc:"#1c1c22",fam:["Objezierski","Skoroszewski","Wczele","Zdzychowski"]},
- {n:"Wieniawa",b:"W polu złotym głowa żubrza czarna z pierścieniem w nozdrzach.",f:"#c9a227",s:"ʘ",sc:"#1c1c22",fam:["Długosz","Leszczyński","Wieniawski"]},
- {n:"Zadora",a:"Płomienie",b:"W polu błękitnym głowa lwia srebrna ziejąca płomieniami.",f:"#1e4f9e",s:"Z",sc:"#e8ecf2",fam:["Lanckoroński","Zadora","Zbąski"]},
- {n:"Zaremba",b:"W polu czerwonym pół lwa czarnego nad murem srebrnym.",f:"#9e1b1b",s:"Ƶ",sc:"#e8ecf2",fam:["Cielecki","Kalinowski","Zaremba","Zarembski","Zarębski"]},
-];
-</script>
+<script src="herby.js"></script>
 
 <script>
 /* ── pomocnicze ── */
@@ -386,16 +330,41 @@ const norm = s => s.toLowerCase()
 const stem = s => s.replace(/ska$/,"ski").replace(/cka$/,"cki").replace(/dzka$/,"dzki");
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+/* pełny wektorowy kartusz: korona szlachecka + tarcza + kompozycja godeł */
+let __svgId = 0;
 function shieldSVG(h){
-  const fs = h.s.length>2 ? 15 : h.s.length>1 ? 22 : 32;
-  return `<svg class="herb-shield" viewBox="0 0 74 88" aria-hidden="true">
-    <path d="M37 3 69 14v26c0 20-13.5 33.5-32 42C18.5 73.5 5 60 5 40V14z"
-          fill="${h.f}" stroke="#d4af37" stroke-width="2.5"/>
-    <path d="M37 8 64 17.5V40c0 16.5-11 28.5-27 36.5C21 68.5 10 56.5 10 40V17.5z"
-          fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
-    <text x="37" y="46" text-anchor="middle" dominant-baseline="middle"
-          font-size="${fs}" font-weight="bold" fill="${h.sc}"
-          font-family="Georgia,serif">${h.s}</text>
+  const SP = "M60 24 L104 36 V72 C104 100 86 120 60 134 C34 120 16 100 16 72 V36 Z";
+  const id = ++__svgId;
+  let inner = "";
+  if(h.f2) inner += `<rect x="8" y="86" width="104" height="54" fill="${h.f2}"/>`;
+  for(const it of (h.g || [])){
+    const [c, x, y, s, fill, rot, mir] = it;
+    let g = (GODLA[c] || "").replaceAll("FILL", fill || "#e8ecf2");
+    let tr = `translate(${x},${y})`;
+    if(rot) tr += ` rotate(${rot})`;
+    if(mir) tr += ` scale(-1,1)`;
+    tr += ` scale(${s/100}) translate(-50,-50)`;
+    inner += `<g transform="${tr}">${g}</g>`;
+  }
+  return `<svg class="herb-shield" viewBox="0 -4 120 158" aria-hidden="true">
+    <defs>
+      <clipPath id="cp${id}"><path d="${SP}"/></clipPath>
+      <linearGradient id="gl${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff" stop-opacity=".26"/>
+        <stop offset=".45" stop-color="#fff" stop-opacity="0"/>
+        <stop offset="1" stop-color="#000" stop-opacity=".30"/>
+      </linearGradient>
+    </defs>
+    <g fill="#d4af37" stroke="#8a6d1f" stroke-width=".8">
+      <path d="M40 21 L37 7 L50 15 L60 3 L70 15 L83 7 L80 21 Z"/>
+      <circle cx="37" cy="5" r="2.6"/><circle cx="60" cy="1.5" r="2.6"/><circle cx="83" cy="5" r="2.6"/>
+      <rect x="35" y="19" width="50" height="5.5" rx="2.7"/>
+    </g>
+    <path d="${SP}" fill="${h.f}"/>
+    <g clip-path="url(#cp${id})">${inner}<path d="${SP}" fill="url(#gl${id})"/></g>
+    <path d="M60 30 L98 40.5 V72 C98 96 82 114 60 127 C38 114 22 96 22 72 V40.5 Z"
+          fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/>
+    <path d="${SP}" fill="none" stroke="#d4af37" stroke-width="3.2"/>
   </svg>`;
 }
 
