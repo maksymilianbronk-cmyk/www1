@@ -186,7 +186,7 @@ const SITES = [
   {
     slug: "axio1-detailing",
     title: "AXIO1 Mobilny Detailing — Mazowieckie",
-    desc: "Luksusowy czarno-złoty landing dla firmy AXIO1 mobilny detailing (Dominik Gawryszewski, woj. mazowieckie): 6 usług z formularza leada — mycie detailingowe, pranie tapicerki, czyszczenie wnętrza, ozonowanie, impregnacja skóry, detailing kamperów i łodzi. Złoty pył na canvasie HTML5, parallax hero, rysowane ikony SVG usług i szkic auta, marquee usług, liczniki, pasek postępu, tilt kart. Zdjęcia Pixabay z kaskadą zapasowych źródeł, formularz wyceny (mailto), prawdziwy telefon i e-mail.",
+    desc: "Luksusowy czarno-złoty landing dla firmy AXIO1 mobilny detailing (Dominik Gawryszewski, woj. mazowieckie): prawdziwe logo odwzorowane wektorowo (SVG), realny cennik z Booksy (wosk Long Life 250 zł, Premium 12 msc, voucher 149 zł) z przyciskami Umów, baner rezerwacji Booksy pod hero, linki do filmików z realizacji na Instagramie i TikToku. Złoty pył na canvasie HTML5, parallax hero, rysowane ikony SVG usług i szkic auta, marquee usług, liczniki, pasek postępu, tilt kart. Zdjęcia Pixabay z kaskadą zapasowych źródeł, formularz wyceny (mailto), prawdziwy telefon i e-mail.",
     icon: "🚘",
     tag: "landing",
     preview: true,
