@@ -6,104 +6,211 @@
 <title>Drzewo genealogiczne rodziny von Bronk (Niepoczołowski)</title>
 <style>
   :root{
-    --ink:#1c2b4a;
-    --ink-soft:#3d517c;
-    --paper:#f3efe4;
-    --paper-deep:#e9e3d2;
-    --box:#ffffff;
-    --box-line:#8fa0c4;
-    --accent:#8c6a2f;
-    --lit:#b3541e;
+    --ink:#2b3648;
+    --ink-soft:#6b7688;
+    --bg:#f1f3f8;
+    --card:#ffffff;
+    --card-line:#dde3ec;
+    --accent:#ef7a1a;         /* pomarańcz w stylu MyHeritage */
+    --accent-deep:#d05e04;
+    --male:#aac8ea;  --male-ink:#27507c;
+    --female:#f3b9c8;--female-ink:#8c3a55;
+    --edge:#b6bfce;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden}
   body{
     font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
-    background:var(--paper);
+    background:
+      radial-gradient(circle at 20% 0%, #ffffff 0%, transparent 45%),
+      var(--bg);
     color:var(--ink);
   }
   /* ---------- pasek górny ---------- */
   header{
-    position:fixed;inset:0 0 auto 0;z-index:20;
-    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    position:fixed;inset:0 0 auto 0;z-index:30;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
     padding:10px 16px;
-    background:linear-gradient(180deg,#16223c 0%,#1c2b4a 100%);
-    color:#f2ecdd;box-shadow:0 2px 14px rgba(20,30,60,.35);
+    background:#ffffff;
+    border-bottom:1px solid #e4e8f0;
+    box-shadow:0 2px 12px rgba(35,48,77,.08);
   }
   header h1{
-    font-size:15px;letter-spacing:.06em;font-weight:600;
-    display:flex;align-items:center;gap:9px;white-space:nowrap;
+    font-size:15px;letter-spacing:.02em;font-weight:700;color:var(--ink);
+    display:flex;align-items:center;gap:10px;white-space:nowrap;
   }
-  header h1 .crest{font-size:20px}
+  header h1 .crest{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),#f9a825);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    box-shadow:0 2px 6px rgba(239,122,26,.4);
+  }
   header h1 small{
-    display:block;font-size:10.5px;font-weight:400;letter-spacing:.12em;
-    color:#c9bfa4;text-transform:uppercase;
+    display:block;font-size:10px;font-weight:500;letter-spacing:.14em;
+    color:#98a2b6;text-transform:uppercase;
   }
-  .tools{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+  header h1 .short{display:none}
+  .tools{display:flex;align-items:center;gap:7px;margin-left:auto;flex-wrap:wrap}
   .tools input[type=search]{
-    width:min(280px,60vw);padding:7px 12px;border-radius:8px;border:1px solid #46598a;
-    background:#0f1930;color:#f2ecdd;font-size:13px;outline:none;
+    width:min(250px,56vw);padding:8px 13px;border-radius:20px;border:1px solid #d7dde8;
+    background:#f5f7fb;color:var(--ink);font-size:13px;outline:none;
   }
-  .tools input[type=search]::placeholder{color:#8b97b8}
+  .tools input[type=search]:focus{border-color:var(--accent)}
   .tools button{
-    min-width:34px;height:34px;padding:0 10px;border-radius:8px;border:1px solid #46598a;
-    background:#26375e;color:#f2ecdd;font-size:15px;cursor:pointer;line-height:1;
+    min-width:34px;height:34px;padding:0 11px;border-radius:17px;border:1px solid #d7dde8;
+    background:#fff;color:var(--ink);font-size:14px;cursor:pointer;line-height:1;
+    transition:background .15s,border-color .15s;
   }
-  .tools button:hover{background:#33477a}
-  .tools button.txt{font-size:12px;letter-spacing:.04em}
+  .tools button:hover{background:#fdf1e6;border-color:var(--accent);color:var(--accent-deep)}
+  .tools button.txt{font-size:12px;letter-spacing:.02em;font-weight:600}
   /* ---------- scena ---------- */
   #stage{position:fixed;inset:0;cursor:grab;touch-action:none}
   #stage.panning{cursor:grabbing}
   svg{width:100%;height:100%;display:block}
-  /* ---------- węzły ---------- */
-  .node rect{
-    fill:var(--box);stroke:var(--box-line);stroke-width:1.1;
-    rx:6;
+  /* ---------- karty osób ---------- */
+  .node rect.card{
+    fill:var(--card);stroke:var(--card-line);stroke-width:1.2;rx:12;
+    filter:drop-shadow(0 2px 3px rgba(35,48,77,.10));
   }
-  .node .genbar{stroke:none}
   .node text{fill:var(--ink);pointer-events:none}
   .node .nm{font-size:11.5px;font-weight:600}
-  .node .dt{font-size:9.3px;fill:var(--ink-soft)}
+  .node .dt{font-size:9.2px;fill:var(--ink-soft)}
+  .node .avt{font-size:12px;font-weight:700;pointer-events:none}
+  .node .av.m{fill:var(--male)} .node .avt.m{fill:var(--male-ink)}
+  .node .av.k{fill:var(--female)} .node .avt.k{fill:var(--female-ink)}
   .node{cursor:pointer}
-  .node:hover rect.card{stroke:var(--accent);stroke-width:1.6}
-  .edge{stroke:#93856a;stroke-width:1.4;fill:none}
-  .mline{stroke:#93856a;stroke-width:1.1;fill:none}
-  .glabel{font-size:26px;font-weight:700;fill:#c9bda0;letter-spacing:.1em}
-  .fragbox{fill:none;stroke:#b3a37e;stroke-dasharray:7 6;stroke-width:1.6;rx:14}
-  .fraglabel{font-size:15px;font-weight:600;fill:#8c6a2f;letter-spacing:.05em}
+  .node:hover rect.card{stroke:var(--accent);stroke-width:1.8}
+  .node.selected rect.card{stroke:var(--accent);stroke-width:2.4}
+  .edge{stroke:var(--edge);stroke-width:1.5;fill:none}
+  .mline{stroke:var(--edge);stroke-width:1.3;fill:none}
+  .mring{fill:none;stroke:#c9a24b;stroke-width:1.4}
+  .glabel{font-size:26px;font-weight:800;fill:#d3d9e5;letter-spacing:.1em}
+  .fragbox{fill:none;stroke:#c4b58d;stroke-dasharray:7 6;stroke-width:1.6;rx:14}
+  .fraglabel{font-size:15px;font-weight:600;fill:#a07c33;letter-spacing:.04em}
+  /* przyciski szybkiego dodawania na karcie */
+  .qa circle{fill:var(--accent);stroke:#fff;stroke-width:1.6}
+  .qa text{fill:#fff;font-size:13px;font-weight:700;pointer-events:none}
+  .qa{opacity:0;pointer-events:none;transition:opacity .15s;cursor:pointer}
+  .node:hover .qa,.node.selected .qa{opacity:1;pointer-events:auto}
+  .qa:hover circle{fill:var(--accent-deep)}
   /* podświetlenie linii krwi */
-  .dimmed .node,.dimmed .edge,.dimmed .mline{opacity:.16}
-  .dimmed .node.lit,.dimmed .edge.lit,.dimmed .mline.lit{opacity:1}
-  .node.lit rect.card{stroke:var(--lit);stroke-width:2}
-  .edge.lit{stroke:var(--lit);stroke-width:2.2}
-  .node.found rect.card{stroke:var(--lit);stroke-width:2.6;filter:drop-shadow(0 0 6px rgba(179,84,30,.8))}
-  /* ---------- panel informacyjny ---------- */
+  .dimmed .node,.dimmed .edge,.dimmed .mline,.dimmed .mring{opacity:.14}
+  .dimmed .node.lit,.dimmed .edge.lit{opacity:1}
+  .edge.lit{stroke:var(--accent);stroke-width:2.4}
+  .node.found rect.card{stroke:var(--accent-deep);stroke-width:2.6;filter:drop-shadow(0 0 8px rgba(239,122,26,.65))}
+  /* ---------- panel osoby ---------- */
+  #panel{
+    position:fixed;top:66px;right:14px;bottom:14px;z-index:25;
+    width:min(330px,calc(100vw - 28px));
+    background:#fff;border:1px solid #e2e7f0;border-radius:16px;
+    box-shadow:0 12px 40px rgba(35,48,77,.18);
+    padding:20px 18px 16px;overflow-y:auto;
+    transform:translateX(110%);transition:transform .25s ease;
+  }
+  #panel.open{transform:none}
+  #panel .close{
+    position:absolute;top:10px;right:12px;border:0;background:none;font-size:17px;
+    cursor:pointer;color:#9aa4b8;
+  }
+  #panel .pav{
+    width:74px;height:74px;border-radius:50%;margin:2px auto 10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:700;color:#fff;
+    box-shadow:0 4px 12px rgba(35,48,77,.2);
+  }
+  #panel .pav.m{background:linear-gradient(135deg,#7ba4d6,#4c78ab);color:#eaf2fc}
+  #panel .pav.k{background:linear-gradient(135deg,#e79bb1,#c15c7f);color:#fdeef3}
+  #panel h2{font-size:17px;text-align:center;margin-bottom:2px}
+  #panel .pdates{font-size:12.5px;color:var(--ink-soft);text-align:center;margin-bottom:4px}
+  #panel .pnote{font-size:12px;color:#a07c33;text-align:center;font-style:italic;margin-bottom:6px}
+  #panel h3{
+    font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:#98a2b6;
+    margin:13px 0 6px;border-bottom:1px solid #eef1f6;padding-bottom:4px;
+  }
+  .chip{
+    display:flex;align-items:center;gap:8px;width:100%;
+    padding:6px 8px;margin-bottom:4px;border:1px solid #e8ecf3;border-radius:10px;
+    background:#f8fafd;cursor:pointer;text-align:left;font-size:12.5px;color:var(--ink);
+  }
+  .chip:hover{border-color:var(--accent);background:#fdf3ea}
+  .chip .cav{
+    width:26px;height:26px;border-radius:50%;flex:0 0 26px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:700;
+  }
+  .chip .cav.m{background:var(--male);color:var(--male-ink)}
+  .chip .cav.k{background:var(--female);color:var(--female-ink)}
+  .chip small{display:block;color:var(--ink-soft);font-size:10.5px}
+  .pbtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:14px}
+  .pbtns button{
+    padding:9px 6px;border-radius:10px;border:1px solid #d7dde8;background:#fff;
+    font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;
+  }
+  .pbtns button:hover{border-color:var(--accent);color:var(--accent-deep);background:#fdf3ea}
+  .pbtns button.primary{
+    grid-column:1 / -1;background:var(--accent);border-color:var(--accent);color:#fff;
+  }
+  .pbtns button.primary:hover{background:var(--accent-deep)}
+  .pbtns button.danger:hover{border-color:#c0392b;color:#c0392b;background:#fdeeec}
+  /* ---------- modal edycji ---------- */
+  #ovl{
+    position:fixed;inset:0;z-index:40;background:rgba(30,40,60,.45);
+    display:none;align-items:center;justify-content:center;padding:16px;
+  }
+  #ovl.open{display:flex}
+  #modal{
+    width:min(360px,94vw);background:#fff;border-radius:16px;
+    box-shadow:0 20px 60px rgba(20,30,50,.35);padding:20px 20px 16px;
+  }
+  #modal h3{font-size:15px;margin-bottom:12px;color:var(--ink)}
+  #modal label{display:block;font-size:11px;font-weight:600;color:#7a8499;
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+  #modal input,#modal select{
+    display:block;width:100%;margin-top:4px;padding:8px 11px;font-size:13.5px;
+    border:1px solid #d7dde8;border-radius:9px;outline:none;color:var(--ink);
+    font-family:inherit;
+  }
+  #modal input:focus,#modal select:focus{border-color:var(--accent)}
+  #modal .mrow{display:flex;gap:10px}
+  #modal .mrow label{flex:1}
+  #modal .mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+  #modal .mbtns button{
+    padding:9px 16px;border-radius:9px;border:1px solid #d7dde8;background:#fff;
+    font-size:13px;font-weight:600;cursor:pointer;color:var(--ink);
+  }
+  #modal .mbtns .save{background:var(--accent);border-color:var(--accent);color:#fff}
+  #modal .mbtns .save:hover{background:var(--accent-deep)}
+  /* ---------- drobiazgi ---------- */
+  #hint{
+    position:fixed;left:14px;bottom:14px;z-index:15;
+    background:rgba(43,54,72,.88);color:#eef1f6;border-radius:10px;
+    padding:8px 13px;font-size:11.5px;letter-spacing:.02em;pointer-events:none;
+    transition:opacity .6s;
+  }
+  #toast{
+    position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:50;
+    background:#2f9e44;color:#fff;padding:8px 16px;border-radius:20px;
+    font-size:12.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .3s;
+  }
+  #toast.err{background:#c0392b}
   #info{
-    position:fixed;right:14px;bottom:14px;z-index:20;width:min(360px,calc(100vw - 28px));
-    background:#fffdf6;border:1px solid #d6c9a8;border-radius:12px;
-    box-shadow:0 8px 30px rgba(40,30,10,.18);
-    padding:14px 16px;font-size:12.5px;line-height:1.55;color:#43405a;
-    display:none;
+    position:fixed;left:14px;bottom:52px;z-index:26;width:min(360px,calc(100vw - 28px));
+    background:#fff;border:1px solid #e2e7f0;border-radius:14px;
+    box-shadow:0 10px 34px rgba(35,48,77,.16);
+    padding:14px 16px;font-size:12.5px;line-height:1.55;color:#4a5468;display:none;
   }
   #info.open{display:block}
   #info h2{font-size:13.5px;color:var(--ink);margin-bottom:6px}
   #info p{margin-bottom:7px}
   #info .sym{display:inline-block;min-width:30px;font-weight:700;color:var(--ink)}
-  #info .close{
-    position:absolute;top:8px;right:10px;border:0;background:none;font-size:16px;
-    cursor:pointer;color:#8a8060;
-  }
-  #hint{
-    position:fixed;left:14px;bottom:14px;z-index:15;
-    background:rgba(28,43,74,.85);color:#e8e0cb;border-radius:10px;
-    padding:8px 13px;font-size:11.5px;letter-spacing:.03em;pointer-events:none;
-    transition:opacity .6s;
-  }
-  header h1 .short{display:none}
+  #info .close{position:absolute;top:8px;right:10px;border:0;background:none;font-size:16px;cursor:pointer;color:#9aa4b8}
   @media(max-width:640px){
     header h1 span.full{display:none}
     header h1 .short{display:inline}
     #hint{display:none}
+    #panel{top:auto;right:0;left:0;bottom:0;width:100%;max-height:55vh;border-radius:16px 16px 0 0;
+      transform:translateY(110%)}
+    #panel.open{transform:none}
   }
 </style>
 </head>
@@ -112,7 +219,7 @@
 <header>
   <h1><span class="crest">🦌</span>
     <span>
-      <span class="full">Drzewo genealogiczne rodziny von Bronk</span><span class="short">Rodzina von Bronk</span>
+      <span class="full">Drzewo rodziny von Bronk</span><span class="short">von Bronk</span>
       <small>Niepoczołowski · herb: jeleń w studni · 1721 → dziś</small>
     </span>
   </h1>
@@ -121,36 +228,80 @@
     <datalist id="names"></datalist>
     <button id="zi" title="Przybliż">+</button>
     <button id="zo" title="Oddal">−</button>
-    <button id="fit" class="txt" title="Pokaż całość">⤢ całość</button>
-    <button id="root" class="txt" title="Pokaż korzeń rodu">⌂ korzeń</button>
+    <button id="fit" class="txt" title="Pokaż całość">⤢</button>
+    <button id="root" class="txt" title="Pokaż korzeń rodu">⌂</button>
+    <button id="exp" class="txt" title="Eksportuj dane (JSON)">💾</button>
+    <button id="imp" class="txt" title="Importuj dane (JSON)">📥</button>
+    <button id="rst" class="txt" title="Przywróć oryginalne drzewo">↺</button>
     <button id="inf" class="txt" title="Legenda">ℹ️</button>
+    <input type="file" id="impfile" accept="application/json" style="display:none">
   </div>
 </header>
 
 <div id="stage"><svg id="svg" preserveAspectRatio="xMidYMid meet"></svg></div>
 
-<div id="hint">Przeciągaj, aby przesuwać · kółko / szczypnięcie = zoom · kliknij osobę = linia krwi</div>
+<div id="hint">Przeciągaj i zoomuj · kliknij osobę = szczegóły i edycja · najedź na kartę = szybkie dodawanie ⊕</div>
+<div id="toast">✓ zapisano</div>
+
+<!-- panel szczegółów osoby -->
+<aside id="panel">
+  <button class="close" id="pclose">✕</button>
+  <div class="pav" id="pav"></div>
+  <h2 id="pname"></h2>
+  <div class="pdates" id="pdates"></div>
+  <div class="pnote" id="pnote"></div>
+  <div id="prels"></div>
+  <div class="pbtns">
+    <button class="primary" id="bedit">✏️ Edytuj dane</button>
+    <button id="baddsp">💍 Dodaj małżonka</button>
+    <button id="baddch">👶 Dodaj dziecko</button>
+    <button class="danger" id="bdel" style="grid-column:1 / -1">🗑 Usuń osobę</button>
+  </div>
+</aside>
+
+<!-- modal edycji -->
+<div id="ovl">
+  <div id="modal">
+    <h3 id="mtitle">Edytuj osobę</h3>
+    <label>Imię i nazwisko<input id="f_n" autocomplete="off"></label>
+    <div class="mrow">
+      <label>Urodzenie<input id="f_b" placeholder="dd.mm.rrrr" autocomplete="off"></label>
+      <label>Śmierć<input id="f_d" placeholder="dd.mm.rrrr" autocomplete="off"></label>
+    </div>
+    <label>Adnotacja<input id="f_note" autocomplete="off"></label>
+    <label>Płeć
+      <select id="f_g">
+        <option value="">rozpoznaj automatycznie</option>
+        <option value="m">mężczyzna</option>
+        <option value="k">kobieta</option>
+      </select>
+    </label>
+    <div class="mbtns">
+      <button type="button" id="mcancel">Anuluj</button>
+      <button type="button" class="save" id="msave">Zapisz</button>
+    </div>
+  </div>
+</div>
 
 <div id="info">
   <button class="close" id="infx">✕</button>
-  <h2>Jak czytać to drzewo</h2>
-  <p><span class="sym">ur./zm.</span> daty urodzenia i śmierci (format z oryginalnego wydruku)</p>
-  <p><span class="sym">=</span> linia pozioma między kartami — małżeństwo / związek</p>
-  <p><span class="sym">?</span> odczyt z fotografii niepewny (kadr nieostry lub zasłonięty)</p>
-  <p><span class="sym">🖱</span> kliknięcie osoby podświetla jej przodków i potomków; kliknięcie tła wyłącza podświetlenie</p>
-  <p style="border-top:1px dashed #d6c9a8;padding-top:7px">
+  <h2>Jak korzystać</h2>
+  <p><span class="sym">🖱</span> kliknięcie osoby otwiera panel szczegółów z edycją; kliknięcie tła zamyka</p>
+  <p><span class="sym">⊕</span> po najechaniu na kartę: pomarańczowy plus u dołu dodaje dziecko, z boku — małżonka</p>
+  <p><span class="sym">💾</span> każda zmiana zapisuje się automatycznie w tej przeglądarce; eksport/import JSON w pasku górnym, ↺ przywraca oryginał</p>
+  <p><span class="sym">?</span> odczyt z fotografii wydruku niepewny</p>
+  <p style="border-top:1px dashed #e2e7f0;padding-top:7px">
     Drzewo odtworzono z 11 fotografii wydruku <em>„Drzewo genealogiczne rodziny von Bronk (Niepoczołowski)"</em>.
-    Fragmenty nieczytelne na zdjęciach (m.in. część gałęzi Otto Bonawentury, rodzin Warta, Grabalnego i Kuc
-    oraz pojedyncze daty) pominięto lub oznaczono „?". Dane łatwo poprawić — wszystkie osoby są w jednej
-    strukturze <code>DANE</code> w kodzie strony.
+    Fragmenty nieczytelne pominięto lub oznaczono „?".
   </p>
-  <p id="stat" style="color:#8c6a2f;font-weight:600"></p>
+  <p id="stat" style="color:var(--accent-deep);font-weight:600"></p>
 </div>
 
 <script>
 /* ==========================================================================
-   DANE — odtworzone z fotografii wydruku.
-   n = imię i nazwisko, b = ur., d = zm., s = małżonkowie, c = dzieci, note = uwaga
+   DANE ORYGINALNE — odtworzone z fotografii wydruku.
+   n = imię i nazwisko, b = ur., d = zm., s = małżonkowie, c = dzieci,
+   note = uwaga, g = płeć (m/k, brak = rozpoznanie automatyczne).
    "?" przy dacie / nazwisku = odczyt niepewny.
    ========================================================================== */
 const DANE = {
@@ -394,17 +545,69 @@ const FRAGMENTY = [
 ];
 
 /* ==========================================================================
-   UKŁAD I RYSOWANIE
+   PERSYSTENCJA — edycje zapisują się w localStorage tej przeglądarki
    ========================================================================== */
-const BOX_W=168, BOX_H=76, SP_GAP=14, SIB_GAP=30, LEVEL_H=190, PAD=120;
-const GEN_COLORS=["#8c6a2f","#1c2b4a","#5b7553","#7a4a63","#2f6f8c","#a3552e","#4f5d8c","#6d7a3a","#8c2f45","#3a6d6a","#555555"];
+const LS_KEY="drzewo-bronk-edycja-v1";
+let TREE=DANE, FRAG=FRAGMENTY;
+try{
+  const raw=localStorage.getItem(LS_KEY);
+  if(raw){
+    const s=JSON.parse(raw);
+    if(s && s.t && s.t.n){ TREE=s.t; FRAG=Array.isArray(s.f)?s.f:[]; }
+  }
+}catch(e){}
 
-const svg=document.getElementById('svg');
-const NS="http://www.w3.org/2000/svg";
-let units=[], edges=[], maxDepth=0;
-let idSeq=0;
+function strip(nd){
+  const o={n:nd.n};
+  ["b","d","note","g"].forEach(k=>{if(nd[k])o[k]=nd[k];});
+  if(nd.s&&nd.s.length)o.s=nd.s.map(sp=>{
+    const so={n:sp.n};["b","d","note","g"].forEach(k=>{if(sp[k])so[k]=sp[k];});return so;});
+  if(nd.c&&nd.c.length)o.c=nd.c.map(strip);
+  return o;
+}
+function saveLS(){
+  try{
+    localStorage.setItem(LS_KEY,JSON.stringify({
+      t:strip(TREE),
+      f:FRAG.map(f=>({label:f.label,tree:strip(f.tree)}))
+    }));
+    toast("✓ zapisano w przeglądarce");
+  }catch(e){toast("nie udało się zapisać","err");}
+}
+let toastT=null;
+function toast(msg,cls){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=cls||"";t.style.opacity=1;
+  clearTimeout(toastT);toastT=setTimeout(()=>t.style.opacity=0,1800);
+}
 
-function measure(node){                       // szerokość poddrzewa
+/* ==========================================================================
+   PŁEĆ / AWATARY
+   ========================================================================== */
+const MALE_EX=new Set(["Kosma","Barnaba","Bonawentura","Zawisza","Ilja","Kuba"]);
+function guessGender(p){
+  if(p.g==="m"||p.g==="k")return p.g;
+  const words=p.n.trim().split(/\s+/).filter(w=>!/^\(/.test(w));
+  const first=(words[0]||"").replace(/[?.,]/g,"");
+  if(MALE_EX.has(first))return "m";
+  if(/a$/i.test(first))return "k";
+  const last=(words[words.length-1]||"").replace(/[?.,]/g,"");
+  if(/(ska|cka|zka|wna|yna)$/i.test(last))return "k";
+  return "m";
+}
+function initials(name){
+  const w=name.replace(/[()?.]/g,"").trim().split(/\s+/).filter(x=>x&&x!=="von");
+  return ((w[0]||" ")[0]+((w[1]||" ")[0]||"")).toUpperCase().trim()||"?";
+}
+
+/* ==========================================================================
+   UKŁAD DRZEWA
+   ========================================================================== */
+const BOX_W=196, BOX_H=84, SP_GAP=22, SIB_GAP=34, LEVEL_H=215, PAD=140;
+let units=[],edges=[],personIndex=[],uidMap=new Map(),piByPerson=new Map();
+let idSeq=0,personSeq=0,maxDepth=0,totalW=0,totalH=0,ROOT_PI=null;
+
+function measure(node){
   node.id=idSeq++;
   const sp=node.s?node.s.length:0;
   node.unitW=BOX_W*(1+sp)+SP_GAP*sp;
@@ -416,107 +619,132 @@ function measure(node){                       // szerokość poddrzewa
   node.subW=Math.max(node.unitW,cw||0);
   return node.subW;
 }
-function place(node,x0,depth){                // pozycje
+function place(node,x0,depth){
   maxDepth=Math.max(maxDepth,depth);
   node.depth=depth;
-  let cw=0;
   if(node.c&&node.c.length){
+    let cw=0;
     node.c.forEach(ch=>cw+=ch.subW+SIB_GAP); cw-=SIB_GAP;
     let cx=x0+(node.subW-cw)/2;
     node.c.forEach(ch=>{place(ch,cx,depth+1);cx+=ch.subW+SIB_GAP;});
   }
-  node.ux=x0+(node.subW-node.unitW)/2;        // lewy brzeg zestawu kart
+  node.ux=x0+(node.subW-node.unitW)/2;
   node.uy=depth*LEVEL_H;
   units.push(node);
   if(node.c&&node.c.length){
     const jx=node.s&&node.s.length? node.ux+BOX_W+SP_GAP/2 : node.ux+BOX_W/2;
     const jy=node.uy+BOX_H;
-    const railY=jy+ (LEVEL_H-BOX_H)/2;
+    const railY=jy+(LEVEL_H-BOX_H)/2;
     node.c.forEach(ch=>{
-      const cxm=ch.ux+(ch.s&&ch.s.length?BOX_W/2:BOX_W/2); // zawsze środek karty dziecka
       edges.push({from:node,to:ch,d:`M${jx},${jy} V${railY} H${ch.ux+BOX_W/2} V${ch.uy}`});
     });
   }
 }
+function depthOf(n){return 1+((n.c&&n.c.length)?Math.max(...n.c.map(depthOf)):0);}
 
-function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+/* ==========================================================================
+   RYSOWANIE KART
+   ========================================================================== */
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
 function wrapName(name){
-  if(name.length<=19)return [name];
+  if(name.length<=17)return [name];
   const w=name.split(" ");
   let l1="",l2="";
-  w.forEach(word=>{ if((l1+" "+word).trim().length<=19&&!l2) l1=(l1+" "+word).trim(); else l2=(l2+" "+word).trim();});
-  if(l2.length>21){l2=l2.slice(0,20)+"…";}
+  w.forEach(word=>{ if((l1+" "+word).trim().length<=17&&!l2) l1=(l1+" "+word).trim(); else l2=(l2+" "+word).trim();});
+  if(l2.length>19)l2=l2.slice(0,18)+"…";
   return [l1,l2];
 }
-function cardSVG(p,x,y,gen,isSpouse){
-  const col=GEN_COLORS[gen%GEN_COLORS.length];
-  const lines=wrapName(p.n);
-  let ty=y+(lines.length===1?24:19);
-  let t=`<g class="node" data-id="${p.uid}" transform="translate(${x},${y})">`;
+function cardSVG(person,uid,x,y,isPrimary,hasSpouse){
+  const g=guessGender(person);
+  const lines=wrapName(person.n);
+  const TX=62;
+  let t=`<g class="node" data-id="${uid}" transform="translate(${x},${y})">`;
   t+=`<rect class="card" width="${BOX_W}" height="${BOX_H}"/>`;
-  t+=`<rect class="genbar" x="0" y="0" width="5" height="${BOX_H}" fill="${col}"/>`;
-  let yy=lines.length===1?26:20;
-  lines.forEach(l=>{t+=`<text class="nm" x="${BOX_W/2+2}" y="${yy}" text-anchor="middle">${esc(l)}</text>`;yy+=14;});
-  const dts=[];
-  if(p.b)dts.push("ur. "+p.b);
-  if(p.d)dts.push("zm. "+p.d);
-  if(dts.length)t+=`<text class="dt" x="${BOX_W/2+2}" y="${yy+2}" text-anchor="middle">${esc(dts.join("  ·  "))}</text>`;
-  if(p.note)t+=`<text class="dt" x="${BOX_W/2+2}" y="${yy+15}" text-anchor="middle" font-style="italic">${esc(p.note)}</text>`;
-  t+=`<title>${esc(p.n)}${p.b?"\nur. "+p.b:""}${p.d?"\nzm. "+p.d:""}${p.note?"\n"+p.note:""}</title></g>`;
+  t+=`<circle class="av ${g}" cx="31" cy="${BOX_H/2}" r="21"/>`;
+  t+=`<text class="avt ${g}" x="31" y="${BOX_H/2+4.5}" text-anchor="middle">${esc(initials(person.n))}</text>`;
+  let yy=lines.length===1?(person.b||person.d?32:BOX_H/2+4):26;
+  lines.forEach(l=>{t+=`<text class="nm" x="${TX}" y="${yy}">${esc(l)}</text>`;yy+=14;});
+  if(person.b)t+=`<text class="dt" x="${TX}" y="${yy+2}">ur. ${esc(person.b)}</text>`,yy+=11;
+  if(person.d)t+=`<text class="dt" x="${TX}" y="${yy+2}">✝ zm. ${esc(person.d)}</text>`,yy+=11;
+  if(person.note)t+=`<text class="dt" x="${TX}" y="${yy+2}" font-style="italic">${esc(person.note)}</text>`;
+  if(isPrimary){
+    t+=`<g class="qa" data-act="child"><circle cx="${BOX_W/2}" cy="${BOX_H}" r="9"/><text x="${BOX_W/2}" y="${BOX_H+4}" text-anchor="middle">+</text><title>Dodaj dziecko</title></g>`;
+    if(!hasSpouse)
+      t+=`<g class="qa" data-act="spouse"><circle cx="${BOX_W}" cy="${BOX_H/2}" r="9"/><text x="${BOX_W}" y="${BOX_H/2+4}" text-anchor="middle">+</text><title>Dodaj małżonka</title></g>`;
+  }
+  t+=`<title>${esc(person.n)}${person.b?"\nur. "+person.b:""}${person.d?"\nzm. "+person.d:""}${person.note?"\n"+person.note:""}</title></g>`;
   return t;
 }
-
-let personSeq=0, personIndex=[];   // [uid,name,dates,x,y,nodeRef]
+function regPerson(person,node,role,spIdx,cx,cy){
+  const uid="p"+(personSeq++);
+  const pi={uid,person,node,role,spIdx,n:person.n,b:person.b,x:cx,y:cy};
+  personIndex.push(pi);uidMap.set(uid,pi);piByPerson.set(person,pi);
+  return uid;
+}
 function unitSVG(node){
-  let t="", x=node.ux, gen=node.depth;
-  node.uid="p"+(personSeq++);
-  personIndex.push({uid:node.uid,n:node.n,b:node.b,x:node.ux+node.unitW/2,y:node.uy+BOX_H/2,node});
-  t+=cardSVG({...node,uid:node.uid},x,node.uy,gen,false);
+  let t="",x=node.ux;
+  const uid=regPerson(node,node,"p",-1,node.ux+node.unitW/2,node.uy+BOX_H/2);
+  t+=cardSVG(node,uid,x,node.uy,true,!!(node.s&&node.s.length));
   if(node.s)node.s.forEach((sp,i)=>{
     const sx=x+(BOX_W+SP_GAP)*(i+1);
-    sp.uid="p"+(personSeq++);
-    personIndex.push({uid:sp.uid,n:sp.n,b:sp.b,x:sx+BOX_W/2,y:node.uy+BOX_H/2,node});
-    t+=`<path class="mline" d="M${sx-SP_GAP},${node.uy+BOX_H/2-4} h${SP_GAP} M${sx-SP_GAP},${node.uy+BOX_H/2+4} h${SP_GAP}"/>`;
-    t+=cardSVG({...sp,uid:sp.uid},sx,node.uy,gen,true);
+    const suid=regPerson(sp,node,"s",i,sx+BOX_W/2,node.uy+BOX_H/2);
+    const my=node.uy+BOX_H/2;
+    t+=`<path class="mline" d="M${sx-SP_GAP},${my} h${SP_GAP}"/>`;
+    t+=`<circle class="mring" cx="${sx-SP_GAP/2-2.5}" cy="${my-3}" r="4"/><circle class="mring" cx="${sx-SP_GAP/2+2.5}" cy="${my+3}" r="4"/>`;
+    t+=cardSVG(sp,suid,sx,node.uy,false,false);
   });
   return t;
 }
 
-/* ---- budowa sceny ---- */
-measure(DANE);
-place(DANE,PAD,0);
-let mainW=DANE.subW+PAD*2;
+/* ==========================================================================
+   BUDOWA CAŁEJ SCENY (wywoływana też po każdej edycji)
+   ========================================================================== */
+const svg=document.getElementById('svg');
+function rebuild(keepView){
+  units=[];edges=[];personIndex=[];uidMap=new Map();piByPerson=new Map();
+  idSeq=0;personSeq=0;maxDepth=0;
 
-/* fragmenty po prawej */
-let fragSVG="", fx=mainW+260;
-FRAGMENTY.forEach(f=>{
-  measure(f.tree);
-  const fw=f.tree.subW;
-  place(f.tree,fx,6);
-  fragSVG+=`<rect class="fragbox" x="${fx-40}" y="${6*LEVEL_H-70}" width="${fw+80}" height="${LEVEL_H*4.2}" rx="14"/>`;
-  fragSVG+=`<text class="fraglabel" x="${fx-24}" y="${6*LEVEL_H-88}">${esc(f.label)}</text>`;
-  fx+=fw+220;
-});
-const totalW=fx+PAD, totalH=(maxDepth+1)*LEVEL_H+PAD*2;
+  measure(TREE);
+  place(TREE,PAD,0);
+  const mainW=TREE.subW+PAD*2;
 
-let body="";
-edges.forEach((e,i)=>{body+=`<path class="edge" data-f="${e.from.id}" data-t="${e.to.id}" d="${e.d}"/>`;});
-units.forEach(u=>{body+=unitSVG(u);});
-/* etykiety pokoleń */
-let glab="";
-for(let g=0;g<=maxDepth;g++){
-  glab+=`<text class="glabel" x="${PAD-90}" y="${g*LEVEL_H+BOX_H/2+9}">${["I","II","III","IV","V","VI","VII","VIII","IX","X","XI"][g]||g+1}</text>`;
+  let fragSVG="",fx=mainW+260;
+  FRAG.forEach(f=>{
+    measure(f.tree);
+    const fw=f.tree.subW,fd=depthOf(f.tree);
+    place(f.tree,fx,6);
+    fragSVG+=`<rect class="fragbox" x="${fx-40}" y="${6*LEVEL_H-70}" width="${fw+80}" height="${LEVEL_H*(fd+0.6)}" rx="14"/>`;
+    fragSVG+=`<text class="fraglabel" x="${fx-24}" y="${6*LEVEL_H-88}">${esc(f.label)}</text>`;
+    fx+=fw+220;
+  });
+  totalW=fx+PAD; totalH=(maxDepth+1)*LEVEL_H+PAD*2;
+
+  let body="";
+  edges.forEach(e=>{body+=`<path class="edge" data-f="${e.from.id}" data-t="${e.to.id}" d="${e.d}"/>`;});
+  units.forEach(u=>{body+=unitSVG(u);});
+  let glab="";
+  for(let g=0;g<=maxDepth;g++){
+    glab+=`<text class="glabel" x="${PAD-90}" y="${g*LEVEL_H+BOX_H/2+9}">${["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"][g]||g+1}</text>`;
+  }
+  svg.innerHTML=`<g id="world">${glab}${fragSVG}${body}</g>`;
+
+  ROOT_PI=personIndex.find(p=>p.person===TREE);
+  document.getElementById('stat').textContent=
+    `Na planszy: ${personIndex.length} osób, ${maxDepth+1} pokoleń.`;
+
+  const dl=document.getElementById('names');dl.innerHTML="";
+  personIndex.forEach(p=>{
+    const o=document.createElement('option');
+    o.value=p.n+(p.b?" ("+p.b+")":"");
+    dl.appendChild(o);
+  });
+  if(!keepView)fitAll();
 }
-svg.innerHTML=`<g id="world">${glab}${fragSVG}${body}</g>`;
-
-/* liczba osób */
-document.getElementById('stat').textContent=
-  `Na planszy: ${personIndex.length} osób, ${maxDepth+1} pokoleń.`;
 
 /* ==========================================================================
    PAN / ZOOM
    ========================================================================== */
-let vb={x:0,y:0,w:totalW,h:totalH};
+let vb={x:0,y:0,w:1000,h:600};
 function applyVB(){svg.setAttribute("viewBox",`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);}
 function fitAll(){
   const ar=innerWidth/innerHeight, car=totalW/totalH;
@@ -528,9 +756,7 @@ function centerOn(x,y,w){
   const ar=innerWidth/innerHeight;
   vb.w=w;vb.h=w/ar;vb.x=x-vb.w/2;vb.y=y-vb.h/2;applyVB();
 }
-function screenToSVG(px,py){
-  return {x:vb.x+px/innerWidth*vb.w, y:vb.y+py/innerHeight*vb.h};
-}
+function screenToSVG(px,py){return {x:vb.x+px/innerWidth*vb.w,y:vb.y+py/innerHeight*vb.h};}
 function zoomAt(px,py,f){
   const p=screenToSVG(px,py);
   vb.w*=f;vb.h*=f;
@@ -580,67 +806,245 @@ function endPtr(e){
 }
 stage.addEventListener('pointerup',endPtr);
 stage.addEventListener('pointercancel',endPtr);
-
 document.getElementById('zi').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,0.8);
 document.getElementById('zo').onclick=()=>zoomAt(innerWidth/2,innerHeight/2,1.25);
 document.getElementById('fit').onclick=fitAll;
-const ROOT_PI=personIndex.find(p=>p.node===DANE);
-document.getElementById('root').onclick=()=>{
-  centerOn(ROOT_PI.x,ROOT_PI.y+LEVEL_H,2200);
-};
+document.getElementById('root').onclick=()=>centerOn(ROOT_PI.x,ROOT_PI.y+LEVEL_H,2200);
 addEventListener('resize',applyVB);
 
 /* ==========================================================================
-   PODŚWIETLANIE LINII KRWI + WYSZUKIWARKA
+   PODŚWIETLANIE LINII KRWI
    ========================================================================== */
-const world=document.getElementById('world');
-const uidMap=new Map(personIndex.map(p=>[p.uid,p]));
+function world(){return document.getElementById('world');}
 function clearLit(){
-  world.classList.remove('dimmed');
-  world.querySelectorAll('.lit,.found').forEach(el=>el.classList.remove('lit','found'));
+  const w=world();
+  w.classList.remove('dimmed');
+  w.querySelectorAll('.lit,.found,.selected').forEach(el=>el.classList.remove('lit','found','selected'));
 }
 function lightUnit(node){
-  // przodkowie
-  const ids=new Set(), edgeKeys=new Set();
+  const ids=new Set(),edgeKeys=new Set();
   let cur=node;
   while(cur){ids.add(cur.id);if(cur.parent)edgeKeys.add(cur.parent.id+"-"+cur.id);cur=cur.parent;}
   (function down(nd){ids.add(nd.id);(nd.c||[]).forEach(ch=>{edgeKeys.add(nd.id+"-"+ch.id);down(ch);});})(node);
-  world.classList.add('dimmed');
-  world.querySelectorAll('.node').forEach(el=>{
+  const w=world();
+  w.classList.add('dimmed');
+  w.querySelectorAll('.node').forEach(el=>{
     const pi=uidMap.get(el.dataset.id);
     if(pi&&ids.has(pi.node.id))el.classList.add('lit');
   });
-  world.querySelectorAll('.edge').forEach(el=>{
+  w.querySelectorAll('.edge').forEach(el=>{
     if(edgeKeys.has(el.dataset.f+"-"+el.dataset.t))el.classList.add('lit');
   });
 }
+
+/* ==========================================================================
+   PANEL OSOBY (widok szczegółów jak w MyHeritage)
+   ========================================================================== */
+const panel=document.getElementById('panel');
+let sel=null;   // aktualnie wybrany wpis personIndex
+
+function relChip(person,subtitle){
+  const pi=piByPerson.get(person);
+  const g=guessGender(person);
+  const yrs=[person.b,person.d].filter(Boolean).join(" – ");
+  const b=document.createElement('button');
+  b.className="chip";
+  b.innerHTML=`<span class="cav ${g}">${esc(initials(person.n))}</span>
+    <span>${esc(person.n)}<small>${esc(subtitle||yrs||"")}</small></span>`;
+  b.onclick=()=>{if(pi)selectPI(pi,true);};
+  return b;
+}
+function openPanel(pi){
+  sel=pi;
+  const p=pi.person,g=guessGender(p);
+  document.getElementById('pav').className="pav "+g;
+  document.getElementById('pav').textContent=initials(p.n);
+  document.getElementById('pname').textContent=p.n;
+  const dts=[];
+  if(p.b)dts.push("ur. "+p.b);
+  if(p.d)dts.push("✝ zm. "+p.d);
+  document.getElementById('pdates').textContent=dts.join("   ·   ")||"brak dat";
+  document.getElementById('pnote').textContent=p.note||"";
+
+  const rels=document.getElementById('prels');rels.innerHTML="";
+  const addSec=(title,persons,subs)=>{
+    if(!persons.length)return;
+    const h=document.createElement('h3');h.textContent=title;rels.appendChild(h);
+    persons.forEach((pp,i)=>rels.appendChild(relChip(pp,subs&&subs[i])));
+  };
+  if(pi.role==="p"){
+    const par=[];
+    if(pi.node.parent){par.push(pi.node.parent);if(pi.node.parent.s&&pi.node.parent.s[0])par.push(pi.node.parent.s[0]);}
+    addSec("Rodzice",par);
+    addSec(pi.node.s&&pi.node.s.length>1?"Małżonkowie":"Małżonek",pi.node.s||[]);
+    addSec("Dzieci",pi.node.c||[]);
+    const sibs=(pi.node.parent?(pi.node.parent.c||[]).filter(x=>x!==pi.node):[]);
+    addSec("Rodzeństwo",sibs);
+  }else{
+    addSec("Współmałżonek",[pi.node]);
+    addSec("Dzieci",pi.node.c||[]);
+  }
+  document.getElementById('bdel').style.display=(pi.person===TREE)?"none":"block";
+  panel.classList.add('open');
+}
+function selectPI(pi,center){
+  clearLit();
+  lightUnit(pi.node);
+  const el=world().querySelector(`.node[data-id="${pi.uid}"]`);
+  if(el)el.classList.add('found','selected');
+  if(center)centerOn(pi.x,pi.y,1500);
+  openPanel(pi);
+}
+function closePanel(){panel.classList.remove('open');sel=null;clearLit();}
+document.getElementById('pclose').onclick=closePanel;
+
+/* klik na planszy */
 svg.addEventListener('click',e=>{
   if(moved)return;
+  const qa=e.target.closest('.qa');
+  if(qa){
+    const g=qa.closest('.node');
+    const pi=uidMap.get(g.dataset.id);
+    if(pi){sel=pi;openModal(qa.dataset.act==="child"?"child":"spouse");}
+    e.stopPropagation();return;
+  }
   const g=e.target.closest('.node');
-  if(!g){clearLit();return;}
-  clearLit();
+  if(!g){closePanel();return;}
   const pi=uidMap.get(g.dataset.id);
-  if(pi){lightUnit(pi.node);g.classList.add('found');}
+  if(pi)selectPI(pi,false);
 });
 
-/* wyszukiwarka */
-const dl=document.getElementById('names'), q=document.getElementById('q');
-personIndex.forEach(p=>{
-  const o=document.createElement('option');
-  o.value=p.n+(p.b?" ("+p.b+")":"");
-  dl.appendChild(o);
+/* ==========================================================================
+   EDYCJA — modal
+   ========================================================================== */
+const ovl=document.getElementById('ovl');
+let modalMode="edit";
+function openModal(mode){
+  if(!sel)return;
+  modalMode=mode;
+  const t={edit:"✏️ Edytuj: "+sel.person.n,
+           child:"👶 Nowe dziecko — rodzic: "+sel.node.n,
+           spouse:"💍 Nowy małżonek dla: "+sel.node.n}[mode];
+  document.getElementById('mtitle').textContent=t;
+  const p=mode==="edit"?sel.person:{};
+  document.getElementById('f_n').value=p.n||"";
+  document.getElementById('f_b').value=p.b||"";
+  document.getElementById('f_d').value=p.d||"";
+  document.getElementById('f_note').value=p.note||"";
+  document.getElementById('f_g').value=p.g||"";
+  ovl.classList.add('open');
+  setTimeout(()=>document.getElementById('f_n').focus(),50);
+}
+function closeModal(){ovl.classList.remove('open');}
+document.getElementById('mcancel').onclick=closeModal;
+ovl.addEventListener('click',e=>{if(e.target===ovl)closeModal();});
+
+document.getElementById('msave').onclick=()=>{
+  const v={
+    n:document.getElementById('f_n').value.trim(),
+    b:document.getElementById('f_b').value.trim(),
+    d:document.getElementById('f_d').value.trim(),
+    note:document.getElementById('f_note').value.trim(),
+    g:document.getElementById('f_g').value,
+  };
+  if(!v.n){toast("podaj imię i nazwisko","err");return;}
+  let focusPerson=null;
+  if(modalMode==="edit"){
+    const p=sel.person;
+    p.n=v.n;p.b=v.b||undefined;p.d=v.d||undefined;p.note=v.note||undefined;p.g=v.g||undefined;
+    focusPerson=p;
+  }else if(modalMode==="child"){
+    const nc={n:v.n};
+    if(v.b)nc.b=v.b;if(v.d)nc.d=v.d;if(v.note)nc.note=v.note;if(v.g)nc.g=v.g;
+    (sel.node.c=sel.node.c||[]).push(nc);
+    focusPerson=nc;
+  }else if(modalMode==="spouse"){
+    const ns={n:v.n};
+    if(v.b)ns.b=v.b;if(v.d)ns.d=v.d;if(v.note)ns.note=v.note;if(v.g)ns.g=v.g;
+    (sel.node.s=sel.node.s||[]).push(ns);
+    focusPerson=ns;
+  }
+  closeModal();
+  saveLS();
+  rebuild(true);
+  const pi=piByPerson.get(focusPerson);
+  if(pi)selectPI(pi,true);
+};
+
+/* przyciski panelu */
+document.getElementById('bedit').onclick=()=>openModal("edit");
+document.getElementById('baddch').onclick=()=>openModal("child");
+document.getElementById('baddsp').onclick=()=>openModal("spouse");
+document.getElementById('bdel').onclick=()=>{
+  if(!sel)return;
+  const pi=sel;
+  if(pi.person===TREE){toast("nie można usunąć korzenia rodu","err");return;}
+  if(pi.role==="s"){
+    if(!confirm(`Usunąć osobę „${pi.person.n}"?`))return;
+    pi.node.s.splice(pi.spIdx,1);
+  }else{
+    const cnt=countSub(pi.node);
+    const fi=FRAG.findIndex(f=>f.tree===pi.node);
+    if(!confirm(`Usunąć osobę „${pi.person.n}"${cnt>1?` wraz z ${cnt-1} potomkami/małżonkami`:""}?`))return;
+    if(fi>=0){FRAG.splice(fi,1);}
+    else{
+      const arr=pi.node.parent.c;
+      arr.splice(arr.indexOf(pi.node),1);
+    }
+  }
+  closePanel();
+  saveLS();
+  rebuild(true);
+};
+function countSub(nd){
+  let c=1+(nd.s?nd.s.length:0);
+  (nd.c||[]).forEach(ch=>c+=countSub(ch));
+  return c;
+}
+
+/* ==========================================================================
+   EKSPORT / IMPORT / RESET
+   ========================================================================== */
+document.getElementById('exp').onclick=()=>{
+  const data=JSON.stringify({t:strip(TREE),f:FRAG.map(f=>({label:f.label,tree:strip(f.tree)}))},null,1);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));
+  a.download="drzewo-bronk.json";
+  a.click();URL.revokeObjectURL(a.href);
+  toast("wyeksportowano JSON");
+};
+document.getElementById('imp').onclick=()=>document.getElementById('impfile').click();
+document.getElementById('impfile').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const s=JSON.parse(r.result);
+      if(!s||!s.t||!s.t.n)throw 0;
+      TREE=s.t;FRAG=Array.isArray(s.f)?s.f:[];
+      saveLS();closePanel();rebuild(false);
+      toast("zaimportowano drzewo");
+    }catch(_){toast("nieprawidłowy plik JSON","err");}
+  };
+  r.readAsText(f);
+  e.target.value="";
 });
+document.getElementById('rst').onclick=()=>{
+  if(!confirm("Przywrócić oryginalne drzewo z wydruku? Twoje edycje w tej przeglądarce zostaną usunięte."))return;
+  localStorage.removeItem(LS_KEY);
+  location.reload();
+};
+
+/* ==========================================================================
+   WYSZUKIWARKA
+   ========================================================================== */
+const q=document.getElementById('q');
 function searchGo(){
   const v=q.value.trim().toLowerCase();
   if(!v)return;
   const hit=personIndex.find(p=>(p.n+(p.b?" ("+p.b+")":"")).toLowerCase()===v)
         ||personIndex.find(p=>p.n.toLowerCase().includes(v));
-  if(hit){
-    centerOn(hit.x,hit.y,1500);
-    clearLit();lightUnit(hit.node);
-    const el=world.querySelector(`.node[data-id="${hit.uid}"]`);
-    if(el)el.classList.add('found');
-  }
+  if(hit)selectPI(hit,true);
 }
 q.addEventListener('change',searchGo);
 q.addEventListener('keydown',e=>{if(e.key==="Enter")searchGo();});
@@ -650,9 +1054,11 @@ const info=document.getElementById('info');
 document.getElementById('inf').onclick=()=>info.classList.toggle('open');
 document.getElementById('infx').onclick=()=>info.classList.remove('open');
 
-/* start: widok korzenia */
-fitAll();
-centerOn(ROOT_PI.x, ROOT_PI.y+LEVEL_H*1.2, 2600);
+/* ==========================================================================
+   START
+   ========================================================================== */
+rebuild(false);
+centerOn(ROOT_PI.x,ROOT_PI.y+LEVEL_H*1.2,2600);
 setTimeout(()=>{const h=document.getElementById('hint');if(h)h.style.opacity=0;},9000);
 </script>
 </body>

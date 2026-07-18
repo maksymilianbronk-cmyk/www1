@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "drzewo-bronk",
     title: "Drzewo genealogiczne rodziny von Bronk",
-    desc: "Interaktywne drzewo genealogiczne rodziny von Bronk (Niepoczołowski) odtworzone z 11 fotografii papierowego wydruku: od Michała Piotra von Bronk (ur. 1721) do dziś, 11 pokoleń i kilkaset osób na jednej planszy SVG. Przesuwanie, zoom kółkiem i szczypnięciem, wyszukiwarka osób, podświetlanie linii krwi po kliknięciu, etykiety pokoleń i fragmenty o niepewnym powiązaniu.",
+    desc: "Interaktywne, edytowalne drzewo genealogiczne rodziny von Bronk (Niepoczołowski) w stylu MyHeritage, odtworzone z 11 fotografii papierowego wydruku: od Michała Piotra von Bronk (ur. 1721) do dziś, 10 pokoleń i 368 osób na jednej planszy SVG. Karty z awatarami, panel szczegółów osoby z relacjami, edycja / dodawanie małżonków i dzieci / usuwanie z autozapisem w przeglądarce, eksport i import JSON, wyszukiwarka, zoom i podświetlanie linii krwi.",
     icon: "🦌",
     tag: "genealogia",
     preview: true,
