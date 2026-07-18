@@ -193,6 +193,25 @@
     border:1px solid var(--gold);color:var(--gold);font-size:.95rem;letter-spacing:.04em;margin-bottom:10px;transition:.2s}
   .btn-line:hover{background:rgba(212,175,55,.12)}
 
+  /* ── galeria prac ── */
+  #galeria{background:var(--bg2);border-top:1px solid var(--line)}
+  .foto-grid{columns:3 280px;column-gap:18px}
+  .foto{break-inside:avoid;margin:0 0 18px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;cursor:zoom-in;transition:transform .2s,border-color .2s}
+  .foto:hover{transform:translateY(-3px);border-color:var(--gold)}
+  .foto img{width:100%;display:block}
+  .foto figcaption{padding:12px 14px;font-size:.85rem;color:var(--muted)}
+  .foto figcaption b{color:var(--gold2);font-family:var(--serif);font-size:1rem;display:block}
+  .lightbox{position:fixed;inset:0;z-index:90;background:rgba(8,8,11,.94);display:none;
+    flex-direction:column;align-items:center;justify-content:center;padding:30px;cursor:zoom-out}
+  .lightbox.on{display:flex}
+  .lightbox img{max-width:94vw;max-height:82vh;border-radius:10px;
+    box-shadow:0 20px 80px rgba(0,0,0,.8);border:1px solid var(--gold)}
+  .lightbox p{color:var(--txt);margin-top:14px;font-size:.95rem;text-align:center;max-width:700px}
+  .lightbox .lb-x{position:absolute;top:18px;right:26px;font-size:1.8rem;color:var(--muted);
+    background:none;border:none;cursor:pointer}
+  .lightbox .lb-x:hover{color:var(--gold)}
+
   /* ── stopka ── */
   footer{padding:44px 20px;text-align:center;color:var(--muted);font-size:.88rem}
   footer .back{display:inline-block;margin-top:14px;color:var(--accent)}
@@ -217,6 +236,7 @@
       <a href="#szukaj">Wyszukiwarka</a>
       <a href="#herby">Herby</a>
       <a href="#drewno">Herb z drewna</a>
+      <a href="#galeria">Galeria prac</a>
       <a href="drzewo.html" style="color:var(--gold2)">🌳 Drzewo rodziny</a>
       <a href="#zamowienie">Zamówienie</a>
     </nav>
@@ -273,6 +293,52 @@
       </span>
       <span class="herb-order" style="pointer-events:none">Otwórz edytor →</span>
     </a>
+  </div>
+</section>
+
+<section id="galeria">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Galeria <span>naszych prac</span></h2>
+      <p>Prawdziwe realizacje z pracowni — herby rodowe, kartusze i szyldy
+         rzeźbione ręcznie w litym drewnie, barwione i złocone.</p>
+    </div>
+    <div class="foto-grid">
+      <figure class="foto">
+        <img src="galeria/herb-jastrzebiec.jpg" loading="lazy"
+             alt="Rzeźbiony w drewnie herb Jastrzębiec rodziny Skowrońskich z polichromią">
+        <figcaption><b>Herb Jastrzębiec — rodzina Skowrońskich</b>
+          Owalny kartusz z pełną polichromią: błękitne pole, złota podkowa z krzyżem,
+          korona, labry i klejnot z jastrzębiem.</figcaption>
+      </figure>
+      <figure class="foto">
+        <img src="galeria/tablica-leliwa.jpg" loading="lazy"
+             alt="Rzeźbiona tablica błogosławieństwa domu z herbem Leliwa">
+        <figcaption><b>Tablica domowa z herbem Leliwa</b>
+          Zwój z modlitwą błogosławieństwa domu, klejnot z pawim ogonem
+          oraz wstęga z zawołaniem „Leliwa”.</figcaption>
+      </figure>
+      <figure class="foto">
+        <img src="galeria/muzykanci-z-bremy.jpg" loading="lazy"
+             alt="Rzeźbiony kartusz Muzykanci z Bremy z herbem Bremy">
+        <figcaption><b>Kartusz „Muzykanci z Bremy”</b>
+          Barokowy kartusz z herbem Bremy i słynną piramidą zwierząt —
+          osioł, pies, kot i kogut.</figcaption>
+      </figure>
+      <figure class="foto">
+        <img src="galeria/szyld-sikorska-huta.jpg" loading="lazy"
+             alt="Rzeźbiony szyld posesji Stara Sikorska Huta z numerem 344">
+        <figcaption><b>Szyld posesji „Stara Sikorska Huta 344”</b>
+          Wstęga z gotycką kaligrafią i owalną tablicą numerową,
+          opalane krawędzie.</figcaption>
+      </figure>
+      <figure class="foto">
+        <img src="galeria/szyldy-puzdrowo.jpg" loading="lazy"
+             alt="Rzeźbione szyldy — tablica Puzdrowo i deska z numerem telefonu">
+        <figcaption><b>Szyldy rzeźbione — Puzdrowo</b>
+          Klasyczna tablica ryflowana i rustykalna deska z reliefem kory.</figcaption>
+      </figure>
+    </div>
   </div>
 </section>
 
@@ -565,6 +631,21 @@ document.getElementById("zamowienie").addEventListener("submit", e => {
     Potwierdzimy wycenę i termin realizacji w 1–2 dni robocze.`;
   ok.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
+</script>
+<div class="lightbox" id="lightbox">
+  <button class="lb-x" title="Zamknij">✕</button>
+  <img id="lb-img" src="" alt="">
+  <p id="lb-cap"></p>
+</div>
+<script>
+const lb = document.getElementById("lightbox");
+document.querySelectorAll(".foto").forEach(f => f.addEventListener("click", () => {
+  document.getElementById("lb-img").src = f.querySelector("img").src;
+  document.getElementById("lb-cap").textContent = f.querySelector("figcaption").textContent.trim();
+  lb.classList.add("on");
+}));
+lb.addEventListener("click", () => lb.classList.remove("on"));
+document.addEventListener("keydown", e => { if (e.key === "Escape") lb.classList.remove("on"); });
 </script>
 </body>
 </html>
