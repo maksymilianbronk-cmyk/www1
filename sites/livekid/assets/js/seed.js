@@ -254,6 +254,15 @@
       { id: uid("ts"), specialistId: "s3", childId: "c2", date: daysAgo(5), type: "Wsparcie psychologiczne", notes: "Praca nad regulacją emocji i adaptacją w grupie.", next: "2026-07-22" },
     ];
 
+    /* zajęcia dodatkowe (płatne) */
+    const classes = [
+      { id: "zd1", name: "Język angielski", instructor: "Native Speaker School", day: "Poniedziałek", time: "10:00", price: 120, capacity: 15, enrolled: ["c1", "c3", "c6", "c9"] },
+      { id: "zd2", name: "Rytmika", instructor: "Tomasz Mazur", day: "Wtorek", time: "11:00", price: 80, capacity: 20, enrolled: ["c1", "c2", "c4", "c5", "c7"] },
+      { id: "zd3", name: "Zajęcia taneczne", instructor: "Studio Tańca Krok", day: "Środa", time: "15:00", price: 100, capacity: 12, enrolled: ["c3", "c8"] },
+      { id: "zd4", name: "Robotyka i klocki LEGO", instructor: "MiniTech", day: "Czwartek", time: "15:30", price: 140, capacity: 10, enrolled: ["c6", "c1b"] },
+      { id: "zd5", name: "Basen", instructor: "Aquapark Fala", day: "Piątek", time: "9:30", price: 160, capacity: 16, enrolled: ["c2", "c9", "c1"] },
+    ];
+
     const director = { id: "d1", name: "Ewa Zielińska", role: "dyrektor", email: "dyrektor@kidbloom.pl", facilityId: "f1" };
     const samorzad = { id: "sm1", name: "Wydział Edukacji UM", role: "samorzad", email: "edukacja@um.warszawa.pl" };
 
@@ -262,7 +271,7 @@
       attendance, absences, menu, mealOrders, reports, journal, planDnia, observations,
       announcements, messages, events, gallery, recruitment, invoices, payments,
       documents, consents, staffSchedule, staffAbsences, subsidies, notifications,
-      specialistCare, therapySessions,
+      specialistCare, therapySessions, classes,
     };
   }
 
@@ -295,7 +304,7 @@
       if (this._cache) return this._cache;
       let data;
       try { data = JSON.parse(localStorage.getItem(KEY)); } catch { data = null; }
-      if (!data || !data.facilities || !data.therapySessions) { data = seed(); this._save(data); }
+      if (!data || !data.facilities || !data.therapySessions || !data.classes) { data = seed(); this._save(data); }
       this._cache = data;
       return data;
     },

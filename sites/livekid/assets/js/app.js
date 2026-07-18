@@ -17,7 +17,7 @@
   const monthName = (m) => new Date(m + "-01").toLocaleDateString("pl-PL", { month: "long", year: "numeric" });
 
   /* stan widoku (kalendarz, zakładki, filtry) */
-  const VS = { calY: 2026, calM: 6, tabs: {}, rozMonth: "2026-07", search: "" };
+  const VS = { calY: 2026, calM: 6, tabs: {}, rozMonth: "2026-07", search: "", matCat: "all", matSearch: "" };
 
   function toast(msg) {
     let t = document.querySelector(".toast");
@@ -43,8 +43,10 @@
       { path: "profil", ico: "🧒", label: "Profil dziecka" },
       { path: "nieobecnosci", ico: "📅", label: "Nieobecności" },
       { path: "posilki", ico: "🍽️", label: "Posiłki i jadłospis" },
+      { path: "zajecia", ico: "🎭", label: "Zajęcia dodatkowe" },
       { path: "rozwoj", ico: "🌱", label: "Rozwój i obserwacje" },
       { path: "galeria", ico: "📸", label: "Galeria" },
+      { path: "materialy", ico: "📚", label: "Materiały do domu" },
       { g: "Kontakt" },
       { path: "wiadomosci", ico: "💬", label: "Wiadomości", badge: "unread" },
       { path: "ogloszenia", ico: "📣", label: "Ogłoszenia" },
@@ -64,6 +66,7 @@
       { g: "Treści" },
       { path: "galeria", ico: "📸", label: "Galeria" },
       { path: "jadlospis", ico: "🍽️", label: "Jadłospis" },
+      { path: "materialy", ico: "📚", label: "Materiały" },
       { path: "wiadomosci", ico: "💬", label: "Wiadomości" },
     ],
     dyrektor: [
@@ -71,6 +74,7 @@
       { path: "pulpit", ico: "📊", label: "Pulpit" },
       { path: "dzieci", ico: "🧒", label: "Dzieci i umowy" },
       { path: "grupy", ico: "🧸", label: "Grupy" },
+      { path: "zajecia", ico: "🎭", label: "Zajęcia dodatkowe" },
       { path: "kadry", ico: "👩‍🏫", label: "Kadry" },
       { g: "Finanse" },
       { path: "rozliczenia", ico: "🧾", label: "Rozliczenia i faktury" },
@@ -79,6 +83,7 @@
       { path: "rekrutacja", ico: "📥", label: "Rekrutacja", badge: "rekrut" },
       { path: "ogloszenia", ico: "📣", label: "Ogłoszenia" },
       { path: "kalendarz", ico: "🗓️", label: "Kalendarz" },
+      { path: "materialy", ico: "📚", label: "Materiały" },
       { path: "dokumenty", ico: "📄", label: "Dokumenty" },
       { path: "ustawienia", ico: "⚙️", label: "Ustawienia i dane" },
     ],
@@ -217,8 +222,10 @@
     if (t) ACTIONS.importJSON(t, KB.session());
   });
   document.addEventListener("input", (e) => {
-    const t = e.target.closest('[data-act="searchInput"]');
-    if (t) ACTIONS.searchInput(t, KB.session());
+    const si = e.target.closest('[data-act="searchInput"]');
+    if (si) return ACTIONS.searchInput(si, KB.session());
+    const ms = e.target.closest('[data-act="matSearch"]');
+    if (ms) return ACTIONS.matSearch(ms, KB.session());
   });
   document.addEventListener("submit", (e) => {
     const f = e.target.closest("form[data-act]"); if (!f) return;
@@ -386,6 +393,23 @@
           ${data.menu.map((d) => `<div class="menu-day"><div class="menu-date">${plShort(d.date)}<span style="text-transform:capitalize">${wday(d.date)}</span></div><div><div class="meal-line"><b>Śniadanie</b> ${esc(d["śniadanie"])}</div><div class="meal-line"><b>Obiad</b> ${esc(d["obiad"])}</div><div class="meal-line"><b>Podwieczorek</b> ${esc(d["podwieczorek"])}</div></div></div>`).join("")}
         </div>
       </div>` };
+  };
+
+  VIEWS.rodzic.zajecia = (sess) => {
+    const { kids, child } = parentChild(sess);
+    const data = KB.load();
+    const mine = data.classes.filter((z) => z.enrolled.includes(child.id));
+    const monthly = mine.reduce((s, z) => s + z.price, 0);
+    return { title: "Zajęcia dodatkowe", sub: "Zapisz dziecko na zajęcia — koszt zostanie doliczony do rachunku.", html: `
+      ${childSwitcher(kids, child)}
+      <div class="grid g-3" style="margin-bottom:18px">
+        <div class="stat accent-teal"><div class="s-ico">🎭</div><div class="s-val">${mine.length}</div><div class="s-lbl">Zapisane zajęcia</div></div>
+        <div class="stat accent-amber"><div class="s-ico">💰</div><div class="s-val">${money(monthly)}</div><div class="s-lbl">Miesięczny koszt</div></div>
+        <div class="stat accent-sky"><div class="s-ico">📅</div><div class="s-val">${data.classes.length}</div><div class="s-lbl">Dostępne zajęcia</div></div>
+      </div>
+      <div class="grid g-2">${data.classes.map((z) => { const on = z.enrolled.includes(child.id); const full = z.enrolled.length >= z.capacity && !on; return `<div class="card2"><div class="card-h"><span class="avatar" style="background:#f3f0ff">🎭</span><div><h3>${esc(z.name)}</h3><span class="muted" style="font-size:.84rem">${esc(z.instructor)}</span></div><div class="spacer"></div><b>${money(z.price)}/mies.</b></div>
+        <div class="flex" style="justify-content:space-between;margin-bottom:12px"><span class="pill pill-gray">${esc(z.day)}, ${esc(z.time)}</span><span class="muted" style="font-size:.82rem">${z.enrolled.length}/${z.capacity} miejsc</span></div>
+        <button class="btn ${on ? "btn-ghost" : full ? "btn-ghost" : "btn-primary"} btn-block" data-act="enrollClass" data-id="${z.id}" ${full ? "disabled style=opacity:.5" : ""}>${on ? "✓ Zapisane — wypisz" : full ? "Brak miejsc" : "＋ Zapisz dziecko"}</button></div>`; }).join("")}</div>` };
   };
 
   VIEWS.rodzic.rozwoj = (sess) => {
@@ -637,6 +661,16 @@
       <div class="grid g-2">${data.groups.map((g) => { const kids = KB.childrenOf(g.id); const teacher = data.staff.find((s) => s.id === (g.teacherIds || [])[0]); return `<div class="card2"><div class="card-h"><span class="avatar" style="background:${g.color}22;font-size:1.5rem">🧸</span><div><h3>${esc(g.name)}</h3><span class="muted" style="font-size:.84rem">${esc(g.ageRange)} · ${esc(g.room)}</span></div><div class="spacer"></div><span class="pill" style="background:${g.color}22;color:${g.color}">${kids.length} dzieci</span></div><div class="r-sub" style="margin-bottom:10px">Wychowawca: <b>${teacher ? esc(teacher.name) : "—"}</b></div><div class="photo-grid" style="grid-template-columns:repeat(auto-fill,minmax(44px,1fr))">${kids.map((k) => `<div class="photo" style="font-size:1.3rem" title="${esc(k.name)}">${k.avatar}</div>`).join("")}</div></div>`; }).join("")}</div>` };
   };
 
+  VIEWS.dyrektor.zajecia = () => {
+    const data = KB.load();
+    const totalRevenue = data.classes.reduce((s, z) => s + z.price * z.enrolled.length, 0);
+    const totalEnroll = data.classes.reduce((s, z) => s + z.enrolled.length, 0);
+    return { title: "Zajęcia dodatkowe", sub: "Oferta zajęć płatnych, instruktorzy i zapisy.", html: `
+      <div class="toolbar"><button class="btn btn-primary" data-act="openAddClass">＋ Dodaj zajęcia</button><div style="flex:1"></div><span class="pill pill-teal">${totalEnroll} zapisów</span><span class="pill pill-amber">${money(totalRevenue)}/mies.</span></div>
+      <div class="card2"><div class="wrap-scroll"><table class="tbl"><thead><tr><th>Zajęcia</th><th>Instruktor</th><th>Termin</th><th class="right">Cena</th><th>Zapisy</th><th class="right">Przychód/mies.</th></tr></thead>
+        <tbody>${data.classes.map((z) => { const pct = Math.round(z.enrolled.length / z.capacity * 100); return `<tr><td><b>🎭 ${esc(z.name)}</b></td><td>${esc(z.instructor)}</td><td>${esc(z.day)}, ${esc(z.time)}</td><td class="right">${money(z.price)}</td><td><div class="flex" style="gap:8px"><div class="bar" style="width:70px"><span style="width:${pct}%"></span></div><span class="muted" style="font-size:.8rem">${z.enrolled.length}/${z.capacity}</span></div></td><td class="right"><b>${money(z.price * z.enrolled.length)}</b></td></tr>`; }).join("")}</tbody></table></div></div>` };
+  };
+
   VIEWS.dyrektor.kadry = () => {
     const data = KB.load();
     const T = tab("kadry", "lista");
@@ -782,6 +816,29 @@
         <div class="card2"><div class="card-h"><span class="avatar" style="background:#f0f7f5">💰</span><div><h3>Raport dotacji</h3><span class="muted" style="font-size:.84rem">Rozliczenie dotacji oświatowych</span></div></div><button class="btn btn-primary btn-block mt-16" data-act="exportSubsidies">⬇ Pobierz CSV</button></div>
       </div>` };
   };
+
+  /* ============================================================ MATERIAŁY */
+  const roleLetter = { rodzic: "r", nauczyciel: "n", dyrektor: "d" };
+  VIEWS.rodzic.materialy = (sess) => materialsView(sess, "Materiały do domu", "Karty pracy, kolorowanki i zadania do wydrukowania w domu.");
+  VIEWS.nauczyciel.materialy = (sess) => materialsView(sess, "Materiały edukacyjne", "Scenariusze, karty pracy, arkusze i pomoce dydaktyczne — gotowe do druku.");
+  VIEWS.dyrektor.materialy = (sess) => materialsView(sess, "Materiały edukacyjne", "Scenariusze, wzory dokumentów, arkusze i e-booki dla placówki.");
+
+  function materialsView(sess, title, sub) {
+    const rl = roleLetter[sess.role] || "n";
+    let items = MAT.forRole(rl);
+    const cats = MAT.CATS.filter((c) => items.some((i) => i.cat === c.id));
+    if (VS.matCat !== "all") items = items.filter((i) => i.cat === VS.matCat);
+    const q = (VS.matSearch || "").toLowerCase();
+    if (q) items = items.filter((i) => (i.title + " " + i.desc).toLowerCase().includes(q));
+    const chip = (id, label, ico) => `<button class="mat-chip ${VS.matCat === id ? "on" : ""}" data-act="matCat" data-v="${id}">${ico ? ico + " " : ""}${esc(label)}</button>`;
+    return { title, sub, html: `
+      <div class="toolbar"><div class="search"><input placeholder="Szukaj materiału…" data-act="matSearch" value="${esc(VS.matSearch)}"></div><span class="pill pill-teal">${items.length} materiałów</span></div>
+      <div class="mat-chips">${chip("all", "Wszystkie")}${cats.map((c) => chip(c.id, c.label, c.ico)).join("")}</div>
+      <div class="grid g-3 mt-16">
+        ${items.map((i) => { const c = MAT.cat(i.cat); return `<div class="mat-card"><div class="mat-thumb" style="background:${c.color}1f;color:${c.color}">${c.ico}</div><div class="mat-body"><div class="mat-cat" style="color:${c.color}">${esc(c.label)}</div><div class="mat-title">${esc(i.title)}</div><div class="mat-desc">${esc(i.desc)}</div><div class="mat-foot"><span class="pill pill-gray">${esc(i.age)}</span><div class="spacer" style="flex:1"></div><button class="btn btn-ghost btn-sm" data-act="previewMat" data-id="${i.id}">Podgląd</button><button class="btn btn-primary btn-sm" data-act="printMat" data-id="${i.id}">⬇ Pobierz</button></div></div></div>`; }).join("")}
+      </div>
+      ${items.length === 0 ? `<div class="empty2"><div class="e-ico">🔍</div>Brak materiałów w tej kategorii.</div>` : ""}` };
+  }
 
   /* ============================================================ SPECJALISTA */
   VIEWS.specjalista.wiadomosci = (sess) => threadView(sess);
@@ -1091,6 +1148,36 @@
         ${sess.length ? `<div class="card-h" style="margin:10px 0 6px"><b>Sesje specjalistów</b></div>${sess.map((s) => { const sp = KB.staffById(s.specialistId); return `<div class="r-sub" style="margin:4px 0">${plDate(s.date)} · ${esc(s.type)} (${sp ? esc(sp.name) : "—"})</div>`; }).join("")}` : ""}
         <div class="modal-actions"><button type="button" class="btn btn-primary btn-block" onclick="KBcloseModal()">Zamknij</button></div>`);
     },
+
+    /* materiały */
+    matCat(t) { VS.matCat = t.dataset.v; render(); },
+    matSearch(t) { VS.matSearch = t.value; render(); const inp = document.querySelector('[data-act="matSearch"]'); if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } },
+    previewMat(t) {
+      const m = MAT.byId(t.dataset.id); if (!m) return; const c = MAT.cat(m.cat);
+      modal(`<h3>${c.ico} ${esc(m.title)}</h3><p class="m-sub">${esc(c.label)} · ${esc(m.age)}</p>
+        <p>${esc(m.desc)}</p>
+        <div class="mat-preview">${MAT.render(m)}</div>
+        <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="KBcloseModal()">Zamknij</button><button class="btn btn-primary" data-act="printMat" data-id="${m.id}">⬇ Pobierz / drukuj</button></div>`);
+    },
+    printMat(t) { const m = MAT.byId(t.dataset.id); if (m) { UI.print(m.title, MAT.render(m)); toast("Materiał gotowy do druku ✓"); } },
+
+    /* zajęcia dodatkowe */
+    enrollClass(t, sess) {
+      const { child } = parentChild(sess), data = KB.load(), z = data.classes.find((x) => x.id === t.dataset.id); if (!z) return;
+      const idx = z.enrolled.indexOf(child.id);
+      if (idx >= 0) { z.enrolled.splice(idx, 1); toast("Wypisano z zajęć ✓"); }
+      else { if (z.enrolled.length >= z.capacity) { toast("Brak wolnych miejsc"); return; } z.enrolled.push(child.id); toast(`Zapisano na: ${z.name} ✓`); }
+      KB.save(); render();
+    },
+    openAddClass() {
+      modal(`<h3>Nowe zajęcia dodatkowe</h3><form data-act="saveClass">
+        <div class="field"><label>Nazwa</label><input name="name" required></div>
+        <div class="field"><label>Instruktor / firma</label><input name="instructor" required></div>
+        <div class="field-row"><div class="field"><label>Dzień</label><select name="day"><option>Poniedziałek</option><option>Wtorek</option><option>Środa</option><option>Czwartek</option><option>Piątek</option></select></div><div class="field"><label>Godzina</label><input type="time" name="time" value="15:00"></div></div>
+        <div class="field-row"><div class="field"><label>Cena/mies. (zł)</label><input type="number" name="price" value="100"></div><div class="field"><label>Limit miejsc</label><input type="number" name="capacity" value="15"></div></div>
+        <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="KBcloseModal()">Anuluj</button><button class="btn btn-primary">Dodaj</button></div></form>`);
+    },
+    saveClass(f) { const fd = new FormData(f); KB.load().classes.push({ id: KB.uid("zd"), name: fd.get("name"), instructor: fd.get("instructor"), day: fd.get("day"), time: fd.get("time"), price: +fd.get("price") || 0, capacity: +fd.get("capacity") || 10, enrolled: [] }); KB.save(); closeModal(); toast("Zajęcia dodane ✓"); render(); },
 
     /* motyw */
     toggleTheme() {

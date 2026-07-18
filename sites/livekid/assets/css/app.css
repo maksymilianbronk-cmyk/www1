@@ -344,6 +344,28 @@ img { max-width: 100%; }
   .cal-num { font-size: .72rem; }
 }
 
+/* ============================ MATERIAŁY ============================ */
+.mat-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.mat-chip { padding: 8px 14px; border-radius: 20px; background: var(--card); border: 1.5px solid var(--line); font-weight: 800; font-size: .82rem; color: var(--ink-2); box-shadow: var(--shadow-s); }
+.mat-chip:hover { border-color: var(--teal); color: var(--ink); }
+.mat-chip.on { background: var(--teal); color: #fff; border-color: var(--teal); }
+.mat-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-s); overflow: hidden; display: flex; flex-direction: column; transition: .15s; }
+.mat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.mat-thumb { height: 92px; display: grid; place-items: center; font-size: 2.6rem; }
+.mat-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+.mat-cat { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+.mat-title { font-weight: 800; font-size: 1.02rem; margin: 3px 0 4px; }
+.mat-desc { color: var(--ink-2); font-size: .84rem; flex: 1; }
+.mat-foot { display: flex; align-items: center; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+.mat-preview { border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 12px 0; max-height: 320px; overflow: auto; background: #fff; color: #123a3a; }
+.mat-preview h1 { font-size: 1.15rem; margin-bottom: 4px; }
+.mat-preview h3 { font-size: .95rem; margin: 10px 0 4px; }
+.mat-preview table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: .85rem; }
+.mat-preview th, .mat-preview td { border: 1px solid #e3ece9; padding: 6px 8px; text-align: left; }
+.mat-preview .box { background: #f6faf9; border-radius: 10px; padding: 12px; margin: 8px 0; font-size: .88rem; }
+.mat-preview .brand { color: #0a8c7d; font-weight: 900; margin-bottom: 8px; }
+.mat-preview .muted { color: #6a8a8a; }
+
 /* ============================ TRYB CIEMNY ============================ */
 :root[data-theme="dark"] {
   --ink: #e7f1ef;

@@ -69,7 +69,8 @@ sites/livekid/
 │   └── js/
 │       ├── seed.js         # model danych + „store" na localStorage + dane demo (v2)
 │       ├── ui.js           # komponenty UI: wykresy SVG, kalendarz, wydruk
-│       └── app.js          # router SPA, ~35 widoków dla 4 ról, logika modułów
+│       ├── materialy.js    # biblioteka materiałów edukacyjnych + generatory druku
+│       └── app.js          # router SPA, 45+ widoków dla 5 ról, logika modułów
 └── DOKUMENTACJA.md         # ten dokument
 ```
 
@@ -98,6 +99,15 @@ donut w czystym SVG), kalendarz miesięczny, powiadomienia, wydruk faktur/dokume
 Dodatkowo: **tryb ciemny** (przełącznik w stopce panelu, zapamiętywany) oraz
 **drill-down dziecka** w panelu dyrektora (klik w wiersz → pełny profil:
 frekwencja, faktury, obserwacje, sesje specjalistów).
+
+**Materiały edukacyjne** (jak sekcja „Materiały" w LiveKid): biblioteka ~24
+oryginalnych materiałów w 8 kategoriach (scenariusze zajęć, karty pracy,
+kolorowanki, zadania matematyczne, arkusze obserwacji, wzory dokumentów,
+dyplomy, e-booki) z filtrem, wyszukiwarką, podglądem i **generowaniem materiału
+do druku** (`window.print`). Dostęp zależny od roli — rodzic widzi materiały „do
+domu", nauczyciel materiały dydaktyczne, dyrektor dodatkowo wzory dokumentów i
+e-booki. **Zajęcia dodatkowe** (płatne): dyrektor zarządza ofertą i widzi zapisy
+i przychód, rodzic zapisuje/wypisuje dziecko z informacją o koszcie miesięcznym.
 
 ## 5. Import własnych danych (docelowo)
 

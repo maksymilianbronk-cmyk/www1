@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "livekid",
     title: "KidBloom — system dla żłobków i przedszkoli",
-    desc: "Odwrotna inżynieria systemu LiveKid: samodzielna aplikacja SPA (HTML/CSS/vanilla JS) z 5 rolami (Rodzic, Nauczyciel, Dyrektor, Samorząd, Specjalista) i 40+ ekranami. Moduły: dziennik elektroniczny, ewidencja obecności i godzin, raporty dzienne, profil dziecka, nieobecności z kalendarzem, jadłospis i zamawianie posiłków, rozwój i obserwacje, galeria, czaty, ogłoszenia, płatności online z wydrukiem faktur, dokumenty i zgody RODO, plan dnia, grupy, kadry z grafikiem, rozliczenia wielomiesięczne, rekrutacja, raporty z wykresami SVG, dotacje samorządowe, dziennik sesji specjalisty (logopeda/psycholog), drill-down profilu dziecka, tryb ciemny, import/eksport JSON, generowanie treści AI (demo). Strona marketingowa + mock backend na localStorage.",
+    desc: "Odwrotna inżynieria systemu LiveKid: samodzielna aplikacja SPA (HTML/CSS/vanilla JS) z 5 rolami (Rodzic, Nauczyciel, Dyrektor, Samorząd, Specjalista) i 45+ ekranami. Moduły: dziennik elektroniczny, ewidencja obecności i godzin, raporty dzienne, profil dziecka, nieobecności z kalendarzem, jadłospis i zamawianie posiłków, zajęcia dodatkowe z zapisami, biblioteka materiałów edukacyjnych (scenariusze, karty pracy, kolorowanki, arkusze, dokumenty, dyplomy, e-booki — z wydrukiem), rozwój i obserwacje, galeria, czaty, ogłoszenia, płatności online z wydrukiem faktur, dokumenty i zgody RODO, plan dnia, grupy, kadry z grafikiem, rozliczenia wielomiesięczne, rekrutacja, raporty z wykresami SVG, dotacje samorządowe, dziennik sesji specjalisty (logopeda/psycholog), drill-down profilu dziecka, tryb ciemny, import/eksport JSON, generowanie treści AI (demo). Strona marketingowa + mock backend na localStorage.",
     icon: "🌱",
     tag: "system",
     preview: true,
@@ -25,7 +25,7 @@ const SITES = [
       colors: ["#0eb39e", "#123a3a", "#ff7a6b", "#ffb340", "#eef5f3"],
       fonts: ["Nunito"],
       tech: ["HTML", "CSS", "Vanilla JS", "SPA", "SVG charts", "localStorage", "Google Fonts"],
-      files: ["index.html", "o-systemie.html", "assets/css/app.css", "assets/js/seed.js", "assets/js/ui.js", "assets/js/app.js", "DOKUMENTACJA.md"],
+      files: ["index.html", "o-systemie.html", "assets/css/app.css", "assets/js/seed.js", "assets/js/ui.js", "assets/js/materialy.js", "assets/js/app.js", "DOKUMENTACJA.md"],
     },
   },
   {
