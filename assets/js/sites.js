@@ -209,4 +209,17 @@ const SITES = [
       tech: ["HTML", "CSS", "Vanilla JS", "localStorage"],
     },
   },
+  {
+    slug: "materialy-kaszubskie",
+    title: "Materiały kaszubskie do pobrania",
+    desc: "Zestawienie darmowych publikacji cyfrowych o Kaszubach: Bałtycka Biblioteka Cyfrowa, Skarbnica Kaszubska, Kaszëbskô Czëtnica i Rada Języka Kaszubskiego — setki PDF-ów ZKP o kulturze, języku i historii, plus informacje o tekach haftu kaszubskiego (szkoła pucka). Karty źródeł w tradycyjnych barwach haftu kaszubskiego.",
+    icon: "📚",
+    tag: "katalog",
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#2f6fd0", "#f0b429", "#c22e3a", "#2e8b57"],
+      fonts: ["Segoe UI / system-ui"],
+      tech: ["HTML", "CSS"],
+    },
+  },
 ];
