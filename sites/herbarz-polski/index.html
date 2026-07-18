@@ -217,6 +217,7 @@
       <a href="#szukaj">Wyszukiwarka</a>
       <a href="#herby">Herby</a>
       <a href="#drewno">Herb z drewna</a>
+      <a href="drzewo.html" style="color:var(--gold2)">🌳 Drzewo rodziny</a>
       <a href="#zamowienie">Zamówienie</a>
     </nav>
   </div>
@@ -256,6 +257,22 @@
     </div>
     <div class="alpha-bar" id="alpha"></div>
     <div class="grid" id="katalog"></div>
+  </div>
+</section>
+
+<section id="drzewo-promo" style="padding:0">
+  <div class="wrap">
+    <a href="drzewo.html" style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;
+       border:1px solid var(--gold);border-radius:18px;padding:26px 30px;margin:10px 0 30px;
+       background:linear-gradient(120deg,rgba(212,175,55,.08),rgba(108,99,255,.06))">
+      <span style="font-size:2.2rem">🌳</span>
+      <span style="max-width:560px">
+        <b style="font-family:var(--serif);font-size:1.3rem;color:var(--gold2)">Zbuduj drzewo swojej rodziny</b><br>
+        <span style="color:var(--muted);font-size:.92rem">Edytowalne widoki jak w aplikacjach genealogicznych:
+        karty osób z herbami, pokolenia połączone liniami, widok listy, eksport do pliku.</span>
+      </span>
+      <span class="herb-order" style="pointer-events:none">Otwórz edytor →</span>
+    </a>
   </div>
 </section>
 
@@ -376,44 +393,6 @@ const norm = s => s.toLowerCase()
 /* żeńskie końcówki nazwisk → męskie (Kowalska → Kowalski) */
 const stem = s => s.replace(/ska$/,"ski").replace(/cka$/,"cki").replace(/dzka$/,"dzki");
 const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-/* pełny wektorowy kartusz: korona szlachecka + tarcza + kompozycja godeł */
-let __svgId = 0;
-function shieldSVG(h){
-  const SP = "M60 24 L104 36 V72 C104 100 86 120 60 134 C34 120 16 100 16 72 V36 Z";
-  const id = ++__svgId;
-  let inner = "";
-  if(h.f2) inner += `<rect x="8" y="86" width="104" height="54" fill="${h.f2}"/>`;
-  for(const it of (h.g || [])){
-    const [c, x, y, s, fill, rot, mir] = it;
-    let g = (GODLA[c] || "").replaceAll("FILL", fill || "#e8ecf2");
-    let tr = `translate(${x},${y})`;
-    if(rot) tr += ` rotate(${rot})`;
-    if(mir) tr += ` scale(-1,1)`;
-    tr += ` scale(${s/100}) translate(-50,-50)`;
-    inner += `<g transform="${tr}">${g}</g>`;
-  }
-  return `<svg class="herb-shield" viewBox="0 -4 120 158" aria-hidden="true">
-    <defs>
-      <clipPath id="cp${id}"><path d="${SP}"/></clipPath>
-      <linearGradient id="gl${id}" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#fff" stop-opacity=".26"/>
-        <stop offset=".45" stop-color="#fff" stop-opacity="0"/>
-        <stop offset="1" stop-color="#000" stop-opacity=".30"/>
-      </linearGradient>
-    </defs>
-    <g fill="#d4af37" stroke="#8a6d1f" stroke-width=".8">
-      <path d="M40 21 L37 7 L50 15 L60 3 L70 15 L83 7 L80 21 Z"/>
-      <circle cx="37" cy="5" r="2.6"/><circle cx="60" cy="1.5" r="2.6"/><circle cx="83" cy="5" r="2.6"/>
-      <rect x="35" y="19" width="50" height="5.5" rx="2.7"/>
-    </g>
-    <path d="${SP}" fill="${h.f}"/>
-    <g clip-path="url(#cp${id})">${inner}<path d="${SP}" fill="url(#gl${id})"/></g>
-    <path d="M60 30 L98 40.5 V72 C98 96 82 114 60 127 C38 114 22 96 22 72 V40.5 Z"
-          fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/>
-    <path d="${SP}" fill="none" stroke="#d4af37" stroke-width="3.2"/>
-  </svg>`;
-}
 
 function herbCard(h, matched){
   const LIMIT = 8;

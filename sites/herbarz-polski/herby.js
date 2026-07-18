@@ -255,3 +255,42 @@ for (const [nazwa, lista] of Object.entries(DODATKI)) {
   for (const naz of lista) if (!h.fam.includes(naz)) h.fam.push(naz);
   h.fam.sort((a, b) => a.localeCompare(b, "pl"));
 }
+
+/* ── renderer tarczy (wspólny dla podstron) ── */
+/* pełny wektorowy kartusz: korona szlachecka + tarcza + kompozycja godeł */
+let __svgId = 0;
+function shieldSVG(h){
+  const SP = "M60 24 L104 36 V72 C104 100 86 120 60 134 C34 120 16 100 16 72 V36 Z";
+  const id = ++__svgId;
+  let inner = "";
+  if(h.f2) inner += `<rect x="8" y="86" width="104" height="54" fill="${h.f2}"/>`;
+  for(const it of (h.g || [])){
+    const [c, x, y, s, fill, rot, mir] = it;
+    let g = (GODLA[c] || "").replaceAll("FILL", fill || "#e8ecf2");
+    let tr = `translate(${x},${y})`;
+    if(rot) tr += ` rotate(${rot})`;
+    if(mir) tr += ` scale(-1,1)`;
+    tr += ` scale(${s/100}) translate(-50,-50)`;
+    inner += `<g transform="${tr}">${g}</g>`;
+  }
+  return `<svg class="herb-shield" viewBox="0 -4 120 158" aria-hidden="true">
+    <defs>
+      <clipPath id="cp${id}"><path d="${SP}"/></clipPath>
+      <linearGradient id="gl${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff" stop-opacity=".26"/>
+        <stop offset=".45" stop-color="#fff" stop-opacity="0"/>
+        <stop offset="1" stop-color="#000" stop-opacity=".30"/>
+      </linearGradient>
+    </defs>
+    <g fill="#d4af37" stroke="#8a6d1f" stroke-width=".8">
+      <path d="M40 21 L37 7 L50 15 L60 3 L70 15 L83 7 L80 21 Z"/>
+      <circle cx="37" cy="5" r="2.6"/><circle cx="60" cy="1.5" r="2.6"/><circle cx="83" cy="5" r="2.6"/>
+      <rect x="35" y="19" width="50" height="5.5" rx="2.7"/>
+    </g>
+    <path d="${SP}" fill="${h.f}"/>
+    <g clip-path="url(#cp${id})">${inner}<path d="${SP}" fill="url(#gl${id})"/></g>
+    <path d="M60 30 L98 40.5 V72 C98 96 82 114 60 127 C38 114 22 96 22 72 V40.5 Z"
+          fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/>
+    <path d="${SP}" fill="none" stroke="#d4af37" stroke-width="3.2"/>
+  </svg>`;
+}

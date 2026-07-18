@@ -55,3 +55,52 @@ if (typeof HERBY !== "undefined") {
     h.fam.sort((a, b) => a.localeCompare(b, "pl"));
   }
 }
+
+/* ── trzecia transza indeksu nazwisk ── */
+const HERBOWNI3 = {
+"Bończa":["Bądzyński","Charzewski","Ciemiński","Dobrzelewski","Fredrowicz","Gąsowski","Jackowski","Klonowski","Kurdwanowski","Osuchowski","Pieczyski","Sielski","Uleniecki"],
+"Ciołek":["Bąkowski","Bielecki","Chruślicki","Gniewięcki","Kargoszyński","Kaski","Milanowski","Ostrowicki","Powsiński","Sobiekurski","Wilczogórski","Żelechowski"],
+"Dąbrowa":["Bagiński","Bronowski","Bzicki","Damięcki","Jabłonowski","Kierzkowski","Konopka","Łuniewski","Obrębski","Święcicki","Wyszomirski"],
+"Dębno":["Bydłowski","Cikowski","Gałecki","Krzeszowski","Michowski","Odechowski","Pikarski","Rupniewski","Sancygniowski","Wielogłowski","Włodzisławski"],
+"Dołęga":["Białyszewski","Cieszewski","Dobrzankowski","Gulczewski","Kamionowski","Modzelewski","Prusinowski","Tłuchowski","Węgierski"],
+"Drzewica":["Chomętowski","Dulski","Kokoszka","Miedzianowski","Oleszkowski","Sasin","Wilkanowski"],
+"Glaubicz":["Bojanowski","Chełkowski","Dłuski","Gorzycki","Krzycki","Luboński","Radlicki","Sczaniecki"],
+"Godziemba":["Dameracki","Gutowski","Niemojewski","Osiński","Rakowski","Sulmierski","Wilkostowski"],
+"Gryf":["Cikowski","Dersław","Gostwicki","Krzcięcki","Mokronoski","Otfinowski","Przecławski","Rożniatowski","Trzecieski","Zebrzydowski"],
+"Grzymała":["Będzieszyński","Choiński","Dziektarski","Gulczewski","Kargowski","Modliszewski","Osmólski","Przespolewski","Trląski","Zdzarowski"],
+"Janina":["Bystrzejowski","Chomęcki","Cieciszowski","Gierczycki","Głuchowski","Latoszyński","Olszamowski","Rzeczycki","Stoiński"],
+"Jasieńczyk":["Będziński","Boglewski","Bystram","Gierczycki","Kluczkowski","Ratomski","Rusinowski","Skarszewski","Zambrowski"],
+"Jastrzębiec":["Bacciarelli","Bełdowski","Bogatko","Cielemęcki","Dmoszyński","Gorzkowski","Kłodnicki","Niemyski","Ostrowicki","Tokarzewski"],
+"Junosza":["Bacławski","Grabianka","Krzynowłoski","Miecznikowski","Osiecki","Płocki","Szczytowski","Wichrowski","Zaleski"],
+"Korab":["Chwalibogowski","Czepowski","Kiedrowski","Kwiatkowski","Lgota","Milejowski","Sokolnicki","Straszewski","Zaleśny"],
+"Korczak":["Baworowski","Czerkawski","Duszanowicz","Hoszcz","Krasnodębski","Litwinowicz","Ohryzko-Włodkowski","Rohatyński","Sielecki","Zahorski"],
+"Kościesza":["Bartoszewicz","Chojnowski","Danowski","Gojcieszewski","Krzywiec","Milkiewicz","Prusak","Strzegocki","Zdanowicz"],
+"Leliwa":["Bnitowski","Curyło","Gierczyński","Kołomyjski","Łosiatyński","Pilikowski","Rozwadowski","Spytkowski","Tworkowski","Zassowski"],
+"Leszczyc":["Broniszewski","Gembicki","Krzepiński","Mrowiński","Radoliński","Skorzewski","Tolibowski","Wyskotowski"],
+"Lis":["Bzowski","Chełmicki","Fijałkowski","Konopnicki","Kulesza","Mzurek","Prokopowicz","Strzałkowski","Świętosławski","Wąsowicz"],
+"Lubicz":["Bujnowski","Choromański","Duczymiński","Grądzki","Kołomyjski","Kurzeniecki","Łapiński","Mieczkowski","Perzanowski","Roman","Sikorski","Szumski","Wojno","Zaremba"],
+"Łabędź":["Chomiński","Dunin-Marcinkiewicz","Kroczowski","Łabęski","Osmólski","Skrzynecki","Sulgostowski","Zbaraski"],
+"Łodzia":["Bniński","Charłupski","Iłowiecki","Krzesiński","Lgiński","Ponieński","Rogaczewski","Włościborski"],
+"Nałęcz":["Bytyński","Chomętowski","Dziekczyński","Gorzewski","Kwilecki","Łowicki","Niegolewski","Ostroroski","Sadowski","Topolski"],
+"Nieczuja":["Będkowski","Chełmowski","Dzierżek","Gorzycki","Krzelczycki","Moszczyński","Przecławski","Sięgniewski","Ubysz"],
+"Nowina":["Bartodziejski","Chrościcki","Dobiecki","Gniewosz","Koczowski","Modliszewski","Napiórkowski","Sędzicki","Wierzchowski"],
+"Odrowąż":["Bebnowski","Cedrowski","Dębiński","Kietliński","Łęcki","Petrykowski","Płaskowicki","Sędziszewski","Twardowski"],
+"Ogończyk":["Bądkowski","Byszewski","Dziewczopolski","Krobanowski","Luboński","Mierucki","Niestojemski","Pomorski","Sumiński","Widawski"],
+"Oksza":["Będkowski","Chomęcki","Gierczycki","Krzelczycki","Mokrski","Orzechowski","Rejowski","Strasz","Włodkowic"],
+"Ostoja":["Chomranicki","Czechowicz","Gadowski","Kondracki","Mokrzecki","Przedpełski","Ściborski","Zawiszyn"],
+"Pilawa":["Bujanowski","Charzowski","Kliczkowski","Moskorzowski","Podfilipski","Zgłobicki"],
+"Pierzchała":["Kołudzki","Pniewski","Roguski","Ryszewski","Taczalski"],
+};
+
+/* scalenie trzeciej transzy */
+if (typeof HERBY !== "undefined") {
+  for (const [nazwa, lista] of Object.entries(HERBOWNI3)) {
+    const h = HERBY.find(x => x.n === nazwa);
+    if (!h) continue;
+    for (const naz of lista) {
+      const n = naz.trim();
+      if (n.length > 2 && !h.fam.includes(n)) h.fam.push(n);
+    }
+    h.fam.sort((a, b) => a.localeCompare(b, "pl"));
+  }
+}
