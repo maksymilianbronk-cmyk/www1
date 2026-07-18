@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herbarz Polski — wyszukiwarka nazwisk i herbów rodowych</title>
+<meta name="description" content="Wyszukiwarka polskich nazwisk szlacheckich i herbów rodowych. Zamów ręcznie rzeźbiony herb swojego rodu z drewna.">
+<style>
+  :root{
+    --bg:#0f0f13; --bg2:#16161d; --card:#1a1a23; --line:#2a2a36;
+    --txt:#e8e8f0; --muted:#9a9aad; --accent:#6c63ff;
+    --gold:#d4af37; --gold2:#f0d67c; --red:#a4201d;
+    --serif:"Cormorant Garamond","Times New Roman",serif;
+    --sans:"Segoe UI",system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.6}
+  h1,h2,h3,.serif{font-family:var(--serif)}
+  a{color:var(--gold);text-decoration:none}
+  a:hover{color:var(--gold2)}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+
+  /* ── nagłówek ── */
+  header{position:sticky;top:0;z-index:50;background:rgba(15,15,19,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;gap:24px;padding:14px 20px;max-width:1100px;margin:0 auto}
+  .logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);
+    font-size:1.35rem;font-weight:700;color:var(--txt);letter-spacing:.04em}
+  .logo svg{width:30px;height:34px}
+  .nav-links{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+  .nav-links a{color:var(--muted);font-size:.9rem;text-transform:uppercase;letter-spacing:.08em}
+  .nav-links a:hover{color:var(--gold)}
+
+  /* ── hero ── */
+  .hero{position:relative;text-align:center;padding:72px 20px 56px;overflow:hidden;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(212,175,55,.10), transparent 70%),
+      radial-gradient(ellipse 40% 40% at 85% 20%, rgba(108,99,255,.08), transparent 70%),
+      var(--bg)}
+  .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+    background-image:repeating-linear-gradient(45deg,var(--gold) 0 1px,transparent 1px 22px),
+      repeating-linear-gradient(-45deg,var(--gold) 0 1px,transparent 1px 22px)}
+  .hero .crown{font-size:2.2rem;letter-spacing:.4em;color:var(--gold);opacity:.85}
+  .hero h1{font-size:clamp(2.4rem,6vw,4rem);font-weight:700;letter-spacing:.03em;margin:10px 0 6px}
+  .hero h1 em{font-style:normal;color:var(--gold)}
+  .hero .sub{color:var(--muted);max-width:620px;margin:0 auto 34px;font-size:1.05rem}
+  .ornament{display:flex;align-items:center;gap:14px;justify-content:center;color:var(--gold);
+    opacity:.7;margin:18px 0}
+  .ornament::before,.ornament::after{content:"";height:1px;width:90px;
+    background:linear-gradient(90deg,transparent,var(--gold));}
+  .ornament::after{background:linear-gradient(90deg,var(--gold),transparent)}
+
+  /* ── wyszukiwarka ── */
+  .searchbox{position:relative;max-width:640px;margin:0 auto;z-index:5}
+  .searchbox input{width:100%;padding:18px 56px 18px 24px;font-size:1.1rem;color:var(--txt);
+    background:var(--card);border:1px solid var(--gold);border-radius:999px;outline:none;
+    box-shadow:0 0 0 0 rgba(212,175,55,.25);transition:box-shadow .25s}
+  .searchbox input:focus{box-shadow:0 0 0 5px rgba(212,175,55,.15)}
+  .searchbox input::placeholder{color:var(--muted)}
+  .searchbox .lens{position:absolute;right:20px;top:50%;transform:translateY(-50%);
+    font-size:1.2rem;color:var(--gold);pointer-events:none}
+  .hint{color:var(--muted);font-size:.85rem;margin-top:14px}
+  .hint b{color:var(--gold);font-weight:600;cursor:pointer}
+  .stats{display:flex;gap:36px;justify-content:center;margin-top:38px;flex-wrap:wrap}
+  .stat b{display:block;font-family:var(--serif);font-size:1.9rem;color:var(--gold)}
+  .stat span{color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.1em}
+
+  /* ── wyniki ── */
+  #wyniki{padding:36px 0 10px;min-height:40px}
+  .res-info{color:var(--muted);margin-bottom:18px;font-size:.95rem}
+  .res-info b{color:var(--gold)}
+  .no-res{text-align:center;color:var(--muted);padding:26px;border:1px dashed var(--line);
+    border-radius:14px;max-width:640px;margin:0 auto}
+
+  /* ── karty herbów ── */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;padding:8px 0 40px}
+  .herb-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:22px;display:flex;flex-direction:column;gap:14px;
+    transition:transform .2s,border-color .2s}
+  .herb-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+  .herb-head{display:flex;gap:16px;align-items:center}
+  .herb-shield{width:74px;height:88px;flex:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
+  .herb-name{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--gold2)}
+  .herb-alias{color:var(--muted);font-size:.82rem}
+  .herb-blazon{font-size:.9rem;color:var(--txt);opacity:.9;font-style:italic;
+    border-left:2px solid var(--gold);padding-left:12px}
+  .herb-fam{font-size:.85rem;color:var(--muted);line-height:1.75}
+  .herb-fam b{color:var(--txt);font-weight:600;display:block;font-size:.78rem;
+    text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;color:var(--gold)}
+  .herb-fam mark{background:rgba(212,175,55,.25);color:var(--gold2);border-radius:4px;padding:0 3px}
+  .herb-more{background:none;border:none;color:var(--accent);cursor:pointer;font-size:.83rem;padding:0}
+  .herb-more:hover{text-decoration:underline}
+  .herb-order{margin-top:auto;display:inline-block;text-align:center;padding:10px 18px;
+    border:1px solid var(--gold);border-radius:999px;color:var(--gold);font-size:.88rem;
+    letter-spacing:.05em;transition:background .2s,color .2s;cursor:pointer;background:none}
+  .herb-order:hover{background:var(--gold);color:#1a1408}
+
+  /* ── sekcje ── */
+  section{padding:64px 0}
+  .sec-head{text-align:center;margin-bottom:40px}
+  .sec-head h2{font-size:clamp(1.8rem,4vw,2.6rem);color:var(--txt)}
+  .sec-head h2 span{color:var(--gold)}
+  .sec-head p{color:var(--muted);max-width:640px;margin:10px auto 0}
+  .alpha-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:26px}
+  .alpha-bar button{background:var(--card);border:1px solid var(--line);color:var(--muted);
+    min-width:38px;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:.9rem;transition:.2s}
+  .alpha-bar button:hover,.alpha-bar button.on{border-color:var(--gold);color:var(--gold)}
+
+  /* ── drewno ── */
+  #drewno{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .wood-flex{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;align-items:start}
+  @media(max-width:860px){.wood-flex{grid-template-columns:1fr}}
+  .wood-info h3{font-size:1.35rem;color:var(--gold2);margin:22px 0 8px}
+  .wood-info p{color:var(--muted);font-size:.95rem}
+  .steps{list-style:none;margin-top:10px}
+  .steps li{display:flex;gap:14px;margin:16px 0;color:var(--muted);font-size:.95rem}
+  .steps .n{flex:none;width:34px;height:34px;border:1px solid var(--gold);border-radius:50%;
+    display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:1.05rem}
+  .steps b{color:var(--txt)}
+  .price-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.92rem}
+  .price-table th{color:var(--gold);text-transform:uppercase;font-size:.75rem;letter-spacing:.1em;
+    text-align:left;padding:10px 8px;border-bottom:1px solid var(--gold)}
+  .price-table td{padding:11px 8px;border-bottom:1px solid var(--line);color:var(--muted)}
+  .price-table td:first-child{color:var(--txt)}
+  .price-table td:last-child{color:var(--gold2);white-space:nowrap;font-family:var(--serif);font-size:1.05rem}
+
+  /* ── formularz ── */
+  .order-form{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;
+    position:sticky;top:84px}
+  .order-form h3{font-size:1.5rem;color:var(--gold2);margin-bottom:4px}
+  .order-form .of-sub{color:var(--muted);font-size:.88rem;margin-bottom:20px}
+  .field{margin-bottom:15px}
+  .field label{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--muted);margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:var(--bg);color:var(--txt);
+    border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:.95rem;
+    font-family:inherit;outline:none;transition:border-color .2s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+  .field textarea{resize:vertical;min-height:80px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:480px){.field-row{grid-template-columns:1fr}}
+  .btn-gold{width:100%;padding:14px;border:none;border-radius:999px;cursor:pointer;
+    background:linear-gradient(135deg,var(--gold),#b8912c);color:#1a1408;font-size:1rem;
+    font-weight:700;letter-spacing:.05em;transition:filter .2s}
+  .btn-gold:hover{filter:brightness(1.12)}
+  .order-ok{display:none;background:rgba(66,211,146,.1);border:1px solid #42d392;color:#9ff0c8;
+    border-radius:12px;padding:14px 16px;font-size:.9rem;margin-top:14px}
+  .order-ok.show{display:block}
+  .order-ok a{color:#9ff0c8;text-decoration:underline}
+
+  /* ── galeria drewna ── */
+  .wood-samples{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:16px}
+  .wood-chip{border-radius:12px;padding:14px;text-align:center;border:1px solid var(--line);font-size:.85rem}
+  .wood-chip b{display:block;font-family:var(--serif);font-size:1.05rem;margin-bottom:2px}
+  .wood-chip span{font-size:.75rem;opacity:.8}
+
+  /* ── stopka ── */
+  footer{padding:44px 20px;text-align:center;color:var(--muted);font-size:.88rem}
+  footer .back{display:inline-block;margin-top:14px;color:var(--accent)}
+  .disclaimer{max-width:760px;margin:0 auto 14px;font-size:.78rem;opacity:.75}
+</style>
+</head>
+<body>
+</content>
+</invoke>
+
+<header>
+  <div class="nav">
+    <div class="logo">
+      <svg viewBox="0 0 30 34" aria-hidden="true">
+        <path d="M15 1 28 6v10c0 8-5.5 13.5-13 17C7.5 29.5 2 24 2 16V6z"
+              fill="#1a1a23" stroke="#d4af37" stroke-width="1.6"/>
+        <path d="M15 6.5 17.2 12h5.6l-4.5 3.6 1.7 5.7-5-3.4-5 3.4 1.7-5.7L7.2 12h5.6z" fill="#d4af37"/>
+      </svg>
+      Herbarz Polski
+    </div>
+    <nav class="nav-links">
+      <a href="#szukaj">Wyszukiwarka</a>
+      <a href="#herby">Herby</a>
+      <a href="#drewno">Herb z drewna</a>
+      <a href="#zamowienie">Zamówienie</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="szukaj">
+  <div class="crown">☙ ❧</div>
+  <h1>Herbarz <em>Polski</em></h1>
+  <div class="ornament">✦</div>
+  <p class="sub">Wyszukiwarka polskich nazwisk szlacheckich i herbów rodowych.
+     Wpisz nazwisko, aby sprawdzić, do jakiego herbu było przypisane —
+     albo przeglądaj herby alfabetycznie.</p>
+  <div class="searchbox">
+    <input id="q" type="search" autocomplete="off" spellcheck="false"
+           placeholder="Wpisz nazwisko lub nazwę herbu, np. Zaremba, Ostoja, Kowalski…">
+    <span class="lens">⚜</span>
+  </div>
+  <p class="hint">Spróbuj: <b data-q="Jastrzębiec">Jastrzębiec</b> ·
+     <b data-q="Dąbrowski">Dąbrowski</b> · <b data-q="Nałęcz">Nałęcz</b> ·
+     <b data-q="Zawisza">Zawisza</b></p>
+  <div class="stats">
+    <div class="stat"><b id="st-herby">0</b><span>herbów</span></div>
+    <div class="stat"><b id="st-naz">0</b><span>nazwisk</span></div>
+    <div class="stat"><b>XIII–XVIII w.</b><span>okres źródeł</span></div>
+  </div>
+</section>
+
+<div class="wrap"><div id="wyniki" aria-live="polite"></div></div>
+
+<section id="herby">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Katalog <span>herbów rodowych</span></h2>
+      <p>Najbardziej znane polskie herby szlacheckie wraz z blazonowaniem
+         (opisem heraldycznym) i przykładami rodów pieczętujących się danym herbem.</p>
+    </div>
+    <div class="alpha-bar" id="alpha"></div>
+    <div class="grid" id="katalog"></div>
+  </div>
+</section>
+
+<section id="drewno">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Herb rodowy <span>rzeźbiony w drewnie</span></h2>
+      <p>Wykonujemy ręcznie rzeźbione herby na podstawie historycznych wzorów —
+         idealne jako ozdoba domu, prezent rodzinny lub pamiątka rodowa.</p>
+    </div>
+    <div class="wood-flex">
+      <div class="wood-info">
+        <h3>Jak powstaje Twój herb?</h3>
+        <ol class="steps">
+          <li><span class="n">1</span><div><b>Wybór herbu.</b> Znajdź herb w wyszukiwarce
+            albo prześlij nam własny wzór / opis rodzinny.</div></li>
+          <li><span class="n">2</span><div><b>Projekt.</b> Przygotowujemy rysunek
+            techniczny herbu i przesyłamy go do akceptacji przed rzeźbieniem.</div></li>
+          <li><span class="n">3</span><div><b>Rzeźbienie.</b> Herb powstaje ręcznie
+            w litym drewnie — dłutami, bez frezowania CNC (na życzenie także CNC).</div></li>
+          <li><span class="n">4</span><div><b>Wykończenie.</b> Barwienie, złocenia
+            szlagmetalem, olejowosk i zawieszka montażowa.</div></li>
+          <li><span class="n">5</span><div><b>Dostawa.</b> Bezpieczna wysyłka kurierem
+            w ciągu 3–6 tygodni od akceptacji projektu.</div></li>
+        </ol>
+        <h3>Cennik orientacyjny</h3>
+        <table class="price-table">
+          <tr><th>Wariant</th><th>Wymiary</th><th>Cena od</th></tr>
+          <tr><td>Herb mały (płaskorzeźba)</td><td>ok. 25 × 30 cm</td><td>od 590 zł</td></tr>
+          <tr><td>Herb klasyczny</td><td>ok. 35 × 45 cm</td><td>od 990 zł</td></tr>
+          <tr><td>Herb reprezentacyjny</td><td>ok. 50 × 65 cm</td><td>od 1 890 zł</td></tr>
+          <tr><td>Herb polichromowany + złocenia</td><td>dowolne</td><td>+30–50%</td></tr>
+          <tr><td>Projekt herbu (sama grafika)</td><td>plik PDF/PNG</td><td>od 190 zł</td></tr>
+        </table>
+        <h3>Gatunki drewna</h3>
+        <div class="wood-samples">
+          <div class="wood-chip" style="background:linear-gradient(135deg,#caa472,#a87e4f);color:#2a1c0e">
+            <b>Lipa</b><span>klasyka rzeźby, miękka, precyzyjny detal</span></div>
+          <div class="wood-chip" style="background:linear-gradient(135deg,#b98a55,#8a5f33);color:#241605">
+            <b>Dąb</b><span>trwały, szlachetny, wyraźne usłojenie</span></div>
+          <div class="wood-chip" style="background:linear-gradient(135deg,#8a4b2f,#5e2f1c);color:#f5e6d8">
+            <b>Orzech</b><span>ciemny, elegancki, reprezentacyjny</span></div>
+          <div class="wood-chip" style="background:linear-gradient(135deg,#d9b98c,#c09a63);color:#2a1c0e">
+            <b>Jesion</b><span>jasny, sprężysty, nowoczesny wygląd</span></div>
+        </div>
+      </div>
+      <form class="order-form" id="zamowienie" autocomplete="on">
+        <h3>Zamów wycenę herbu</h3>
+        <p class="of-sub">Bez zobowiązań — odpowiadamy w 1–2 dni robocze.</p>
+        <div class="field">
+          <label for="f-herb">Herb / nazwisko rodu *</label>
+          <input id="f-herb" required placeholder="np. herb Ostoja / rodzina Zarembów">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-wariant">Wariant</label>
+            <select id="f-wariant">
+              <option>Herb mały (25×30 cm)</option>
+              <option selected>Herb klasyczny (35×45 cm)</option>
+              <option>Herb reprezentacyjny (50×65 cm)</option>
+              <option>Sam projekt graficzny</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-drewno">Drewno</label>
+            <select id="f-drewno">
+              <option selected>Lipa</option><option>Dąb</option>
+              <option>Orzech</option><option>Jesion</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-imie">Imię i nazwisko *</label>
+            <input id="f-imie" required placeholder="Jan Kowalski">
+          </div>
+          <div class="field">
+            <label for="f-mail">E-mail *</label>
+            <input id="f-mail" type="email" required placeholder="jan@przyklad.pl">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-uwagi">Uwagi (kolory, złocenia, termin…)</label>
+          <textarea id="f-uwagi" placeholder="np. wersja polichromowana, prezent na 60. urodziny"></textarea>
+        </div>
+        <button class="btn-gold" type="submit">Wyślij zapytanie o wycenę</button>
+        <div class="order-ok" id="order-ok"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="disclaimer">Serwis ma charakter edukacyjno-poglądowy. Przynależność nazwiska
+     do herbu nie przesądza o pochodzeniu konkretnej rodziny — wiele nazwisk nosiły
+     zarówno rody szlacheckie, jak i rodziny niespokrewnione. Pełną weryfikację
+     umożliwiają źródła genealogiczne (m.in. herbarze Niesieckiego, Bonieckiego i Uruskiego).</p>
+  <p>⚜ Herbarz Polski — wyszukiwarka herbów i pracownia herbów z drewna</p>
+  <a class="back" href="../../">← wróć do kolekcji</a>
+</footer>
+
+<script>
+/* ── Baza herbów: n=nazwa, a=inne nazwy, b=blazonowanie, f=barwa pola,
+     s=godło (symbol), sc=barwa godła, fam=rody/nazwiska ── */
+const HERBY = [
+ {n:"Abdank",a:"Awdaniec, Habdank",b:"W polu czerwonym srebrna łękawica (litera W).",f:"#9e1b1b",s:"W",sc:"#e8ecf2",fam:["Ankwicz","Białobrzeski","Bogucki","Buczacki","Chądzyński","Doliński","Górski","Kaczkowski","Konarski","Kossowski","Kowalski","Machowski","Rogowski","Skarbek","Warszycki"]},
+ {n:"Bończa",b:"W polu błękitnym jednorożec srebrny.",f:"#1e4f9e",s:"♘",sc:"#e8ecf2",fam:["Bończa","Brzeski","Bystrzycki","Fredro","Miaskowski","Osiński","Siemiątkowski","Tomaszewski"]},
+ {n:"Ciołek",b:"W polu srebrnym ciołek czerwony.",f:"#dfe3ea",s:"♉",sc:"#9e1b1b",fam:["Ciołek","Ciołkowski","Czerski","Drzewiecki","Ostrołęcki","Poniatowski","Wilski","Żelechowski"]},
+ {n:"Dąbrowa",b:"W polu błękitnym podkowa srebrna z trzema krzyżami.",f:"#1e4f9e",s:"∩",sc:"#e8ecf2",fam:["Chojnowski","Cichocki","Dąbrowski","Kołakowski","Uszyński","Wnorowski","Zaniewski"]},
+ {n:"Doliwa",b:"W polu błękitnym skos srebrny z trzema różami czerwonymi.",f:"#1e4f9e",s:"❀",sc:"#e8ecf2",fam:["Doliwa","Smogulecki","Starczewski","Strzałkowski","Wilkowski","Wyganowski"]},
+ {n:"Dołęga",b:"W polu błękitnym podkowa srebrna z krzyżem i strzałą.",f:"#1e4f9e",s:"∩↓",sc:"#e8ecf2",fam:["Chełmicki","Dołęga","Głowiński","Kretkowski","Lasocki","Lewandowski","Mniszewski","Narzymski","Orłowski","Osiecki"]},
+ {n:"Drzewica",b:"W polu błękitnym półksiężyc z dwiema gwiazdami złotymi.",f:"#1e4f9e",s:"☽★",sc:"#d4af37",fam:["Cieszkowski","Drzewicki","Goły","Machnicki"]},
+ {n:"Godziemba",b:"W polu czerwonym sosna zielona o trzech wierzchołkach.",f:"#9e1b1b",s:"↟",sc:"#3fae6a",fam:["Dąmbski","Godziemba","Lubrański","Pigłowski","Sosnowski"]},
+ {n:"Gozdawa",b:"W polu czerwonym podwójna lilia srebrna.",f:"#9e1b1b",s:"⚜",sc:"#e8ecf2",fam:["Bieniewski","Gozdawski","Krzywiński","Mikołajewski","Pac","Russocki"]},
+ {n:"Gryf",a:"Jaksa",b:"W polu czerwonym gryf srebrny wspięty.",f:"#9e1b1b",s:"G",sc:"#e8ecf2",fam:["Branicki","Chmielecki","Gryfita","Jaksa","Mielecki","Ślizień","Żmigrodzki"]},
+ {n:"Grzymała",b:"W polu złotym mur czerwony z trzema wieżami.",f:"#c9a227",s:"♜",sc:"#9e1b1b",fam:["Bukowiecki","Grudziński","Grzymała","Kosmowski","Potulicki","Przyjemski","Słupski"]},
+ {n:"Janina",b:"W polu czerwonym tarcza (pawęż) srebrna.",f:"#9e1b1b",s:"⛨",sc:"#e8ecf2",fam:["Janiński","Sobieski","Strzemeski","Suchodolski","Wielopolski"]},
+ {n:"Jastrzębiec",a:"Boleścic, Zarazy",b:"W polu błękitnym podkowa złota z krzyżem, na hełmie jastrząb.",f:"#1e4f9e",s:"∩✚",sc:"#d4af37",fam:["Bełżecki","Boratyński","Gąsiorowski","Jastrzębski","Kozłowski","Łubieński","Myszkowski","Niemojewski","Ostrowski","Rzeszowski","Zaborowski","Zborowski"]},
+ {n:"Jelita",a:"Koźlarogi",b:"W polu czerwonym trzy kopie złote w gwiazdę.",f:"#9e1b1b",s:"⋔",sc:"#d4af37",fam:["Borzęcki","Kurdwanowski","Mokrski","Płaza","Romer","Zamoyski","Żeromski"]},
+ {n:"Junosza",b:"W polu czerwonym baran srebrny na murawie.",f:"#9e1b1b",s:"♈",sc:"#e8ecf2",fam:["Bielski","Junosza","Karnkowski","Piaseczyński","Piotrowski","Podoski","Rościszewski","Załuski"]},
+ {n:"Korab",b:"W polu czerwonym korab złoty z masztem-wieżą.",f:"#9e1b1b",s:"⚓",sc:"#d4af37",fam:["Kobierzycki","Korab","Kowalski","Łaski","Wierusz","Zapolski"]},
+ {n:"Korczak",b:"W polu czerwonym trzy wręby srebrne.",f:"#9e1b1b",s:"☰",sc:"#e8ecf2",fam:["Bałaban","Braniecki","Hulewicz","Komorowski","Korczak","Krupski","Radecki"]},
+ {n:"Kościesza",a:"Strzegomia",b:"W polu czerwonym rogacina rozdarta srebrna z krzyżem.",f:"#9e1b1b",s:"↑",sc:"#e8ecf2",fam:["Chodkiewicz","Gosławski","Kościesza","Piłsudski","Strzegomski","Wysocki"]},
+ {n:"Leliwa",b:"W polu błękitnym półksiężyc złoty, nad nim gwiazda złota.",f:"#1e4f9e",s:"☽★",sc:"#d4af37",fam:["Czapski","Granowski","Hlebowicz","Melsztyński","Morsztyn","Pilecki","Sieniawski","Tarnowski","Tyszkiewicz"]},
+ {n:"Lis",a:"Mzura",b:"W polu czerwonym strzała srebrna dwukrotnie przekrzyżowana.",f:"#9e1b1b",s:"‡",sc:"#e8ecf2",fam:["Lisowski","Mzurowski","Sapieha","Świętorzecki","Wierzbięta"]},
+ {n:"Lubicz",b:"W polu błękitnym podkowa srebrna z dwoma krzyżami.",f:"#1e4f9e",s:"∩✚",sc:"#e8ecf2",fam:["Grabowski","Kuczyński","Lubowidzki","Lubicz","Milewski","Perkowski","Rekowski","Szepietowski","Wysocki","Żórawski"]},
+ {n:"Łabędź",b:"W polu czerwonym łabędź srebrny.",f:"#9e1b1b",s:"Ł",sc:"#e8ecf2",fam:["Dunin","Duninowski","Modliszewski","Rzuchowski","Skrzyński","Szpotański"]},
+ {n:"Łodzia",b:"W polu czerwonym łódź złota.",f:"#9e1b1b",s:"◡",sc:"#d4af37",fam:["Bniński","Górka","Łodzia","Opaliński","Ponikiewski","Rogaliński","Szołdrski"]},
+ {n:"Nałęcz",b:"W polu czerwonym nałęczka srebrna zawiązana.",f:"#9e1b1b",s:"◠",sc:"#e8ecf2",fam:["Czarnkowski","Gembicki","Małachowski","Moszczeński","Nałęcz","Ostroróg","Raczyński","Sadowski","Szamotulski"]},
+ {n:"Nieczuja",b:"W polu czerwonym ostrzew srebrny z krzyżem.",f:"#9e1b1b",s:"Y",sc:"#e8ecf2",fam:["Dembowski","Nieczuja","Ostrowski","Sieklicki","Urbański"]},
+ {n:"Nowina",a:"Złotogoleńczyk",b:"W polu błękitnym ucho kotłowe srebrne z mieczem.",f:"#1e4f9e",s:"℧",sc:"#e8ecf2",fam:["Jankowski","Kwiatkowski","Nowicki","Nowina","Wilkoński","Złotnicki"]},
+ {n:"Odrowąż",b:"W polu czerwonym strzała srebrna z zawiasami (wąsami).",f:"#9e1b1b",s:"Ψ",sc:"#e8ecf2",fam:["Białaczowski","Chlewicki","Odrowąż","Pieniążek","Sprowski","Szydłowiecki"]},
+ {n:"Ogończyk",a:"Powała",b:"W polu czerwonym półpierścień srebrny ze strzałą.",f:"#9e1b1b",s:"◠↑",sc:"#e8ecf2",fam:["Działyński","Kościelecki","Kucharski","Ogończyk","Sierakowski","Zakrzewski"]},
+ {n:"Oksza",b:"W polu czerwonym oksza (topór) srebrna.",f:"#9e1b1b",s:"⛏",sc:"#e8ecf2",fam:["Grabowski","Okszyc","Orzechowski","Rej","Rejowski","Włodkowic"]},
+ {n:"Ostoja",b:"W polu czerwonym dwa półksiężyce złote i miecz.",f:"#9e1b1b",s:"☾†☽",sc:"#d4af37",fam:["Błociszewski","Bzowski","Chełmski","Czechowski","Danielecki","Ostaszewski","Ostoja","Ścibor"]},
+ {n:"Pilawa",b:"W polu błękitnym półtrzecia krzyża srebrnego.",f:"#1e4f9e",s:"✞",sc:"#e8ecf2",fam:["Kamieniecki","Moskorzewski","Pilawski","Potocki"]},
+ {n:"Pobóg",b:"W polu błękitnym podkowa srebrna z krzyżem zaćwieczonym.",f:"#1e4f9e",s:"∩†",sc:"#e8ecf2",fam:["Koniecpolski","Maciejowski","Pobóg","Poborski","Rokitnicki"]},
+ {n:"Pomian",b:"W polu złotym głowa żubrza czarna przeszyta mieczem.",f:"#c9a227",s:"P",sc:"#1c1c22",fam:["Kossobudzki","Łukowski","Pomianowski","Rusiecki","Wichrowski"]},
+ {n:"Poraj",a:"Róża",b:"W polu czerwonym róża srebrna pięciolistna.",f:"#9e1b1b",s:"✿",sc:"#e8ecf2",fam:["Bużeński","Chodakowski","Kurozwęcki","Poraj","Różycki"]},
+ {n:"Prawdzic",b:"W polu błękitnym lew złoty z pierścieniem (prawdą).",f:"#1e4f9e",s:"♌",sc:"#d4af37",fam:["Grzybowski","Prawdzic","Szczawiński","Ujejski","Zapolski"]},
+ {n:"Prus",a:"Prus I, Turzyna",b:"W polu czerwonym półtora krzyża srebrnego.",f:"#9e1b1b",s:"†",sc:"#e8ecf2",fam:["Głowacki","Obidziński","Prus","Windyka","Wiśniewski"]},
+ {n:"Radwan",a:"Wierzbowa",b:"W polu czerwonym chorągiew kościelna złota z krzyżem.",f:"#9e1b1b",s:"⚑",sc:"#d4af37",fam:["Babski","Judycki","Malczewski","Radwan","Radwański","Zebrzydowski"]},
+ {n:"Rawicz",a:"Rawa",b:"W polu złotym panna w koronie na niedźwiedziu czarnym.",f:"#c9a227",s:"R",sc:"#1c1c22",fam:["Dembiński","Gawroński","Grotowski","Prażmowski","Rawicz","Warszewicki"]},
+ {n:"Rogala",b:"W polu srebrnym róg jeleni czerwony i róg bawoli czarny.",f:"#dfe3ea",s:"⋎",sc:"#9e1b1b",fam:["Kownacki","Rogala","Rogalski","Wężyk","Zawadzki"]},
+ {n:"Rola",b:"W polu czerwonym róża srebrna z trzema krojami.",f:"#9e1b1b",s:"❁",sc:"#e8ecf2",fam:["Nadolski","Rola","Rolicz","Szczawiński","Wilczewski"]},
+ {n:"Sas",a:"Drag",b:"W polu błękitnym półksiężyc złoty, strzała i dwie gwiazdy.",f:"#1e4f9e",s:"★↑★",sc:"#d4af37",fam:["Baczyński","Bandrowski","Berezowski","Bilinski","Czajkowski","Dzieduszycki","Hoszowski","Ilnicki","Komarnicki","Kulczycki","Sozański","Tarnawski","Witwicki","Żurakowski"]},
+ {n:"Sulima",b:"W polu dwudzielnym: pół orła czarnego w złocie, trzy kamienie w czerwieni.",f:"#1c1c22",s:"S",sc:"#d4af37",fam:["Gamrat","Oporowski","Sulimowski","Zawisza"]},
+ {n:"Szeliga",b:"W polu czerwonym półksiężyc złoty z krzyżem.",f:"#9e1b1b",s:"☽✚",sc:"#d4af37",fam:["Szeliga","Szeligowski","Tłubicki","Żelski"]},
+ {n:"Szreniawa",a:"Śreniawa, Krzywaśń",b:"W polu czerwonym krzywaśń (rzeka) srebrna z krzyżem.",f:"#9e1b1b",s:"≈",sc:"#e8ecf2",fam:["Kmita","Lubomirski","Rupniewski","Stadnicki","Szreniawski"]},
+ {n:"Ślepowron",a:"Korwin ślepy",b:"W polu błękitnym podkowa z krzyżem, na nim kruk z pierścieniem.",f:"#1e4f9e",s:"∩✟",sc:"#e8ecf2",fam:["Gosiewski","Kamieński","Kamiński","Kossakowski","Krasiński","Milewski","Ślepowroński","Wąsowicz"]},
+ {n:"Świnka",b:"W polu czerwonym głowa dzika srebrna.",f:"#9e1b1b",s:"Ś",sc:"#e8ecf2",fam:["Świnka","Zajączkowski","Zieliński","Żychliński"]},
+ {n:"Topór",a:"Starża",b:"W polu czerwonym topór srebrny.",f:"#9e1b1b",s:"⚒",sc:"#e8ecf2",fam:["Balicki","Ossoliński","Tarło","Tęczyński","Toporczyk","Zaklika"]},
+ {n:"Trąby",b:"W polu srebrnym trzy trąby czarne w gwiazdę.",f:"#dfe3ea",s:"T",sc:"#1c1c22",fam:["Brzuchowski","Jordan","Radziwiłł","Trąbski"]},
+ {n:"Wczele",b:"Pole szachowane złoto-czarne (szachownica).",f:"#c9a227",s:"▦",sc:"#1c1c22",fam:["Objezierski","Skoroszewski","Wczele","Zdzychowski"]},
+ {n:"Wieniawa",b:"W polu złotym głowa żubrza czarna z pierścieniem w nozdrzach.",f:"#c9a227",s:"ʘ",sc:"#1c1c22",fam:["Długosz","Leszczyński","Wieniawski"]},
+ {n:"Zadora",a:"Płomienie",b:"W polu błękitnym głowa lwia srebrna ziejąca płomieniami.",f:"#1e4f9e",s:"Z",sc:"#e8ecf2",fam:["Lanckoroński","Zadora","Zbąski"]},
+ {n:"Zaremba",b:"W polu czerwonym pół lwa czarnego nad murem srebrnym.",f:"#9e1b1b",s:"Ƶ",sc:"#e8ecf2",fam:["Cielecki","Kalinowski","Zaremba","Zarembski","Zarębski"]},
+];
+</script>
+
+<script>
+/* ── pomocnicze ── */
+const norm = s => s.toLowerCase()
+  .replace(/ą/g,"a").replace(/ć/g,"c").replace(/ę/g,"e").replace(/ł/g,"l")
+  .replace(/ń/g,"n").replace(/ó/g,"o").replace(/ś/g,"s").replace(/[żź]/g,"z");
+/* żeńskie końcówki nazwisk → męskie (Kowalska → Kowalski) */
+const stem = s => s.replace(/ska$/,"ski").replace(/cka$/,"cki").replace(/dzka$/,"dzki");
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function shieldSVG(h){
+  const fs = h.s.length>2 ? 15 : h.s.length>1 ? 22 : 32;
+  return `<svg class="herb-shield" viewBox="0 0 74 88" aria-hidden="true">
+    <path d="M37 3 69 14v26c0 20-13.5 33.5-32 42C18.5 73.5 5 60 5 40V14z"
+          fill="${h.f}" stroke="#d4af37" stroke-width="2.5"/>
+    <path d="M37 8 64 17.5V40c0 16.5-11 28.5-27 36.5C21 68.5 10 56.5 10 40V17.5z"
+          fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+    <text x="37" y="46" text-anchor="middle" dominant-baseline="middle"
+          font-size="${fs}" font-weight="bold" fill="${h.sc}"
+          font-family="Georgia,serif">${h.s}</text>
+  </svg>`;
+}
+
+function herbCard(h, matched){
+  const LIMIT = 8;
+  const isM = f => matched && matched.has(f);
+  const sorted = matched ? [...h.fam].sort((a,b)=> (isM(b)-isM(a)) || a.localeCompare(b,"pl")) : h.fam;
+  const shown = sorted.slice(0,LIMIT), rest = sorted.slice(LIMIT);
+  const famHtml = shown.map(f => isM(f) ? `<mark>${esc(f)}</mark>` : esc(f)).join(", ")
+    + (rest.length ? `<span class="fam-rest" hidden>, ${rest.map(f => isM(f)?`<mark>${esc(f)}</mark>`:esc(f)).join(", ")}</span>
+       <button class="herb-more" type="button">+ ${rest.length} więcej</button>` : "");
+  return `<article class="herb-card">
+    <div class="herb-head">${shieldSVG(h)}
+      <div><div class="herb-name">${esc(h.n)}</div>
+      ${h.a ? `<div class="herb-alias">inaczej: ${esc(h.a)}</div>` : ""}</div>
+    </div>
+    <p class="herb-blazon">${esc(h.b)}</p>
+    <p class="herb-fam"><b>Rody pieczętujące się herbem</b>${famHtml}</p>
+    <button class="herb-order" type="button" data-herb="${esc(h.n)}">🪵 Zamów ten herb w drewnie</button>
+  </article>`;
+}
+
+/* ── statystyki ── */
+document.getElementById("st-herby").textContent = HERBY.length;
+document.getElementById("st-naz").textContent =
+  new Set(HERBY.flatMap(h=>h.fam)).size + "+";
+
+/* ── katalog + pasek liter ── */
+const katalogEl = document.getElementById("katalog");
+const alphaEl = document.getElementById("alpha");
+let letter = "";
+
+function renderKatalog(){
+  const list = letter ? HERBY.filter(h => norm(h.n)[0] === norm(letter)) : HERBY;
+  katalogEl.innerHTML = list.map(h => herbCard(h)).join("") ||
+    `<p class="no-res">Brak herbów na literę „${esc(letter)}”.</p>`;
+}
+const letters = [...new Set(HERBY.map(h=>h.n[0]))].sort((a,b)=>a.localeCompare(b,"pl"));
+alphaEl.innerHTML = `<button class="on" data-l="">Wszystkie</button>` +
+  letters.map(l=>`<button data-l="${l}">${l}</button>`).join("");
+alphaEl.addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  letter = b.dataset.l;
+  alphaEl.querySelectorAll("button").forEach(x=>x.classList.toggle("on", x===b));
+  renderKatalog();
+});
+renderKatalog();
+
+/* ── wyszukiwarka ── */
+const q = document.getElementById("q");
+const wyniki = document.getElementById("wyniki");
+
+function search(raw){
+  const query = stem(norm(raw.trim()));
+  if(query.length < 2){ wyniki.innerHTML = ""; return; }
+  const hits = [];
+  for(const h of HERBY){
+    const nameHit = norm(h.n).includes(query) || (h.a && norm(h.a).includes(query));
+    const matched = new Set(h.fam.filter(f => {
+      const nf = norm(f);
+      return nf.startsWith(query) || query.startsWith(nf) || (query.length>3 && nf.includes(query));
+    }));
+    if(nameHit || matched.size) hits.push({h, matched, score:(nameHit?100:0)+matched.size});
+  }
+  hits.sort((a,b)=>b.score-a.score);
+  if(!hits.length){
+    wyniki.innerHTML = `<div class="no-res">Nie znaleziono „<b>${esc(raw)}</b>” w bazie.
+      Spróbuj innej pisowni (np. formy męskiej nazwiska) albo
+      <a href="#zamowienie">napisz do nas</a> — sprawdzimy w pełnych herbarzach
+      Niesieckiego i Bonieckiego.</div>`;
+    return;
+  }
+  wyniki.innerHTML =
+    `<p class="res-info">Znaleziono <b>${hits.length}</b> ${hits.length===1?"herb":hits.length<5?"herby":"herbów"} dla zapytania „<b>${esc(raw)}</b>”:</p>
+     <div class="grid">${hits.map(x=>herbCard(x.h, x.matched)).join("")}</div>`;
+  }
+
+q.addEventListener("input", () => search(q.value));
+document.querySelectorAll(".hint b").forEach(b =>
+  b.addEventListener("click", () => { q.value = b.dataset.q; search(q.value); q.focus(); }));
+
+/* ── delegacja: „więcej” + „zamów” ── */
+document.addEventListener("click", e => {
+  const more = e.target.closest(".herb-more");
+  if(more){
+    more.previousElementSibling.hidden = false;
+    more.remove();
+    return;
+  }
+  const order = e.target.closest(".herb-order");
+  if(order){
+    const f = document.getElementById("f-herb");
+    f.value = "herb " + order.dataset.herb;
+    document.getElementById("zamowienie").scrollIntoView({behavior:"smooth"});
+    setTimeout(()=>f.focus({preventScroll:true}), 600);
+  }
+});
+
+/* ── formularz zamówienia ── */
+document.getElementById("zamowienie").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = id => document.getElementById(id).value.trim();
+  const subject = encodeURIComponent(`Wycena herbu z drewna — ${v("f-herb")}`);
+  const body = encodeURIComponent(
+    `Herb / ród: ${v("f-herb")}\nWariant: ${v("f-wariant")}\nDrewno: ${v("f-drewno")}\n` +
+    `Zamawiający: ${v("f-imie")} <${v("f-mail")}>\nUwagi: ${v("f-uwagi") || "—"}`);
+  const ok = document.getElementById("order-ok");
+  ok.innerHTML = `Dziękujemy! Zapytanie przygotowane — kliknij, aby wysłać je e-mailem:
+    <a href="mailto:zamowienia@herbarz.example?subject=${subject}&body=${body}">
+    otwórz wiadomość w programie pocztowym</a>. Odpowiadamy w 1–2 dni robocze.`;
+  ok.classList.add("show");
+  ok.scrollIntoView({behavior:"smooth", block:"nearest"});
+});
+</script>
+</body>
+</html>

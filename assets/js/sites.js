@@ -222,4 +222,17 @@ const SITES = [
       tech: ["HTML", "CSS"],
     },
   },
+  {
+    slug: "herbarz-polski",
+    title: "Herbarz Polski — herby i nazwiska",
+    desc: "Wyszukiwarka polskich nazwisk szlacheckich i 52 herbów rodowych z blazonowaniem i tarczami SVG. Szukanie po nazwisku lub nazwie herbu (obsługa form żeńskich i polskich znaków), katalog alfabetyczny oraz usługa zamówienia ręcznie rzeźbionego herbu z drewna: proces w 5 krokach, cennik, gatunki drewna i formularz wyceny.",
+    icon: "🛡️",
+    tag: "katalog",
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#1a1a23", "#d4af37", "#9e1b1b", "#1e4f9e"],
+      fonts: ["Cormorant Garamond", "Segoe UI / system-ui"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS"],
+    },
+  },
 ];
