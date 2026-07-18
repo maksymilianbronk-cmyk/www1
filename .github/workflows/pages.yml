@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+      # środowisko github-pages ma regułę ochrony dopuszczającą deploy
+      # tylko z tej gałęzi — publikacja = dosunięcie jej do main
+      - claude/website-collection-setup-xojca4
   workflow_dispatch:
 
 permissions:
