@@ -65,16 +65,23 @@
   .topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.45rem 0;flex-wrap:wrap}
   .topbar a{color:var(--ivory);display:inline-block;padding:.3rem 0}
   .topbar a:hover{color:var(--gold)}
-  .topbar .tb-l{display:flex;gap:1.4rem;flex-wrap:wrap}
+  .topbar .tb-l{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:center}
   .topbar .dot{color:var(--gold)}
+  .tb-soc{display:flex;gap:.4rem;align-items:center}
+  .tb-soc a{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid rgba(212,175,55,.35);border-radius:50%;padding:0;transition:.25s}
+  .tb-soc a:hover{background:var(--gold);border-color:var(--gold)}
+  .tb-soc svg{width:15px;height:15px;fill:var(--gold);transition:.25s}
+  .tb-soc a:hover svg{fill:var(--black)}
 
   /* ---------- nav ---------- */
   header{position:sticky;top:0;z-index:100;background:rgba(10,10,11,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
   .nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
-  .logo{display:flex;flex-direction:column;line-height:1}
-  .logo b{font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--white);letter-spacing:.04em}
-  .logo b i{font-style:normal;color:var(--gold)}
-  .logo span{font-size:.58rem;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-top:.3rem}
+  .logo{display:flex;align-items:center;gap:.8rem}
+  .logo-badge{width:56px;height:56px;flex:0 0 auto;border-radius:50%;box-shadow:0 0 18px rgba(212,175,55,.25)}
+  .logo-txt{display:flex;flex-direction:column;line-height:1}
+  .logo-txt b{font-family:var(--serif);font-size:1.55rem;font-weight:700;color:var(--white);letter-spacing:.04em}
+  .logo-txt b i{font-style:normal;color:var(--gold)}
+  .logo-txt>span{font-size:.58rem;letter-spacing:.42em;text-transform:uppercase;color:var(--gold);margin-top:.3rem}
   .menu{display:flex;gap:2rem;list-style:none;align-items:center}
   .menu a{display:inline-block;padding:.55rem 0;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory);transition:color .2s}
   .menu a:hover{color:var(--gold)}
@@ -166,6 +173,48 @@
   .rev span{display:block;font-size:.74rem;color:var(--mut)}
   .stars{color:var(--gold);letter-spacing:.2em;font-size:.8rem}
 
+  /* ---------- cennik ---------- */
+  .price{background:var(--coal);border-block:1px solid rgba(255,255,255,.05)}
+  .price-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:1.6rem;align-items:start}
+  .price-card{background:var(--panel);border:1px solid rgba(255,255,255,.06);padding:2rem}
+  .price-card h3{font-size:1.35rem;margin-bottom:.9rem}
+  .price-card>p{font-size:.92rem;color:var(--mut)}
+  .price-badge{display:inline-block;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);border:1px solid var(--line);padding:.3rem .7rem;margin-bottom:1rem}
+  .scope{list-style:none;margin:1.3rem 0;display:grid;gap:.55rem}
+  .scope li{display:flex;gap:.7rem;font-size:.9rem;color:#cfccc2;align-items:flex-start}
+  .scope svg{flex:0 0 18px;height:18px;stroke:var(--gold);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;margin-top:.15rem}
+  .warn{border:1px solid rgba(212,175,55,.28);background:rgba(212,175,55,.05);padding:1rem 1.2rem;font-size:.8rem;color:var(--mut);margin:1.2rem 0}
+  .warn b{color:var(--gold-2);font-weight:500;display:block;margin-bottom:.3rem;letter-spacing:.06em}
+  .price-foot{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.07);padding-top:1.3rem;margin-top:1.3rem}
+  .price-val{font-family:var(--serif);font-size:1.7rem;color:var(--gold)}
+  .price-val small{font-family:var(--sans);font-size:.75rem;color:var(--mut);letter-spacing:.1em;margin-left:.5rem}
+  .price-rows{display:grid}
+  .price-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .price-row:last-child{border-bottom:none}
+  .price-row b{font-weight:500;color:var(--ivory);font-size:.92rem;letter-spacing:.04em}
+  .price-row small{display:block;color:var(--mut);font-size:.72rem;letter-spacing:.08em}
+  .price-row .pr{font-family:var(--serif);color:var(--gold);font-size:1.12rem;white-space:nowrap}
+  .price-row .um{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;border:1px solid var(--gold);color:var(--gold);padding:.65rem 1rem;transition:.25s;white-space:nowrap}
+  .price-row .um:hover{background:var(--gold);color:var(--black)}
+  .price-side{display:grid;gap:1.6rem}
+  .voucher{background:linear-gradient(135deg,#1c1810,#131210);border:1px dashed var(--gold-dim);padding:1.8rem 2rem;position:relative;overflow:hidden}
+  .voucher::after{content:"🎁";position:absolute;right:1.2rem;top:1rem;font-size:1.6rem;opacity:.8}
+  .voucher h3{font-size:1.15rem;margin-bottom:.5rem}
+  .voucher p{font-size:.85rem;color:var(--mut)}
+  .price-note{font-size:.8rem;color:var(--mut)}
+  .price-note a{color:var(--gold)}
+  .ig-inline{color:var(--gold);border-bottom:1px solid var(--gold-dim)}
+  .ig-inline:hover{color:var(--gold-2)}
+
+  /* ---------- galeria: linki do filmików ---------- */
+  .gal-link{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;background:rgba(10,10,11,.55);opacity:0;transition:opacity .3s}
+  .gal figure:hover .gal-link,.gal-link:focus-visible{opacity:1}
+  .gal-link svg{width:46px;height:46px;fill:var(--gold);stroke:none;border:1.5px solid var(--gold);border-radius:50%;padding:.55rem;background:rgba(0,0,0,.4)}
+  .gal-link span{font-size:.68rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-2)}
+  .gal-cta{text-align:center;margin-top:2.2rem}
+  .gal-cta .btn{display:inline-flex;align-items:center;gap:.7rem}
+  .ig-glyph{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+
   /* ---------- cta band ---------- */
   .cta-band{background:linear-gradient(120deg,#191712,#0c0c0d);border-block:1px solid var(--line);text-align:center}
   .cta-band .wrap{padding:4.5rem 0;display:flex;flex-direction:column;align-items:center;gap:1.4rem}
@@ -212,6 +261,12 @@
   .hero .wrap{position:relative;z-index:2}
   .hero h1 em{background:linear-gradient(110deg,var(--gold-2),#fff6d8 25%,var(--gold) 55%,var(--gold-2) 80%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shineTxt 5.5s linear infinite}
   @keyframes shineTxt{to{background-position:220% 0}}
+  .hero-wrap{display:flex;align-items:center;justify-content:space-between;gap:2.5rem}
+  .hero-badge{width:clamp(220px,26vw,380px);height:clamp(220px,26vw,380px);flex:0 0 auto;border-radius:50%;filter:drop-shadow(0 0 45px rgba(212,175,55,.28));animation:float 7s ease-in-out infinite}
+  @media(max-width:900px){
+    .hero-wrap{flex-direction:column;align-items:flex-start;gap:0}
+    .hero-badge{order:-1;width:150px;height:150px;margin-top:2.6rem;margin-bottom:-3.4rem}
+  }
   .scr{position:absolute;left:50%;bottom:1.5rem;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;color:var(--gold);opacity:.85}
   .scr svg{width:22px;height:12px;stroke:var(--gold);fill:none;stroke-width:2;animation:chev 1.6s ease-in-out infinite}
   .scr svg:nth-child(2){animation-delay:.25s;opacity:.55}
@@ -221,6 +276,22 @@
   .btn.solid{position:relative;overflow:hidden}
   .btn.solid::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-60%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-20deg);animation:btnShine 3.6s ease-in-out infinite}
   @keyframes btnShine{0%,55%{left:-60%}100%{left:135%}}
+
+  /* ---------- baner Booksy ---------- */
+  .booksy{background:linear-gradient(120deg,#16130c,#0c0b09);border-bottom:1px solid var(--line)}
+  .booksy-link{display:flex;align-items:center;justify-content:center;gap:1.4rem;width:min(1180px,92%);margin:0 auto;padding:1.6rem 0;position:relative;overflow:hidden}
+  .booksy-link::after{content:"";position:absolute;top:0;bottom:0;width:34%;left:-50%;background:linear-gradient(105deg,transparent,rgba(212,175,55,.14),transparent);transform:skewX(-20deg);animation:btnShine 4.2s ease-in-out infinite}
+  .booksy-cal{flex:0 0 62px;width:62px;height:62px;border-radius:50%;border:1px solid var(--gold);background:radial-gradient(circle at 30% 25%,rgba(212,175,55,.25),transparent 70%);display:flex;align-items:center;justify-content:center;animation:float 5s ease-in-out infinite}
+  .booksy-cal svg{width:32px;height:32px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .booksy-check{stroke:var(--gold-2)}
+  .booksy-txt small{display:block;color:var(--mut);letter-spacing:.22em;text-transform:uppercase;font-size:.66rem;margin-bottom:.25rem}
+  .booksy-txt b{font-family:var(--serif);font-weight:600;font-size:clamp(1.35rem,3vw,1.9rem);color:var(--white);letter-spacing:.02em}
+  .booksy-txt b i{font-style:normal;background:linear-gradient(110deg,var(--gold-2),#fff6d8 30%,var(--gold) 60%,var(--gold-2));background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shineTxt 5.5s linear infinite}
+  .booksy-link:hover .booksy-txt b{color:var(--gold-2)}
+  @media(max-width:640px){
+    .booksy-link{gap:1rem;padding:1.3rem 0}
+    .booksy-cal{flex-basis:52px;width:52px;height:52px}
+  }
 
   /* ---------- marquee usług ---------- */
   .tick{overflow:hidden;background:#0c0b09;border-block:1px solid var(--line);padding:.8rem 0}
@@ -281,9 +352,10 @@
     .rev-grid{grid-template-columns:1fr}
     .gal{grid-template-columns:1fr 1fr}
   }
-  @media(max-width:640px){
+  @media(max-width:900px){
     /* menu jako panel absolutny pod headerem — fixed wewnątrz backdrop-filter
-       tworzy własny containing block i prześwitywał; tło w pełni kryjące */
+       tworzy własny containing block i prześwitywał; tło w pełni kryjące.
+       Próg 900px: 7 pozycji menu nie mieści się już na tablecie. */
     header{background:var(--black)}
     .nav{position:relative}
     .menu{position:absolute;top:100%;left:0;right:0;background:var(--black);flex-direction:column;padding:1rem 0 1.6rem;gap:.4rem;border-bottom:1px solid var(--line);box-shadow:0 24px 40px rgba(0,0,0,.6);display:none;z-index:99}
@@ -292,9 +364,16 @@
     .burger{display:block;min-width:44px;min-height:44px}
     .nav .btn{display:none}
     .nav-phone{display:inline-flex;margin-left:auto;margin-right:.7rem}
+  }
+  @media(max-width:960px){
+    .price-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:640px){
     .grid-serv,.gal,.usp .wrap,.proc-grid,form{grid-template-columns:1fr}
     .topbar .tb-r{display:none}
     .hero{min-height:88vh}
+    .price-foot{flex-direction:column;align-items:flex-start}
+    .price-row{flex-wrap:wrap}
   }
 </style>
 </head>
@@ -304,6 +383,14 @@
 <div class="topbar">
   <div class="wrap">
     <div class="tb-l">
+      <span class="tb-soc">
+        <a href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener" aria-label="Instagram AXIO1 Detailing">
+          <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.8.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.2 15.62 2.2 15.24 2.2 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.2 8.8 2.2 12 2.2zm0 1.8c-3.15 0-3.52.01-4.76.07-1.08.05-1.67.23-2.06.38-.52.2-.89.44-1.28.83-.39.39-.63.76-.83 1.28-.15.39-.33.98-.38 2.06-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.05 1.08.23 1.67.38 2.06.2.52.44.89.83 1.28.39.39.76.63 1.28.83.39.15.98.33 2.06.38 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c1.08-.05 1.67-.23 2.06-.38.52-.2.89-.44 1.28-.83.39-.39.63-.76.83-1.28.15-.39.33-.98.38-2.06.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.05-1.08-.23-1.67-.38-2.06-.2-.52-.44-.89-.83-1.28a3.5 3.5 0 0 0-1.28-.83c-.39-.15-.98-.33-2.06-.38-1.24-.06-1.61-.07-4.76-.07zm0 3.06a4.94 4.94 0 1 1 0 9.88 4.94 4.94 0 0 1 0-9.88zm0 8.15a3.21 3.21 0 1 0 0-6.42 3.21 3.21 0 0 0 0 6.42zm6.29-8.35a1.15 1.15 0 1 1-2.3 0 1.15 1.15 0 0 1 2.3 0z"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@axio1.detailing" target="_blank" rel="noopener" aria-label="TikTok AXIO1 Detailing">
+          <svg viewBox="0 0 24 24"><path d="M16.6 3c.36 1.94 1.62 3.45 3.56 3.98.5.14.98.2 1.48.2v3.44a8.2 8.2 0 0 1-4.63-1.44v6.72c0 3.61-2.72 6.6-6.35 6.83a6.57 6.57 0 0 1-6.95-6.56 6.57 6.57 0 0 1 7.28-6.53v3.5a3.1 3.1 0 0 0-3.75 3.03 3.1 3.1 0 0 0 3.27 3.1c1.7-.06 2.99-1.5 2.99-3.2V3h3.1z"/></svg>
+        </a>
+      </span>
       <span>📍 Warszawa i całe woj. mazowieckie <span class="dot">•</span> dojazd do klienta</span>
     </div>
     <div class="tb-r">
@@ -318,12 +405,16 @@
 <header>
   <div class="wrap nav">
     <a class="logo" href="#start" aria-label="AXIO1 Mobilny Detailing">
-      <b>AXIO<i>1</i></b>
-      <span>Mobilny Detailing</span>
+      <svg class="logo-badge" aria-hidden="true"><use href="#axio1-logo"/></svg>
+      <span class="logo-txt">
+        <b>AXIO<i>1</i></b>
+        <span>Mobilny Detailing</span>
+      </span>
     </a>
     <nav>
       <ul class="menu" id="menu">
         <li><a href="#uslugi">Usługi</a></li>
+        <li><a href="#cennik">Cennik</a></li>
         <li><a href="#proces">Jak działamy</a></li>
         <li><a href="#onas">O nas</a></li>
         <li><a href="#galeria">Realizacje</a></li>
@@ -337,6 +428,34 @@
   </div>
 </header>
 
+<!-- logo AXIO1 — wektorowe odwzorowanie emblematu firmy -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="lgBg" cx="35%" cy="28%" r="85%">
+      <stop offset="0" stop-color="#1c1c1f"/><stop offset="1" stop-color="#040405"/>
+    </radialGradient>
+    <linearGradient id="lgGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4de8f"/><stop offset=".45" stop-color="#d4af37"/><stop offset="1" stop-color="#8f701e"/>
+    </linearGradient>
+    <linearGradient id="lgGold2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7e6a6"/><stop offset="1" stop-color="#c39a2b"/>
+    </linearGradient>
+    <linearGradient id="lgSilver" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#c9ccd2"/><stop offset="1" stop-color="#84898f"/>
+    </linearGradient>
+    <symbol id="axio1-logo" viewBox="0 0 400 400">
+      <circle cx="200" cy="200" r="198" fill="url(#lgBg)"/>
+      <circle cx="200" cy="200" r="174" fill="none" stroke="url(#lgGold)" stroke-width="5"/>
+      <circle cx="200" cy="200" r="186" fill="none" stroke="url(#lgGold)" stroke-width="1" opacity=".35"/>
+      <text x="197" y="219" text-anchor="middle" font-family="Jost,Arial,sans-serif" font-weight="600"
+            font-size="84" letter-spacing="8"><tspan fill="url(#lgSilver)">AXIO</tspan><tspan fill="url(#lgGold2)">1</tspan></text>
+      <path d="M96 256h26M278 256h26" stroke="url(#lgGold2)" stroke-width="2"/>
+      <text x="200" y="263" text-anchor="middle" font-family="Jost,Arial,sans-serif" font-weight="500"
+            font-size="19.5" letter-spacing="5.5" fill="url(#lgGold2)">MOBILNY DETAILING</text>
+    </symbol>
+  </defs>
+</svg>
+
 <div class="progress" id="progress" aria-hidden="true"></div>
 
 <!-- hero -->
@@ -347,7 +466,7 @@
          data-fb='["https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1800&q=80","https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1800"]'
          data-ph="🚘" alt="Czarny samochód po detailingu — głębia lakieru" onerror="fb(this)">
   </div>
-  <div class="wrap">
+  <div class="wrap hero-wrap">
     <div class="hero-in">
       <span class="kicker">Mobilny detailing premium</span>
       <h1>Salon detailingu<br><em>pod Twoim domem</em></h1>
@@ -367,12 +486,26 @@
         <div><b data-n="7" data-suf=" dni">7 dni</b><span>w tygodniu</span></div>
       </div>
     </div>
+    <svg class="hero-badge rv" role="img" aria-label="Logo AXIO1 Mobilny Detailing"><use href="#axio1-logo"/></svg>
   </div>
   <div class="scr" aria-hidden="true">
     <svg viewBox="0 0 22 12"><path d="M2 2l9 8 9-8"/></svg>
     <svg viewBox="0 0 22 12"><path d="M2 2l9 8 9-8"/></svg>
   </div>
 </section>
+
+<!-- booksy -->
+<div class="booksy">
+  <a class="booksy-link rv" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">
+    <span class="booksy-cal" aria-hidden="true">
+      <svg viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="32" rx="5"/><path d="M6 20h36M16 6v8M32 6v8"/><path class="booksy-check" d="M17 30l5 5 9-10"/></svg>
+    </span>
+    <span class="booksy-txt">
+      <small>Wolisz konkretny termin? Zarezerwuj wizytę online</small>
+      <b>Rezerwuj na <i>Booksy</i> →</b>
+    </span>
+  </a>
+</div>
 
 <!-- marquee usług -->
 <div class="tick" aria-hidden="true">
@@ -537,6 +670,91 @@
   </div>
 </section>
 
+<!-- cennik -->
+<section class="sec price" id="cennik">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">Cennik</span>
+      <h2>Realne usługi, <span class="gold">realne ceny</span></h2>
+      <p>Pełna, aktualna lista usług i wolne terminy dostępne są w naszym profilu
+         <a class="ig-inline" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Booksy</a>.
+         Wszystkie usługi wykonujemy mobilnie, u Ciebie.</p>
+    </div>
+    <div class="price-grid">
+
+      <article class="price-card rv">
+        <span class="price-badge">Usługa mobilna</span>
+        <h3>Wosk ochronny Long Life</h3>
+        <p>Wysokiej jakości wosk ochronny aplikowany ręcznie na wcześniej przygotowany lakier.
+           Tworzy hydrofobową warstwę ochronną, podkreśla głębię koloru i nadaje lakierowi wysoki
+           połysk. Zabezpiecza przed promieniowaniem UV, zabrudzeniami drogowymi oraz niekorzystnym
+           wpływem warunków atmosferycznych.</p>
+        <ul class="scope">
+          <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Kontrola stanu lakieru</li>
+          <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Odtłuszczenie powierzchni</li>
+          <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Ręczna aplikacja wosku</li>
+          <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Dotarcie i wypolerowanie</li>
+          <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Kontrola końcowa</li>
+        </ul>
+        <div class="warn">
+          <b>⚠️ Ważne informacje</b>
+          Usługa wykonywana wyłącznie jako dodatek do mycia detailingowego lub innej usługi
+          obejmującej przygotowanie lakieru. Przed aplikacją wykonywana jest ocena stanu lakieru
+          oraz dokumentacja fotograficzna pojazdu. Deklarowana trwałość zabezpieczenia zależy od
+          sposobu użytkowania pojazdu, warunków atmosferycznych oraz prawidłowej pielęgnacji po
+          wykonaniu usługi.
+        </div>
+        <div class="price-foot">
+          <span class="price-val">250,00 zł<small>· 40 min</small></span>
+          <a class="btn solid" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Umów na Booksy</a>
+        </div>
+      </article>
+
+      <div class="price-side">
+        <div class="price-card rv">
+          <span class="price-badge">Trwałość 12 miesięcy</span>
+          <h3>Wosk ochronny Premium</h3>
+          <div class="price-rows">
+            <div class="price-row">
+              <div><b>Sedan</b><small>ok. 50 min</small></div>
+              <span class="pr">300,00 zł</span>
+              <a class="um" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Umów</a>
+            </div>
+            <div class="price-row">
+              <div><b>SUV</b><small>ok. 1 g 40 min</small></div>
+              <span class="pr">370,00 zł</span>
+              <a class="um" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Umów</a>
+            </div>
+            <div class="price-row">
+              <div><b>Van / Bus</b><small>ok. 2 g 30 min</small></div>
+              <span class="pr">650,00 zł</span>
+              <a class="um" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Umów</a>
+            </div>
+            <div class="price-row">
+              <div><b>Camper</b><small>wycena indywidualna</small></div>
+              <span class="pr">zapytaj</span>
+              <a class="um" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Umów</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="voucher rv">
+          <h3>Voucher podarunkowy</h3>
+          <p>Dowolna kwota lub wybrana usługa. Wersja fizyczna, wysyłana pocztą lub kurierem.</p>
+          <div class="price-foot">
+            <span class="price-val">149,00 zł</span>
+            <a class="um" href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Zamów</a>
+          </div>
+        </div>
+
+        <p class="price-note rv">Pranie tapicerki samochodowej realizujemy w ramach linii
+           <b style="color:var(--gold-2)">AXIO1 TEXTILE</b> — szczegóły i terminy na
+           <a href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Booksy</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- process -->
 <section class="sec proc" id="proces">
   <div class="wrap">
@@ -590,45 +808,76 @@
     <div class="sec-head rv">
       <span class="kicker">Realizacje</span>
       <h2>Efekty naszej <span class="gold">pracy</span></h2>
-      <p>Zdjęcia poglądowe — galeria realizacji AXIO1 już wkrótce.</p>
+      <p>Zdjęcia poglądowe — filmiki z prawdziwych realizacji AXIO1 obejrzysz na naszym
+         Instagramie <a class="ig-inline" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener">@axio1_detailing</a>.</p>
     </div>
     <div class="gal">
       <figure class="rv">
         <img src="https://cdn.pixabay.com/photo/2016/11/18/12/49/car-1834274_1280.jpg"
              data-fb='["https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80","https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg?auto=compress&cs=tinysrgb&w=1200"]'
              data-ph="🚘" alt="Lakier po korekcie i wosku" loading="lazy" onerror="fb(this)">
+        <a class="gal-link" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener" aria-label="Zobacz filmiki z realizacji na Instagramie AXIO1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          <span>Zobacz film</span>
+        </a>
         <figcaption>Głębia lakieru</figcaption>
       </figure>
       <figure class="rv">
         <img src="https://cdn.pixabay.com/photo/2017/03/27/14/56/auto-2179220_1280.jpg"
              data-fb='["https://images.pexels.com/photos/6873081/pexels-photo-6873081.jpeg?auto=compress&cs=tinysrgb&w=1200","https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=1200&q=80"]'
              data-ph="🫧" alt="Mycie pianą aktywną" loading="lazy" onerror="fb(this)">
+        <a class="gal-link" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener" aria-label="Zobacz filmiki z realizacji na Instagramie AXIO1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          <span>Zobacz film</span>
+        </a>
         <figcaption>Piana aktywna</figcaption>
       </figure>
       <figure class="rv">
         <img src="https://cdn.pixabay.com/photo/2016/11/29/09/32/auto-1868726_1280.jpg"
              data-fb='["https://images.pexels.com/photos/385003/pexels-photo-385003.jpeg?auto=compress&cs=tinysrgb&w=1200","https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80"]'
              data-ph="✨" alt="Wnętrze po detailingu" loading="lazy" onerror="fb(this)">
+        <a class="gal-link" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener" aria-label="Zobacz filmiki z realizacji na Instagramie AXIO1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          <span>Zobacz film</span>
+        </a>
         <figcaption>Wnętrze premium</figcaption>
       </figure>
       <figure class="rv">
         <img src="https://cdn.pixabay.com/photo/2017/08/31/05/47/bmw-2699538_1280.jpg"
              data-fb='["https://images.pexels.com/photos/193021/pexels-photo-193021.jpeg?auto=compress&cs=tinysrgb&w=1200","https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80"]'
              data-ph="🛋️" alt="Skórzana tapicerka po impregnacji" loading="lazy" onerror="fb(this)">
+        <a class="gal-link" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener" aria-label="Zobacz filmiki z realizacji na Instagramie AXIO1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          <span>Zobacz film</span>
+        </a>
         <figcaption>Skóra po impregnacji</figcaption>
       </figure>
       <figure class="rv">
         <img src="https://cdn.pixabay.com/photo/2018/06/07/20/17/camper-3460856_1280.jpg"
              data-fb='["https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=1200&q=80","https://images.pexels.com/photos/2506711/pexels-photo-2506711.jpeg?auto=compress&cs=tinysrgb&w=1200"]'
              data-ph="🚐" alt="Kamper po myciu detailingowym" loading="lazy" onerror="fb(this)">
+        <a class="gal-link" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener" aria-label="Zobacz filmiki z realizacji na Instagramie AXIO1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          <span>Zobacz film</span>
+        </a>
         <figcaption>Kampery</figcaption>
       </figure>
       <figure class="rv">
         <img src="https://cdn.pixabay.com/photo/2016/11/29/04/17/boat-1867124_1280.jpg"
              data-fb='["https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1200&q=80","https://images.pexels.com/photos/1295036/pexels-photo-1295036.jpeg?auto=compress&cs=tinysrgb&w=1200"]'
              data-ph="🛥️" alt="Łódź po detailingu" loading="lazy" onerror="fb(this)">
+        <a class="gal-link" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener" aria-label="Zobacz filmiki z realizacji na Instagramie AXIO1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>
+          <span>Zobacz film</span>
+        </a>
         <figcaption>Łodzie i jachty</figcaption>
       </figure>
+    </div>
+    <div class="gal-cta rv">
+      <a class="btn solid" href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener">
+        <svg class="ig-glyph" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor" stroke="none"/></svg>
+        Filmiki z realizacji na Instagramie
+      </a>
     </div>
   </div>
 </section>
@@ -699,6 +948,14 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
         <div><small>Godziny</small><b>Pon–Nd 8:00–20:00</b></div>
       </div>
+      <div class="con-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><path d="M17.4 6.6h.01"/></svg>
+        <div><small>Social media</small>
+          <a href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener">@axio1_detailing</a>
+          &nbsp;<span style="color:var(--gold)">•</span>&nbsp;
+          <a href="https://www.tiktok.com/@axio1.detailing" target="_blank" rel="noopener">TikTok</a>
+        </div>
+      </div>
     </div>
 
     <form id="quoteForm" class="rv" novalidate>
@@ -718,6 +975,7 @@
         <label for="f-serv">Usługa</label>
         <select id="f-serv" name="service">
           <option>Mycie detailingowe</option>
+          <option>Wosk ochronny (Long Life / Premium 12 msc)</option>
           <option>Pranie tapicerki</option>
           <option>Czyszczenie detailingowe wnętrza</option>
           <option>Ozonowanie</option>
@@ -740,13 +998,19 @@
 <footer>
   <div class="wrap">
     <div class="foot">
-      <div>
-        <b style="font-family:var(--serif);color:var(--white);font-size:1.1rem">AXIO<span class="gold">1</span></b>
-        <span style="letter-spacing:.3em;font-size:.6rem;text-transform:uppercase;color:var(--gold)"> Mobilny Detailing</span>
+      <div style="display:flex;align-items:center;gap:.8rem">
+        <svg style="width:46px;height:46px;border-radius:50%" aria-hidden="true"><use href="#axio1-logo"/></svg>
+        <div>
+          <b style="font-family:var(--serif);color:var(--white);font-size:1.1rem">AXIO<span class="gold">1</span></b>
+          <span style="letter-spacing:.3em;font-size:.6rem;text-transform:uppercase;color:var(--gold)"> Mobilny Detailing</span>
+        </div>
       </div>
       <div>
         <a href="tel:+48514841191">+48 514 841 191</a> &nbsp;•&nbsp;
-        <a href="mailto:d.gawryszewski@icloud.com">d.gawryszewski@icloud.com</a>
+        <a href="mailto:d.gawryszewski@icloud.com">d.gawryszewski@icloud.com</a> &nbsp;•&nbsp;
+        <a href="https://www.instagram.com/axio1_detailing/" target="_blank" rel="noopener">Instagram</a> &nbsp;•&nbsp;
+        <a href="https://www.tiktok.com/@axio1.detailing" target="_blank" rel="noopener">TikTok</a> &nbsp;•&nbsp;
+        <a href="https://booksy.com/pl-pl/351207_axio1-mobilny-auto-detailing_motoryzacja_3_warszawa" target="_blank" rel="noopener">Booksy</a>
       </div>
       <div>© 2026 AXIO1 Mobilny Detailing. Zdjęcia poglądowe: Pixabay.</div>
     </div>
