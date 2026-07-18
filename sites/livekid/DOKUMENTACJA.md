@@ -93,6 +93,11 @@ donut w czystym SVG), kalendarz miesięczny, powiadomienia, wydruk faktur/dokume
 | Nauczyciel | Magda Nowak | grupa Motylki: obecność (+ „zaznacz wszystkich"), raporty dzienne, dziennik, plan dnia, obserwacje, galeria, jadłospis (edycja), czaty |
 | Dyrektor | Ewa Zielińska | cała placówka: pulpit z wykresami/trendami, dzieci (wyszukiwarka, dodawanie), grupy, kadry (grafik, nieobecności), rozliczenia wielomiesięczne, raporty, rekrutacja, ogłoszenia, kalendarz, dokumenty, ustawienia + import/eksport |
 | Samorząd | Wydział Edukacji | nadzór nad 3 placówkami: pulpit zbiorczy, lista placówek, dotacje, raporty zbiorcze |
+| Specjalista | Julia Krawczyk | logopeda: podopieczni, dziennik sesji terapeutycznych (z generowaniem AI), harmonogram, wiadomości |
+
+Dodatkowo: **tryb ciemny** (przełącznik w stopce panelu, zapamiętywany) oraz
+**drill-down dziecka** w panelu dyrektora (klik w wiersz → pełny profil:
+frekwencja, faktury, obserwacje, sesje specjalistów).
 
 ## 5. Import własnych danych (docelowo)
 

@@ -343,3 +343,50 @@ img { max-width: 100%; }
   .cal-cell { min-height: 38px; padding: 4px; }
   .cal-num { font-size: .72rem; }
 }
+
+/* ============================ TRYB CIEMNY ============================ */
+:root[data-theme="dark"] {
+  --ink: #e7f1ef;
+  --ink-2: #9db6b2;
+  --bg: #0e1a19;
+  --card: #162523;
+  --line: #26403c;
+  --teal-l: #123833;
+}
+:root[data-theme="dark"] body { background: var(--bg); }
+:root[data-theme="dark"] .sidebar,
+:root[data-theme="dark"] .mtop { background: #122120; border-color: var(--line); }
+:root[data-theme="dark"] .nav-item:hover { background: #1b2e2b; }
+:root[data-theme="dark"] .side-actions button,
+:root[data-theme="dark"] .btn-ghost,
+:root[data-theme="dark"] .seg,
+:root[data-theme="dark"] .rtile,
+:root[data-theme="dark"] .cal-cell,
+:root[data-theme="dark"] .cal-nav,
+:root[data-theme="dark"] .menu-day .menu-date,
+:root[data-theme="dark"] .bubble.them { background: #1b2e2b; color: var(--ink); }
+:root[data-theme="dark"] .seg button.on,
+:root[data-theme="dark"] .search input,
+:root[data-theme="dark"] .field input,
+:root[data-theme="dark"] .field select,
+:root[data-theme="dark"] .field textarea,
+:root[data-theme="dark"] .bell,
+:root[data-theme="dark"] .date-chip { background: #1f322f; color: var(--ink); border-color: var(--line); }
+:root[data-theme="dark"] .btn-ghost:hover,
+:root[data-theme="dark"] .side-actions button:hover,
+:root[data-theme="dark"] .nav-item:hover { background: #223734; }
+:root[data-theme="dark"] .bar,
+:root[data-theme="dark"] tbody tr:hover { background: #1b2e2b; }
+:root[data-theme="dark"] .tbl tbody tr:hover { background: #1b2e2b; }
+:root[data-theme="dark"] .photo { background: linear-gradient(135deg, #1b2e2b, #16302a); }
+:root[data-theme="dark"] .notif-item.unread { background: #14312b; }
+:root[data-theme="dark"] .auth {
+  background:
+    radial-gradient(1000px 500px at 15% -10%, #123833 0, transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, #2a1f1c 0, transparent 55%),
+    var(--bg);
+}
+:root[data-theme="dark"] .role-btn { background: #1b2e2b; }
+:root[data-theme="dark"] .role-btn:hover { background: #1f322f; }
+:root[data-theme="dark"] .ai-btn { background: #241f3a; }
+:root[data-theme="dark"] .tab:hover { color: var(--ink); }

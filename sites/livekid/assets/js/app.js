@@ -89,6 +89,14 @@
       { path: "dotacje", ico: "💰", label: "Dotacje" },
       { path: "raporty", ico: "📈", label: "Raporty zbiorcze" },
     ],
+    specjalista: [
+      { g: "Gabinet" },
+      { path: "pulpit", ico: "🏠", label: "Pulpit" },
+      { path: "podopieczni", ico: "🧒", label: "Podopieczni" },
+      { path: "sesje", ico: "🗒️", label: "Dziennik sesji" },
+      { path: "harmonogram", ico: "🕐", label: "Harmonogram" },
+      { path: "wiadomosci", ico: "💬", label: "Wiadomości" },
+    ],
   };
 
   const ROLE_META = {
@@ -96,6 +104,7 @@
     nauczyciel: { emoji: "👩‍🏫", name: "Nauczyciel" },
     dyrektor: { emoji: "💼", name: "Dyrektor" },
     samorzad: { emoji: "🏛️", name: "Samorząd" },
+    specjalista: { emoji: "🗣️", name: "Specjalista" },
   };
 
   /* ---------------- ekran logowania ---------------- */
@@ -113,6 +122,7 @@
             <button class="role-btn" data-login="nauczyciel:t1"><span class="role-emoji" style="background:#e2effd">👩‍🏫</span><span><span class="role-name">Magda Nowak</span><br><span class="role-desc">Nauczyciel · grupa Motylki</span></span></button>
             <button class="role-btn" data-login="dyrektor:d1"><span class="role-emoji" style="background:#d9f5f0">💼</span><span><span class="role-name">Ewa Zielińska</span><br><span class="role-desc">Dyrektor · ${esc(data.facility.name)}</span></span></button>
             <button class="role-btn" data-login="samorzad:sm1"><span class="role-emoji" style="background:#efeaff">🏛️</span><span><span class="role-name">Wydział Edukacji</span><br><span class="role-desc">Samorząd · nadzór nad placówkami</span></span></button>
+            <button class="role-btn" data-login="specjalista:s1"><span class="role-emoji" style="background:#e6f7ee">🗣️</span><span><span class="role-name">Julia Krawczyk</span><br><span class="role-desc">Specjalista · logopeda</span></span></button>
           </div>
           <p class="auth-foot">Konta demonstracyjne — dane lokalne w przeglądarce. <a href="o-systemie.html">O systemie</a> · <a href="DOKUMENTACJA.md" target="_blank" rel="noopener">Dokumentacja</a></p>
         </div>
@@ -131,7 +141,7 @@
     const data = KB.load();
     if (sess.role === "dyrektor") return data.director;
     if (sess.role === "samorzad") return data.samorzad;
-    if (sess.role === "nauczyciel") return KB.staffById(sess.id);
+    if (sess.role === "nauczyciel" || sess.role === "specjalista") return KB.staffById(sess.id);
     return KB.parent(sess.id);
   }
 
@@ -158,7 +168,7 @@
         ${navHtml}
         <div class="side-foot">
           <div class="side-user"><span class="av">${meta.emoji}</span><span><span class="u-name">${esc(user.name)}</span><br><span class="u-role">${meta.name}</span></span></div>
-          <div class="side-actions"><button data-act="reset">↺ Reset demo</button><button data-act="logout">Wyloguj</button></div>
+          <div class="side-actions"><button data-act="toggleTheme">${document.documentElement.getAttribute("data-theme") === "dark" ? "☀️ Jasny" : "🌙 Ciemny"}</button><button data-act="reset">↺ Reset</button><button data-act="logout">Wyloguj</button></div>
         </div>
       </aside>
       <div class="scrim" id="scrim"></div>
@@ -228,7 +238,7 @@
   }
   window.addEventListener("hashchange", render);
 
-  const VIEWS = { rodzic: {}, nauczyciel: {}, dyrektor: {}, samorzad: {} };
+  const VIEWS = { rodzic: {}, nauczyciel: {}, dyrektor: {}, samorzad: {}, specjalista: {} };
 
   /* helper: wybrane dziecko rodzica */
   function parentChild(sess) {
@@ -615,7 +625,8 @@
     return { title: "Dzieci i umowy", sub: `${data.children.length} dzieci · ${data.contracts.filter((c) => c.status === "aktywna").length} aktywnych umów`, html: `
       <div class="toolbar"><div class="search"><input placeholder="Szukaj dziecka…" data-act="searchInput" value="${esc(VS.search)}"></div><button class="btn btn-primary" data-act="openAddChild">＋ Dodaj dziecko</button></div>
       <div class="card2"><div class="wrap-scroll"><table class="tbl"><thead><tr><th>Dziecko</th><th>Grupa</th><th>Rodzic</th><th>Umowa od</th><th class="right">Czesne</th><th>Status</th></tr></thead>
-        <tbody>${list.map((c) => { const g = KB.group(c.groupId), p = KB.parent(c.parentId), u = KB.contractOf(c.id); return `<tr><td><b>${c.avatar} ${esc(c.name)}</b><br><span class="muted" style="font-size:.78rem">${KB.ageFrom(c.birth)} lata${c.allergies !== "brak" ? " · ⚠️ " + esc(c.allergies) : ""}</span></td><td><span class="pill" style="background:${g.color}22;color:${g.color}">${esc(g.name)}</span></td><td>${esc(p.name)}<br><span class="muted" style="font-size:.78rem">${esc(p.phone)}</span></td><td>${plDate(u.from)}</td><td class="right">${money(u.monthlyFee)}</td><td><span class="pill pill-green">${esc(u.status)}</span></td></tr>`; }).join("")}</tbody></table></div>
+        <tbody>${list.map((c) => { const g = KB.group(c.groupId), p = KB.parent(c.parentId), u = KB.contractOf(c.id); return `<tr style="cursor:pointer" data-act="openChildDetail" data-id="${c.id}"><td><b>${c.avatar} ${esc(c.name)}</b><br><span class="muted" style="font-size:.78rem">${KB.ageFrom(c.birth)} lata${c.allergies !== "brak" ? " · ⚠️ " + esc(c.allergies) : ""}</span></td><td><span class="pill" style="background:${g.color}22;color:${g.color}">${esc(g.name)}</span></td><td>${esc(p.name)}<br><span class="muted" style="font-size:.78rem">${esc(p.phone)}</span></td><td>${plDate(u.from)}</td><td class="right">${money(u.monthlyFee)}</td><td><span class="pill pill-green">${esc(u.status)}</span></td></tr>`; }).join("")}</tbody></table></div>
+        <p class="muted mt-16" style="font-size:.82rem">💡 Kliknij dziecko, aby zobaczyć pełny profil (frekwencja, faktury, obserwacje, sesje).</p>
         ${list.length === 0 ? `<div class="empty2"><div class="e-ico">🔍</div>Brak wyników.</div>` : ""}
       </div>` };
   };
@@ -770,6 +781,57 @@
         <div class="card2"><div class="card-h"><span class="avatar" style="background:#f0f7f5">📊</span><div><h3>Raport zbiorczy placówek</h3><span class="muted" style="font-size:.84rem">Dzieci, kadra, frekwencja</span></div></div><button class="btn btn-primary btn-block mt-16" data-act="exportFacilities">⬇ Pobierz CSV</button></div>
         <div class="card2"><div class="card-h"><span class="avatar" style="background:#f0f7f5">💰</span><div><h3>Raport dotacji</h3><span class="muted" style="font-size:.84rem">Rozliczenie dotacji oświatowych</span></div></div><button class="btn btn-primary btn-block mt-16" data-act="exportSubsidies">⬇ Pobierz CSV</button></div>
       </div>` };
+  };
+
+  /* ============================================================ SPECJALISTA */
+  VIEWS.specjalista.wiadomosci = (sess) => threadView(sess);
+
+  VIEWS.specjalista.pulpit = (sess) => {
+    const sp = KB.staffById(sess.id), kids = KB.careOf(sess.id), sessions = KB.sessionsOf(sess.id);
+    const todaySess = sessions.filter((s) => s.next === KB.today || s.date === KB.today);
+    const upcoming = sessions.filter((s) => s.next && s.next >= KB.today).sort((a, b) => a.next.localeCompare(b.next));
+    return { title: `Gabinet — ${esc(sp.role)}`, sub: `${esc(sp.name)} · ${kids.length} podopiecznych`, html: `
+      <div class="grid g-4" style="margin-bottom:18px">
+        <div class="stat accent-teal"><div class="s-ico">🧒</div><div class="s-val">${kids.length}</div><div class="s-lbl">Podopieczni</div></div>
+        <div class="stat accent-sky"><div class="s-ico">🗒️</div><div class="s-val">${sessions.length}</div><div class="s-lbl">Sesje (łącznie)</div></div>
+        <div class="stat accent-amber"><div class="s-ico">📅</div><div class="s-val">${upcoming.length}</div><div class="s-lbl">Zaplanowane</div></div>
+        <div class="stat accent-coral"><div class="s-ico">⏱️</div><div class="s-val">${sp.hoursWeek}h</div><div class="s-lbl">Wymiar tygodniowy</div></div>
+      </div>
+      <div class="grid g-2">
+        <div class="card2"><div class="card-h"><h3>Podopieczni</h3><div class="spacer"></div><a href="#/specjalista/sesje" class="btn btn-ghost btn-sm">Dziennik</a></div>
+          ${kids.map((k) => { const g = KB.group(k.groupId); const last = KB.sessionsForChild(k.id).filter((s) => s.specialistId === sess.id).sort((a, b) => b.date.localeCompare(a.date))[0]; return `<div class="row"><span class="avatar" style="background:${g.color}22">${k.avatar}</span><div class="r-main"><div class="r-title">${esc(k.name)} <span class="muted" style="font-weight:600">· ${esc(g.name)}</span></div><div class="r-sub">${last ? "ostatnia sesja: " + plDate(last.date) : "brak sesji"}</div></div><button class="btn btn-primary btn-sm" data-act="openSession" data-id="${k.id}">＋ sesja</button></div>`; }).join("")}
+        </div>
+        <div class="card2"><div class="card-h"><h3>Najbliższe sesje</h3></div>
+          ${upcoming.length ? upcoming.map((s) => { const ch = KB.child(s.childId); return `<div class="row"><span class="avatar" style="background:#e6f7ee">🗓️</span><div class="r-main"><div class="r-title">${esc(ch.name)}</div><div class="r-sub">${esc(s.type)} · ${plDate(s.next)}</div></div></div>`; }).join("") : `<div class="empty2"><div class="e-ico">📅</div>Brak zaplanowanych sesji.</div>`}
+        </div>
+      </div>` };
+  };
+
+  VIEWS.specjalista.podopieczni = (sess) => {
+    const kids = KB.careOf(sess.id);
+    return { title: "Podopieczni", sub: "Dzieci objęte opieką specjalisty.", html: `
+      <div class="card2"><div class="wrap-scroll"><table class="tbl"><thead><tr><th>Dziecko</th><th>Grupa</th><th class="right">Sesje</th><th>Ostatnia</th><th></th></tr></thead>
+        <tbody>${kids.map((k) => { const g = KB.group(k.groupId); const ss = KB.sessionsForChild(k.id).filter((s) => s.specialistId === sess.id).sort((a, b) => b.date.localeCompare(a.date)); return `<tr><td><b>${k.avatar} ${esc(k.name)}</b><br><span class="muted" style="font-size:.78rem">${KB.ageFrom(k.birth)} lata</span></td><td><span class="pill" style="background:${g.color}22;color:${g.color}">${esc(g.name)}</span></td><td class="right">${ss.length}</td><td>${ss[0] ? plDate(ss[0].date) : "—"}</td><td class="right"><button class="btn btn-primary btn-sm" data-act="openSession" data-id="${k.id}">＋ sesja</button></td></tr>`; }).join("")}</tbody></table></div></div>` };
+  };
+
+  VIEWS.specjalista.sesje = (sess) => {
+    const sessions = KB.sessionsOf(sess.id).slice().sort((a, b) => b.date.localeCompare(a.date));
+    return { title: "Dziennik sesji", sub: "Zapisy sesji terapeutycznych — dziennik specjalisty.", html: `
+      <button class="btn btn-primary" data-act="openSession" style="margin-bottom:18px">＋ Nowa sesja</button>
+      <div class="card2">${sessions.length ? sessions.map((s) => { const ch = KB.child(s.childId); return `<div class="row"><span class="avatar" style="background:#e6f7ee">🗒️</span><div class="r-main"><div class="r-title">${esc(ch ? ch.name : "—")} · ${esc(s.type)}</div><div class="r-sub">${plDate(s.date)} — ${esc(s.notes)}${s.next ? ` · <b>następna:</b> ${plDate(s.next)}` : ""}</div></div></div>`; }).join("") : `<div class="empty2"><div class="e-ico">🗒️</div>Brak sesji.</div>`}</div>` };
+  };
+
+  VIEWS.specjalista.harmonogram = (sess) => {
+    const sp = KB.staffById(sess.id);
+    const slots = [
+      { day: "Poniedziałek", items: ["9:00 Zosia K. — logopedia", "10:00 Lena Z. — logopedia"] },
+      { day: "Wtorek", items: ["11:00 konsultacje z kadrą"] },
+      { day: "Środa", items: ["9:00 Zosia K. — logopedia", "10:30 diagnozy"] },
+      { day: "Czwartek", items: ["9:30 Jaś W. — wsparcie"] },
+      { day: "Piątek", items: ["9:00 Zosia K. — logopedia", "12:00 dokumentacja"] },
+    ];
+    return { title: "Harmonogram", sub: `Tygodniowy plan pracy — ${esc(sp.name)} (${sp.hoursWeek}h/tydz.)`, html: `
+      <div class="grid g-2">${slots.map((s) => `<div class="card2"><div class="card-h"><h3>${esc(s.day)}</h3></div><div class="timeline">${s.items.map((it) => `<div class="tl-item"><div class="tl-time">${esc(it.split(" ")[0])}</div><div style="font-weight:600">${esc(it.split(" ").slice(1).join(" "))}</div></div>`).join("")}</div></div>`).join("")}</div>` };
   };
 
   /* ============================================================ AKCJE */
@@ -985,6 +1047,59 @@
       rd.readAsText(file);
     },
 
+    /* specjalista */
+    openSession(t, sess) {
+      const kids = KB.careOf(sess.id);
+      const preId = t.dataset.id;
+      const sp = KB.staffById(sess.id);
+      const defType = sp.role === "logopeda" ? "Terapia logopedyczna" : sp.role === "psycholog" ? "Wsparcie psychologiczne" : "Sesja";
+      modal(`<h3>Nowa sesja</h3><p class="m-sub">Dziennik specjalisty <button class="ai-btn" data-act="aiSession" style="float:right">✨ AI</button></p>
+        <form data-act="saveSession">
+          <div class="field"><label>Dziecko</label><select name="child">${kids.map((k) => `<option value="${k.id}" ${k.id === preId ? "selected" : ""}>${esc(k.name)}</option>`).join("")}</select></div>
+          <div class="field"><label>Rodzaj</label><input name="type" value="${esc(defType)}"></div>
+          <div class="field"><label>Notatka z sesji</label><textarea name="notes" id="sesNotes" required></textarea></div>
+          <div class="field"><label>Następna sesja</label><input type="date" name="next" value="${KB.today}"></div>
+          <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="KBcloseModal()">Anuluj</button><button class="btn btn-primary">Zapisz</button></div>
+        </form>`);
+    },
+    aiSession() { document.getElementById("sesNotes").value = "Podczas sesji dziecko było skoncentrowane i chętne do współpracy. Wykonano zaplanowane ćwiczenia, obserwuję stopniową poprawę. Zalecane kontynuowanie ćwiczeń w domu."; toast("Notatka wygenerowana ✨"); },
+    saveSession(f, sess) {
+      const fd = new FormData(f), sp = KB.staffById(sess.id);
+      KB.load().therapySessions.push({ id: KB.uid("ts"), specialistId: sess.id, childId: fd.get("child"), date: KB.today, type: fd.get("type"), notes: fd.get("notes"), next: fd.get("next") || "" });
+      KB.save(); closeModal(); toast("Sesja zapisana ✓"); render();
+    },
+
+    /* szczegóły dziecka (dyrektor) */
+    openChildDetail(t) {
+      const ch = KB.child(t.dataset.id); if (!ch) return;
+      const g = KB.group(ch.groupId), p = KB.parent(ch.parentId), u = KB.contractOf(ch.id);
+      const att = KB.attendanceOf(ch.id).slice(0, 10).reverse();
+      const trend = att.map((a) => ({ label: plShort(a.date), value: a.present ? 1 : 0, color: a.present ? "var(--teal)" : "var(--line)" }));
+      const invs = KB.invoicesOf(ch.id).sort((a, b) => b.month.localeCompare(a.month));
+      const reps = KB.load().reports.filter((r) => r.childId === ch.id).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+      const obs = KB.load().observations.filter((o) => o.childId === ch.id).sort((a, b) => b.date.localeCompare(a.date));
+      const sess = KB.sessionsForChild(ch.id);
+      modal(`<h3>${ch.avatar} ${esc(ch.name)}</h3><p class="m-sub">${KB.ageFrom(ch.birth)} lata · grupa ${esc(g.name)} · rodzic: ${esc(p.name)} (${esc(p.phone)})</p>
+        <div class="grid g-2" style="gap:12px;margin-bottom:12px">
+          <div class="rtile"><div class="rt-val">${attRate(ch.id, 30)}%</div><div class="rt-lbl">Frekwencja 30 dni</div></div>
+          <div class="rtile"><div class="rt-val">${money(u.monthlyFee)}</div><div class="rt-lbl">Czesne</div></div>
+        </div>
+        <div class="card-h" style="margin:6px 0"><b>Obecność (10 dni)</b></div>${UI.barChart(trend, { height: 110, fmt: (v) => v ? "✓" : "–" })}
+        <div class="card-h" style="margin:10px 0 6px"><b>Faktury</b></div>
+        ${invs.map((i) => `<div class="row" style="padding:8px 4px"><div class="r-main"><div class="r-title" style="font-size:.86rem">${esc(i.number)}</div></div><b>${money(i.total)}</b> ${i.paid ? '<span class="pill pill-green">✓</span>' : '<span class="pill pill-red">!</span>'}</div>`).join("")}
+        ${obs.length ? `<div class="card-h" style="margin:10px 0 6px"><b>Obserwacje</b></div>${obs.map((o) => `<div class="r-sub" style="margin:4px 0">${esc(o.area)} ${"★".repeat(o.rating)} — ${esc(o.text.slice(0, 70))}…</div>`).join("")}` : ""}
+        ${sess.length ? `<div class="card-h" style="margin:10px 0 6px"><b>Sesje specjalistów</b></div>${sess.map((s) => { const sp = KB.staffById(s.specialistId); return `<div class="r-sub" style="margin:4px 0">${plDate(s.date)} · ${esc(s.type)} (${sp ? esc(sp.name) : "—"})</div>`; }).join("")}` : ""}
+        <div class="modal-actions"><button type="button" class="btn btn-primary btn-block" onclick="KBcloseModal()">Zamknij</button></div>`);
+    },
+
+    /* motyw */
+    toggleTheme() {
+      const cur = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", cur);
+      try { localStorage.setItem("kidbloom_theme", cur); } catch {}
+      render();
+    },
+
     /* samorząd */
     paySubsidy(t) { const s = KB.load().subsidies.find((x) => x.facilityId === t.dataset.id); if (s) { s.status = "wypłacona"; KB.save(); toast("Dotacja wypłacona ✓"); render(); } },
     exportSubsidies() { const data = KB.load(); const rows = [["Placówka", "Dzieci", "Stawka", "Kwota", "Status"]]; data.subsidies.forEach((s) => { const f = data.facilities.find((x) => x.id === s.facilityId); rows.push([f.name, s.childrenCount, s.ratePerChild, s.amount, s.status]); }); downloadCSV("dotacje_2026-07.csv", rows); },
@@ -997,6 +1112,9 @@
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: name });
     a.click(); URL.revokeObjectURL(a.href); toast("Plik CSV pobrany ✓");
   }
+
+  /* init motywu z localStorage */
+  try { const th = localStorage.getItem("kidbloom_theme"); if (th) document.documentElement.setAttribute("data-theme", th); } catch {}
 
   render();
 })();

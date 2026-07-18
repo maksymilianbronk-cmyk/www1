@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "livekid",
     title: "KidBloom — system dla żłobków i przedszkoli",
-    desc: "Odwrotna inżynieria systemu LiveKid: samodzielna aplikacja SPA (HTML/CSS/vanilla JS) z 4 rolami (Rodzic, Nauczyciel, Dyrektor, Samorząd) i ~35 ekranami. Moduły: dziennik elektroniczny, ewidencja obecności i godzin, raporty dzienne, profil dziecka, nieobecności z kalendarzem, jadłospis i zamawianie posiłków, rozwój i obserwacje, galeria, czaty, ogłoszenia, płatności online z wydrukiem faktur, dokumenty i zgody RODO, plan dnia, grupy, kadry z grafikiem, rozliczenia wielomiesięczne, rekrutacja, raporty z wykresami SVG, dotacje samorządowe, import/eksport JSON, generowanie treści AI (demo). Strona marketingowa + mock backend na localStorage.",
+    desc: "Odwrotna inżynieria systemu LiveKid: samodzielna aplikacja SPA (HTML/CSS/vanilla JS) z 5 rolami (Rodzic, Nauczyciel, Dyrektor, Samorząd, Specjalista) i 40+ ekranami. Moduły: dziennik elektroniczny, ewidencja obecności i godzin, raporty dzienne, profil dziecka, nieobecności z kalendarzem, jadłospis i zamawianie posiłków, rozwój i obserwacje, galeria, czaty, ogłoszenia, płatności online z wydrukiem faktur, dokumenty i zgody RODO, plan dnia, grupy, kadry z grafikiem, rozliczenia wielomiesięczne, rekrutacja, raporty z wykresami SVG, dotacje samorządowe, dziennik sesji specjalisty (logopeda/psycholog), drill-down profilu dziecka, tryb ciemny, import/eksport JSON, generowanie treści AI (demo). Strona marketingowa + mock backend na localStorage.",
     icon: "🌱",
     tag: "system",
     preview: true,

@@ -239,6 +239,19 @@
       { id: uid("n"), userId: "d1", icon: "📥", text: "2 nowe zgłoszenia rekrutacyjne", date: daysAgo(2), read: false },
       { id: uid("n"), userId: "d1", icon: "⚠️", text: "Zaległe płatności: kilka faktur", date: daysAgo(1), read: false },
       { id: uid("n"), userId: "sm1", icon: "💰", text: "Dotacja lipcowa do wypłaty (Tęczowa Kraina)", date: daysAgo(1), read: false },
+      { id: uid("n"), userId: "s1", icon: "🗣️", text: "Dziś 3 sesje logopedyczne w planie", date: daysAgo(0), read: false },
+    ];
+
+    /* opieka specjalistów (podopieczni) + dziennik sesji */
+    const specialistCare = [
+      { specialistId: "s1", childId: "c1" }, { specialistId: "s1", childId: "c3" }, { specialistId: "s1", childId: "c6" },
+      { specialistId: "s3", childId: "c2" }, { specialistId: "s3", childId: "c9" },
+    ];
+    const therapySessions = [
+      { id: uid("ts"), specialistId: "s1", childId: "c1", date: daysAgo(3), type: "Terapia logopedyczna", notes: "Ćwiczenia głoski sz. Zosia robi wyraźne postępy, chętnie powtarza.", next: "2026-07-24" },
+      { id: uid("ts"), specialistId: "s1", childId: "c3", date: daysAgo(3), type: "Terapia logopedyczna", notes: "Ćwiczenia oddechowe i usprawnianie aparatu mowy.", next: "2026-07-24" },
+      { id: uid("ts"), specialistId: "s1", childId: "c1", date: daysAgo(10), type: "Diagnoza logopedyczna", notes: "Ocena artykulacji — zalecane ćwiczenia głosek szumiących.", next: "2026-07-17" },
+      { id: uid("ts"), specialistId: "s3", childId: "c2", date: daysAgo(5), type: "Wsparcie psychologiczne", notes: "Praca nad regulacją emocji i adaptacją w grupie.", next: "2026-07-22" },
     ];
 
     const director = { id: "d1", name: "Ewa Zielińska", role: "dyrektor", email: "dyrektor@kidbloom.pl", facilityId: "f1" };
@@ -249,6 +262,7 @@
       attendance, absences, menu, mealOrders, reports, journal, planDnia, observations,
       announcements, messages, events, gallery, recruitment, invoices, payments,
       documents, consents, staffSchedule, staffAbsences, subsidies, notifications,
+      specialistCare, therapySessions,
     };
   }
 
@@ -281,7 +295,7 @@
       if (this._cache) return this._cache;
       let data;
       try { data = JSON.parse(localStorage.getItem(KEY)); } catch { data = null; }
-      if (!data || !data.facilities) { data = seed(); this._save(data); }
+      if (!data || !data.facilities || !data.therapySessions) { data = seed(); this._save(data); }
       this._cache = data;
       return data;
     },
@@ -308,6 +322,9 @@
     reportOf: (childId, date) => KB.load().reports.find((r) => r.childId === childId && r.date === date),
     invoicesOf: (childId) => KB.load().invoices.filter((i) => i.childId === childId),
     notifsOf: (userId) => KB.load().notifications.filter((n) => n.userId === userId),
+    careOf: (specialistId) => KB.load().specialistCare.filter((c) => c.specialistId === specialistId).map((c) => KB.child(c.childId)).filter(Boolean),
+    sessionsOf: (specialistId) => KB.load().therapySessions.filter((s) => s.specialistId === specialistId),
+    sessionsForChild: (childId) => KB.load().therapySessions.filter((s) => s.childId === childId),
     ageFrom: (birth) => { const b = new Date(birth), t = new Date(TODAY); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return a; },
   };
 
