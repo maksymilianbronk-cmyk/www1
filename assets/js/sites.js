@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "drzewo-bronk",
+    title: "Drzewo genealogiczne rodziny von Bronk",
+    desc: "Interaktywne, edytowalne drzewo genealogiczne rodziny von Bronk (Niepoczołowski) w stylu MyHeritage, odtworzone z 11 fotografii papierowego wydruku: od Michała Piotra von Bronk (ur. 1721) do dziś, 10 pokoleń i 368 osób na jednej planszy SVG. Karty z awatarami, panel szczegółów osoby z relacjami, edycja / dodawanie małżonków i dzieci / usuwanie z autozapisem w przeglądarce, eksport i import JSON, wyszukiwarka, zoom i podświetlanie linii krwi.",
+    icon: "🦌",
+    tag: "genealogia",
+    preview: true,
+    meta: {
+      colors: ["#f3efe4", "#16223c", "#8c6a2f", "#b3541e", "#ffffff"],
+      fonts: ["Segoe UI / system-ui"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS"],
+    },
+  },
+  {
     slug: "powerfit",
     title: "POWERFIT Gym & Fitness",
     desc: "Wielostronicowy serwis siłowni POWERFIT Brusy: prawdziwe logo klubu i 13 zdjęć trenerki Iwony Dulskiej (galeria, sekcje, tła), kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron, rezerwacja online w stylu Booksy z kropkami dostępności, prawdziwe profile social media, fotograficzne tła z parallaxą.",
