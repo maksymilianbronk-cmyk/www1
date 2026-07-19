@@ -318,6 +318,36 @@ h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.15; letter-spacin
   position: absolute; right: -30px; bottom: -30px; width: 150px; height: 150px; opacity: 0.14;
 }
 
+/* ---------- karty aukcji Allegro ---------- */
+.prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 1.2rem; }
+.prod {
+  display: flex; flex-direction: column; gap: 0.7rem; position: relative;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.25rem 1.2rem 1.1rem; box-shadow: var(--shadow);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.prod:hover { transform: translateY(-4px); border-color: var(--green); box-shadow: var(--shadow-lg); }
+.prod .prod-top { display: flex; align-items: flex-start; gap: 0.7rem; }
+.prod .card-icon { width: 42px; height: 42px; border-radius: 10px; margin: 0; flex: none; }
+.prod .card-icon svg { width: 22px; height: 22px; }
+.prod h3 { font-size: 0.97rem; line-height: 1.35; }
+.prod .prod-meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+  margin-top: auto; padding-top: 0.65rem; border-top: 1px dashed var(--line);
+}
+.prod .price { font-family: var(--font-head); font-weight: 700; color: var(--green-dark); font-size: 1.05rem; }
+.prod .price small { font-weight: 500; font-size: 0.75rem; color: var(--ink-soft); }
+.prod .go { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.84rem; font-weight: 600; color: var(--blue-dark); white-space: nowrap; }
+.prod .go svg { width: 14px; height: 14px; transition: transform 0.2s; }
+.prod:hover .go svg { transform: translateX(3px); }
+.tag-smart {
+  position: absolute; top: -0.6rem; right: 0.9rem;
+  background: var(--gold); color: #3d2c00; font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.16rem 0.6rem; border-radius: 999px; box-shadow: var(--shadow);
+}
+.prod-note { text-align: center; font-size: 0.8rem; color: var(--ink-soft); margin-top: 1.4rem; }
+
 /* ---------- FAQ ---------- */
 .faq { max-width: 46rem; margin-inline: auto; display: grid; gap: 0.9rem; }
 .faq-item {
