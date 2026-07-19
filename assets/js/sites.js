@@ -25,7 +25,7 @@ const SITES = [
       colors: ["#0eb39e", "#123a3a", "#ff7a6b", "#ffb340", "#eef5f3"],
       fonts: ["Nunito"],
       tech: ["HTML", "CSS", "Vanilla JS", "SPA", "SVG charts", "localStorage", "Google Fonts"],
-      files: ["index.html", "o-systemie.html", "assets/css/app.css", "assets/js/seed.js", "assets/js/ui.js", "assets/js/materialy.js", "assets/js/app.js", "DOKUMENTACJA.md"],
+      files: ["index.html", "o-systemie.html", "assets/css/app.css", "assets/js/seed.js", "assets/js/ui.js", "assets/js/materialy.js", "assets/js/app.js", "DOKUMENTACJA.md", "AUDYT-LIVEKID.md"],
     },
   },
   {

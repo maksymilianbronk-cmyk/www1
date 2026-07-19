@@ -15,6 +15,8 @@
   const initials = (name) => name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const first = (name) => name.split(" ")[0];
   const monthName = (m) => new Date(m + "-01").toLocaleDateString("pl-PL", { month: "long", year: "numeric" });
+  const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+  const interest = (inv) => { if (inv.paid || !inv.dueDate) return 0; const od = daysBetween(inv.dueDate, KB.today); if (od <= 0) return 0; return Math.round(inv.total * 0.0005 * od); }; // 0,05%/dzień
 
   /* stan widoku (kalendarz, zakładki, filtry) */
   const VS = { calY: 2026, calM: 6, tabs: {}, rozMonth: "2026-07", search: "", matCat: "all", matSearch: "" };
@@ -61,6 +63,7 @@
       { path: "obecnosc", ico: "✅", label: "Obecność" },
       { path: "raporty", ico: "📝", label: "Raporty dzienne" },
       { path: "dziennik", ico: "📖", label: "Dziennik elektroniczny" },
+      { path: "diagnoza", ico: "🎯", label: "Diagnoza i podstawa" },
       { path: "plan", ico: "🕐", label: "Plan dnia" },
       { path: "obserwacje", ico: "🔎", label: "Obserwacje" },
       { g: "Treści" },
@@ -496,16 +499,19 @@
     let invoices = []; kids.forEach((k) => invoices.push(...KB.invoicesOf(k.id)));
     invoices.sort((a, b) => (a.paid - b.paid) || b.month.localeCompare(a.month));
     const due = invoices.filter((i) => !i.paid).reduce((s, i) => s + i.total, 0);
-    const paidCount = invoices.filter((i) => i.paid).length;
-    return { title: "Płatności", sub: "Rachunki i faktury. Płatności online (demo Przelewy24).", html: `
-      <div class="grid g-3" style="margin-bottom:18px">
-        <div class="stat accent-coral"><div class="s-ico">💳</div><div class="s-val">${money(due)}</div><div class="s-lbl">Do zapłaty</div></div>
-        <div class="stat accent-teal"><div class="s-ico">✅</div><div class="s-val">${paidCount}</div><div class="s-lbl">Opłacone faktury</div></div>
-        <div class="stat accent-amber"><div class="s-ico">📄</div><div class="s-val">${invoices.length}</div><div class="s-lbl">Wszystkie faktury</div></div>
+    const overpay = kids.reduce((s, k) => s + KB.overpaymentOf(k.id), 0);
+    const odsetkiTotal = invoices.filter((i) => !i.paid).reduce((s, i) => s + interest(i), 0);
+    const saldo = overpay - due - odsetkiTotal; // <0 = do zapłaty
+    return { title: "Płatności", sub: "Rachunki, saldo konta i faktury. Płatności online (demo Przelewy24).", html: `
+      <div class="grid g-4" style="margin-bottom:18px">
+        <div class="stat ${saldo < 0 ? "accent-coral" : "accent-teal"}"><div class="s-ico">${saldo < 0 ? "💳" : "✅"}</div><div class="s-val">${money(Math.abs(saldo))}</div><div class="s-lbl">Saldo konta</div><div class="s-sub ${saldo < 0 ? "s-down" : "s-up"}">${saldo < 0 ? "do zapłaty" : "nadpłata"}</div></div>
+        <div class="stat accent-amber"><div class="s-ico">🧾</div><div class="s-val">${money(due)}</div><div class="s-lbl">Nieopłacone faktury</div></div>
+        <div class="stat accent-sky"><div class="s-ico">➕</div><div class="s-val">${money(overpay)}</div><div class="s-lbl">Nadpłata</div></div>
+        <div class="stat accent-coral"><div class="s-ico">⏰</div><div class="s-val">${money(odsetkiTotal)}</div><div class="s-lbl">Odsetki za zwłokę</div></div>
       </div>
-      <div class="card2"><div class="card-h"><h3>Faktury</h3></div>
+      <div class="card2"><div class="card-h"><h3>Faktury</h3><div class="spacer"></div><span class="muted" style="font-size:.82rem">kliknij fakturę, aby zobaczyć składniki</span></div>
         <div class="wrap-scroll"><table class="tbl"><thead><tr><th>Numer</th><th>Dziecko</th><th>Miesiąc</th><th class="right">Kwota</th><th>Status</th><th></th></tr></thead>
-        <tbody>${invoices.map((i) => { const ch = KB.child(i.childId); return `<tr><td><b>${esc(i.number)}</b></td><td>${ch.avatar} ${esc(first(ch.name))}</td><td>${esc(monthName(i.month))}</td><td class="right"><b>${money(i.total)}</b></td><td>${i.paid ? '<span class="pill pill-green">opłacona</span>' : '<span class="pill pill-red">do zapłaty</span>'}</td><td class="right"><button class="btn btn-ghost btn-sm" data-act="printInvoice" data-id="${i.id}">🖨️</button>${i.paid ? "" : ` <button class="btn btn-primary btn-sm" data-act="payInvoice" data-id="${i.id}">Zapłać</button>`}</td></tr>`; }).join("")}</tbody></table></div>
+        <tbody>${invoices.map((i) => { const ch = KB.child(i.childId); const od = i.paid ? 0 : interest(i); return `<tr style="cursor:pointer" data-act="invoiceDetail" data-id="${i.id}"><td><b>${esc(i.number)}</b></td><td>${ch.avatar} ${esc(first(ch.name))}</td><td>${esc(monthName(i.month))}</td><td class="right"><b>${money(i.total)}</b>${od ? `<br><span class="pill pill-red" style="font-size:.68rem">+${money(od)} ods.</span>` : ""}</td><td>${i.paid ? '<span class="pill pill-green">opłacona</span>' : od ? '<span class="pill pill-amber">po terminie</span>' : '<span class="pill pill-red">do zapłaty</span>'}</td><td class="right"><button class="btn btn-ghost btn-sm" data-act="printInvoice" data-id="${i.id}">🖨️</button>${i.paid ? "" : ` <button class="btn btn-primary btn-sm" data-act="payInvoice" data-id="${i.id}">Zapłać</button>`}</td></tr>`; }).join("")}</tbody></table></div>
       </div>` };
   };
 
@@ -514,15 +520,21 @@
     const data = KB.load();
     const docs = data.documents.filter((d) => d.childId === child.id);
     const cons = data.consents.filter((c) => c.childId === child.id);
-    return { title: "Dokumenty i zgody", sub: "Umowy, dokumenty oraz zgody RODO i na wizerunek.", html: `
+    const u = KB.contractOf(child.id);
+    const pickups = KB.pickupsOf(child.id);
+    return { title: "Dokumenty i zgody", sub: "Umowa, upoważnienia do odbioru, zgody RODO i na wizerunek.", html: `
       ${childSwitcher(kids, child)}
       <div class="grid g-2">
-        <div class="card2"><div class="card-h"><h3>📄 Dokumenty</h3></div>
-          ${docs.map((d) => `<div class="row"><span class="avatar" style="background:#f0f7f5">${d.type === "umowa" ? "📝" : "📋"}</span><div class="r-main"><div class="r-title">${esc(d.name)}</div><div class="r-sub">${plDate(d.date)}</div></div><button class="btn btn-ghost btn-sm" data-act="printDoc" data-name="${esc(d.name)}">🖨️ PDF</button></div>`).join("")}
+        <div class="card2"><div class="card-h"><h3>📝 Umowa elektroniczna</h3></div>
+          <div class="row"><span class="avatar" style="background:${u.signed ? "#e2f7ec" : "#fff2dc"}">${u.signed ? "✅" : "✍️"}</span><div class="r-main"><div class="r-title">Umowa o świadczenie usług</div><div class="r-sub">obowiązuje od ${plDate(u.from)} · ${u.signed ? "podpisana elektronicznie" : "oczekuje na podpis"}</div></div>${u.signed ? '<span class="pill pill-green">podpisana</span>' : `<button class="btn btn-primary btn-sm" data-act="signContract" data-id="${u.id}">✍️ Podpisz</button>`}</div>
+          ${docs.map((d) => `<div class="row"><span class="avatar" style="background:#f0f7f5">📋</span><div class="r-main"><div class="r-title">${esc(d.name)}</div><div class="r-sub">${plDate(d.date)}</div></div><button class="btn btn-ghost btn-sm" data-act="printDoc" data-name="${esc(d.name)}">🖨️ PDF</button></div>`).join("")}
         </div>
-        <div class="card2"><div class="card-h"><h3>✅ Zgody</h3></div>
-          ${cons.map((c) => `<div class="row"><span class="avatar" style="background:${c.granted ? "#e2f7ec" : "#fde4e6"}">${c.granted ? "✅" : "⛔"}</span><div class="r-main"><div class="r-title">${esc(c.name)}</div><div class="r-sub">${c.granted ? "udzielona " + plDate(c.date) : "brak zgody"}</div></div><div class="seg"><button class="${c.granted ? "on" : ""}" data-act="setConsent" data-id="${c.id}" data-v="1">Tak</button><button class="${!c.granted ? "on" : ""}" data-act="setConsent" data-id="${c.id}" data-v="0">Nie</button></div></div>`).join("")}
+        <div class="card2"><div class="card-h"><h3>🤝 Upoważnienia do odbioru</h3><div class="spacer"></div><button class="btn btn-ghost btn-sm" data-act="openPickup">＋ Dodaj</button></div>
+          ${pickups.length ? pickups.map((p) => `<div class="row"><span class="avatar" style="background:#e2effd">🧑</span><div class="r-main"><div class="r-title">${esc(p.name)}</div><div class="r-sub">${esc(p.relation)} · ${esc(p.phone)}</div></div><button class="btn btn-ghost btn-sm" data-act="delPickup" data-id="${p.id}">✕</button></div>`).join("") : `<div class="empty2"><div class="e-ico">🤝</div>Brak upoważnionych osób.</div>`}
         </div>
+      </div>
+      <div class="card2 mt-16"><div class="card-h"><h3>✅ Zgody</h3></div>
+        ${cons.map((c) => `<div class="row"><span class="avatar" style="background:${c.granted ? "#e2f7ec" : "#fde4e6"}">${c.granted ? "✅" : "⛔"}</span><div class="r-main"><div class="r-title">${esc(c.name)}</div><div class="r-sub">${c.granted ? "udzielona " + plDate(c.date) : "brak zgody"}</div></div><div class="seg"><button class="${c.granted ? "on" : ""}" data-act="setConsent" data-id="${c.id}" data-v="1">Tak</button><button class="${!c.granted ? "on" : ""}" data-act="setConsent" data-id="${c.id}" data-v="0">Nie</button></div></div>`).join("")}
       </div>` };
   };
 
@@ -575,6 +587,29 @@
     return { title: "Dziennik elektroniczny", sub: `Temat, opis i realizacja podstawy programowej — grupa ${esc(grp.name)}`, html: `
       <button class="btn btn-primary" data-act="openJournal" style="margin-bottom:18px">＋ Nowy wpis</button>
       <div class="card2">${entries.map((j) => `<div class="row"><span class="avatar" style="background:#e2effd">📖</span><div class="r-main"><div class="r-title">${esc(j.topic)} ${j.core ? `<span class="pill pill-teal">podst. ${esc(j.core)}</span>` : ""}</div><div class="r-sub">${plDate(j.date)} — ${esc(j.desc)}</div></div></div>`).join("")}</div>` };
+  };
+
+  VIEWS.nauczyciel.diagnoza = (sess) => {
+    const t = KB.staffById(sess.id), grp = KB.group(t.groupId), kids = KB.childrenOf(t.groupId), data = KB.load();
+    const areas = [
+      { id: "I", name: "Fizyczny", target: 8 }, { id: "II", name: "Emocjonalny", target: 8 },
+      { id: "III", name: "Społeczny", target: 8 }, { id: "IV", name: "Poznawczy", target: 10 },
+    ];
+    const entries = data.journal.filter((j) => j.groupId === grp.id);
+    const areaData = areas.map((a) => { const done = entries.filter((j) => (j.core || "").startsWith(a.id + ".")).length + (a.id === "IV" ? 6 : a.id === "I" ? 5 : a.id === "III" ? 4 : 3); const pct = Math.min(100, Math.round(done / a.target * 100)); return { ...a, done, pct }; });
+    const overall = Math.round(areaData.reduce((s, a) => s + a.pct, 0) / areaData.length);
+    const donutSeg = [{ label: "Zrealizowano", value: overall, color: "var(--teal)" }, { label: "Pozostało", value: 100 - overall, color: "var(--line)" }];
+    return { title: "Diagnoza i podstawa programowa", sub: `Stopień realizacji podstawy programowej — grupa ${esc(grp.name)}`, html: `
+      <div class="grid g-2">
+        <div class="card2"><div class="card-h"><h3>Realizacja ogółem</h3></div><div class="flex" style="justify-content:center">${UI.donut(donutSeg, { center: overall + "%", centerSub: "zrealizowano" })}</div></div>
+        <div class="card2"><div class="card-h"><h3>Obszary podstawy programowej</h3></div>
+          ${areaData.map((a) => `<div style="margin-bottom:14px"><div class="flex" style="justify-content:space-between"><span style="font-weight:700;font-size:.9rem">Obszar ${a.id} — ${esc(a.name)}</span><b>${a.pct}%</b></div><div class="bar mt-10"><span style="width:${a.pct}%"></span></div></div>`).join("")}
+        </div>
+      </div>
+      <div class="card2 mt-16"><div class="card-h"><h3>Diagnoza dzieci</h3><div class="spacer"></div><span class="muted" style="font-size:.82rem">na podstawie obserwacji</span></div>
+        <div class="wrap-scroll"><table class="tbl"><thead><tr><th>Dziecko</th><th>Obserwacje</th><th>Średnia</th><th>Gotowość</th></tr></thead>
+        <tbody>${kids.map((k) => { const obs = data.observations.filter((o) => o.childId === k.id); const avg = obs.length ? (obs.reduce((s, o) => s + o.rating, 0) / obs.length) : 0; const stars = avg ? "★".repeat(Math.round(avg)) + "☆".repeat(5 - Math.round(avg)) : "—"; const lvl = avg >= 4 ? '<span class="pill pill-green">wysoka</span>' : avg >= 3 ? '<span class="pill pill-amber">średnia</span>' : avg > 0 ? '<span class="pill pill-red">wymaga wsparcia</span>' : '<span class="pill pill-gray">brak danych</span>'; return `<tr><td><b>${k.avatar} ${esc(k.name)}</b></td><td>${obs.length}</td><td><span class="stars" style="color:var(--amber)">${stars}</span></td><td>${lvl}</td></tr>`; }).join("")}</tbody></table></div>
+      </div>` };
   };
 
   VIEWS.nauczyciel.plan = (sess) => {
@@ -738,7 +773,13 @@
         <div class="stat accent-sky"><div class="s-ico">✅</div><div class="s-val">${data.consents.filter((c) => c.granted).length}</div><div class="s-lbl">Udzielone zgody</div></div>
         <div class="stat accent-coral"><div class="s-ico">⛔</div><div class="s-val">${data.consents.filter((c) => !c.granted).length}</div><div class="s-lbl">Brak zgody</div></div>
       </div>
-      <div class="card2"><div class="card-h"><h3>Stan zgód</h3></div>${Object.entries(consentStats).map(([name, s]) => { const tot = s.g + s.n; const pct = Math.round(s.g / tot * 100); return `<div class="row"><div class="r-main"><div class="r-title">${esc(name)}</div><div class="bar mt-10"><span style="width:${pct}%"></span></div></div><b>${s.g}/${tot}</b></div>`; }).join("")}</div>` };
+      <div class="grid g-2">
+        <div class="card2"><div class="card-h"><h3>Stan zgód</h3></div>${Object.entries(consentStats).map(([name, s]) => { const tot = s.g + s.n; const pct = Math.round(s.g / tot * 100); return `<div class="row"><div class="r-main"><div class="r-title">${esc(name)}</div><div class="bar mt-10"><span style="width:${pct}%"></span></div></div><b>${s.g}/${tot}</b></div>`; }).join("")}</div>
+        <div class="card2"><div class="card-h"><h3>✍️ Umowy elektroniczne</h3></div>
+          ${(() => { const unsigned = data.contracts.filter((c) => c.signed === false); return unsigned.length ? unsigned.map((c) => { const ch = KB.child(c.childId); return `<div class="row"><span class="avatar" style="background:#fff2dc">✍️</span><div class="r-main"><div class="r-title">${ch ? ch.avatar + " " + esc(ch.name) : "—"}</div><div class="r-sub">umowa od ${plDate(c.from)} — oczekuje na podpis rodzica</div></div><button class="btn btn-primary btn-sm" data-act="signContract" data-id="${c.id}">Oznacz podpisaną</button></div>`; }).join("") : `<div class="empty2"><div class="e-ico">✅</div>Wszystkie umowy podpisane.</div>`; })()}
+          <div class="row" style="border-top:2px solid var(--line);margin-top:6px"><div class="r-main"><div class="r-title">Podpisane umowy</div></div><span class="pill pill-green">${data.contracts.filter((c) => c.signed !== false).length}</span></div>
+        </div>
+      </div>` };
   };
 
   VIEWS.dyrektor.ustawienia = () => {
@@ -929,6 +970,13 @@
       KB.save(); toast("Zamówienie zapisane ✓");
     },
     payInvoice(t) { const i = KB.load().invoices.find((x) => x.id === t.dataset.id); if (i) { i.paid = true; KB.save(); toast("Płatność zaksięgowana ✓ (demo Przelewy24)"); render(); } },
+    invoiceDetail(t) {
+      const i = KB.load().invoices.find((x) => x.id === t.dataset.id); if (!i) return; const ch = KB.child(i.childId); const od = i.paid ? 0 : interest(i);
+      modal(`<h3>Faktura ${esc(i.number)}</h3><p class="m-sub">${ch.avatar} ${esc(ch.name)} · ${esc(monthName(i.month))}</p>
+        <table class="tbl"><tbody>${i.items.map((it) => `<tr><td>${esc(it.name)}</td><td class="right">${money(it.amount)}</td></tr>`).join("")}${od ? `<tr><td class="muted">Odsetki za zwłokę (${daysBetween(i.dueDate, KB.today)} dni)</td><td class="right" style="color:var(--red)">${money(od)}</td></tr>` : ""}<tr><td><b>Razem</b></td><td class="right"><b>${money(i.total + od)}</b></td></tr></tbody></table>
+        <p class="muted" style="font-size:.82rem">Termin płatności: ${plDate(i.dueDate)} · ${i.paid ? "opłacona" : "do zapłaty"}</p>
+        <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="KBcloseModal()">Zamknij</button><button class="btn btn-primary" data-act="printInvoice" data-id="${i.id}">🖨️ Drukuj</button></div>`);
+    },
     printInvoice(t) {
       const i = KB.load().invoices.find((x) => x.id === t.dataset.id); if (!i) return;
       const ch = KB.child(i.childId), f = KB.load().facility;
@@ -941,6 +989,16 @@
     },
     printDoc(t) { UI.print(t.dataset.name, `<div class="brand">🌱 KidBloom</div><h1>${esc(t.dataset.name)}</h1><p class="muted">Dokument demonstracyjny wygenerowany przez system KidBloom.</p><div class="box">Treść dokumentu…</div>`); },
     setConsent(t) { const c = KB.load().consents.find((x) => x.id === t.dataset.id); if (c) { c.granted = t.dataset.v === "1"; c.date = KB.today; KB.save(); toast("Zgoda zaktualizowana ✓"); render(); } },
+    signContract(t) { const c = KB.load().contracts.find((x) => x.id === t.dataset.id); if (c) { c.signed = true; KB.save(); toast("Umowa podpisana elektronicznie ✓"); render(); } },
+    openPickup(t, sess) {
+      const { child } = parentChild(sess);
+      modal(`<h3>Dodaj upoważnienie</h3><p class="m-sub">Osoba uprawniona do odbioru: ${esc(child.name)}</p>
+        <form data-act="savePickup"><div class="field"><label>Imię i nazwisko</label><input name="name" required></div>
+        <div class="field-row"><div class="field"><label>Pokrewieństwo</label><input name="relation" placeholder="np. babcia"></div><div class="field"><label>Telefon</label><input name="phone"></div></div>
+        <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="KBcloseModal()">Anuluj</button><button class="btn btn-primary">Dodaj</button></div></form>`);
+    },
+    savePickup(f, sess) { const { child } = parentChild(sess), fd = new FormData(f); KB.load().pickups.push({ id: KB.uid("pu"), childId: child.id, name: fd.get("name"), relation: fd.get("relation") || "—", phone: fd.get("phone") || "" }); KB.save(); closeModal(); toast("Upoważnienie dodane ✓"); render(); },
+    delPickup(t) { const data = KB.load(); data.pickups = data.pickups.filter((p) => p.id !== t.dataset.id); KB.replace(data); toast("Upoważnienie usunięte"); render(); },
     newThread(t, sess) {
       const data = KB.load();
       const targets = sess.role === "rodzic" ? [data.director, ...data.staff.filter((s) => s.role === "nauczyciel")] : data.parents;
@@ -1059,7 +1117,7 @@
         <div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="KBcloseModal()">Anuluj</button><button class="btn btn-primary">Dodaj</button></div></form>`);
     },
     saveStaff(f) { const fd = new FormData(f), data = KB.load(); const id = KB.uid("t"); data.staff.push({ id, name: fd.get("name"), role: fd.get("role"), groupId: null, email: "", phone: "", qualifications: fd.get("qual") || "", hoursWeek: +fd.get("hours") || 40, employment: "umowa o pracę" }); data.staffSchedule.push({ staffId: id, mon: "7:00–15:00", tue: "7:00–15:00", wed: "7:00–15:00", thu: "7:00–15:00", fri: "7:00–15:00" }); KB.save(); closeModal(); toast("Pracownik dodany ✓"); render(); },
-    regenInvoices() { const data = KB.load(); data.invoices.filter((i) => i.month === VS.rozMonth).forEach((inv) => { const c = KB.contractOf(inv.childId); const days = data.attendance.filter((a) => a.childId === inv.childId && a.present).length; const meals = days * c.mealFee; inv.items = [{ name: "Czesne (opłata stała)", amount: c.monthlyFee }, { name: `Wyżywienie (${days} dni × ${c.mealFee} zł)`, amount: meals }]; inv.total = c.monthlyFee + meals; }); KB.save(); toast("Faktury przeliczone ✓"); render(); },
+    regenInvoices() { const data = KB.load(); data.invoices.filter((i) => i.month === VS.rozMonth).forEach((inv) => { const c = KB.contractOf(inv.childId); const days = data.attendance.filter((a) => a.childId === inv.childId && a.present).length; const meals = days * c.mealFee; inv.items = [{ name: "Czesne (opłata stała)", amount: c.monthlyFee }, { name: `Wyżywienie (${days} dni × ${c.mealFee} zł)`, amount: meals }]; inv.total = c.monthlyFee + meals; KB.classesOf(inv.childId).forEach((z) => { inv.items.push({ name: `Zajęcia: ${z.name}`, amount: z.price }); inv.total += z.price; }); }); KB.save(); toast("Faktury przeliczone (z zajęciami dodatkowymi) ✓"); render(); },
     markPaid(t) { const i = KB.load().invoices.find((x) => x.id === t.dataset.id); if (i) { i.paid = true; KB.save(); toast("Oznaczono jako opłaconą ✓"); render(); } },
     exportInvoices() { const data = KB.load(); const rows = [["Numer", "Dziecko", "Miesiąc", "Kwota", "Status"]]; data.invoices.filter((i) => i.month === VS.rozMonth).forEach((i) => rows.push([i.number, KB.child(i.childId).name, i.month, i.total, i.paid ? "opłacona" : "niezapłacona"])); downloadCSV(`faktury_${VS.rozMonth}.csv`, rows); },
     exportReport(t) {
@@ -1086,8 +1144,8 @@
       const pid = KB.uid("p"), ch = KB.uid("c"), u = KB.uid("u");
       data.parents.push({ id: pid, name: r.parentName, email: r.email || "", phone: r.phone });
       data.children.push({ id: ch, name: r.childName, groupId: grp.id, parentId: pid, birth: r.birth, avatar: "🧒", allergies: "brak", contractId: u, diet: "standardowa" });
-      data.contracts.push({ id: u, childId: ch, from: KB.today, monthlyFee: 650, mealFee: 18, status: "aktywna", hoursDeclared: "7:00–17:00" });
-      r.status = "przyjete"; KB.save(); toast(`${r.childName} przyjęty/a — utworzono umowę ✓`); render();
+      data.contracts.push({ id: u, childId: ch, from: KB.today, monthlyFee: 650, mealFee: 18, status: "aktywna", hoursDeclared: "7:00–17:00", signed: false });
+      r.status = "przyjete"; KB.save(); toast(`${r.childName} przyjęty/a — umowa wysłana do e-podpisu ✓`); render();
     },
     rejectRek(t) { const r = KB.load().recruitment.find((x) => x.id === t.dataset.id); r.status = "odrzucone"; KB.save(); toast("Zgłoszenie odrzucone"); render(); },
     openAnn() { modal(`<h3>Nowe ogłoszenie</h3><p class="m-sub">Trafi do rodziców i kadry. <button class="ai-btn" data-act="aiAnn" style="float:right">✨ AI</button></p><form data-act="saveAnn"><div class="field"><label>Tytuł</label><input name="title" id="aTitle" required></div><div class="field"><label>Kategoria</label><select name="category"><option>wydarzenie</option><option>organizacja</option><option>żywienie</option></select></div><div class="field"><label>Treść</label><textarea name="body" id="aBody" required></textarea></div><label class="row" style="cursor:pointer;border:none"><input type="checkbox" name="pinned" style="width:18px;height:18px;accent-color:var(--teal)"> <span>Przypnij na górze</span></label><div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="KBcloseModal()">Anuluj</button><button class="btn btn-primary">Opublikuj</button></div></form>`); },

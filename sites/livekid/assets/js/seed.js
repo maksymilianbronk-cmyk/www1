@@ -75,7 +75,7 @@
         const ageBase = g.id === "g3" ? 2 : g.id === "g1" ? 3 : g.id === "g2" ? 4 : 5;
         const birthY = 2026 - ageBase - Math.floor(rnd() * 2);
         children.push({ id: ch, name: `${first} ${last}`, groupId: g.id, parentId: pid, birth: `${birthY}-${pad(1 + Math.floor(rnd() * 12))}-${pad(1 + Math.floor(rnd() * 27))}`, avatar: boy ? pick(AVA_M) : pick(AVA_F), allergies: rnd() > 0.75 ? pick(["orzechy", "laktoza", "gluten", "truskawki"]) : "brak", contractId: u, diet: rnd() > 0.85 ? pick(["wegetariańska", "bezmleczna", "bezglutenowa"]) : "standardowa" });
-        contracts.push({ id: u, childId: ch, from: `${2024 + Math.floor(rnd() * 2)}-09-01`, monthlyFee: 650, mealFee: 18, status: "aktywna", hoursDeclared: "7:00–17:00" });
+        contracts.push({ id: u, childId: ch, from: `${2024 + Math.floor(rnd() * 2)}-09-01`, monthlyFee: 650, mealFee: 18, status: "aktywna", hoursDeclared: "7:00–17:00", signed: true });
       }
     });
 
@@ -85,7 +85,7 @@
     contracts[0].id = "u1"; contracts[0].childId = "c1";
     // drugie dziecko Anny (Antek) w tej samej grupie
     children.push({ id: "c1b", name: "Antek Kowalski", groupId: "g1", parentId: "p1", birth: "2023-05-30", avatar: "🐸", allergies: "brak", contractId: "u1b", diet: "standardowa" });
-    contracts.push({ id: "u1b", childId: "c1b", from: "2025-02-01", monthlyFee: 650, mealFee: 18, status: "aktywna", hoursDeclared: "8:00–16:00" });
+    contracts.push({ id: "u1b", childId: "c1b", from: "2025-02-01", monthlyFee: 650, mealFee: 18, status: "aktywna", hoursDeclared: "8:00–16:00", signed: false });
 
     /* obecności: ostatnie 30 dni roboczych */
     const attendance = [];
@@ -263,6 +263,21 @@
       { id: "zd5", name: "Basen", instructor: "Aquapark Fala", day: "Piątek", time: "9:30", price: 160, capacity: 16, enrolled: ["c2", "c9", "c1"] },
     ];
 
+    // dolicz zajęcia dodatkowe do faktur bieżącego miesiąca
+    invoices.filter((i) => i.month === "2026-07").forEach((inv) => {
+      classes.forEach((z) => { if (z.enrolled.includes(inv.childId)) { inv.items.push({ name: `Zajęcia: ${z.name}`, amount: z.price }); inv.total += z.price; } });
+    });
+
+    // salda kont (nadpłaty) i upoważnienia do odbioru
+    const balances = [
+      { childId: "c1", overpayment: 65 }, { childId: "c3", overpayment: 120 },
+    ];
+    const pickups = [
+      { id: uid("pu"), childId: "c1", name: "Barbara Kowalska", relation: "babcia", phone: "601 111 222" },
+      { id: uid("pu"), childId: "c1", name: "Piotr Kowalski", relation: "tata", phone: "601 333 444" },
+      { id: uid("pu"), childId: "c2", name: "Anna Wiśniewska", relation: "mama", phone: "602 555 666" },
+    ];
+
     const director = { id: "d1", name: "Ewa Zielińska", role: "dyrektor", email: "dyrektor@kidbloom.pl", facilityId: "f1" };
     const samorzad = { id: "sm1", name: "Wydział Edukacji UM", role: "samorzad", email: "edukacja@um.warszawa.pl" };
 
@@ -271,7 +286,7 @@
       attendance, absences, menu, mealOrders, reports, journal, planDnia, observations,
       announcements, messages, events, gallery, recruitment, invoices, payments,
       documents, consents, staffSchedule, staffAbsences, subsidies, notifications,
-      specialistCare, therapySessions, classes,
+      specialistCare, therapySessions, classes, balances, pickups,
     };
   }
 
@@ -304,7 +319,7 @@
       if (this._cache) return this._cache;
       let data;
       try { data = JSON.parse(localStorage.getItem(KEY)); } catch { data = null; }
-      if (!data || !data.facilities || !data.therapySessions || !data.classes) { data = seed(); this._save(data); }
+      if (!data || !data.facilities || !data.therapySessions || !data.classes || !data.pickups) { data = seed(); this._save(data); }
       this._cache = data;
       return data;
     },
@@ -334,6 +349,9 @@
     careOf: (specialistId) => KB.load().specialistCare.filter((c) => c.specialistId === specialistId).map((c) => KB.child(c.childId)).filter(Boolean),
     sessionsOf: (specialistId) => KB.load().therapySessions.filter((s) => s.specialistId === specialistId),
     sessionsForChild: (childId) => KB.load().therapySessions.filter((s) => s.childId === childId),
+    pickupsOf: (childId) => KB.load().pickups.filter((p) => p.childId === childId),
+    overpaymentOf: (childId) => { const b = (KB.load().balances || []).find((x) => x.childId === childId); return b ? b.overpayment : 0; },
+    classesOf: (childId) => KB.load().classes.filter((z) => z.enrolled.includes(childId)),
     ageFrom: (birth) => { const b = new Date(birth), t = new Date(TODAY); let a = t.getFullYear() - b.getFullYear(); if (t.getMonth() < b.getMonth() || (t.getMonth() === b.getMonth() && t.getDate() < b.getDate())) a--; return a; },
   };
 
