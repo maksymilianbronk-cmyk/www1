@@ -318,6 +318,24 @@ h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.15; letter-spacin
   position: absolute; right: -30px; bottom: -30px; width: 150px; height: 150px; opacity: 0.14;
 }
 
+/* ---------- duży przycisk Allegro pod hero ---------- */
+.allegro-cta { text-align: center; margin-top: 2.4rem; }
+.btn-allegro {
+  padding: 1.15rem 2.6rem;
+  font-family: var(--font-head); font-size: clamp(1.05rem, 2.2vw, 1.3rem); font-weight: 700;
+  color: #fff; background: linear-gradient(120deg, #ff5a00, #ff7e2d);
+  box-shadow: 0 14px 34px rgba(255, 90, 0, 0.38);
+  animation: allegropulse 2.6s ease-in-out infinite;
+}
+.btn-allegro svg { width: 24px; height: 24px; }
+.btn-allegro:hover { filter: brightness(1.06); color: #fff; }
+@keyframes allegropulse {
+  0%, 100% { box-shadow: 0 14px 34px rgba(255, 90, 0, 0.38), 0 0 0 0 rgba(255, 90, 0, 0.35); }
+  60% { box-shadow: 0 14px 34px rgba(255, 90, 0, 0.38), 0 0 0 18px rgba(255, 90, 0, 0); }
+}
+.allegro-cta small { display: block; margin-top: 0.8rem; color: var(--ink-soft); font-size: 0.85rem; }
+@media (max-width: 480px) { .btn-allegro { width: 100%; justify-content: center; padding: 1.05rem 1.4rem; } }
+
 /* ---------- karty aukcji Allegro ---------- */
 .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 1.2rem; }
 .prod {
