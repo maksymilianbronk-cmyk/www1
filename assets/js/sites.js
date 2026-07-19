@@ -212,7 +212,7 @@ const SITES = [
   {
     slug: "gofrownia-dan-dad",
     title: "Gofrownia Dan & Dad — Dźwirzyno",
-    desc: "Wielostronicowy serwis rodzinnej gofrowni Dan & Dad z Dźwirzyna (HoReCa): biel i róż wg briefu klienta, autorskie logo SVG (gofr z sercem i parą), 6 podstron — Start, O nas, Menu z zakładkami, Galeria SVG z lightboxem, 3-krokowa rezerwacja stolika z podsumowaniem i mailto, Kontakt z rysowaną mapką Dźwirzyna. Prawdziwe dane: tel. +48 452 110 100, dandad2023@gmail.com, profil FB, receptura od 1984. Bez zdjęć stockowych — 100% autorskich ilustracji SVG, animacje scrollowania, split-text, custom cursor, magnetyczne przyciski, konfetti, hamburger fullscreen.",
+    desc: "Wielostronicowy serwis rodzinnej gofrowni Dan & Dad z Dźwirzyna (HoReCa): biel i róż wg briefu klienta, autorskie logo SVG (gofr z sercem i parą), 6 podstron — Start, O nas, Menu z zakładkami, Galeria z lightboxem, 3-krokowa rezerwacja stolika z podsumowaniem i mailto, Kontakt z rysowaną mapką Dźwirzyna. 13 prawdziwych zdjęć od klienta (hero-blob, filmstrip, polaroidy, galeria) + autorskie ilustracje SVG. Prawdziwe dane: tel. +48 452 110 100, dandad2023@gmail.com, profil FB, receptura od 1984. Animacje scrollowania, split-text, custom cursor, magnetyczne przyciski, konfetti, hamburger fullscreen.",
     icon: "🧇",
     tag: "landing",
     preview: true,

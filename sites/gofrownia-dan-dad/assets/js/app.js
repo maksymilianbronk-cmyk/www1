@@ -123,8 +123,8 @@
     var lbTitle = lightbox.querySelector(".lb-title");
     [].forEach.call(document.querySelectorAll(".g-tile"), function (tile) {
       tile.addEventListener("click", function () {
-        var svg = tile.querySelector("svg");
-        if (svg) lbArt.innerHTML = svg.outerHTML;
+        var media = tile.querySelector("img, svg");
+        if (media) lbArt.innerHTML = media.outerHTML;
         lbTitle.textContent = tile.getAttribute("data-title") || "";
         lightbox.classList.add("open");
         document.body.style.overflow = "hidden";
