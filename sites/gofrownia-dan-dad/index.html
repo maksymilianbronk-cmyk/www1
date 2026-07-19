@@ -107,8 +107,12 @@
     </div>
 
     <div class="hero-art">
-      <!-- Główny gofr -->
-      <svg class="waffle-main" viewBox="0 0 420 420" aria-label="Ilustracja gofra z bitą śmietaną i truskawkami">
+      <!-- Główne zdjęcie: gofry Dan & Dad -->
+      <div class="photo-blob">
+        <img src="assets/img/gofry-owoce.jpg" alt="Dwa gofry Dan & Dad z bitą śmietaną, truskawkami, borówkami i polewą karmelową">
+      </div>
+      <!-- Główny gofr (ilustracja zapasowa, ukryta) -->
+      <svg class="waffle-main" style="display:none" viewBox="0 0 420 420" aria-label="Ilustracja gofra z bitą śmietaną i truskawkami">
         <defs>
           <radialGradient id="wg" cx="45%" cy="40%" r="65%">
             <stop offset="0%" stop-color="#f7cf87"/><stop offset="100%" stop-color="#e9a94e"/>
@@ -195,6 +199,28 @@
   </div>
 </div>
 
+<!-- ===================== PASEK ZDJĘĆ ===================== -->
+<section class="photo-strip" aria-label="Zdjęcia z gofrowni" style="padding-top:clamp(40px,6vw,64px)">
+  <div class="photo-strip-track">
+    <div class="photo-card"><img src="assets/img/gofry-owoce.jpg" alt="Gofry z owocami i karmelem" loading="lazy"></div>
+    <div class="photo-card portrait"><img src="assets/img/dziewczynka-gofr.jpg" alt="Mała gościni z gofrem truskawkowym" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/para-gofry-lodowka.jpg" alt="Para gości z goframi truskawkowymi" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/seniorki-desery.jpg" alt="Przyjaciółki przy deserach lodowych na tarasie" loading="lazy"></div>
+    <div class="photo-card portrait"><img src="assets/img/chlopiec-gofr.jpg" alt="Uśmiechnięty chłopiec z gofrem jagodowym" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/randka-gofry.jpg" alt="Para karmiąca się goframi na randce" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/goscie-lody-wnetrze.jpg" alt="Goście z lodami we wnętrzu gofrowni" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/rodzina-taras.jpg" alt="Rodzina przy stoliku na tarasie" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/gofry-owoce.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="photo-card portrait"><img src="assets/img/dziewczynka-gofr.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/para-gofry-lodowka.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/seniorki-desery.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="photo-card portrait"><img src="assets/img/chlopiec-gofr.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/randka-gofry.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/goscie-lody-wnetrze.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="photo-card"><img src="assets/img/rodzina-taras.jpg" alt="" aria-hidden="true" loading="lazy"></div>
+  </div>
+</section>
+
 <!-- ===================== OFERTA ===================== -->
 <section class="section-pad" id="oferta">
   <span class="giant-word" style="top:30px">smaki</span>
@@ -273,7 +299,10 @@
   <div class="container split">
     <div class="split-art reveal rv-left">
       <div class="frame">
-        <!-- scenka: gofrownia nad morzem -->
+        <img src="assets/img/rodzina-taras.jpg" alt="Rodzina z dziećmi przy goframi na tarasie gofrowni Dan & Dad" loading="lazy">
+      </div>
+      <div class="frame" style="display:none">
+        <!-- scenka: gofrownia nad morzem (ilustracja zapasowa) -->
         <svg viewBox="0 0 560 430" aria-label="Ilustracja gofrowni Dan & Dad nad morzem">
           <rect width="560" height="430" fill="#fff5f8"/>
           <circle cx="470" cy="80" r="46" fill="#f7cf87"/>
@@ -409,12 +438,10 @@
           <a href="tel:+48452110100" class="btn" style="border:2px solid rgba(255,255,255,.6);color:#fff">Zadzwoń: 452 110 100</a>
         </div>
       </div>
-      <svg class="cta-art" viewBox="0 0 300 300" aria-hidden="true">
-        <circle cx="150" cy="150" r="120" fill="#fff" opacity=".14"/>
-        <circle cx="150" cy="150" r="92" fill="#f3c06b" stroke="#c9822e" stroke-width="5"/>
-        <g stroke="#c9822e" stroke-width="3.6" opacity=".55"><line x1="86" y1="118" x2="214" y2="118"/><line x1="70" y1="150" x2="230" y2="150"/><line x1="86" y1="182" x2="214" y2="182"/><line x1="118" y1="86" x2="118" y2="214"/><line x1="150" y1="70" x2="150" y2="230"/><line x1="182" y1="86" x2="182" y2="214"/></g>
-        <path class="heart-beat" d="M150 208c-24-18-40-31-40-47a19 19 0 0 1 40-12 19 19 0 0 1 40 12c0 16-16 29-40 47z" fill="#f2578e" stroke="#fff" stroke-width="4"/>
-      </svg>
+      <figure class="polaroid cta-art" style="margin-inline:auto;animation:none">
+        <img src="assets/img/dziewczynka-gofr.jpg" alt="Dziewczynka z gofrem truskawkowym w gofrowni Dan & Dad" loading="lazy">
+        <figcaption>pierwszy gofr? uśmiech gratis!</figcaption>
+      </figure>
     </div>
   </div>
 </section>
