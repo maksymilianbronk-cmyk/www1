@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F.U.H. Wieczorek — Skup i sprzedaż elektroniki | Łódź, Radomsko, Częstochowa</title>
+<meta name="description" content="F.U.H. Wieczorek — skup elektroniki na sztuki i na kilogramy, sklep i serwis komputerowy z wieloletnim stażem. Łódź, Radomsko, Częstochowa. Super Sprzedawca Allegro, 99,7% pozytywnych ocen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230e9f6e'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3EW%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- pasek górny -->
+<div class="topbar">
+  <div class="container">
+    <div class="tb-left">
+      <a href="tel:+48537347875"><svg><use href="#i-phone"/></svg>+48 537 347 875</a>
+    </div>
+    <div class="tb-right">
+      <span class="hide-m"><svg><use href="#i-clock"/></svg>pn–pt 9:00–17:00</span>
+      <span><svg><use href="#i-pin"/></svg>Łódź · Radomsko · Częstochowa</span>
+    </div>
+  </div>
+</div>
+
+<!-- nagłówek -->
+<header class="header">
+  <div class="container">
+    <a class="logo" href="index.html" aria-label="F.U.H. Wieczorek — strona główna">
+      <svg class="logo-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="48" y2="48">
+            <stop offset="0" stop-color="#0e9f6e"/><stop offset="1" stop-color="#1d6fe0"/>
+          </linearGradient>
+        </defs>
+        <rect x="3" y="3" width="42" height="42" rx="11" fill="url(#lg)"/>
+        <path d="M13 15l4 18 4.5-12 4.5 12 4-18" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="13" cy="15" r="2.2" fill="#aef0d6"/>
+        <circle cx="35" cy="15" r="2.2" fill="#bcd8ff"/>
+      </svg>
+      <span class="logo-text">
+        <strong>F.U.H. <span>WIECZOREK</span></strong>
+        <small>skup · sprzedaż · serwis</small>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Menu główne">
+      <a href="index.html" class="active">Start</a>
+      <a href="skup.html">Skup elektroniki</a>
+      <a href="oferta.html">Sklep i serwis</a>
+      <a href="o-nas.html">O firmie</a>
+      <a href="kontakt.html">Kontakt</a>
+      <a href="kontakt.html#wycena" class="nav-cta">Wyceń sprzęt</a>
+    </nav>
+    <button class="burger" aria-label="Otwórz menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- hero -->
+<section class="hero">
+  <svg class="hero-grid-bg" width="100%" height="100%" aria-hidden="true">
+    <defs>
+      <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+        <path d="M46 0H0v46" fill="none" stroke="rgba(126,232,195,0.07)" stroke-width="1"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grid)"/>
+  </svg>
+  <div class="container hero-inner">
+    <div>
+      <span class="hero-badge">
+        <svg viewBox="0 0 24 24" fill="#f5b731"><use href="#i-star"/></svg>
+        Super Sprzedawca Allegro · 99,7% pozytywnych ocen
+      </span>
+      <h1>Skup <span class="hl-green">elektroniki</span> i&nbsp;sprzedaż <span class="hl-blue">sprzętu IT</span> z&nbsp;wieloletnim stażem</h1>
+      <p class="lead">Kupujemy elektronikę na sztuki i&nbsp;na kilogramy — laptopy, komputery, podzespoły i&nbsp;sprzęt RTV. Prowadzimy też sklep i&nbsp;serwis komputerowy. Uczciwa wycena, szybka wypłata, 15&nbsp;lat zaufania klientów.</p>
+      <div class="hero-ctas">
+        <a href="kontakt.html#wycena" class="btn btn-green"><svg><use href="#i-cash"/></svg>Wyceń swój sprzęt</a>
+        <a href="skup.html" class="btn btn-ghost"><svg><use href="#i-recycle"/></svg>Co skupujemy?</a>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 460 400" fill="none">
+        <defs>
+          <linearGradient id="hg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0e9f6e"/><stop offset="1" stop-color="#1d6fe0"/>
+          </linearGradient>
+          <linearGradient id="hg2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#123246"/><stop offset="1" stop-color="#0b2434"/>
+          </linearGradient>
+        </defs>
+        <!-- orbita -->
+        <g class="spin-slow" style="transform-box: fill-box;">
+          <circle cx="230" cy="200" r="178" stroke="rgba(126,232,195,0.25)" stroke-width="1.5" stroke-dasharray="4 10"/>
+          <circle cx="230" cy="22" r="6" fill="#35d99f"/>
+          <circle cx="408" cy="200" r="4.5" fill="#5ba0ff"/>
+          <circle cx="230" cy="378" r="5" fill="#f5b731"/>
+        </g>
+        <!-- płytka drukowana -->
+        <rect x="105" y="90" width="250" height="220" rx="20" fill="url(#hg2)" stroke="rgba(126,232,195,0.35)" stroke-width="1.5"/>
+        <!-- ścieżki -->
+        <g stroke="#35d99f" stroke-width="2" stroke-linecap="round" opacity="0.85">
+          <path class="pulse-line" d="M105 140h55l20 20"/>
+          <path class="pulse-line" d="M105 260h48l24 -22"/>
+          <path class="pulse-line" d="M355 150h-52l-22 22"/>
+          <path class="pulse-line" d="M355 250h-46l-26 -20"/>
+          <path class="pulse-line" d="M200 310v-38l18 -18"/>
+          <path class="pulse-line" d="M262 90v40l-14 14"/>
+        </g>
+        <circle class="blink" cx="140" cy="120" r="4" fill="#35d99f"/>
+        <circle class="blink d1" cx="325" cy="118" r="4" fill="#5ba0ff"/>
+        <circle class="blink d2" cx="138" cy="285" r="4" fill="#f5b731"/>
+        <circle class="blink d3" cx="322" cy="286" r="4" fill="#35d99f"/>
+        <!-- CPU -->
+        <rect x="182" y="152" width="96" height="96" rx="12" fill="url(#hg1)"/>
+        <rect x="200" y="170" width="60" height="60" rx="8" fill="#071722" opacity="0.35"/>
+        <path d="M212 200l10 10 20-22" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <g stroke="#7ee8c3" stroke-width="2.4" stroke-linecap="round">
+          <path d="M198 140v-14M230 140v-14M262 140v-14M198 274v-14M230 274v-14M262 274v-14"/>
+          <path d="M170 184h-14M170 216h-14M290 184h14M290 216h14"/>
+        </g>
+        <!-- pływające elementy -->
+        <g class="float-slow">
+          <rect x="20" y="70" width="86" height="62" rx="12" fill="#0f2f42" stroke="#35d99f" stroke-width="1.5"/>
+          <rect x="32" y="82" width="62" height="30" rx="4" fill="#123c54"/>
+          <path d="M28 118h70" stroke="#35d99f" stroke-width="3" stroke-linecap="round"/>
+          <text x="63" y="102" font-family="Space Grotesk, sans-serif" font-size="13" font-weight="700" fill="#7ee8c3" text-anchor="middle">IT</text>
+        </g>
+        <g class="float-mid">
+          <rect x="356" y="60" width="66" height="90" rx="12" fill="#0f2f42" stroke="#5ba0ff" stroke-width="1.5"/>
+          <rect x="366" y="72" width="46" height="56" rx="4" fill="#123c54"/>
+          <circle cx="389" cy="140" r="4" fill="#5ba0ff"/>
+        </g>
+        <g class="float-fast">
+          <circle cx="392" cy="300" r="38" fill="#0f2f42" stroke="#f5b731" stroke-width="1.5"/>
+          <text x="392" y="311" font-family="Space Grotesk, sans-serif" font-size="24" font-weight="700" fill="#f5b731" text-anchor="middle">zł</text>
+        </g>
+        <g class="float-mid">
+          <circle cx="60" cy="300" r="34" fill="#0f2f42" stroke="#35d99f" stroke-width="1.5"/>
+          <g transform="translate(42,282) scale(1.5)" stroke="#35d99f" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 19H4.7a1.5 1.5 0 0 1-1.3-2.25l2-3.46M11 19H7l2-3.5M14.6 6.5l-1.9-3.2a1.5 1.5 0 0 0-2.6 0L8.2 6.6M12.6 3.5L14.5 7l-4 .2M17.4 9.2l2.2 3.8a1.5 1.5 0 0 1-1.3 2.25H16M19.5 13l-3.9.3 1.9 3.5"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0 70V28C240 62 480 70 720 48S1200 6 1440 28v42z" fill="#f4f9f7"/></svg>
+  </div>
+</section>
+
+<!-- pasek statystyk -->
+<div class="stats-strip">
+  <div class="container">
+    <div class="stats-grid reveal">
+      <div class="stat"><div class="num" data-count="99.7" data-decimals="1" data-suffix="%">0%</div><div class="lbl">pozytywnych ocen na Allegro</div></div>
+      <div class="stat"><div class="num" data-count="375" data-suffix="+">0</div><div class="lbl">ocen od kupujących</div></div>
+      <div class="stat"><div class="num" data-count="15" data-suffix="+">0</div><div class="lbl">lat na Allegro</div></div>
+      <div class="stat"><div class="num" data-count="3">0</div><div class="lbl">lokalizacje w Polsce</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- usługi -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Czym się zajmujemy</span>
+      <h2>Kompleksowo: od skupu po serwis</h2>
+      <p>Jedno miejsce, w którym sprzedasz zbędną elektronikę, kupisz sprawdzony sprzęt i naprawisz komputer.</p>
+    </div>
+    <div class="cards">
+      <article class="card reveal">
+        <div class="card-icon"><svg style="color:#0e9f6e"><use href="#i-recycle"/></svg></div>
+        <h3>Skup elektroniki</h3>
+        <p>Skupujemy elektronikę na sztuki i na kilogramy — od pojedynczego laptopa po całe partie sprzętu z firm i likwidacji.</p>
+        <a class="card-link" href="skup.html">Zobacz szczegóły <svg><use href="#i-arrow"/></svg></a>
+      </article>
+      <article class="card reveal d1">
+        <div class="card-icon blue"><svg style="color:#1d6fe0"><use href="#i-laptop"/></svg></div>
+        <h3>Sklep komputerowy</h3>
+        <p>Nowy i używany sprzęt IT w okazyjnych cenach: komputery, laptopy, podzespoły, zasilacze i akcesoria — z gwarancją i fakturą.</p>
+        <a class="card-link" href="oferta.html">Zobacz ofertę <svg><use href="#i-arrow"/></svg></a>
+      </article>
+      <article class="card reveal d2">
+        <div class="card-icon"><svg style="color:#0e9f6e"><use href="#i-wrench"/></svg></div>
+        <h3>Serwis komputerowy</h3>
+        <p>Diagnoza i naprawa komputerów oraz laptopów. Wieloletni staż, indywidualne podejście do każdego sprzętu i klienta.</p>
+        <a class="card-link" href="oferta.html#serwis">Więcej o serwisie <svg><use href="#i-arrow"/></svg></a>
+      </article>
+      <article class="card reveal d3">
+        <div class="card-icon blue"><svg style="color:#1d6fe0"><use href="#i-tv"/></svg></div>
+        <h3>RTV, AGD i meble</h3>
+        <p>Poza elektroniką sprzedajemy również sprzęt RTV, lodówki gastronomiczne, meble i inne akcesoria — na miejscu i przez Allegro.</p>
+        <a class="card-link" href="oferta.html#rtv">Sprawdź asortyment <svg><use href="#i-arrow"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- jak działa skup -->
+<section class="section alt">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow blue">Prosty proces</span>
+      <h2>Jak wygląda skup? 4 kroki</h2>
+      <p>Cały proces możesz przejść telefonicznie lub mailowo — bez wychodzenia z domu.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><span class="step-num">1</span>
+        <div class="card-icon"><svg style="color:#0e9f6e"><use href="#i-phone"/></svg></div>
+        <h3>Skontaktuj się</h3>
+        <p>Zadzwoń lub napisz — opisz, jaki sprzęt chcesz sprzedać: rodzaj, ilość, stan.</p>
+      </div>
+      <div class="step reveal d1"><span class="step-num">2</span>
+        <div class="card-icon blue"><svg style="color:#1d6fe0"><use href="#i-scale"/></svg></div>
+        <h3>Otrzymaj wycenę</h3>
+        <p>Wyceniamy na sztuki lub na kilogramy — zawsze uczciwie i konkretnie.</p>
+      </div>
+      <div class="step reveal d2"><span class="step-num">3</span>
+        <div class="card-icon"><svg style="color:#0e9f6e"><use href="#i-truck"/></svg></div>
+        <h3>Dostarcz sprzęt</h3>
+        <p>Przywieź sprzęt do jednego z trzech punktów albo ustal z nami odbiór większej partii.</p>
+      </div>
+      <div class="step reveal d3"><span class="step-num">4</span>
+        <div class="card-icon blue"><svg style="color:#1d6fe0"><use href="#i-cash"/></svg></div>
+        <h3>Odbierz pieniądze</h3>
+        <p>Płacimy od ręki — gotówką lub przelewem. Bez czekania, bez kruczków.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Allegro -->
+<section class="section">
+  <div class="container">
+    <div class="allegro-panel reveal">
+      <svg class="medal" viewBox="0 0 24 24" style="color:#f5b731"><use href="#i-medal"/></svg>
+      <div>
+        <h3>Super Sprzedawca na Allegro od ponad 15 lat</h3>
+        <p>375+ pozytywnych ocen, 99,7% zadowolonych kupujących, wyróżnienia za szybką odpowiedź na pytania i błyskawiczny zwrot pieniędzy. Wszystkie opinie potwierdzone zakupem.</p>
+      </div>
+      <a class="btn btn-outline" href="https://allegro.pl/uzytkownik/FUHWIECZOREK" target="_blank" rel="noopener">
+        <svg><use href="#i-arrow"/></svg>Nasz profil Allegro
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- dlaczego my -->
+<section class="section alt">
+  <div class="container split">
+    <div class="reveal">
+      <span class="eyebrow">Dlaczego my</span>
+      <h2>Handlujemy elektroniką od lat — i widać to w opiniach</h2>
+      <p>Do każdego klienta oraz sprzętu podchodzimy indywidualnie. Zależy nam, żeby każda transakcja kończyła się sukcesem — zarówno dla sprzedającego, jak i kupującego.</p>
+      <ul class="checklist">
+        <li><svg style="color:#0e9f6e"><use href="#i-check"/></svg><span><strong>Uczciwa wycena</strong> — na sztuki lub na kilogramy, zawsze jasne warunki.</span></li>
+        <li><svg style="color:#0e9f6e"><use href="#i-check"/></svg><span><strong>Faktura VAT i gwarancja</strong> — kupujesz bezpiecznie, z dokumentami.</span></li>
+        <li><svg style="color:#0e9f6e"><use href="#i-check"/></svg><span><strong>3 lokalizacje</strong> — Łódź, Radomsko i magazyn w Częstochowie.</span></li>
+        <li><svg style="color:#0e9f6e"><use href="#i-check"/></svg><span><strong>14 dni na zwrot</strong> — pełne prawo odstąpienia od umowy przy zakupach.</span></li>
+      </ul>
+      <a href="o-nas.html" class="btn btn-green"><svg><use href="#i-arrow"/></svg>Poznaj naszą firmę</a>
+    </div>
+    <div class="art reveal d1" aria-hidden="true">
+      <svg viewBox="0 0 440 360" fill="none">
+        <defs>
+          <linearGradient id="wg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0e9f6e"/><stop offset="1" stop-color="#1d6fe0"/>
+          </linearGradient>
+        </defs>
+        <rect x="30" y="40" width="380" height="250" rx="20" fill="#fff" stroke="#dde8e3" stroke-width="2"/>
+        <rect x="30" y="40" width="380" height="54" rx="20" fill="#eaf3ef"/>
+        <circle cx="60" cy="67" r="7" fill="#0e9f6e"/><circle cx="84" cy="67" r="7" fill="#f5b731"/><circle cx="108" cy="67" r="7" fill="#1d6fe0"/>
+        <g class="float-slow">
+          <rect x="62" y="120" width="150" height="18" rx="9" fill="#d9f2e7"/>
+          <rect x="62" y="150" width="220" height="12" rx="6" fill="#eef4f1"/>
+          <rect x="62" y="172" width="190" height="12" rx="6" fill="#eef4f1"/>
+          <rect x="62" y="205" width="120" height="38" rx="19" fill="url(#wg1)"/>
+          <text x="122" y="229" font-family="Space Grotesk, sans-serif" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">99,7%</text>
+        </g>
+        <g class="float-mid">
+          <rect x="285" y="120" width="96" height="120" rx="14" fill="#f4f9f7" stroke="#dde8e3" stroke-width="1.5"/>
+          <g transform="translate(316,140) scale(1.4)" style="color:#f5b731"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17.1l-5.7 3.1 1.2-6.3L2.8 9.5l6.4-.8z" transform="translate(-8,-6) scale(0.9)" fill="#f5b731"/></g>
+          <rect x="303" y="180" width="60" height="9" rx="4.5" fill="#d9f2e7"/>
+          <rect x="310" y="197" width="46" height="9" rx="4.5" fill="#eef4f1"/>
+          <rect x="299" y="214" width="68" height="9" rx="4.5" fill="#eef4f1"/>
+        </g>
+        <g class="float-fast">
+          <circle cx="60" cy="300" r="30" fill="#0e9f6e" opacity="0.12"/>
+          <circle cx="380" cy="310" r="24" fill="#1d6fe0" opacity="0.12"/>
+        </g>
+        <g class="float-mid">
+          <rect x="150" y="270" width="150" height="52" rx="26" fill="#fff" stroke="#dde8e3" stroke-width="2"/>
+          <g transform="translate(168,284) scale(1.05)" stroke="#0e9f6e" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l7.5 3v5.5c0 4.7-3.2 7.9-7.5 9.5-4.3-1.6-7.5-4.8-7.5-9.5V6z" transform="scale(0.9)"/>
+            <path d="M8 10.8l2 2 3.8-4" transform="scale(0.9)"/>
+          </g>
+          <text x="242" y="302" font-family="Inter, sans-serif" font-size="12.5" font-weight="600" fill="#0c1f2c" text-anchor="middle">Zaufany</text>
+          <text x="242" y="315" font-family="Inter, sans-serif" font-size="10" fill="#4a5d6a" text-anchor="middle">sprzedawca</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- lokalizacje -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow blue">Gdzie nas znajdziesz</span>
+      <h2>Trzy punkty, jedna jakość obsługi</h2>
+    </div>
+    <div class="loc-grid">
+      <article class="loc reveal">
+        <div class="loc-head g"><svg><use href="#i-pin"/></svg>Łódź — siedziba główna</div>
+        <div class="loc-body">
+          <div class="row"><svg style="color:#0e9f6e"><use href="#i-pin"/></svg><span><strong>ul. Ks. Skorupki 17/19</strong><br>90-532 Łódź</span></div>
+          <div class="row"><svg style="color:#0e9f6e"><use href="#i-clock"/></svg><span>pn–pt: 9:00–17:00<br>sob–nd: zamknięte</span></div>
+          <a class="maplink" href="https://maps.google.com/?q=Ks.+Skorupki+17/19,+90-532+Łódź" target="_blank" rel="noopener">Pokaż na mapie <svg><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="loc reveal d1">
+        <div class="loc-head b"><svg><use href="#i-pin"/></svg>Radomsko — sklep</div>
+        <div class="loc-body">
+          <div class="row"><svg style="color:#1d6fe0"><use href="#i-pin"/></svg><span><strong>ul. Żeromskiego 5</strong><br>97-500 Radomsko</span></div>
+          <div class="row"><svg style="color:#1d6fe0"><use href="#i-clock"/></svg><span>pn–pt: 9:00–17:00<br>sob: 9:00–13:00</span></div>
+          <a class="maplink" href="https://maps.google.com/?q=Żeromskiego+5,+Radomsko" target="_blank" rel="noopener">Pokaż na mapie <svg><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="loc reveal d2">
+        <div class="loc-head n"><svg><use href="#i-truck"/></svg>Częstochowa — magazyn</div>
+        <div class="loc-body">
+          <div class="row"><svg style="color:#123246"><use href="#i-pin"/></svg><span><strong>ul. Krakowska 80</strong><br>Częstochowa</span></div>
+          <div class="row"><svg style="color:#123246"><use href="#i-truck"/></svg><span>Odbiory i dostawy większych partii sprzętu — po wcześniejszym umówieniu.</span></div>
+          <a class="maplink" href="https://maps.google.com/?q=Krakowska+80,+Częstochowa" target="_blank" rel="noopener">Pokaż na mapie <svg><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="cta-band reveal">
+      <svg class="deco" style="top:-40px;right:-40px;width:220px" viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="80" stroke="#35d99f" stroke-width="1.5" fill="none" stroke-dasharray="5 10"/>
+        <circle cx="100" cy="100" r="50" stroke="#5ba0ff" stroke-width="1.5" fill="none" stroke-dasharray="5 10"/>
+      </svg>
+      <h2>Masz zbędną elektronikę? Zamień ją na gotówkę.</h2>
+      <p>Wyślij listę sprzętu albo po prostu zadzwoń — wycena nic nie kosztuje i do niczego nie zobowiązuje.</p>
+      <div class="hero-ctas">
+        <a href="tel:+48537347875" class="btn btn-green"><svg><use href="#i-phone"/></svg>Zadzwoń: 537 347 875</a>
+        <a href="kontakt.html#wycena" class="btn btn-ghost"><svg><use href="#i-mail"/></svg>Napisz do nas</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- stopka -->
+<footer class="footer">
+  <div class="container footer-top">
+    <div class="about">
+      <a class="logo" href="index.html">
+        <svg class="logo-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect x="3" y="3" width="42" height="42" rx="11" fill="url(#lg)"/>
+          <path d="M13 15l4 18 4.5-12 4.5 12 4-18" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span class="logo-text"><strong>F.U.H. <span style="color:#35d99f">WIECZOREK</span></strong><small>skup · sprzedaż · serwis</small></span>
+      </a>
+      <p>Sklep i serwis komputerowy z wieloletnim stażem. Skup i sprzedaż elektroniki — na sztuki i na kilogramy. Meble, RTV i akcesoria.</p>
+    </div>
+    <div>
+      <h4>Nawigacja</h4>
+      <ul>
+        <li><a href="index.html">Start</a></li>
+        <li><a href="skup.html">Skup elektroniki</a></li>
+        <li><a href="oferta.html">Sklep i serwis</a></li>
+        <li><a href="o-nas.html">O firmie</a></li>
+        <li><a href="kontakt.html">Kontakt</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Lokalizacje</h4>
+      <ul>
+        <li>Łódź, ul. Ks. Skorupki 17/19</li>
+        <li>Radomsko, ul. Żeromskiego 5</li>
+        <li>Częstochowa, ul. Krakowska 80</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Kontakt</h4>
+      <div class="frow"><svg><use href="#i-phone"/></svg><a href="tel:+48537347875">+48 537 347 875</a></div>
+      <div class="frow"><svg><use href="#i-mail"/></svg><a href="mailto:awrecyclingi@gmail.com">awrecyclingi@gmail.com</a></div>
+      <div class="frow"><svg><use href="#i-clock"/></svg><span>pn–pt 9:00–17:00</span></div>
+      <div class="frow"><svg><use href="#i-star"/></svg><a href="https://allegro.pl/uzytkownik/FUHWIECZOREK" target="_blank" rel="noopener">Allegro: FUHWIECZOREK</a></div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <span id="year"></span> F.U.H. WIECZOREK Maria Wieczorek · NIP 7721562861 · REGON 592308794</span>
+    <span>Łódź · Radomsko · Częstochowa</span>
+  </div>
+  <div class="back-collection"><a href="../../">← wróć do kolekcji</a></div>
+</footer>
+
+<a href="tel:+48537347875" class="fab-call" aria-label="Zadzwoń do nas">
+  <svg><use href="#i-phone"/></svg>
+</a>
+
+<script src="main.js"></script>
+</body>
+</html>

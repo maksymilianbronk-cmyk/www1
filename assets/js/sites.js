@@ -235,4 +235,17 @@ const SITES = [
       tech: ["HTML", "CSS"],
     },
   },
+  {
+    slug: "fuh-wieczorek",
+    title: "F.U.H. Wieczorek — Skup i sprzedaż elektroniki, Łódź",
+    desc: "Wielostronicowy serwis firmy F.U.H. Wieczorek (Łódź, Radomsko, Częstochowa): skup elektroniki na sztuki i na kilogramy, sklep i serwis komputerowy, RTV i meble. Kolorystyka zielono-niebieska wg briefu, autorskie logo i ilustracje SVG (animowana płytka drukowana, pulsujące ścieżki), liczniki zaufania z Allegro (Super Sprzedawca, 99,7%, 375+ ocen, 15 lat), 5 podstron — Start, Skup, Sklep i serwis, O firmie, Kontakt z formularzem wyceny (mailto). Prawdziwe dane firmy: NIP, REGON, adresy 3 punktów, tel. +48 537 347 875.",
+    icon: "♻️",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#f4f9f7", "#071722", "#0e9f6e", "#1d6fe0", "#f5b731"],
+      fonts: ["Space Grotesk", "Inter"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts"],
+    },
+  },
 ];
