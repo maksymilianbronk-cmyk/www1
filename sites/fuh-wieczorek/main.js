@@ -69,10 +69,29 @@
     var y = document.getElementById("year");
     if (y) y.textContent = new Date().getFullYear();
 
-    /* sticky header shadow */
+    /* pasek postępu scrolla */
+    var prog = document.createElement("div");
+    prog.className = "scroll-progress";
+    document.body.appendChild(prog);
+
+    /* przycisk "do góry" */
+    var toTop = document.createElement("button");
+    toTop.className = "to-top";
+    toTop.setAttribute("aria-label", "Przewiń do góry");
+    toTop.innerHTML = '<svg><use href="#i-arrow"/></svg>';
+    document.body.appendChild(toTop);
+    toTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    /* sticky header shadow + postęp + widoczność "do góry" */
     var header = document.querySelector(".header");
     var onScroll = function () {
-      if (header) header.classList.toggle("scrolled", window.scrollY > 8);
+      var y = window.scrollY;
+      if (header) header.classList.toggle("scrolled", y > 8);
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      prog.style.width = (max > 0 ? (y / max) * 100 : 0) + "%";
+      toTop.classList.toggle("show", y > 700);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -110,6 +129,13 @@
     );
     document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
 
+    /* kaskadowe opóźnienia w siatkach kategorii */
+    document.querySelectorAll(".cat-grid").forEach(function (grid) {
+      Array.prototype.forEach.call(grid.children, function (el, i) {
+        el.style.transitionDelay = (i % 5) * 70 + "ms";
+      });
+    });
+
     /* liczniki */
     var cio = new IntersectionObserver(
       function (entries) {
@@ -146,6 +172,15 @@
         var open = item.classList.toggle("open");
         a.style.maxHeight = open ? a.scrollHeight + "px" : "0";
         q.setAttribute("aria-expanded", open ? "true" : "false");
+        /* zamknij pozostałe pozycje akordeonu */
+        if (open) {
+          item.parentElement.querySelectorAll(".faq-item.open").forEach(function (other) {
+            if (other === item) return;
+            other.classList.remove("open");
+            other.querySelector(".faq-a").style.maxHeight = "0";
+            other.querySelector(".faq-q").setAttribute("aria-expanded", "false");
+          });
+        }
       });
     });
 
