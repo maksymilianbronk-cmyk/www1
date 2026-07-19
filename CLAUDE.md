@@ -36,6 +36,14 @@ www1/
 }
 ```
 
+## Skille pomocnicze
+
+- **`nowa-strona`** — dodaje nową stronę do kolekcji (opis wyżej).
+- **`allegro-aukcje`** (`.claude/skills/allegro-aukcje/`) — wyszukuje aukcje
+  danego sprzedawcy Allegro (fan-out wyszukiwań web + walidacja slugów,
+  fallback na wyszukiwanie w profilu) i generuje karty produktów skryptem
+  `gen_prod_cards.py`. Użyj przy prośbach typu „podlinkuj aukcje z Allegro".
+
 ## Zasady
 
 - Każda strona jest **w pełni samodzielna** — własny HTML/CSS/JS.
