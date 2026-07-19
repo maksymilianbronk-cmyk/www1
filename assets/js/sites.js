@@ -210,6 +210,19 @@ const SITES = [
     },
   },
   {
+    slug: "gofrownia-dan-dad",
+    title: "Gofrownia Dan & Dad — Dźwirzyno",
+    desc: "Wielostronicowy serwis rodzinnej gofrowni Dan & Dad z Dźwirzyna (HoReCa): biel i róż wg briefu klienta, autorskie logo SVG (gofr z sercem i parą), 6 podstron — Start, O nas, Menu z zakładkami, Galeria SVG z lightboxem, 3-krokowa rezerwacja stolika z podsumowaniem i mailto, Kontakt z rysowaną mapką Dźwirzyna. Prawdziwe dane: tel. +48 452 110 100, dandad2023@gmail.com, profil FB, receptura od 1984. Bez zdjęć stockowych — 100% autorskich ilustracji SVG, animacje scrollowania, split-text, custom cursor, magnetyczne przyciski, konfetti, hamburger fullscreen.",
+    icon: "🧇",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#fffdfe", "#ffe4ee", "#f2578e", "#e9a94e", "#43203a"],
+      fonts: ["Fraunces", "Outfit", "Yellowtail"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts"],
+    },
+  },
+  {
     slug: "materialy-kaszubskie",
     title: "Materiały kaszubskie do pobrania",
     desc: "10 sprawdzonych źródeł darmowych kaszubskich materiałów cyfrowych z filtrowaniem po kategoriach: biblioteki cyfrowe (Bałtycka i Pomorska), archiwum PDF miesięcznika „Pomerania” z dodatkami Stegna i Najô Ùczba, Skarbnica Kaszubska, Kaszuby ONLINE, Kaszëbskô Czëtnica, Rada Języka Kaszubskiego, słowniki online Sloworz i Kaszebe.org oraz zbiory cyfrowe Muzeum Piśmiennictwa w Wejherowie. Plus sekcja o tekach haftu kaszubskiego (szkoła pucka). Karty w tradycyjnych barwach haftu.",
