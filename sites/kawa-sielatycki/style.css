@@ -134,8 +134,9 @@ h1, h2, h3, .display {
   background:
     radial-gradient(80% 60% at 80% 10%, rgba(201, 162, 75, 0.14), transparent 60%),
     #0b0906;
-  display: flex; flex-direction: column; justify-content: center;
-  padding: 90px 8vw 40px;
+  display: flex; flex-direction: column;
+  padding: 96px 8vw 36px;
+  overflow-y: auto; overscroll-behavior: contain;
   clip-path: circle(0% at calc(100% - 54px) 48px);
   transition: clip-path 0.7s var(--ease);
   visibility: hidden;
@@ -144,11 +145,11 @@ h1, h2, h3, .display {
   clip-path: circle(150% at calc(100% - 54px) 48px);
   visibility: visible;
 }
-.mobile-menu nav { display: flex; flex-direction: column; gap: 6px; }
+.mobile-menu nav { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
 .mobile-menu nav a {
-  font-family: "Space Grotesk", sans-serif; font-size: clamp(2rem, 8.5vw, 3.2rem);
-  font-weight: 600; color: var(--cream); padding: 8px 0;
-  display: flex; align-items: baseline; gap: 18px;
+  font-family: "Space Grotesk", sans-serif; font-size: clamp(1.55rem, 6.4vw, 2.6rem);
+  font-weight: 600; color: var(--cream); padding: 10px 0; line-height: 1.15;
+  display: flex; align-items: baseline; gap: 16px; white-space: nowrap;
   opacity: 0; transform: translateY(34px);
   transition: opacity 0.5s var(--ease), transform 0.6s var(--ease), color 0.3s;
 }
@@ -165,7 +166,8 @@ h1, h2, h3, .display {
 .mobile-menu.open nav a:nth-child(5) { transition-delay: 0.43s; }
 .mobile-menu.open nav a:nth-child(6) { transition-delay: 0.5s; }
 .mobile-menu-foot {
-  margin-top: auto; padding-top: 30px; border-top: 1px solid var(--line);
+  margin-top: auto; padding-top: 22px; border-top: 1px solid var(--line);
+  flex-shrink: 0;
   display: flex; flex-direction: column; gap: 6px;
   font-size: 0.9rem; color: var(--muted);
   opacity: 0; transition: opacity 0.5s 0.55s;
@@ -173,6 +175,12 @@ h1, h2, h3, .display {
 .mobile-menu.open .mobile-menu-foot { opacity: 1; }
 .mobile-menu-foot a { color: var(--gold-2); }
 body.menu-locked { overflow: hidden; }
+/* hamburger (w headerze) musi zostać NAD otwartym menu */
+body.menu-locked .site-header { z-index: 1200; }
+body.menu-locked .site-header.scrolled {
+  background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
 
 /* ---------- HERO ---------- */
 .hero {
@@ -471,6 +479,7 @@ section { position: relative; }
 }
 .facts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
 .fact-chip {
+  display: block;
   border: 1px solid var(--line); border-radius: var(--radius);
   padding: 30px 28px; background: rgba(10, 8, 6, 0.5);
   transition: transform 0.5s var(--ease), border-color 0.4s;

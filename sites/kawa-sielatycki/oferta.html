@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sielatycki Coffee — kawa prosto z gospodarstwa | świeżo palona, czarno-złota jakość</title>
-<meta name="description" content="Sielatycki Coffee — rodzinne gospodarstwo rolne Kamila Sielatyckiego. Świeżo palona kawa ziarnista i mielona, sprzedaż bezpośrednia. Zamów: +48 666 843 861.">
+<title>Oferta — Sielatycki Coffee | kawa ziarnista, mielona, hurt</title>
+<meta name="description" content="Świeżo palona kawa z gospodarstwa: ziarnista, mielona pod Twoją metodę parzenia i zamówienia hurtowe dla firm. Zamów: +48 666 843 861.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
@@ -102,9 +102,9 @@
       </span>
     </a>
     <nav class="main-nav" aria-label="Nawigacja główna">
-      <a href="index.html" class="active">Start</a>
+      <a href="index.html">Start</a>
       <a href="gospodarstwo.html">Gospodarstwo</a>
-      <a href="oferta.html">Oferta</a>
+      <a href="oferta.html" class="active">Oferta</a>
       <a href="ciekawostki.html">Ciekawostki</a>
       <a href="parzenie.html">Parzenie</a>
       <a href="kontakt.html" class="nav-cta">Zamów kawę</a>
@@ -133,152 +133,145 @@
 
 <main>
 
-  <!-- ============ HERO ============ -->
-  <section class="hero">
+  <section class="subhero">
     <div class="hero-bg">
       <img
         src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1920&q=85"
-        data-fallback="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1920&q=85|https://images.unsplash.com/photo-1512568400610-62da28bc8a13?auto=format&fit=crop&w=1920&q=85"
+        data-fallback="https://images.unsplash.com/photo-1512568400610-62da28bc8a13?auto=format&fit=crop&w=1920&q=85|https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1920&q=85"
         alt="Świeżo palone ziarna kawy z bliska" fetchpriority="high">
     </div>
-    <div class="hero-beans" aria-hidden="true">
-      <svg style="top:18%;left:6%;width:44px;height:44px;--rot:-24deg;color:#c9a24b;animation-delay:.4s"><use href="#i-bean-fill"/></svg>
-      <svg style="top:64%;left:12%;width:30px;height:30px;--rot:35deg;color:#e3c47c;animation-delay:1.6s"><use href="#i-bean-fill"/></svg>
-      <svg style="top:26%;right:10%;width:56px;height:56px;--rot:18deg;color:#c9a24b;animation-delay:.9s"><use href="#i-bean-fill"/></svg>
-      <svg style="top:70%;right:18%;width:36px;height:36px;--rot:-40deg;color:#e3c47c;animation-delay:2.3s"><use href="#i-bean-fill"/></svg>
-    </div>
-    <div class="hero-inner">
-      <span class="hero-eyebrow reveal visible">Gospodarstwo rolne · Kamil Sielatycki</span>
-      <h1 class="reveal visible d1">Kawa, która pachnie <em>gospodarstwem</em>, nie fabryką.</h1>
-      <p class="hero-lead reveal visible d2">
-        Świeżo palone ziarna prosto od rolnika. Bez pośredników, bez magazynowych
-        zapasów — palimy małe partie i wysyłamy w ciągu 48 godzin od wypalenia.
-      </p>
-      <div class="hero-actions reveal visible d3">
-        <a class="btn btn-gold" href="oferta.html">Zobacz ofertę <svg><use href="#i-arrow"/></svg></a>
-        <a class="btn btn-ghost" href="gospodarstwo.html">Poznaj gospodarstwo</a>
-      </div>
-      <div class="hero-stats reveal visible d4">
-        <div class="hero-stat"><b>100%</b><span>Arabica</span></div>
-        <div class="hero-stat"><b>48 h</b><span>Od wypalenia do wysyłki</span></div>
-        <div class="hero-stat"><b>Małe partie</b><span>Palone rzemieślniczo</span></div>
-      </div>
-    </div>
-    <div class="hero-scroll" aria-hidden="true"><span>Przewiń</span><span class="line"></span></div>
-  </section>
-
-  <!-- ============ MARQUEE ============ -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>Świeżo palona <svg style="color:#c9a24b"><use href="#i-bean"/></svg> 100% Arabica <svg style="color:#c9a24b"><use href="#i-bean"/></svg> Prosto od rolnika <svg style="color:#c9a24b"><use href="#i-bean"/></svg> Ziarnista i mielona <svg style="color:#c9a24b"><use href="#i-bean"/></svg> Wysyłka w 48 h <svg style="color:#c9a24b"><use href="#i-bean"/></svg></span>
-      <span>Świeżo palona <svg style="color:#c9a24b"><use href="#i-bean"/></svg> 100% Arabica <svg style="color:#c9a24b"><use href="#i-bean"/></svg> Prosto od rolnika <svg style="color:#c9a24b"><use href="#i-bean"/></svg> Ziarnista i mielona <svg style="color:#c9a24b"><use href="#i-bean"/></svg> Wysyłka w 48 h <svg style="color:#c9a24b"><use href="#i-bean"/></svg></span>
-    </div>
-  </div>
-
-  <!-- ============ O GOSPODARSTWIE (zajawka) ============ -->
-  <section class="section" id="o-nas">
-    <div class="container about-grid">
-      <div class="about-media reveal left">
-        <div class="photo-frame">
-          <img
-            src="https://images.unsplash.com/photo-1524350876685-274059332603?auto=format&fit=crop&w=900&q=85"
-            data-fallback="https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=900&q=85|https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=900&q=85"
-            alt="Dłonie trzymające świeże ziarna kawy" loading="lazy">
-        </div>
-        <div class="about-badge"><b>1:1</b><span>Kontakt z rolnikiem</span></div>
-      </div>
-      <div class="about-text reveal right">
-        <span class="eyebrow"><svg style="color:#c9a24b"><use href="#i-leaf"/></svg>Nasze gospodarstwo</span>
-        <h2>Od ziarna do filiżanki — <em>jedna para rąk</em>.</h2>
-        <p>
-          Sielatycki Coffee to rodzinne gospodarstwo rolne. Sami wybieramy zielone
-          ziarno, sami palimy je w małych partiach i sami pakujemy każdą torebkę —
-          a Ty kupujesz bezpośrednio od rolnika, bez pośredników.
-        </p>
-        <div class="signature">
-          <div>
-            <div class="sig-name">Kamil Sielatycki</div>
-            <div class="sig-role">Właściciel gospodarstwa</div>
-          </div>
-        </div>
-        <div class="hero-actions" style="margin-top:30px">
-          <a class="btn btn-ghost" href="gospodarstwo.html">Poznaj gospodarstwo <svg><use href="#i-arrow"/></svg></a>
-        </div>
-      </div>
+    <div class="container">
+      <span class="hero-eyebrow reveal visible">Sprzedaż bezpośrednia · u źródła</span>
+      <h1 class="reveal visible d1">Nasza <em>oferta</em></h1>
+      <p class="hero-lead reveal visible d2">Trzy filary sprzedaży: ziarnista, mielona i hurt. Każda partia z datą wypalenia i opisem profilu smaku.</p>
     </div>
   </section>
 
-  <!-- ============ PAS ZIARNA #1 ============ -->
-  <div class="bean-lane" aria-hidden="true">
-    <span class="lane-label">Podróż ziarna · z plantacji do Twojej filiżanki</span>
-    <div class="bean-traveller">
-      <span class="trail"></span>
-      <svg width="66" height="66" style="color:#c9a24b"><use href="#i-bean-fill"/></svg>
-    </div>
-  </div>
-
-  <!-- ============ OFERTA (zajawka) ============ -->
+  <!-- ============ OFERTA ============ -->
   <section class="section offer" id="oferta">
     <div class="container">
       <div class="section-head center reveal">
         <span class="eyebrow"><svg style="color:#c9a24b"><use href="#i-bag"/></svg>Sprzedaż bezpośrednia</span>
-        <h2>Co znajdziesz w <em>ofercie</em></h2>
+        <h2>Nasza <em>oferta</em></h2>
+        <p>Trzy filary naszej sprzedaży. Każda partia z datą wypalenia i opisem profilu smaku.</p>
       </div>
-      <div class="facts-grid">
-        <a class="fact-chip reveal d1" href="oferta.html">
-          <div class="num">Ziarnista</div>
-          <p>100% Arabica palona jasno-średnio — czekolada, orzech, suszona śliwka. Od 39 zł / 250 g.</p>
-        </a>
-        <a class="fact-chip reveal d2" href="oferta.html">
-          <div class="num">Mielona</div>
-          <p>Mielimy dopiero po zamówieniu — pod drip, kawiarkę, french press albo „po polsku”. Od 42 zł / 250 g.</p>
-        </a>
-        <a class="fact-chip reveal d3" href="oferta.html">
-          <div class="num">Hurt</div>
-          <p>Worki 1–5 kg dla biur, restauracji i kawiarni — stała cena i priorytetowa wysyłka.</p>
-        </a>
+      <div class="offer-grid">
+        <article class="offer-card reveal d1">
+          <div class="offer-photo">
+            <span class="offer-tag">Bestseller</span>
+            <img
+              src="https://images.unsplash.com/photo-1512568400610-62da28bc8a13?auto=format&fit=crop&w=800&q=82"
+              data-fallback="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=82|https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=82"
+              alt="Kawa ziarnista świeżo palona" loading="lazy">
+          </div>
+          <div class="offer-body">
+            <h3>Kawa ziarnista</h3>
+            <p>100% Arabica palona jasno-średnio. Nuty czekolady, orzecha i suszonej śliwki. Idealna do ekspresu i przelewu.</p>
+            <div class="offer-meta">
+              <div class="offer-price">od 39 zł <small>/ 250 g</small></div>
+              <a class="offer-link" href="kontakt.html">Zamów <svg><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+        <article class="offer-card reveal d2">
+          <div class="offer-photo">
+            <span class="offer-tag">Świeżo mielona</span>
+            <img
+              src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=82"
+              data-fallback="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=800&q=82|https://images.unsplash.com/photo-1459755486867-b55449bb39ff?auto=format&fit=crop&w=800&q=82"
+              alt="Filiżanka kawy i mielona kawa" loading="lazy">
+          </div>
+          <div class="offer-body">
+            <h3>Kawa mielona</h3>
+            <p>Mielimy dopiero po złożeniu zamówienia — pod Twoją metodę parzenia: drip, kawiarka, french press albo tradycyjna „po polsku”.</p>
+            <div class="offer-meta">
+              <div class="offer-price">od 42 zł <small>/ 250 g</small></div>
+              <a class="offer-link" href="kontakt.html">Zamów <svg><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
+        <article class="offer-card reveal d3">
+          <div class="offer-photo">
+            <span class="offer-tag">Dla firm i kawiarni</span>
+            <img
+              src="https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=800&q=82"
+              data-fallback="https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=800&q=82|https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=82"
+              alt="Worek ziaren kawy" loading="lazy">
+          </div>
+          <div class="offer-body">
+            <h3>Zamówienia hurtowe</h3>
+            <p>Worki 1–5 kg dla biur, restauracji i kawiarni. Stała cena, stały profil palenia i priorytetowa wysyłka pod umówiony termin.</p>
+            <div class="offer-meta">
+              <div class="offer-price">wycena <small>indywidualna</small></div>
+              <a class="offer-link" href="kontakt.html">Zapytaj <svg><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </article>
       </div>
-      <div class="facts-cta reveal">
-        <a class="btn btn-gold" href="oferta.html">Pełna oferta i ceny <svg><use href="#i-arrow"/></svg></a>
-      </div>
+      <p class="offer-note reveal">Ceny przykładowe — aktualny cennik i dostępność partii potwierdzamy telefonicznie: <a href="tel:+48666843861" style="color:var(--gold-2)">+48 666 843 861</a>.</p>
     </div>
   </section>
 
-  <!-- ============ CIEKAWOSTKI TEASER ============ -->
-  <section class="section facts-teaser" id="ciekawostki">
+  <!-- ============ PAS ZIARNA #2 ============ -->
+  <div class="bean-lane" aria-hidden="true">
+    <span class="lane-label">Świeżość słychać w młynku · aromat czuć w całym domu</span>
+    <div class="bean-traveller">
+      <span class="trail"></span>
+      <svg width="66" height="66" style="color:#e3c47c"><use href="#i-bean-fill"/></svg>
+    </div>
+  </div>
+
+  <!-- ============ OPINIE ============ -->
+  <section class="section" id="opinie" style="padding-top:0">
     <div class="container">
-      <div class="section-head center reveal">
-        <span class="eyebrow"><svg style="color:#c9a24b"><use href="#i-bean"/></svg>Świat kawy</span>
-        <h2>Czy wiesz, że<em>…</em></h2>
-        <p>Kawa to druga najczęściej wybierana substancja na świecie zaraz po wodzie. Oto próbka tego, co znajdziesz na naszych podstronach.</p>
+      <div class="section-head reveal">
+        <span class="eyebrow"><svg style="color:#c9a24b"><use href="#i-quote"/></svg>Opinie klientów</span>
+        <h2>Piją i <em>wracają</em></h2>
       </div>
-      <div class="facts-grid">
-        <div class="fact-chip reveal d1">
-          <div class="num"><span data-count="2.25" data-suffix="">2.25</span><small> mld</small></div>
-          <p>filiżanek kawy wypija się na świecie <b>każdego dnia</b> — to ok. 26 000 filiżanek na sekundę.</p>
-        </div>
-        <div class="fact-chip reveal d2">
-          <div class="num"><span data-count="800">0</span><small>+</small></div>
-          <p>związków aromatycznych zawiera palona kawa — ponad dwa razy więcej niż wino.</p>
-        </div>
-        <div class="fact-chip reveal d3">
-          <div class="num"><span data-count="9">0</span><small> w.</small></div>
-          <p>legenda o pasterzu Kaldim i tańczących kozach sięga IX wieku i etiopskiej Kaffy.</p>
-        </div>
-      </div>
-      <div class="facts-cta reveal">
-        <a class="btn btn-gold" href="ciekawostki.html">Wszystkie ciekawostki <svg><use href="#i-arrow"/></svg></a>
-        <a class="btn btn-ghost" href="parzenie.html">Jak parzyć kawę</a>
+      <div class="reviews-grid">
+        <article class="review-card reveal d1">
+          <span class="quote-ico"><svg style="color:#c9a24b;opacity:.7"><use href="#i-quote"/></svg></span>
+          <p>Pierwszy raz kupiłam kawę z datą palenia sprzed czterech dni. Różnica w aromacie jest nie do opisania — sklepowa już do mnie nie wróci.</p>
+          <div class="review-who">
+            <span class="avatar">MK</span>
+            <div><b>Marta K.</b><span>zamówienie prywatne</span></div>
+          </div>
+          <div class="stars" aria-label="5 gwiazdek">
+            <svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg>
+          </div>
+        </article>
+        <article class="review-card reveal d2">
+          <span class="quote-ico"><svg style="color:#c9a24b;opacity:.7"><use href="#i-quote"/></svg></span>
+          <p>Zamawiamy worki 2 kg do biura co dwa tygodnie. Pan Kamil zawsze doradzi, dopasuje mielenie i dowiezie na czas. Pełen profesjonalizm.</p>
+          <div class="review-who">
+            <span class="avatar">TB</span>
+            <div><b>Tomasz B.</b><span>klient firmowy</span></div>
+          </div>
+          <div class="stars" aria-label="5 gwiazdek">
+            <svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg>
+          </div>
+        </article>
+        <article class="review-card reveal d3">
+          <span class="quote-ico"><svg style="color:#c9a24b;opacity:.7"><use href="#i-quote"/></svg></span>
+          <p>Kupuję ziarno do dripa i kawiarki. Świetny kontakt, kawa zawsze świeża, a do każdej paczki dołączona kartka z profilem smaku. Czuć pasję.</p>
+          <div class="review-who">
+            <span class="avatar">AW</span>
+            <div><b>Agnieszka W.</b><span>miłośniczka dripa</span></div>
+          </div>
+          <div class="stars" aria-label="5 gwiazdek">
+            <svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg><svg style="color:#c9a24b"><use href="#i-star"/></svg>
+          </div>
+        </article>
       </div>
     </div>
   </section>
 
   <section class="cta-band">
     <div class="container reveal">
-      <h2>Kawa świeża jak <em>poranek na wsi</em>.</h2>
-      <p>Zamów partię z najbliższego wypału — dostarczymy ją w 48 godzin od wyjęcia z pieca.</p>
+      <h2>Wybrałeś kawę? <em>Zamów ją dziś.</em></h2>
+      <p>Telefonicznie doradzimy i dobierzemy mielenie, mailowo — wyślemy potwierdzenie i termin wysyłki.</p>
       <div class="facts-cta">
-        <a class="btn btn-gold" href="kontakt.html">Zamów kawę <svg><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-gold" href="kontakt.html">Przejdź do zamówienia <svg><use href="#i-arrow"/></svg></a>
         <a class="btn btn-ghost" href="tel:+48666843861">Zadzwoń: 666 843 861</a>
       </div>
     </div>
