@@ -261,4 +261,17 @@ const SITES = [
       tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts"],
     },
   },
+  {
+    slug: "kawa-sielatycki",
+    title: "Sielatycki Coffee — kawa z gospodarstwa",
+    desc: "Czarno-złoty landing sprzedażowy dla gospodarstwa rolnego Kamila Sielatyckiego (sprzedaż kawy): pełnoekranowe hero z ziarnami kawy i pływającymi ziarnami SVG, marquee, animowane pasy, w których ziarno kawy toczy się z lewej do prawej w rytm scrollowania, oferta (ziarnista, mielona, hurt), proces 4 kroków, galeria, opinie i formularz zamówienia (mailto). 2 podstrony ze światem kawy: 10 ciekawostek oraz przewodnik parzenia (drip, kawiarka, french press, espresso + Arabica vs Robusta). Wyłącznie autorskie ikony SVG (zero emoji), fullscreen hamburger menu z animacją clip-path, kaskada zapasowych zdjęć Unsplash. Prawdziwe dane: tel. +48 666 843 861, kamilsielatycki@gmail.com.",
+    icon: "☕",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#0a0806", "#120e09", "#c9a24b", "#e3c47c", "#f3ecdd"],
+      fonts: ["Fraunces", "Jost"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash"],
+    },
+  },
 ];
