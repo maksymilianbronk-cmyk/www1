@@ -1,10 +1,10 @@
 <?php
 /**
- * api.php — backend panelu Allegro Manager (JSON API).
+ * api.php — backend panelu Allegro Manager (JSON API, SQLite).
  *
  * Akcje: autoryzacja panelu, konfiguracja aplikacji Allegro, OAuth
  * (authorization code + device flow), hurtownie XML, produkty,
- * dopasowanie EAN i wystawianie ofert na Allegro.
+ * dopasowanie EAN, wystawianie i synchronizacja ofert na Allegro.
  */
 require_once __DIR__ . '/lib/bootstrap.php';
 
@@ -24,7 +24,7 @@ switch ($action) {
 
     case 'status': {
         $cfg = config();
-        $tokens = store()->read('tokens');
+        $tokens = db()->get('tokens');
         json_out([
             'ok'             => true,
             'setup_required' => empty($cfg['admin_pass_hash']),
@@ -53,7 +53,7 @@ switch ($action) {
         save_config($cfg);
         $_SESSION['logged_in'] = true;
         session_regenerate_id(true);
-        store()->log('info', 'Utworzono hasło administratora, panel gotowy.');
+        db()->log('info', 'Utworzono hasło administratora, panel gotowy.');
         json_out(['ok' => true, 'csrf' => csrf_token()]);
     }
 
@@ -63,17 +63,17 @@ switch ($action) {
             json_fail('Panel nie jest jeszcze skonfigurowany.', 409);
         }
         // prosty rate-limit: max 10 prób / 10 minut
-        $attempts = array_filter(store()->read('login_attempts', []), function ($t) { return $t > time() - 600; });
+        $attempts = array_values(array_filter(db()->get('login_attempts', []), function ($t) { return $t > time() - 600; }));
         if (count($attempts) >= 10) {
             json_fail('Zbyt wiele prób logowania. Spróbuj za 10 minut.', 429);
         }
         $pass = (string)(body()['password'] ?? '');
         if (!password_verify($pass, $cfg['admin_pass_hash'])) {
             $attempts[] = time();
-            store()->write('login_attempts', array_values($attempts));
+            db()->set('login_attempts', $attempts);
             json_fail('Nieprawidłowe hasło.', 401);
         }
-        store()->write('login_attempts', []);
+        db()->set('login_attempts', []);
         $_SESSION['logged_in'] = true;
         session_regenerate_id(true);
         json_out(['ok' => true, 'csrf' => csrf_token()]);
@@ -100,6 +100,19 @@ switch ($action) {
         json_out(['ok' => true]);
     }
 
+    /** Statystyki na pulpit. */
+    case 'stats': {
+        require_auth();
+        $pdo = db()->pdo;
+        json_out(['ok' => true,
+            'suppliers'  => (int)$pdo->query('SELECT COUNT(*) FROM suppliers')->fetchColumn(),
+            'products'   => (int)$pdo->query('SELECT COUNT(*) FROM products')->fetchColumn(),
+            'with_ean'   => (int)$pdo->query("SELECT COUNT(*) FROM products WHERE ean != ''")->fetchColumn(),
+            'offers'     => (int)$pdo->query('SELECT COUNT(*) FROM offers')->fetchColumn(),
+            'last_fetch' => $pdo->query('SELECT MAX(last_fetch) FROM suppliers')->fetchColumn() ?: null,
+        ]);
+    }
+
     // ============================================================ USTAWIENIA
 
     case 'settings': {
@@ -110,6 +123,7 @@ switch ($action) {
             'allegro_secret_set'  => !empty($cfg['allegro_client_secret']),
             'allegro_env'         => $cfg['allegro_env'] ?? 'sandbox',
             'redirect_uri'        => oauth_redirect_uri(),
+            'cron_url'            => panel_base_url() . '/cron.php?token=' . cron_token(),
             'markup_default'      => $cfg['markup_default'] ?? 20,
             'offer_defaults'      => $cfg['offer_defaults'] ?? [
                 'publication'         => 'INACTIVE',
@@ -146,12 +160,21 @@ switch ($action) {
         }
         // zmiana aplikacji lub środowiska unieważnia tokeny
         if ($cfg['allegro_env'] !== $envBefore || $cfg['allegro_client_id'] !== $idBefore) {
-            store()->delete('tokens');
+            db()->remove('tokens');
             unset($cfg['allegro_user']);
         }
         save_config($cfg);
-        store()->log('info', 'Zapisano ustawienia.', ['env' => $cfg['allegro_env']]);
+        db()->log('info', 'Zapisano ustawienia.', ['env' => $cfg['allegro_env']]);
         json_out(['ok' => true]);
+    }
+
+    case 'cron_token_regenerate': {
+        require_auth();
+        $cfg = config();
+        $cfg['cron_token'] = bin2hex(random_bytes(20));
+        save_config($cfg);
+        db()->log('info', 'Wygenerowano nowy token crona.');
+        json_out(['ok' => true, 'cron_url' => panel_base_url() . '/cron.php?token=' . $cfg['cron_token']]);
     }
 
     // ========================================================= OAUTH ALLEGRO
@@ -186,7 +209,7 @@ switch ($action) {
         if (!empty($resp['access_token'])) {
             save_tokens($resp);
             allegro_fetch_me($client, $resp['access_token']);
-            store()->log('info', 'Połączono konto Allegro (Device Flow).');
+            db()->log('info', 'Połączono konto Allegro (Device Flow).');
             json_out(['ok' => true, 'status' => 'connected']);
         }
         $err = $resp['error'] ?? 'unknown';
@@ -198,11 +221,11 @@ switch ($action) {
 
     case 'allegro_disconnect': {
         require_auth();
-        store()->delete('tokens');
+        db()->remove('tokens');
         $cfg = config();
         unset($cfg['allegro_user']);
         save_config($cfg);
-        store()->log('info', 'Odłączono konto Allegro.');
+        db()->log('info', 'Odłączono konto Allegro.');
         json_out(['ok' => true]);
     }
 
@@ -232,9 +255,8 @@ switch ($action) {
         foreach ($endpoints as $key => $path) {
             $resp = $client->request('GET', $path, $token);
             $data = $resp['data'] ?? [];
-            $list = $data['shippingRates'] ?? $data[$key] ?? null;
+            $list = $data['shippingRates'] ?? null;
             if ($list === null) {
-                // API zwraca różne klucze: returnPolicies / impliedWarranties / warranties
                 foreach (['returnPolicies', 'impliedWarranties', 'warranties'] as $k) {
                     if (isset($data[$k])) { $list = $data[$k]; break; }
                 }
@@ -250,13 +272,15 @@ switch ($action) {
 
     case 'suppliers': {
         require_auth();
-        $suppliers = store()->read('suppliers', []);
-        foreach ($suppliers as &$s) {
-            $s['has_password'] = !empty($s['password']);
-            unset($s['password']);
+        $rows = db()->pdo->query('SELECT id, name, url, login, markup, mapping, last_fetch, last_count,
+            last_format, created_at, (password != "") AS has_password FROM suppliers ORDER BY name')->fetchAll();
+        foreach ($rows as &$r) {
+            $r['markup'] = (float)$r['markup'];
+            $r['has_password'] = (bool)$r['has_password'];
+            $r['mapping'] = $r['mapping'] ? json_decode($r['mapping'], true) : null;
         }
-        unset($s);
-        json_out(['ok' => true, 'suppliers' => array_values($suppliers)]);
+        unset($r);
+        json_out(['ok' => true, 'suppliers' => $rows]);
     }
 
     case 'supplier_save': {
@@ -277,39 +301,47 @@ switch ($action) {
                 json_fail('Mapowanie pól musi być poprawnym JSON-em.');
             }
         }
-        $suppliers = store()->read('suppliers', []);
-        $id = (string)($b['id'] ?? '');
-        if ($id === '' || !isset($suppliers[$id])) {
+        $mappingJson = $mapping ? json_encode($mapping, JSON_UNESCAPED_UNICODE) : null;
+        $markup = max(0, (float)($b['markup'] ?? config()['markup_default'] ?? 20));
+        $login  = trim((string)($b['login'] ?? ''));
+        $id     = (string)($b['id'] ?? '');
+        $pdo    = db()->pdo;
+
+        $exists = false;
+        if ($id !== '') {
+            $st = $pdo->prepare('SELECT 1 FROM suppliers WHERE id = ?');
+            $st->execute([$id]);
+            $exists = (bool)$st->fetchColumn();
+        }
+
+        if ($exists) {
+            $pdo->prepare('UPDATE suppliers SET name = ?, url = ?, login = ?, markup = ?, mapping = ? WHERE id = ?')
+                ->execute([$name, $url, $login, $markup, $mappingJson, $id]);
+            if (!empty($b['password'])) {
+                $pdo->prepare('UPDATE suppliers SET password = ? WHERE id = ?')->execute([(string)$b['password'], $id]);
+            }
+        } else {
             $id = 'h' . substr(bin2hex(random_bytes(6)), 0, 8);
-            $suppliers[$id] = ['id' => $id, 'created_at' => date('Y-m-d H:i:s')];
+            $pdo->prepare('INSERT INTO suppliers (id, name, url, login, password, markup, mapping, created_at)
+                VALUES (?,?,?,?,?,?,?,?)')
+                ->execute([$id, $name, $url, $login, (string)($b['password'] ?? ''), $markup, $mappingJson, date('Y-m-d H:i:s')]);
         }
-        $suppliers[$id] = array_merge($suppliers[$id], [
-            'name'    => $name,
-            'url'     => $url,
-            'login'   => trim((string)($b['login'] ?? '')),
-            'markup'  => max(0, (float)($b['markup'] ?? config()['markup_default'] ?? 20)),
-            'mapping' => $mapping,
-        ]);
-        if (!empty($b['password'])) {
-            $suppliers[$id]['password'] = (string)$b['password'];
-        }
-        store()->write('suppliers', $suppliers);
-        store()->log('info', 'Zapisano hurtownię: ' . $name, ['id' => $id]);
+        db()->log('info', 'Zapisano hurtownię: ' . $name, ['id' => $id]);
         json_out(['ok' => true, 'id' => $id]);
     }
 
     case 'supplier_delete': {
         require_auth();
         $id = (string)(body()['id'] ?? '');
-        $suppliers = store()->read('suppliers', []);
-        if (!isset($suppliers[$id])) {
+        $st = db()->pdo->prepare('SELECT name FROM suppliers WHERE id = ?');
+        $st->execute([$id]);
+        $name = $st->fetchColumn();
+        if ($name === false) {
             json_fail('Nie znaleziono hurtowni.');
         }
-        $name = $suppliers[$id]['name'];
-        unset($suppliers[$id]);
-        store()->write('suppliers', $suppliers);
-        store()->delete('products_' . $id);
-        store()->log('info', 'Usunięto hurtownię: ' . $name);
+        db()->pdo->prepare('DELETE FROM suppliers WHERE id = ?')->execute([$id]); // products: ON DELETE CASCADE
+        db()->pdo->prepare('DELETE FROM offers WHERE supplier_id = ?')->execute([$id]);
+        db()->log('info', 'Usunięto hurtownię: ' . $name);
         json_out(['ok' => true]);
     }
 
@@ -319,41 +351,17 @@ switch ($action) {
         set_time_limit(600);
         session_write_close(); // nie blokuj innych żądań na czas długiego pobierania
         $id = (string)(body()['id'] ?? '');
-        $suppliers = store()->read('suppliers', []);
-        if (!isset($suppliers[$id])) {
+        $st = db()->pdo->prepare('SELECT * FROM suppliers WHERE id = ?');
+        $st->execute([$id]);
+        $s = $st->fetch();
+        if (!$s) {
             json_fail('Nie znaleziono hurtowni.');
         }
-        $s = $suppliers[$id];
-        $tmp = store()->tmpFile('feed_' . $id);
-        $dl = XmlImporter::download($s['url'], $s['login'] ?? '', $s['password'] ?? '', $tmp);
-        if (!$dl['ok']) {
-            store()->log('error', 'Pobieranie XML nieudane: ' . $s['name'], ['error' => $dl['error']]);
-            json_fail($dl['error']);
+        $res = run_supplier_fetch($s);
+        if (!$res['ok']) {
+            json_fail($res['error']);
         }
-        $parsed = XmlImporter::parse($tmp, $s['mapping'] ?? null);
-        @unlink($tmp);
-        if (!$parsed['ok']) {
-            store()->log('error', 'Parsowanie XML nieudane: ' . $s['name'], ['error' => $parsed['error']]);
-            json_fail($parsed['error']);
-        }
-        store()->write('products_' . $id, [
-            'fetched_at' => date('Y-m-d H:i:s'),
-            'format'     => $parsed['format'],
-            'products'   => $parsed['products'],
-        ]);
-        $suppliers[$id]['last_fetch']    = date('Y-m-d H:i:s');
-        $suppliers[$id]['last_count']    = count($parsed['products']);
-        $suppliers[$id]['last_format']   = $parsed['format'];
-        $suppliers[$id]['product_node']  = $parsed['product_node'];
-        store()->write('suppliers', $suppliers);
-        store()->log('info', 'Zaimportowano XML: ' . $s['name'], [
-            'produkty' => count($parsed['products']), 'format' => $parsed['format'], 'bajty' => $dl['bytes'],
-        ]);
-        json_out(['ok' => true,
-            'count'    => count($parsed['products']),
-            'format'   => $parsed['format'],
-            'warnings' => $parsed['warnings'],
-        ]);
+        json_out(['ok' => true, 'count' => $res['count'], 'format' => $res['format'], 'warnings' => $res['warnings']]);
     }
 
     // ============================================================== PRODUKTY
@@ -361,39 +369,58 @@ switch ($action) {
     case 'products': {
         require_auth();
         $sid  = (string)($_GET['supplier'] ?? '');
-        $q    = mb_strtolower(trim((string)($_GET['q'] ?? '')));
+        $q    = trim((string)($_GET['q'] ?? ''));
         $page = max(1, (int)($_GET['page'] ?? 1));
         $per  = 50;
-        $data = store()->read('products_' . $sid);
-        if (!$data) {
-            json_out(['ok' => true, 'products' => [], 'total' => 0, 'page' => 1, 'pages' => 0, 'fetched_at' => null]);
-        }
-        $products = $data['products'];
-        // klucz produktu = pozycja na liście (stała między pobraniami tego samego pliku)
-        foreach ($products as $i => &$p) {
-            $p['key'] = $i;
-        }
-        unset($p);
+
+        $where  = 'p.supplier_id = :sid';
+        $params = [':sid' => $sid];
         if ($q !== '') {
-            $products = array_values(array_filter($products, function ($p) use ($q) {
-                return mb_strpos(mb_strtolower($p['name']), $q) !== false
-                    || strpos($p['ean'], $q) !== false
-                    || mb_strpos(mb_strtolower($p['sku']), $q) !== false;
-            }));
+            $where .= ' AND (p.name LIKE :q OR p.ean LIKE :q OR p.sku LIKE :q)';
+            $params[':q'] = '%' . $q . '%';
         }
         if (!empty($_GET['only_ean'])) {
-            $products = array_values(array_filter($products, function ($p) { return $p['ean'] !== ''; }));
+            $where .= " AND p.ean != ''";
         }
-        $total = count($products);
-        $pages = (int)ceil($total / $per);
-        $slice = array_slice($products, ($page - 1) * $per, $per);
+        if (!empty($_GET['only_unlisted'])) {
+            $where .= ' AND NOT EXISTS (SELECT 1 FROM offers o WHERE o.supplier_id = p.supplier_id AND o.product_uid = p.uid)';
+        }
+        $pdo = db()->pdo;
+        $st = $pdo->prepare("SELECT COUNT(*) FROM products p WHERE $where");
+        $st->execute($params);
+        $total = (int)$st->fetchColumn();
+
+        $st = $pdo->prepare("SELECT p.*,
+                (SELECT o.allegro_offer_id FROM offers o
+                 WHERE o.supplier_id = p.supplier_id AND o.product_uid = p.uid
+                 ORDER BY o.id DESC LIMIT 1) AS offer_id
+            FROM products p WHERE $where ORDER BY p.pos LIMIT :lim OFFSET :off");
+        foreach ($params as $k => $v) {
+            $st->bindValue($k, $v);
+        }
+        $st->bindValue(':lim', $per, PDO::PARAM_INT);
+        $st->bindValue(':off', ($page - 1) * $per, PDO::PARAM_INT);
+        $st->execute();
+        $rows = $st->fetchAll();
+        foreach ($rows as &$r) {
+            $r['images'] = json_decode($r['images'], true) ?: [];
+            $r['price_gross'] = $r['price_gross'] !== null ? (float)$r['price_gross'] : null;
+            $r['stock'] = $r['stock'] !== null ? (int)$r['stock'] : null;
+            unset($r['stale'], $r['description']);
+        }
+        unset($r);
+
+        $sup = $pdo->prepare('SELECT last_fetch, last_format FROM suppliers WHERE id = ?');
+        $sup->execute([$sid]);
+        $supRow = $sup->fetch() ?: ['last_fetch' => null, 'last_format' => null];
+
         json_out(['ok' => true,
-            'products'   => $slice,
+            'products'   => $rows,
             'total'      => $total,
             'page'       => $page,
-            'pages'      => $pages,
-            'fetched_at' => $data['fetched_at'],
-            'format'     => $data['format'],
+            'pages'      => (int)ceil($total / $per),
+            'fetched_at' => $supRow['last_fetch'],
+            'format'     => $supRow['last_format'],
         ]);
     }
 
@@ -436,7 +463,7 @@ switch ($action) {
 
     /**
      * Wystawienie ofert na Allegro (POST /sale/product-offers).
-     * items: [{supplier_id, key, price, qty, ean}]
+     * items: [{product_id, price, qty}]
      */
     case 'allegro_list_offers': {
         require_auth();
@@ -452,20 +479,23 @@ switch ($action) {
         if (!$items) {
             json_fail('Brak produktów do wystawienia.');
         }
+        $getProduct = db()->pdo->prepare('SELECT * FROM products WHERE id = ?');
+        $insOffer   = db()->pdo->prepare('INSERT OR REPLACE INTO offers
+            (supplier_id, product_uid, allegro_offer_id, name, price, qty, status, created_at, updated_at)
+            VALUES (?,?,?,?,?,?,?,?,?)');
 
         $results = [];
         foreach ($items as $item) {
-            $sid = (string)($item['supplier_id'] ?? '');
-            $key = (int)($item['key'] ?? -1);
-            $data = store()->read('products_' . $sid);
-            $product = $data['products'][$key] ?? null;
+            $pid = (int)($item['product_id'] ?? 0);
+            $getProduct->execute([$pid]);
+            $product = $getProduct->fetch();
             if (!$product) {
-                $results[] = ['key' => $key, 'ok' => false, 'error' => 'Nie znaleziono produktu w imporcie.'];
+                $results[] = ['product_id' => $pid, 'ok' => false, 'error' => 'Nie znaleziono produktu w imporcie.'];
                 continue;
             }
             $label = mb_substr($product['name'], 0, 60);
             if ($product['ean'] === '') {
-                $results[] = ['key' => $key, 'name' => $label, 'ok' => false,
+                $results[] = ['product_id' => $pid, 'name' => $label, 'ok' => false,
                     'error' => 'Brak kodu EAN — produkt trzeba wystawić ręcznie w Allegro.'];
                 continue;
             }
@@ -476,7 +506,7 @@ switch ($action) {
             ]), $token);
             $matched = $match['data']['products'][0]['id'] ?? null;
             if ($match['http'] !== 200 || $matched === null) {
-                $results[] = ['key' => $key, 'name' => $label, 'ok' => false,
+                $results[] = ['product_id' => $pid, 'name' => $label, 'ok' => false,
                     'error' => $match['http'] !== 200
                         ? 'Błąd wyszukiwania produktu: ' . AllegroClient::apiError($match)
                         : 'Brak produktu o EAN ' . $product['ean'] . ' w katalogu Allegro.'];
@@ -486,7 +516,7 @@ switch ($action) {
             $price = (float)($item['price'] ?? 0);
             $qty   = max(1, (int)($item['qty'] ?? 1));
             if ($price <= 0) {
-                $results[] = ['key' => $key, 'name' => $label, 'ok' => false, 'error' => 'Nieprawidłowa cena.'];
+                $results[] = ['product_id' => $pid, 'name' => $label, 'ok' => false, 'error' => 'Nieprawidłowa cena.'];
                 continue;
             }
 
@@ -521,17 +551,33 @@ switch ($action) {
             $resp = $client->request('POST', '/sale/product-offers', $token, $payload);
             if (in_array($resp['http'], [200, 201, 202], true)) {
                 $offerId = $resp['data']['id'] ?? null;
-                $results[] = ['key' => $key, 'name' => $label, 'ok' => true,
+                if ($offerId) {
+                    $now = date('Y-m-d H:i:s');
+                    $insOffer->execute([$product['supplier_id'], $product['uid'], (string)$offerId,
+                        $label, $price, $qty, $publication, $now, $now]);
+                }
+                $results[] = ['product_id' => $pid, 'name' => $label, 'ok' => true,
                     'offer_id' => $offerId, 'status' => $publication,
                     'pending'  => $resp['http'] === 202];
-                store()->log('info', 'Wystawiono ofertę: ' . $label, ['offer_id' => $offerId, 'status' => $publication]);
+                db()->log('info', 'Wystawiono ofertę: ' . $label, ['offer_id' => $offerId, 'status' => $publication]);
             } else {
                 $err = AllegroClient::apiError($resp);
-                $results[] = ['key' => $key, 'name' => $label, 'ok' => false, 'error' => $err];
-                store()->log('error', 'Błąd wystawiania: ' . $label, ['error' => $err, 'http' => $resp['http']]);
+                $results[] = ['product_id' => $pid, 'name' => $label, 'ok' => false, 'error' => $err];
+                db()->log('error', 'Błąd wystawiania: ' . $label, ['error' => $err, 'http' => $resp['http']]);
             }
         }
         json_out(['ok' => true, 'results' => $results]);
+    }
+
+    /** Synchronizacja cen i stanów wystawionych ofert z aktualnym importem. */
+    case 'offers_sync': {
+        require_auth();
+        set_time_limit(600);
+        session_write_close();
+        $token  = require_allegro_token();
+        $client = allegro_client();
+        $res = run_offers_sync($client, $token);
+        json_out(['ok' => true] + $res);
     }
 
     /** Lista ofert sprzedawcy na Allegro. */
@@ -548,8 +594,16 @@ switch ($action) {
             json_fail('Błąd pobierania ofert: ' . AllegroClient::apiError($resp));
         }
         $d = $resp['data'];
+        // oznacz oferty zarządzane przez panel
+        $managed = array_column(db()->pdo->query('SELECT allegro_offer_id FROM offers')->fetchAll(), 'allegro_offer_id');
+        $managed = array_flip($managed);
+        $offers  = $d['offers'] ?? [];
+        foreach ($offers as &$o) {
+            $o['managed'] = isset($managed[(string)($o['id'] ?? '')]);
+        }
+        unset($o);
         json_out(['ok' => true,
-            'offers'     => $d['offers'] ?? [],
+            'offers'     => $offers,
             'totalCount' => $d['totalCount'] ?? 0,
             'page'       => $page,
             'pages'      => (int)ceil(($d['totalCount'] ?? 0) / $limit),
@@ -561,7 +615,12 @@ switch ($action) {
 
     case 'logs': {
         require_auth();
-        json_out(['ok' => true, 'logs' => array_reverse(store()->read('logs', []))]);
+        $rows = db()->pdo->query('SELECT ts, level, msg, ctx FROM logs ORDER BY id DESC LIMIT 300')->fetchAll();
+        foreach ($rows as &$r) {
+            $r['ctx'] = json_decode($r['ctx'], true) ?: [];
+        }
+        unset($r);
+        json_out(['ok' => true, 'logs' => $rows]);
     }
 
     default:

@@ -201,9 +201,7 @@ function show(view){
 /* ---------------- Pulpit ---------------- */
 async function viewDash(el){
   const st = await api('status'); STATUS = st; CSRF = st.csrf || CSRF;
-  const sup = await api('suppliers');
-  let totalProducts = 0, lastFetch = null;
-  sup.suppliers.forEach(s => { totalProducts += s.last_count || 0; if (s.last_fetch && (!lastFetch || s.last_fetch > lastFetch)) lastFetch = s.last_fetch; });
+  const stats = await api('stats');
   const a = st.allegro;
   el.innerHTML = `
     <h1>Pulpit</h1>
@@ -213,8 +211,9 @@ async function viewDash(el){
         <div class="big">${a.connected ? '✅' : (a.configured ? '🔌' : '⚠️')}</div>
         <div class="muted">${a.connected ? 'Połączono' + (a.user ? ': ' + esc(a.user) : '') : (a.configured ? 'Aplikacja skonfigurowana — połącz konto' : 'Skonfiguruj aplikację w Ustawieniach')}</div></div>
       <div class="card"><div class="lbl">Środowisko</div><div class="big">${a.env === 'sandbox' ? '🧪' : '🟢'}</div><div class="muted">${a.env === 'sandbox' ? 'Sandbox (testowe)' : 'Produkcja'}</div></div>
-      <div class="card"><div class="lbl">Hurtownie</div><div class="big">${sup.suppliers.length}</div><div class="muted">skonfigurowane źródła XML</div></div>
-      <div class="card"><div class="lbl">Produkty w imporcie</div><div class="big">${totalProducts.toLocaleString('pl-PL')}</div><div class="muted">${lastFetch ? 'ostatni import: ' + lastFetch : 'brak importów'}</div></div>
+      <div class="card"><div class="lbl">Hurtownie</div><div class="big">${stats.suppliers}</div><div class="muted">skonfigurowane źródła XML</div></div>
+      <div class="card"><div class="lbl">Produkty w imporcie</div><div class="big">${stats.products.toLocaleString('pl-PL')}</div><div class="muted">${stats.with_ean.toLocaleString('pl-PL')} z EAN · ${stats.last_fetch ? 'import: ' + stats.last_fetch : 'brak importów'}</div></div>
+      <div class="card"><div class="lbl">Oferty z panelu</div><div class="big">${stats.offers.toLocaleString('pl-PL')}</div><div class="muted">wystawione przez Allegro Manager</div></div>
     </div>
     <div class="panel">
       <h2 style="margin-top:0">🚀 Jak zacząć</h2>
@@ -222,7 +221,8 @@ async function viewDash(el){
         <li><b>Ustawienia</b> → wpisz Client ID / Secret aplikacji z <a href="https://apps.developer.allegro.pl" target="_blank" rel="noopener">apps.developer.allegro.pl</a> i połącz konto Allegro (OAuth — jak w SkyShop).</li>
         <li><b>Hurtownie XML</b> → dodaj adres pliku XML hurtowni (IOF, Ceneo lub dowolny XML) i kliknij „Pobierz XML".</li>
         <li><b>Produkty</b> → zaznacz produkty z kodem EAN i kliknij „Wystaw na Allegro". Ceny naliczą się z ustawioną marżą.</li>
-        <li><b>Oferty Allegro</b> → sprawdzaj status wystawionych ofert.</li>
+        <li><b>Oferty Allegro</b> → sprawdzaj statusy i klikaj „Synchronizuj" po każdym świeżym imporcie (nowe ceny i stany trafią do Allegro).</li>
+        <li><b>Automatyzacja</b> → w Ustawieniach znajdziesz adres crona: hosting może sam pobierać XML i synchronizować oferty np. co godzinę.</li>
       </ol>
       <p class="muted" style="margin-top:.6rem">💡 Zacznij od środowiska <b>Sandbox</b> — przetestujesz cały proces bez wystawiania prawdziwych ofert.</p>
     </div>`;
@@ -302,7 +302,7 @@ function supplierForm(s){
 }
 
 /* ---------------- Produkty ---------------- */
-let prodState = { supplier: '', q: '', page: 1, onlyEan: false, selected: new Map() };
+let prodState = { supplier: '', q: '', page: 1, onlyEan: false, onlyUnlisted: false, selected: new Map() };
 
 async function viewProducts(el){
   const sup = await api('suppliers');
@@ -314,62 +314,61 @@ async function viewProducts(el){
     prodState.supplier = sup.suppliers[0].id;
   }
   const supplier = sup.suppliers.find(s => s.id === prodState.supplier);
-  const r = await api(`products&supplier=${prodState.supplier}&q=${encodeURIComponent(prodState.q)}&page=${prodState.page}${prodState.onlyEan ? '&only_ean=1' : ''}`);
+  const r = await api(`products&supplier=${prodState.supplier}&q=${encodeURIComponent(prodState.q)}&page=${prodState.page}${prodState.onlyEan ? '&only_ean=1' : ''}${prodState.onlyUnlisted ? '&only_unlisted=1' : ''}`);
   const markup = supplier.markup || 0;
+  const offerBase = STATUS.allegro.env === 'sandbox' ? 'https://allegro.pl.allegrosandbox.pl' : 'https://allegro.pl';
   el.innerHTML = `
     <h1>Produkty</h1>
     <p class="sub">${r.fetched_at ? `Import z ${esc(r.fetched_at)} · ${esc(r.format || '')} · ${r.total.toLocaleString('pl-PL')} produktów` : 'Brak importu — pobierz XML w zakładce Hurtownie.'}</p>
     <div class="row" style="margin-bottom:1rem">
       <select id="p-sup" style="width:auto">${sup.suppliers.map(s => `<option value="${s.id}" ${s.id === prodState.supplier ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select>
-      <input id="p-q" style="width:260px" placeholder="Szukaj: nazwa / EAN / SKU…" value="${esc(prodState.q)}">
+      <input id="p-q" style="width:240px" placeholder="Szukaj: nazwa / EAN / SKU…" value="${esc(prodState.q)}">
       <label style="margin:0;display:flex;align-items:center;gap:.4rem;color:var(--txt);font-size:.85rem"><input type="checkbox" id="p-ean" style="width:auto" ${prodState.onlyEan ? 'checked' : ''}> tylko z EAN</label>
+      <label style="margin:0;display:flex;align-items:center;gap:.4rem;color:var(--txt);font-size:.85rem"><input type="checkbox" id="p-unl" style="width:auto" ${prodState.onlyUnlisted ? 'checked' : ''}> tylko niewystawione</label>
       <div style="flex:1"></div>
       <button class="primary" id="p-list" ${prodState.selected.size ? '' : 'disabled'}>🏷️ Wystaw na Allegro (${prodState.selected.size})</button>
     </div>
     <div class="panel" style="padding:0;overflow-x:auto">
     <table><thead><tr>
       <th style="width:30px"><input type="checkbox" id="p-all" style="width:auto"></th>
-      <th></th><th>Nazwa</th><th>EAN</th><th>SKU</th><th>Cena hurt. brutto</th><th>Cena Allegro (+${markup}%)</th><th>Stan</th>
+      <th></th><th>Nazwa</th><th>EAN</th><th>SKU</th><th>Cena hurt. brutto</th><th>Cena Allegro (+${markup}%)</th><th>Stan</th><th>Oferta</th>
     </tr></thead><tbody>
     ${r.products.map(p => {
-      const selKey = prodState.supplier + ':' + p.key;
       const allegroPrice = p.price_gross != null ? Math.round(p.price_gross * (1 + markup/100) * 100) / 100 : null;
       return `<tr>
-        <td><input type="checkbox" style="width:auto" data-sel="${p.key}" ${prodState.selected.has(selKey) ? 'checked' : ''} ${p.ean ? '' : 'disabled title="Brak EAN"'}></td>
+        <td><input type="checkbox" style="width:auto" data-sel="${p.id}" ${prodState.selected.has(p.id) ? 'checked' : ''} ${p.ean ? '' : 'disabled title="Brak EAN"'}></td>
         <td>${p.images && p.images.length ? `<img class="thumb" src="${esc(p.images[0])}" loading="lazy" onerror="this.style.visibility='hidden'">` : ''}</td>
-        <td style="max-width:340px">${esc(p.name)}<div class="muted" style="font-size:.75rem">${esc(p.producer || '')}${p.category ? ' · ' + esc(String(p.category).slice(0, 60)) : ''}</div></td>
+        <td style="max-width:320px">${esc(p.name)}<div class="muted" style="font-size:.75rem">${esc(p.producer || '')}${p.category ? ' · ' + esc(String(p.category).slice(0, 60)) : ''}</div></td>
         <td>${p.ean ? `<code>${esc(p.ean)}</code>` : '<span class="badge warn">brak</span>'}</td>
         <td class="muted">${esc(p.sku || '—')}</td>
         <td>${fmtPln(p.price_gross)}</td>
         <td><b>${fmtPln(allegroPrice)}</b></td>
         <td>${p.stock != null ? p.stock : '—'}</td>
-      </tr>`; }).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:2rem">Brak produktów.</td></tr>'}
+        <td>${p.offer_id ? `<a class="badge ok" href="${offerBase}/oferta/${esc(p.offer_id)}" target="_blank" rel="noopener" title="Oferta ${esc(p.offer_id)}">✓ wystawiona ↗</a>` : '<span class="badge mut">—</span>'}</td>
+      </tr>`; }).join('') || '<tr><td colspan="9" class="muted" style="text-align:center;padding:2rem">Brak produktów.</td></tr>'}
     </tbody></table></div>
     <div class="pager">
       <button id="p-prev" ${r.page <= 1 ? 'disabled' : ''}>‹ Poprzednia</button>
       <span class="muted">strona ${r.page} / ${r.pages || 1}</span>
       <button id="p-next" ${r.page >= r.pages ? 'disabled' : ''}>Następna ›</button>
     </div>`;
+  const select = (id, on) => {
+    const prod = r.products.find(p => p.id === id);
+    if (on && prod) prodState.selected.set(id, {product: prod, markup});
+    else prodState.selected.delete(id);
+  };
   $('#p-sup', el).onchange = e => { prodState.supplier = e.target.value; prodState.page = 1; prodState.selected.clear(); show('products'); };
   $('#p-q', el).onkeydown = e => { if (e.key === 'Enter') { prodState.q = e.target.value; prodState.page = 1; show('products'); } };
   $('#p-ean', el).onchange = e => { prodState.onlyEan = e.target.checked; prodState.page = 1; show('products'); };
+  $('#p-unl', el).onchange = e => { prodState.onlyUnlisted = e.target.checked; prodState.page = 1; show('products'); };
   $('#p-prev', el).onclick = () => { prodState.page--; show('products'); };
   $('#p-next', el).onclick = () => { prodState.page++; show('products'); };
   $('#p-all', el).onchange = e => {
-    el.querySelectorAll('[data-sel]:not(:disabled)').forEach(cb => {
-      cb.checked = e.target.checked;
-      const key = prodState.supplier + ':' + cb.dataset.sel;
-      const prod = r.products.find(p => String(p.key) === cb.dataset.sel);
-      if (e.target.checked) prodState.selected.set(key, {supplier_id: prodState.supplier, product: prod, markup});
-      else prodState.selected.delete(key);
-    });
+    el.querySelectorAll('[data-sel]:not(:disabled)').forEach(cb => { cb.checked = e.target.checked; select(+cb.dataset.sel, e.target.checked); });
     show('products');
   };
   el.querySelectorAll('[data-sel]').forEach(cb => cb.onchange = () => {
-    const key = prodState.supplier + ':' + cb.dataset.sel;
-    const prod = r.products.find(p => String(p.key) === cb.dataset.sel);
-    if (cb.checked) prodState.selected.set(key, {supplier_id: prodState.supplier, product: prod, markup});
-    else prodState.selected.delete(key);
+    select(+cb.dataset.sel, cb.checked);
     $('#p-list', el).disabled = !prodState.selected.size;
     $('#p-list', el).textContent = `🏷️ Wystaw na Allegro (${prodState.selected.size})`;
   });
@@ -431,9 +430,7 @@ async function listingWizard(){
     const goBtn = $('#w-go', bg);
     goBtn.disabled = true; goBtn.innerHTML = '<span class="spin"></span> Wystawiam…';
     const payload = items.map((it, i) => it.matched ? {
-      supplier_id: it.supplier_id,
-      key: it.product.key,
-      ean: it.product.ean,
+      product_id: it.product.id,
       price: parseFloat(bg.querySelector(`[data-price="${i}"]`).value),
       qty: parseInt(bg.querySelector(`[data-qty="${i}"]`).value, 10) || 1,
     } : null).filter(Boolean);
@@ -461,18 +458,23 @@ async function viewOffers(el){
   const offerBase = r.env === 'sandbox' ? 'https://allegro.pl.allegrosandbox.pl' : 'https://allegro.pl';
   el.innerHTML = `
     <h1>Oferty Allegro</h1>
-    <p class="sub">Twoje oferty na koncie Allegro (${r.totalCount.toLocaleString('pl-PL')} łącznie).</p>
+    <p class="sub">Twoje oferty na koncie Allegro (${r.totalCount.toLocaleString('pl-PL')} łącznie). Oznaczenie „z panelu" = oferta wystawiona przez Allegro Manager, objęta synchronizacją.</p>
+    <div class="row" style="margin-bottom:1rem">
+      <button class="primary" id="o-sync">🔄 Synchronizuj ceny i stany z hurtowniami</button>
+      <span class="muted">aktualizuje oferty wystawione z panelu wg ostatniego importu XML</span>
+    </div>
     <div class="panel" style="padding:0;overflow-x:auto">
-    <table><thead><tr><th>Oferta</th><th>Cena</th><th>Dostępne</th><th>Sprzedane</th><th>Status</th><th></th></tr></thead>
+    <table><thead><tr><th>Oferta</th><th>Cena</th><th>Dostępne</th><th>Sprzedane</th><th>Status</th><th></th><th></th></tr></thead>
     <tbody>${r.offers.map(o => `
       <tr>
-        <td style="max-width:380px">${esc(o.name || o.id)}</td>
+        <td style="max-width:360px">${esc(o.name || o.id)}</td>
         <td>${o.sellingMode && o.sellingMode.price ? fmtPln(o.sellingMode.price.amount) : '—'}</td>
         <td>${o.stock ? o.stock.available : '—'}</td>
         <td>${o.stats ? (o.stats.soldQuantity ?? '—') : '—'}</td>
         <td><span class="badge ${o.publication && o.publication.status === 'ACTIVE' ? 'ok' : 'mut'}">${esc(o.publication ? o.publication.status : '?')}</span></td>
+        <td>${o.managed ? '<span class="badge ok">z panelu</span>' : ''}</td>
         <td><a href="${offerBase}/oferta/${esc(o.id)}" target="_blank" rel="noopener">podgląd ↗</a></td>
-      </tr>`).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:2rem">Brak ofert.</td></tr>'}
+      </tr>`).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:2rem">Brak ofert.</td></tr>'}
     </tbody></table></div>
     <div class="pager">
       <button id="o-prev" ${r.page <= 1 ? 'disabled' : ''}>‹</button>
@@ -481,6 +483,19 @@ async function viewOffers(el){
     </div>`;
   $('#o-prev', el).onclick = () => { offersPage--; show('offers'); };
   $('#o-next', el).onclick = () => { offersPage++; show('offers'); };
+  $('#o-sync', el).onclick = async () => {
+    const b = $('#o-sync', el);
+    b.disabled = true; b.innerHTML = '<span class="spin"></span> Synchronizuję…';
+    try {
+      const s = await api('offers_sync', {});
+      toast(`Synchronizacja: sprawdzono ${s.checked}, zaktualizowano ${s.updated}` +
+        (s.zeroed ? `, wyzerowano ${s.zeroed} (brak w feedzie)` : '') +
+        (s.skipped ? `, bez zmian ${s.skipped}` : '') +
+        (s.errors.length ? `, błędy: ${s.errors.length} (szczegóły w Logach)` : ''),
+        s.errors.length ? 'warn' : 'ok', 9000);
+      show('offers');
+    } catch(e){ toast(e.message, 'err', 9000); show('offers'); }
+  };
 }
 
 /* ---------------- Ustawienia ---------------- */
@@ -541,6 +556,15 @@ async function viewSettings(el){
     </div>
 
     <div class="panel">
+      <h2 style="margin-top:0">⏰ Automatyzacja (cron)</h2>
+      <p class="muted">Ustaw na hostingu zadanie cron wywołujące poniższy adres (np. co godzinę) —
+      panel sam pobierze XML wszystkich hurtowni i zsynchronizuje ceny/stany wystawionych ofert.</p>
+      <label>Adres crona (trzymaj w tajemnicy)</label>
+      <div class="row"><input id="s-cron" readonly value="${esc(s.cron_url)}" style="flex:1"><button id="s-cron-copy">📋</button><button id="s-cron-regen" title="Unieważnia stary adres">♻️ Nowy token</button></div>
+      <p class="muted" style="margin-top:.5rem">Przykład wpisu crontab: <code>0 * * * * curl -s "${esc(s.cron_url)}" &gt; /dev/null</code></p>
+    </div>
+
+    <div class="panel">
       <h2 style="margin-top:0">🔒 Zmiana hasła panelu</h2>
       <div class="grid2">
         <div><label>Obecne hasło</label><input id="s-cur" type="password"></div>
@@ -550,6 +574,12 @@ async function viewSettings(el){
     </div>`;
 
   $('#s-copy', el).onclick = () => { navigator.clipboard.writeText(s.redirect_uri); toast('Skopiowano Redirect URI.', 'ok'); };
+  $('#s-cron-copy', el).onclick = () => { navigator.clipboard.writeText($('#s-cron', el).value); toast('Skopiowano adres crona.', 'ok'); };
+  $('#s-cron-regen', el).onclick = async () => {
+    if (!confirm('Wygenerować nowy token? Stary adres crona przestanie działać.')) return;
+    try { const r2 = await api('cron_token_regenerate', {}); $('#s-cron', el).value = r2.cron_url; toast('Nowy token crona wygenerowany.', 'ok'); }
+    catch(e){ toast(e.message, 'err'); }
+  };
   const saveMain = async () => {
     await api('settings_save', {
       allegro_client_id: $('#s-id', el).value,

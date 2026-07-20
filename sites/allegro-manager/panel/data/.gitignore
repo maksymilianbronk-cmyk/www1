@@ -1,4 +1,4 @@
-# Dane runtime (tokeny, konfiguracja, produkty) — nigdy do repozytorium
+# Dane runtime (baza SQLite z tokenami i konfiguracją) — nigdy do repozytorium
 *
 !.htaccess
 !.gitignore

@@ -43,9 +43,10 @@
     <div class="logo"><span class="dot"></span> Allegro Manager</div>
     <h1>Hurtownie XML → Twoje oferty na Allegro</h1>
     <p class="sub">Własny, samodzielny system w stylu SkyShop / BaseLinker: panel administracyjny, który pobiera
-    pliki XML polskich hurtowni, autoryzuje się z Allegro przez OAuth i masowo wystawia przedmioty.
-    Bez abonamentu — działa na Twoim hostingu PHP.</p>
+    pliki XML polskich hurtowni, autoryzuje się z Allegro przez OAuth, masowo wystawia przedmioty
+    i synchronizuje ceny oraz stany. PHP + SQLite — bez abonamentu, działa na Twoim hostingu.</p>
     <a class="cta" href="panel/">Otwórz panel administracyjny →</a>
+    <p style="margin-top:1rem"><a href="allegro-manager.zip" download>⬇️ Pobierz paczkę ZIP (system + dokumentacja)</a></p>
   </header>
 
   <div class="flow">
@@ -62,18 +63,20 @@
     <div class="feat"><h3>🧮 Marże i ceny</h3><p>Osobna marża procentowa dla każdej hurtowni, przeliczanie netto→brutto z VAT, podgląd ceny końcowej przed wystawieniem.</p></div>
     <div class="feat"><h3>🎯 Dopasowanie po EAN</h3><p>Produkty łączone z katalogiem Allegro po kodzie GTIN/EAN — oferta dziedziczy zdjęcia i parametry produktu z katalogu.</p></div>
     <div class="feat"><h3>🏷️ Masowe wystawianie</h3><p>Oferty robocze (dokończysz w Allegro) albo od razu aktywne. Domyślny cennik dostawy, polityka zwrotów, reklamacje i gwarancja z Twojego konta.</p></div>
-    <div class="feat"><h3>🛡️ Bezpieczeństwo</h3><p>Logowanie hasłem (bcrypt), tokeny CSRF, limit prób logowania, dane i tokeny w katalogu zablokowanym przez .htaccess.</p></div>
+    <div class="feat"><h3>🔄 Synchronizacja i cron</h3><p>Panel pamięta wystawione oferty (baza SQLite) i aktualizuje ich ceny/stany wg świeżego importu — ręcznie jednym przyciskiem albo automatycznie przez cron hostingu. Produkt znika z feedu → stan 0.</p></div>
+    <div class="feat"><h3>🗄️ Baza SQLite</h3><p>Produkty, hurtownie, rejestr ofert i logi w jednym pliku bazy (WAL, transakcje, indeksy). Zero konfiguracji, szybkie wyszukiwanie przy dziesiątkach tysięcy produktów, automatyczna migracja ze starszej wersji.</p></div>
+    <div class="feat"><h3>🛡️ Bezpieczeństwo</h3><p>Logowanie hasłem (bcrypt), tokeny CSRF, limit prób logowania, rotowany token crona, dane i tokeny w katalogu zablokowanym przez .htaccess.</p></div>
   </div>
 
   <div class="note">
-    ⚠️ <b>Wymagania:</b> panel to aplikacja <b>PHP 7.4+</b> (cURL, XMLReader, SimpleXML — standard na polskich hostingach).
+    ⚠️ <b>Wymagania:</b> panel to aplikacja <b>PHP 7.4+</b> (PDO SQLite, cURL, XMLReader, SimpleXML — standard na polskich hostingach).
     Na hostingu statycznym (np. GitHub Pages) zobaczysz tylko tę stronę — wgraj folder na hosting z PHP
     (np. przez FTP) i otwórz <code>panel/</code>. Szczegóły w <code>README.md</code>.
     Do połączenia z Allegro potrzebujesz darmowej aplikacji z
     <a href="https://apps.developer.allegro.pl" target="_blank" rel="noopener">apps.developer.allegro.pl</a>.
   </div>
 
-  <footer>Allegro Manager — samodzielny system integracji hurtowni XML z Allegro · PHP + Vanilla JS · bez zewnętrznych zależności</footer>
+  <footer>Allegro Manager — samodzielny system integracji hurtowni XML z Allegro · PHP + SQLite + Vanilla JS · bez zewnętrznych zależności</footer>
 </div>
 </body>
 </html>

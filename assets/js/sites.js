@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "allegro-manager",
     title: "Allegro Manager — hurtownie XML → Allegro",
-    desc: "Samodzielny system w stylu SkyShop/BaseLinker: panel administracyjny PHP, który pobiera pliki XML polskich hurtowni (IOF, Ceneo, dowolny format — auto-wykrywanie pól PL/EN, mapowanie JSON, parsowanie strumieniowe 100+ MB), autoryzuje się z Allegro przez OAuth 2.0 (Authorization Code jak SkyShop + Device Flow, Sandbox i produkcja, auto-odświeżanie tokenów) i masowo wystawia przedmioty przez Allegro REST API z dopasowaniem po EAN, marżami per hurtownia i domyślnymi parametrami ofert. Logowanie bcrypt, CSRF, logi zdarzeń.",
+    desc: "Samodzielny system w stylu SkyShop/BaseLinker: panel administracyjny PHP + SQLite, który pobiera pliki XML polskich hurtowni (IOF, Ceneo, dowolny format — auto-wykrywanie pól PL/EN, mapowanie JSON, parsowanie strumieniowe 100+ MB), autoryzuje się z Allegro przez OAuth 2.0 (Authorization Code jak SkyShop + Device Flow, Sandbox i produkcja, auto-odświeżanie tokenów), masowo wystawia przedmioty przez Allegro REST API z dopasowaniem po EAN i marżami per hurtownia oraz synchronizuje ceny/stany wystawionych ofert (ręcznie lub cronem, rejestr ofert w SQLite). Logowanie bcrypt, CSRF, logi zdarzeń, paczka ZIP do pobrania.",
     icon: "🛒",
     tag: "narzędzie",
     preview: true,
