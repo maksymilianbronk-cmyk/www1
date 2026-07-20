@@ -122,5 +122,6 @@ if ($dupId !== null) {
 
 $leadId = insert_lead((int)$clientRow['id'], $source, $fields, $extra, $formName, $campaign);
 crm_notify_new_lead($clientRow, $fields, $source, $leadId);
+crm_forward_lead($clientRow, $leadId, $source, $fields, $extra);
 
 json_out(['ok' => true, 'lead_id' => $leadId]);

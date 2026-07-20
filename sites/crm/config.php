@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-const CRM_VERSION  = '1.1.0';
+const CRM_VERSION  = '2.0.0';
 const CRM_DB_PATH  = __DIR__ . '/data/crm.sqlite';
 const CRM_PER_PAGE = 25;
 
@@ -46,20 +46,15 @@ function crm_session_start(): void
 }
 
 /* ── Baza danych ── */
+require_once __DIR__ . '/lib/db.php';
+
 function db(): PDO
 {
     static $pdo = null;
     if ($pdo === null) {
-        $dir = dirname(CRM_DB_PATH);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
-        }
-        $pdo = new PDO('sqlite:' . CRM_DB_PATH, null, null, [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-        $pdo->exec('PRAGMA journal_mode = WAL');
-        $pdo->exec('PRAGMA foreign_keys = ON');
+        // warstwa przenośna: SQLite domyślnie, MySQL po utworzeniu
+        // data/config.local.php (szczegóły: lib/db.php)
+        $pdo = ReaktorPDO::open(CRM_DB_PATH);
         crm_migrate($pdo);
     }
     return $pdo;
@@ -130,11 +125,126 @@ function crm_migrate(PDO $pdo): void
     SQL);
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_attempts_ip ON login_attempts(ip)');
 
-    // migracje z v1.0 — dodawane kolumny (błąd "duplicate column" ignorujemy)
-    try {
-        $pdo->exec("ALTER TABLE clients ADD COLUMN notify_email TEXT NOT NULL DEFAULT ''");
-    } catch (PDOException) {
+    $pdo->exec(<<<'SQL'
+    CREATE TABLE IF NOT EXISTS notes (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id   INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+        author_type TEXT NOT NULL DEFAULT 'admin',
+        author_name TEXT NOT NULL DEFAULT '',
+        body        TEXT NOT NULL,
+        created_at  TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+    )
+    SQL);
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_notes_client ON notes(client_id)');
+
+    $pdo->exec(<<<'SQL'
+    CREATE TABLE IF NOT EXISTS campaigns (
+        id             INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id      INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+        fb_campaign_id TEXT NOT NULL DEFAULT '',
+        name           TEXT NOT NULL DEFAULT '',
+        status         TEXT NOT NULL DEFAULT '',
+        objective      TEXT NOT NULL DEFAULT '',
+        month          TEXT NOT NULL DEFAULT '',
+        spend          REAL NOT NULL DEFAULT 0,
+        impressions    INTEGER NOT NULL DEFAULT 0,
+        clicks         INTEGER NOT NULL DEFAULT 0,
+        leads_count    INTEGER NOT NULL DEFAULT 0,
+        currency       TEXT NOT NULL DEFAULT '',
+        fetched_at     TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+        UNIQUE(client_id, fb_campaign_id, month)
+    )
+    SQL);
+
+    // migracje — dodawane kolumny (błąd "duplicate column" ignorujemy)
+    foreach ([
+        "ALTER TABLE clients ADD COLUMN notify_email TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN fb_ad_account_id TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN fb_ads_token TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE notes ADD COLUMN color TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE notes ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE notes ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN slug TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN outbound_url TEXT NOT NULL DEFAULT ''",
+    ] as $sql) {
+        try {
+            $pdo->exec($sql);
+        } catch (PDOException) {
+        }
     }
+
+    // uzupełnij slugi istniejących klientów (adres ich panelu logowania)
+    foreach ($pdo->query("SELECT id, name FROM clients WHERE slug = ''") as $row) {
+        $pdo->prepare('UPDATE clients SET slug = ? WHERE id = ?')
+            ->execute([client_slug((string)$row['name'], (int)$row['id']), (int)$row['id']]);
+    }
+}
+
+/** Slug klienta do adresu jego panelu logowania (login.php?panel=slug). */
+function client_slug(string $name, int $id): string
+{
+    $map  = ['ą'=>'a','ć'=>'c','ę'=>'e','ł'=>'l','ń'=>'n','ó'=>'o','ś'=>'s','ź'=>'z','ż'=>'z'];
+    $slug = strtr(mb_strtolower(trim($name)), $map);
+    $slug = trim(preg_replace('/[^a-z0-9]+/', '-', $slug) ?? '', '-');
+    return ($slug !== '' ? $slug : 'klient') . '-' . $id;
+}
+
+/**
+ * Wychodzący webhook (ApixDrive / Make / Zapier / dowolny catch-hook):
+ * po zapisaniu leada wysyła jego dane POST-em na adres skonfigurowany
+ * u klienta (outbound_url). Krótki timeout — nie blokuje odpowiedzi.
+ */
+function crm_forward_lead(array $client, int $leadId, string $source, array $fields, array $extra): void
+{
+    $url = trim((string)($client['outbound_url'] ?? ''));
+    if ($url === '' || !preg_match('~^https?://~i', $url)) {
+        return;
+    }
+    $payload = json_encode([
+        'event'     => 'lead.created',
+        'lead_id'   => $leadId,
+        'client'    => $client['name'],
+        'source'    => $source,
+        'name'      => $fields['name'] ?? '',
+        'email'     => $fields['email'] ?? '',
+        'phone'     => $fields['phone'] ?? '',
+        'message'   => $fields['message'] ?? '',
+        'extra'     => $extra,
+        'created_at'=> date('c'),
+    ], JSON_UNESCAPED_UNICODE);
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 5,
+            CURLOPT_CONNECTTIMEOUT => 3,
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
+    } else {
+        @file_get_contents($url, false, stream_context_create(['http' => [
+            'method' => 'POST', 'header' => "Content-Type: application/json\r\n",
+            'content' => $payload, 'timeout' => 5,
+        ]]));
+    }
+}
+
+/* ── REAKTOR: globalny licznik rewizji stanu ── */
+function state_rev(): int
+{
+    return (int)setting_get('state_rev', '0');
+}
+
+/** Każda mutacja danych podbija rewizję — klienci REAKTOR-a wykrywają zmianę i dociągają delty. */
+function bump_rev(): void
+{
+    db()->prepare("INSERT INTO settings(key,value) VALUES('state_rev','1')
+                   ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1")
+        ->execute();
 }
 
 /* ── Ustawienia ── */
@@ -401,5 +511,33 @@ function insert_lead(int $clientId, string $source, array $fields, array $raw, s
         json_encode($raw, JSON_UNESCAPED_UNICODE),
         (string)($_SERVER['REMOTE_ADDR'] ?? ''),
     ]);
-    return (int)db()->lastInsertId();
+    $id = (int)db()->lastInsertId();
+    bump_rev();
+    return $id;
+}
+
+/** Pobiera JSON z Graph API (curl z fallbackiem na file_get_contents). */
+function graph_get(string $path, array $params): ?array
+{
+    $url = 'https://graph.facebook.com/v21.0/' . $path . '?' . http_build_query($params);
+    $response = false;
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 20,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+        $response = curl_exec($ch);
+        curl_close($ch);
+    }
+    if ($response === false) {
+        $ctx = stream_context_create(['http' => ['timeout' => 20, 'ignore_errors' => true]]);
+        $response = @file_get_contents($url, false, $ctx);
+    }
+    if ($response === false || $response === null) {
+        return null;
+    }
+    $json = json_decode($response, true);
+    return is_array($json) ? $json : null;
 }

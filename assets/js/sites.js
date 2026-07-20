@@ -16,15 +16,15 @@
 const SITES = [
   {
     slug: "crm",
-    title: "LeadFlow CRM — leady agencji Meta Ads",
-    desc: "Samodzielny system CRM (PHP 8 + SQLite) zbierający leady ze stron www klientów i z formularzy Facebook Lead Ads techniką webhooków / modułu HTTP Request (Make, Zapier lub bezpośrednio z Meta). Panel super admina z leadami wszystkich klientów oraz osobne panele klientów (każdy widzi tylko swoje leady). Statusy, notatki, filtry, wyszukiwarka, eksport CSV, tokeny webhooków per klient. Wymaga hostingu z PHP — instrukcja w sites/crm/README.md.",
+    title: "LeadFlow CRM — leady agencji Meta Ads (silnik REAKTOR)",
+    desc: "Samodzielny system CRM (PHP 8 + SQLite) na autorskim silniku REAKTOR — „React bez Node'a”: SPA na zwykłym hostingu PHP z danymi NA ŻYWO (long-poll + delty, morph DOM, stan w localStorage, mutacje optymistyczne). Leady wpadają webhookami ze stron www i z Facebook Lead Ads (Make/Zapier lub bezpośrednio z Meta) i pojawiają się w otwartym panelu w ~1 s. Panel super admina + panele klientów (każdy widzi tylko swoje dane): zakładki Leady, Reklamy (kampanie z Meta Marketing API przez cron: wydatki, CTR, koszt leada), Statystyki (wykresy) i Wspólne notatki agencja↔klient na żywo. Wymaga hostingu z PHP — instrukcja w sites/crm/README.md.",
     icon: "⚡",
     tag: "narzędzie",
     preview: false,
     meta: {
       colors: ["#0e1320", "#182138", "#4f7cff", "#f5b942", "#2ecc8f"],
       fonts: ["Segoe UI / system-ui"],
-      tech: ["PHP 8", "SQLite", "Webhooki", "Meta Graph API", "Vanilla JS"],
+      tech: ["PHP 8", "SQLite", "REAKTOR (SPA)", "Webhooki", "Meta Graph API", "Vanilla JS"],
     },
   },
   {

@@ -124,6 +124,7 @@ foreach (($payload['entry'] ?? []) as $entry) {
 
         $newId = insert_lead((int)$clientRow['id'], 'facebook', $fields, $extra, $formName, $campaign);
         crm_notify_new_lead($clientRow, $fields, 'facebook', $newId);
+        crm_forward_lead($clientRow, $newId, 'facebook', $fields, $extra);
         $saved++;
     }
 }

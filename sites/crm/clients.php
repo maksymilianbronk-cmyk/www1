@@ -34,6 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         random_token(),
                         $palette[$count % count($palette)],
                     ]);
+                $newId = (int)$pdo->lastInsertId();
+                $pdo->prepare('UPDATE clients SET slug = ? WHERE id = ?')
+                    ->execute([client_slug($name, $newId), $newId]);
+                bump_rev();
                 flash('ok', "Klient „{$name}” dodany. Skopiuj jego adres webhooka poniżej.");
             } catch (PDOException) {
                 flash('error', 'Klient z tym adresem e-mail już istnieje.');
@@ -50,16 +54,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($notify !== '' && !filter_var($notify, FILTER_VALIDATE_EMAIL)) {
             flash('error', 'Nieprawidłowy e-mail do powiadomień.');
         } else {
-            $pdo->prepare('UPDATE clients SET name = ?, company = ?, fb_page_id = ?, fb_page_token = ?, notify_email = ?, active = ? WHERE id = ?')
+            $pdo->prepare('UPDATE clients SET name = ?, company = ?, fb_page_id = ?, fb_page_token = ?,
+                             fb_ad_account_id = ?, fb_ads_token = ?, notify_email = ?, outbound_url = ?, active = ? WHERE id = ?')
                 ->execute([
                     $name,
                     trim((string)($_POST['company'] ?? '')),
                     trim((string)($_POST['fb_page_id'] ?? '')),
                     trim((string)($_POST['fb_page_token'] ?? '')),
+                    trim((string)($_POST['fb_ad_account_id'] ?? '')),
+                    trim((string)($_POST['fb_ads_token'] ?? '')),
                     $notify,
+                    trim((string)($_POST['outbound_url'] ?? '')),
                     isset($_POST['active']) ? 1 : 0,
                     $id,
                 ]);
+            bump_rev();
             flash('ok', 'Dane klienta zapisane.');
         }
     }
@@ -85,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         $pdo->prepare('DELETE FROM clients WHERE id = ?')->execute([$id]);
+        bump_rev();
         flash('ok', 'Klient i jego leady zostały usunięte.');
     }
 
@@ -101,11 +111,11 @@ ui_header('Klienci', 'admin', $admin['name'], 'clients.php');
 ui_flash();
 ?>
 <div class="page-head">
-  <h1>👥 Klienci agencji</h1>
+  <h1><?= svg_icon('users', 22) ?> Klienci agencji</h1>
 </div>
 
 <section class="card">
-  <h2>➕ Dodaj nowego klienta</h2>
+  <h2><?= svg_icon('plus', 18) ?> Dodaj nowego klienta</h2>
   <form method="post" class="grid-form">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="add">
@@ -118,7 +128,7 @@ ui_flash();
 </section>
 
 <?php if (!$clients): ?>
-  <div class="empty-state"><div class="empty-icon">👥</div><p>Brak klientów — dodaj pierwszego powyżej.</p></div>
+  <div class="empty-state"><div class="empty-icon"><?= svg_icon('users', 42) ?></div><p>Brak klientów — dodaj pierwszego powyżej.</p></div>
 <?php endif; ?>
 
 <?php foreach ($clients as $c): ?>
@@ -134,8 +144,12 @@ ui_flash();
 
     <div class="webhook-box">
       <div class="webhook-row">
-        <span class="webhook-label">🌐 Webhook stron www (i modułu HTTP w Make/Zapier):</span>
+        <span class="webhook-label"><?= svg_icon('globe', 14) ?> Webhook stron www (i modułu HTTP w Make/Zapier):</span>
         <code class="webhook-url" data-copy><?= e($webhookBase . '?token=' . $c['token']) ?></code>
+      </div>
+      <div class="webhook-row">
+        <span class="webhook-label"><?= svg_icon('key', 14) ?> Panel logowania tego klienta:</span>
+        <code class="webhook-url" data-copy><?= e(base_url() . '/login.php?panel=' . ($c['slug'] ?? '')) ?></code>
       </div>
       <div class="webhook-hint">
         Wyślij POST (JSON lub formularz) z polami np. <code>name</code>/<code>imie</code>, <code>email</code>,
@@ -145,7 +159,7 @@ ui_flash();
     </div>
 
     <details class="client-edit">
-      <summary>⚙️ Ustawienia klienta (Facebook, hasło, edycja)</summary>
+      <summary><?= svg_icon('gear', 15) ?> Ustawienia klienta (Facebook, reklamy, hasło)</summary>
       <div class="client-edit-body">
         <form method="post" class="grid-form">
           <?= csrf_field() ?>
@@ -162,8 +176,17 @@ ui_flash();
           <label>E-mail klienta do powiadomień o nowych leadach
             <input type="email" name="notify_email" value="<?= e($c['notify_email'] ?? '') ?>" maxlength="200" placeholder="puste = bez powiadomień">
           </label>
+          <label>Wychodzący webhook (ApixDrive / Make — catch hook; każdy nowy lead poleci POST-em)
+            <input type="url" name="outbound_url" value="<?= e($c['outbound_url'] ?? '') ?>" maxlength="300" placeholder="https://…apix-drive.com/… (puste = wyłączone)">
+          </label>
+          <label>ID konta reklamowego Meta (zakładka „Reklamy”)
+            <input type="text" name="fb_ad_account_id" value="<?= e($c['fb_ad_account_id'] ?? '') ?>" maxlength="50" placeholder="np. act_1234567890 lub samo 1234567890">
+          </label>
+          <label>Token Marketing API (uprawnienie ads_read; puste = użyj tokena strony)
+            <input type="text" name="fb_ads_token" value="<?= e($c['fb_ads_token'] ?? '') ?>" placeholder="EAAB… — statystyki kampanii pobiera cron">
+          </label>
           <label class="check-label"><input type="checkbox" name="active" <?= $c['active'] ? 'checked' : '' ?>> Konto aktywne</label>
-          <div class="form-actions"><button type="submit" class="btn btn-sm">💾 Zapisz</button></div>
+          <div class="form-actions"><button type="submit" class="btn btn-sm"><?= svg_icon('check', 14) ?> Zapisz</button></div>
         </form>
 
         <div class="inline-forms">
@@ -172,21 +195,21 @@ ui_flash();
             <input type="hidden" name="action" value="password">
             <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
             <input type="text" name="password" minlength="8" required placeholder="nowe hasło klienta">
-            <button type="submit" class="btn btn-sm btn-ghost">🔑 Zmień hasło</button>
+            <button type="submit" class="btn btn-sm btn-ghost"><?= svg_icon('key', 14) ?> Zmień hasło</button>
           </form>
           <form method="post" class="inline-form"
                 onsubmit="return confirm('Nowy token unieważni obecny adres webhooka. Kontynuować?')">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="regen-token">
             <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
-            <button type="submit" class="btn btn-sm btn-ghost">♻️ Nowy token webhooka</button>
+            <button type="submit" class="btn btn-sm btn-ghost"><?= svg_icon('refresh', 14) ?> Nowy token webhooka</button>
           </form>
           <form method="post" class="inline-form"
                 onsubmit="return confirm('Usunąć klienta „<?= e($c['name']) ?>” razem ze WSZYSTKIMI jego leadami? Tej operacji nie można cofnąć.')">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
-            <button type="submit" class="btn btn-sm btn-danger">🗑 Usuń klienta</button>
+            <button type="submit" class="btn btn-sm btn-danger"><?= svg_icon('trash', 14) ?> Usuń klienta</button>
           </form>
         </div>
       </div>

@@ -1,5 +1,51 @@
 # Historia zmian — LeadFlow CRM
 
+## v2.0.0 (2026-07-20) — silnik REAKTOR ⚛
+
+- 🚀 **Deploy przez MCP** (`deploy.php`): zdalna podmiana wszystkich plików
+  aplikacji paczką ZIP jedną komendą — folder `data/` nietykalny, nic nie jest
+  kasowane, kopia plików (rotacja 5) i bazy przed każdym wdrożeniem, rollback.
+- 🗒 **Notatki w stylu Google Keep**: siatka masonry, 10 kolorów (ciemna
+  paleta Keep), przypinanie, edycja inline, usuwanie, na żywo w obie strony.
+- 🎨 **Wszystkie emotki zastąpione ikonami SVG** — biblioteka ~30 ikon
+  liniowych, jedno źródło (PHP `svg_icon()` + wstrzyknięcie do JS).
+- 🔗 **ApixDrive / dwukierunkowe webhooki**: przyjmowanie POST-ów z ApixDrive
+  (jak Make/Zapier) + wychodzący webhook per klient — każdy nowy lead leci
+  na catch-hook (`outbound_url`), otwierając dalsze automatyzacje.
+- 🚪 **Własny panel logowania każdego klienta**: `login.php?panel=<slug>` —
+  brandowany (nazwa, firma, kolor klienta), wpuszcza wyłącznie to konto.
+- 🗄 **Modułowość baz danych** (`lib/db.php`): SQLite domyślnie, przejście na
+  MySQL przez `data/config.local.php` — translacja dialektu w locie (BETA).
+- 🧰 **Skille agencyjne**: `reaktor-strona` (błyskawiczna budowa animowanych
+  stron na `assets/reaktor/reaktor-fx.js`) i `reaktor-mcp` (deploy przez MCP).
+- 🛡 **24 poprawki z przeglądu adwersaryjnego** (4 wymiary × weryfikacja),
+  m.in.: cache stanu per użytkownik (izolacja kont na wspólnym komputerze),
+  usuwanie „duchów” leadów po skasowaniu klienta (autorytatywny zbiór id),
+  ochrona edytowanych pól przed nadpisaniem przez sync, poprawka stref
+  czasowych wykresu, spójna kopia bazy w trybie WAL (`VACUUM INTO`),
+  paginacja Graph API, częściowe mutacje leada, automatyczne odświeżenie
+  CSRF, pauza long-polla w ukrytej karcie, klucz crona w nagłówku.
+
+- ⚛ **REAKTOR — „React bez Node'a”**: autorski silnik SPA dla zwykłego
+  hostingu PHP. Widoki deklaratywne (stan → HTML), rekonsyliacja DOM (morph
+  z parowaniem po `data-key`, zachowuje fokus i scroll), stan w localStorage
+  (start panelu ~100 ms), routing hashowy, mutacje optymistyczne.
+- 🔴 **Dane na żywo**: long-poll (`sync.php`) + globalna rewizja stanu —
+  nowy lead pojawia się w otwartym panelu w ~1 s od webhooka, z toastem
+  i opcjonalnym dźwiękiem; delty zamiast pełnych odpowiedzi (`api.php?a=delta`).
+- 📣 **Zakładka „Reklamy”** w panelu klienta i admina: kampanie bieżącego
+  miesiąca z Meta Marketing API (status, wydatki, CTR, leady, koszt leada),
+  pobierane cronem; fallback: kampanie wykryte z napływających leadów.
+- 📈 **Zakładka „Statystyki”**: leady dziennie (30 dni), źródła, lejek
+  statusów, kampanie wg kosztu leada — palety wykresów zwalidowane pod
+  kątem dostępności (CVD) i kontrastu.
+- 🗒 **Wspólne notatki** agencja ↔ klient — wątek synchronizowany na żywo
+  w obie strony.
+- ⏱ **cron.php**: kampanie z Marketing API, codzienna kopia zapasowa bazy
+  (rotacja 14), sprzątanie; chroniony kluczem, sekcja w Ustawieniach.
+- 🔧 Jedno źródło zegara dla delt (SQLite `localtime`) — odporność na różne
+  strefy czasowe PHP/systemu.
+
 ## v1.1.0 (2026-07-20)
 
 - 📬 **Powiadomienia e-mail** o nowym leadzie — do agencji (globalnie)

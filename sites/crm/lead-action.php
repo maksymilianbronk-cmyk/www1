@@ -41,5 +41,6 @@ if (!$lead || ($client && (int)$lead['client_id'] !== (int)$client['id'])) {
 
 db()->prepare("UPDATE leads SET status = ?, note = ?, updated_at = datetime('now','localtime') WHERE id = ?")
     ->execute([$status, mb_substr($note, 0, 2000), $id]);
+bump_rev();
 
 redirect($back);
