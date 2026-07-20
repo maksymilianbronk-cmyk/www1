@@ -36,6 +36,31 @@ Dane wejściowe: `URL` instalacji CRM i `KLUCZ` (Ustawienia → Przebudowa przez
 4. Zweryfikuj: `curl -s "URL/lp.php?s=slug" | grep h1` + otwórz/screenshot.
 5. Aktualizacja = ponowny POST tego samego `slug`. Lista: `GET ?key=…`. Usunięcie: `POST ?action=delete&slug=…&key=…`.
 
+## Szablony branżowe (najszybsza droga)
+
+`GET landing-api.php?key=…&templates=1` → lista. Publikacja z szablonu:
+
+```bash
+curl -X POST -H "X-Deploy-Key: KLUCZ" -H "Content-Type: application/json" \
+  -d '{"template":"barber","slug":"barber-jan","client_token":"TOKEN",
+       "overrides":{"sections":[{"type":"pricing","heading":"Cennik","items":[…]},
+         {"type":"map","query":"ul. Główna 1, Brusy"},
+         {"type":"hours","items":[{"d":"Pon–Pt","h":"9–18"}]}]}}' \
+  "URL/landing-api.php"
+```
+
+Klucze: `barber, beauty, budowlana, gastronomia, fitness, moto, stomatolog,
+fotograf`. Szablon sam podstawia dane klienta z CRM (firma, miasto, oferta);
+`overrides.sections` podmienia sekcję tego samego typu lub dodaje nową przed
+kontaktem. Zawsze nadpisz szablonowy cennik i FAQ prawdziwymi danymi klienta.
+
+## Wszystkie typy sekcji
+
+hero · features · stats · steps (jak działamy) · text · gallery · video
+(youtube: ID) · logos (pasek zaufania) · testimonials · pricing · hours
+(godziny otwarcia) · faq · cta (baner śródstronowy) · map (query: adres)
+· contact (form: true)
+
 ## Zasady
 
 - `client_token` z zakładki Klienci — formularz landinga tworzy leady w CRM

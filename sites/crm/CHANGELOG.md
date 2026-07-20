@@ -1,5 +1,23 @@
 # Historia zmian — LeadFlow CRM
 
+## v2.3.0 (2026-07-21) — Landing Kreator: sekcje + szablony branżowe
+
+- 🧩 **7 nowych sekcji landinga** (razem 16): `steps` (jak działamy,
+  numerowane kroki), `team` (zespół ze zdjęciami), `cta` (baner
+  śródstronowy), `video` (YouTube/mp4), `logos` (pasek zaufania),
+  `map` (dojazd — Google Maps bez klucza API), `hours` (godziny otwarcia).
+- 🏭 **8 gotowych szablonów branżowych**: barber, beauty, budowlana,
+  gastronomia, fitness, moto, stomatolog, fotograf — każdy z dopasowanym
+  motywem, fontem, zdjęciami i polskim copy. Publikacja jedną komendą:
+  `POST {"template":"barber","slug":…,"client_token":…}` — szablon sam
+  podstawia dane klienta z CRM (firma, miasto, oferta).
+- 🔧 **Overrides**: nadpisywanie tytułu/motywu oraz sekcji typ-po-typie
+  (własny cennik, FAQ) i dołączanie nowych sekcji (mapa, godziny) przed
+  kontaktem; `GET ?templates=1` listuje dostępne szablony.
+- 📖 Zaktualizowany skill `reaktor-landing` (pełna lista sekcji + procedura
+  szablonowa).
+
+
 ## v2.2.0 (2026-07-21) — REAKTOR Landing Kreator
 
 - 🛬 **Landing Kreator — landingi przez MCP**: landing to specyfikacja JSON

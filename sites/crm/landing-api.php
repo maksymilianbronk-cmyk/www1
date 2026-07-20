@@ -13,6 +13,7 @@
  */
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/lib/landing-templates.php';
 
 $key = (string)($_SERVER['HTTP_X_DEPLOY_KEY'] ?? $_GET['key'] ?? '');
 $expected = setting_get('deploy_key');
@@ -22,6 +23,10 @@ if ($expected === '' || !hash_equals($expected, $key)) {
 $pdo = db();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (!empty($_GET['templates'])) {
+        json_out(['ok' => true, 'templates' => landing_templates_list(),
+                  'hint' => 'POST {"template":"<key>","slug":"…","client_token":"…","overrides":{…}}']);
+    }
     if (!empty($_GET['slug'])) {
         $st = $pdo->prepare('SELECT * FROM landings WHERE slug = ?');
         $st->execute([(string)$_GET['slug']]);
@@ -53,6 +58,49 @@ if (($_GET['action'] ?? '') === 'delete') {
 $spec = json_decode(file_get_contents('php://input') ?: '', true);
 if (!is_array($spec)) {
     json_out(['ok' => false, 'error' => 'Body musi być JSON-em ze specyfikacją landinga.'], 400);
+}
+
+/* Szablon branżowy: {"template":"barber","slug":…,"client_token":…,"overrides":{…}} */
+if (!empty($spec['template'])) {
+    $st = $pdo->prepare('SELECT * FROM clients WHERE token = ? AND active = 1');
+    $st->execute([(string)($spec['client_token'] ?? '')]);
+    $clientRow = $st->fetch();
+    if (!$clientRow) {
+        json_out(['ok' => false, 'error' => 'Szablon wymaga poprawnego client_token (dane klienta z CRM).'], 400);
+    }
+    $built = landing_from_template((string)$spec['template'], $clientRow, (string)($spec['slug'] ?? $clientRow['slug']));
+    if ($built === null) {
+        json_out(['ok' => false, 'error' => 'Nieznany szablon. Lista: GET ?templates=1',
+                  'templates' => array_column(landing_templates_list(), 'key')], 400);
+    }
+    // overrides: płytko dla pól prostych, theme scala się per klucz,
+    // sections nadpisuje typ-po-typie (np. własny cennik czy godziny)
+    $ov = is_array($spec['overrides'] ?? null) ? $spec['overrides'] : [];
+    foreach (['title', 'description', 'slug'] as $k) {
+        if (!empty($ov[$k])) {
+            $built[$k] = $ov[$k];
+        }
+    }
+    if (is_array($ov['theme'] ?? null)) {
+        $built['theme'] = array_merge($built['theme'], $ov['theme']);
+    }
+    if (is_array($ov['sections'] ?? null)) {
+        foreach ($ov['sections'] as $sec) {
+            $type = (string)($sec['type'] ?? '');
+            $replaced = false;
+            foreach ($built['sections'] as $i => $bs) {
+                if (($bs['type'] ?? '') === $type) {
+                    $built['sections'][$i] = $sec;
+                    $replaced = true;
+                    break;
+                }
+            }
+            if (!$replaced) { // nowe sekcje (np. map, hours, video) przed kontaktem
+                array_splice($built['sections'], count($built['sections']) - 1, 0, [$sec]);
+            }
+        }
+    }
+    $spec = $built;
 }
 $slug = strtolower(trim((string)($spec['slug'] ?? '')));
 if (!preg_match('/^[a-z0-9][a-z0-9-]{1,80}$/', $slug)) {

@@ -250,11 +250,17 @@ posty zostają nietknięte.
 
 ## 3h. Landing Kreator — landingi przez MCP
 
-Landing page to spec JSON (sekcje + motyw) wysyłany na `landing-api.php`
+Landing page to spec JSON (16 typów sekcji: hero, features, stats, steps,
+text, gallery, video, logos, testimonials, pricing, hours, faq, cta, map,
+team, contact + motyw) wysyłany na `landing-api.php`
 kluczem wdrożeniowym — strona natychmiast działa pod `lp.php?s=<slug>`
 z animacjami i formularzem tworzącym leady w CRM (pole `client_token`
 z zakładki Klienci). Aktualizacja = ponowny POST; `GET ?key=…` listuje
-landingi. Procedura i wzór speca: skill `.claude/skills/reaktor-landing`.
+landingi. **8 szablonów branżowych** (barber, beauty, budowlana, gastronomia,
+fitness, moto, stomatolog, fotograf): `GET ?templates=1` listuje,
+`POST {"template":"…","slug":"…","client_token":"…","overrides":{…}}`
+publikuje kompletny landing z danymi klienta podstawionymi z CRM.
+Procedura i wzór speca: skill `.claude/skills/reaktor-landing`.
 
 ---
 
