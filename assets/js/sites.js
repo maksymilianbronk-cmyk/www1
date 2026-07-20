@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "allegro-manager",
+    title: "Allegro Manager — hurtownie XML → Allegro",
+    desc: "Samodzielny system w stylu SkyShop/BaseLinker: panel administracyjny PHP, który pobiera pliki XML polskich hurtowni (IOF, Ceneo, dowolny format — auto-wykrywanie pól PL/EN, mapowanie JSON, parsowanie strumieniowe 100+ MB), autoryzuje się z Allegro przez OAuth 2.0 (Authorization Code jak SkyShop + Device Flow, Sandbox i produkcja, auto-odświeżanie tokenów) i masowo wystawia przedmioty przez Allegro REST API z dopasowaniem po EAN, marżami per hurtownia i domyślnymi parametrami ofert. Logowanie bcrypt, CSRF, logi zdarzeń.",
+    icon: "🛒",
+    tag: "narzędzie",
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#1a1a22", "#ff5a00", "#ffb800", "#42d392"],
+      fonts: ["system-ui"],
+      tech: ["PHP", "Allegro REST API", "OAuth 2.0", "XMLReader", "HTML", "CSS", "Vanilla JS"],
+    },
+  },
+  {
     slug: "drzewo-bronk",
     title: "Drzewo genealogiczne rodziny von Bronk",
     desc: "Interaktywne, edytowalne drzewo genealogiczne rodziny von Bronk (Niepoczołowski) w stylu MyHeritage, odtworzone z 11 fotografii papierowego wydruku: od Michała Piotra von Bronk (ur. 1721) do dziś, 10 pokoleń i 368 osób na jednej planszy SVG. Karty z awatarami, panel szczegółów osoby z relacjami, edycja / dodawanie małżonków i dzieci / usuwanie z autozapisem w przeglądarce, eksport i import JSON, wyszukiwarka, zoom i podświetlanie linii krwi.",

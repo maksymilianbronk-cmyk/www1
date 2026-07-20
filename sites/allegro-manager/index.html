@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Allegro Manager — hurtownie XML → Allegro</title>
+<style>
+  :root{
+    --bg:#0f0f13; --bg2:#15151d; --card:#1a1a22; --line:#26262f;
+    --txt:#eef0f6; --mut:#8b8d98; --acc:#ff5a00; --acc2:#ffb800;
+    --ok:#42d392; --info:#6c9fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.6}
+  a{color:var(--info)}
+  .wrap{max-width:1000px;margin:0 auto;padding:2.5rem 1.4rem}
+  header{text-align:center;padding:3rem 0 2rem}
+  .logo{display:inline-flex;align-items:center;gap:.7rem;font-size:2rem;font-weight:800}
+  .logo .dot{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 0 24px rgba(255,90,0,.5)}
+  h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:1rem 0 .6rem;background:linear-gradient(90deg,var(--txt),var(--acc2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--mut);max-width:640px;margin:0 auto 2rem}
+  .cta{display:inline-block;background:var(--acc);color:#fff;font-weight:700;padding:.9rem 2.2rem;border-radius:12px;text-decoration:none;box-shadow:0 8px 30px rgba(255,90,0,.3)}
+  .cta:hover{filter:brightness(1.1)}
+  .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:2.5rem 0}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3rem;position:relative}
+  .step .num{position:absolute;top:-12px;left:1rem;background:var(--acc);color:#fff;font-size:.75rem;font-weight:700;padding:.15rem .6rem;border-radius:99px}
+  .step .ic{font-size:1.8rem;margin-bottom:.5rem}
+  .step h3{font-size:.98rem;margin-bottom:.3rem}
+  .step p{font-size:.83rem;color:var(--mut)}
+  h2{font-size:1.3rem;margin:2.6rem 0 1rem}
+  .feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem}
+  .feat h3{font-size:.95rem;margin-bottom:.4rem}
+  .feat p{font-size:.85rem;color:var(--mut)}
+  .note{background:var(--bg2);border:1px solid var(--line);border-left:4px solid var(--acc2);border-radius:10px;padding:1rem 1.2rem;margin:2rem 0;font-size:.9rem;color:var(--mut)}
+  code{background:var(--bg2);border:1px solid var(--line);padding:.1rem .4rem;border-radius:6px;font-size:.85em}
+  footer{text-align:center;color:var(--mut);font-size:.8rem;padding:2rem 0 1rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="dot"></span> Allegro Manager</div>
+    <h1>Hurtownie XML → Twoje oferty na Allegro</h1>
+    <p class="sub">Własny, samodzielny system w stylu SkyShop / BaseLinker: panel administracyjny, który pobiera
+    pliki XML polskich hurtowni, autoryzuje się z Allegro przez OAuth i masowo wystawia przedmioty.
+    Bez abonamentu — działa na Twoim hostingu PHP.</p>
+    <a class="cta" href="panel/">Otwórz panel administracyjny →</a>
+  </header>
+
+  <div class="flow">
+    <div class="step"><span class="num">KROK 1</span><div class="ic">🔑</div><h3>Połącz konto Allegro</h3><p>Autoryzacja OAuth 2.0 — jak w SkyShop: klikasz „Połącz", logujesz się w Allegro, zatwierdzasz. Obsługa Sandboxa i Device Flow.</p></div>
+    <div class="step"><span class="num">KROK 2</span><div class="ic">🏭</div><h3>Dodaj hurtownię XML</h3><p>Wklejasz adres pliku XML hurtowni (IOF, Ceneo lub dowolny format). Import strumieniowy — nawet pliki po 100 MB.</p></div>
+    <div class="step"><span class="num">KROK 3</span><div class="ic">📦</div><h3>Wybierz produkty</h3><p>Przegląd, wyszukiwarka, filtr EAN. Ceny z hurtowni + Twoja marża procentowa naliczana automatycznie.</p></div>
+    <div class="step"><span class="num">KROK 4</span><div class="ic">🏷️</div><h3>Wystaw na Allegro</h3><p>Dopasowanie po EAN do katalogu produktów Allegro i masowe wystawianie ofert przez REST API.</p></div>
+  </div>
+
+  <h2>Co potrafi panel</h2>
+  <div class="feats">
+    <div class="feat"><h3>🔐 Autoryzacja OAuth jak SkyShop</h3><p>Authorization Code z przekierowaniem do Allegro + Device Flow (kod na telefon). Automatyczne odświeżanie tokenów, środowisko produkcyjne i Sandbox.</p></div>
+    <div class="feat"><h3>📥 Import XML polskich hurtowni</h3><p>Auto-wykrywanie formatu: IOF (Internet Offer Format), Ceneo XML i dowolne feedy z polskimi/angielskimi nazwami pól (nazwa, cena_brutto, EAN, stan…). Basic Auth, gzip, własne mapowanie pól JSON-em.</p></div>
+    <div class="feat"><h3>🧮 Marże i ceny</h3><p>Osobna marża procentowa dla każdej hurtowni, przeliczanie netto→brutto z VAT, podgląd ceny końcowej przed wystawieniem.</p></div>
+    <div class="feat"><h3>🎯 Dopasowanie po EAN</h3><p>Produkty łączone z katalogiem Allegro po kodzie GTIN/EAN — oferta dziedziczy zdjęcia i parametry produktu z katalogu.</p></div>
+    <div class="feat"><h3>🏷️ Masowe wystawianie</h3><p>Oferty robocze (dokończysz w Allegro) albo od razu aktywne. Domyślny cennik dostawy, polityka zwrotów, reklamacje i gwarancja z Twojego konta.</p></div>
+    <div class="feat"><h3>🛡️ Bezpieczeństwo</h3><p>Logowanie hasłem (bcrypt), tokeny CSRF, limit prób logowania, dane i tokeny w katalogu zablokowanym przez .htaccess.</p></div>
+  </div>
+
+  <div class="note">
+    ⚠️ <b>Wymagania:</b> panel to aplikacja <b>PHP 7.4+</b> (cURL, XMLReader, SimpleXML — standard na polskich hostingach).
+    Na hostingu statycznym (np. GitHub Pages) zobaczysz tylko tę stronę — wgraj folder na hosting z PHP
+    (np. przez FTP) i otwórz <code>panel/</code>. Szczegóły w <code>README.md</code>.
+    Do połączenia z Allegro potrzebujesz darmowej aplikacji z
+    <a href="https://apps.developer.allegro.pl" target="_blank" rel="noopener">apps.developer.allegro.pl</a>.
+  </div>
+
+  <footer>Allegro Manager — samodzielny system integracji hurtowni XML z Allegro · PHP + Vanilla JS · bez zewnętrznych zależności</footer>
+</div>
+</body>
+</html>
