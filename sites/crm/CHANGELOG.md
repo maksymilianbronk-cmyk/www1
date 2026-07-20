@@ -1,5 +1,22 @@
 # Historia zmian — LeadFlow CRM
 
+## v2.2.0 (2026-07-21) — REAKTOR Landing Kreator
+
+- 🛬 **Landing Kreator — landingi przez MCP**: landing to specyfikacja JSON
+  (sekcje: hero, features, stats, text, gallery, testimonials, pricing,
+  faq, contact + motyw kolorów i font), wysyłana jedną komendą na
+  `landing-api.php` (klucz wdrożeniowy). Strona od razu żyje pod
+  `lp.php?s=<slug>`; aktualizacja = ponowny POST, do tego lista/podgląd/
+  usuwanie. Spec w bazie (`data/` — przeżywa deploye plików).
+- 🎨 Renderer serwerowy z wbudowanymi efektami REAKTOR FX (reveal,
+  liczniki, płynne kotwice), responsywny, SEO meta, szanuje
+  prefers-reduced-motion.
+- 📥 Formularz kontaktowy landinga spięty wprost z webhookiem CRM
+  (token klienta walidowany przy publikacji, honeypot wbudowany) —
+  leady z landinga wpadają do panelu na żywo.
+- 🤖 Skill `reaktor-landing`: procedura budowy speca i publikacji przez MCP.
+
+
 ## v2.1.0 (2026-07-21) — REAKTOR ContentForge
 
 - ✍️ **ContentForge — autorski generator miesięcznych planów postów**:

@@ -248,6 +248,16 @@ posty zostają nietknięte.
 
 ---
 
+## 3h. Landing Kreator — landingi przez MCP
+
+Landing page to spec JSON (sekcje + motyw) wysyłany na `landing-api.php`
+kluczem wdrożeniowym — strona natychmiast działa pod `lp.php?s=<slug>`
+z animacjami i formularzem tworzącym leady w CRM (pole `client_token`
+z zakładki Klienci). Aktualizacja = ponowny POST; `GET ?key=…` listuje
+landingi. Procedura i wzór speca: skill `.claude/skills/reaktor-landing`.
+
+---
+
 ## 4. Powiadomienia e-mail
 
 CRM wysyła powiadomienie natychmiast po odebraniu leada (funkcją `mail()`

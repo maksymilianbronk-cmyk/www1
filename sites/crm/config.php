@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-const CRM_VERSION  = '2.1.0';
+const CRM_VERSION  = '2.2.0';
 const CRM_DB_PATH  = __DIR__ . '/data/crm.sqlite';
 const CRM_PER_PAGE = 25;
 
@@ -172,6 +172,18 @@ function crm_migrate(PDO $pdo): void
     )
     SQL);
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_posts_client ON posts(client_id, month)');
+
+    $pdo->exec(<<<'SQL'
+    CREATE TABLE IF NOT EXISTS landings (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug       TEXT NOT NULL UNIQUE,
+        title      TEXT NOT NULL DEFAULT '',
+        spec       TEXT NOT NULL DEFAULT '{}',
+        published  INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+    )
+    SQL);
 
     // migracje — dodawane kolumny (błąd "duplicate column" ignorujemy)
     foreach ([
