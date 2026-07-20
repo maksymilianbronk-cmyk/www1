@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "podroze-mapy",
+    title: "Trasa — mapy podróżnicze",
+    desc: "Podróżnicza aplikacja mapowa inspirowana Locus Pro / OsmAnd / Geoportalem: ~85 warstw map do przełączania (OSM, topo/outdoor, satelity Esri/Google/NASA/Sentinel, Geoportal WMTS+WMS z ortofotomapą i działkami, mapy krajowe CH/AT/NO/FR/ES/DE, mapy sztabowe „Genshtab”, nakładki szlaków Waymarked, kolei, morza i pogody). Manager warstw z kategoriami, filtrem, ulubionymi i testem dostępności ⚡, szybkie przełączanie map ‹›, GPS ze śledzeniem, pomiar odległości, waypointy, import/eksport GPX, wyszukiwarka Nominatim, klucze API per dostawca, PWA gotowe pod aplikację Android. Katalog warstw to inżynieria wsteczna pakietów onlinemapsources.xml, AnyGIS i melda.ru (analiza w ANALIZA.md).",
+    icon: "🧭",
+    tag: "narzędzie",
+    preview: true,
+    meta: {
+      colors: ["#181a1f", "#20232a", "#ff7a1a", "#2f8cff", "#e8eaf0"],
+      fonts: ["Segoe UI / system-ui"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Leaflet", "WMTS/WMS", "PWA", "localStorage"],
+    },
+  },
+  {
     slug: "drzewo-bronk",
     title: "Drzewo genealogiczne rodziny von Bronk",
     desc: "Interaktywne, edytowalne drzewo genealogiczne rodziny von Bronk (Niepoczołowski) w stylu MyHeritage, odtworzone z 11 fotografii papierowego wydruku: od Michała Piotra von Bronk (ur. 1721) do dziś, 10 pokoleń i 368 osób na jednej planszy SVG. Karty z awatarami, panel szczegółów osoby z relacjami, edycja / dodawanie małżonków i dzieci / usuwanie z autozapisem w przeglądarce, eksport i import JSON, wyszukiwarka, zoom i podświetlanie linii krwi.",

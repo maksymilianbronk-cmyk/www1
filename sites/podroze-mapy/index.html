@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#181a1f" />
+  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z kilkudziesięcioma warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków). Inspirowana Locus Pro / OsmAnd." />
+  <title>Trasa — mapy podróżnicze</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Górny pasek -->
+  <header class="topbar">
+    <button id="btn-menu" class="tb-btn" title="Warstwy map (M)">☰</button>
+    <div class="tb-title">
+      <span class="tb-logo">🧭</span>
+      <span class="tb-name">Trasa</span>
+      <button id="btn-prev-map" class="tb-btn tb-arrow" title="Poprzednia mapa (,)">‹</button>
+      <span id="active-map-name" class="tb-active" title="Aktywna mapa bazowa">OSM Standard</span>
+      <button id="btn-next-map" class="tb-btn tb-arrow" title="Następna mapa (.)">›</button>
+    </div>
+    <div class="tb-actions">
+      <button id="btn-search" class="tb-btn" title="Szukaj miejsca (S)">🔍</button>
+      <button id="btn-locate" class="tb-btn" title="Moja pozycja (L)">📍</button>
+      <button id="btn-measure" class="tb-btn" title="Pomiar odległości (P)">📏</button>
+      <button id="btn-waypoint" class="tb-btn" title="Dodaj punkt (W)">📌</button>
+      <button id="btn-gpx" class="tb-btn" title="Import / eksport GPX">🛰️</button>
+      <button id="btn-keys" class="tb-btn" title="Klucze API">🔑</button>
+    </div>
+  </header>
+
+  <!-- Pasek wyszukiwania -->
+  <div id="search-bar" class="search-bar hidden">
+    <input id="search-input" type="text" placeholder="Szukaj miejsca (Nominatim)… np. Rumia, Giewont, Paryż" autocomplete="off" />
+    <button id="search-go">Szukaj</button>
+    <button id="search-close" title="Zamknij">✕</button>
+    <ul id="search-results" class="search-results"></ul>
+  </div>
+
+  <!-- Panel warstw (sidebar) -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sb-head">
+      <strong>Manager warstw</strong>
+      <span id="layer-count" class="sb-count"></span>
+      <button id="sb-close" class="tb-btn" title="Zamknij">✕</button>
+    </div>
+    <div class="sb-filter">
+      <input id="layer-filter" type="text" placeholder="Filtruj warstwy… (np. topo, orto, szlaki)" />
+    </div>
+    <div class="sb-hint">
+      ⭐ ulubione &nbsp;·&nbsp; ⚡ test dostępności kategorii &nbsp;·&nbsp; suwak = krycie nakładki
+    </div>
+    <nav id="layer-list" class="layer-list"></nav>
+    <div class="sb-foot">
+      Katalog: inżynieria wsteczna pakietów <em>Locus Pro</em> — onlinemapsources.xml,
+      AnyGIS, melda.ru + usługi Geoportal.gov.pl.
+      Korzystaj zgodnie z warunkami dostawców kafelków.
+    </div>
+  </aside>
+
+  <!-- Mapa -->
+  <div id="map"></div>
+
+  <!-- Dolny pasek statusu -->
+  <footer class="statusbar">
+    <span id="st-coords" title="Współrzędne kursora / środka">—</span>
+    <span id="st-zoom" title="Poziom przybliżenia">z—</span>
+    <span id="st-measure" class="hidden" title="Długość pomiaru"></span>
+    <span id="st-follow" class="hidden">🎯 śledzenie</span>
+  </footer>
+
+  <!-- Modal kluczy API -->
+  <div id="keys-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong>🔑 Klucze API</strong>
+        <button class="tb-btn" data-close="keys-modal">✕</button>
+      </div>
+      <p class="modal-info">
+        Warstwy „Premium” i „Pogoda” działają po wklejeniu darmowego klucza od dostawcy
+        (jak w Locus Pro). Klucze zapisują się tylko w Twojej przeglądarce.
+      </p>
+      <div id="keys-list"></div>
+      <button id="keys-save" class="btn-primary">Zapisz klucze</button>
+    </div>
+  </div>
+
+  <!-- Modal GPX -->
+  <div id="gpx-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong>🛰️ GPX — trasy i punkty</strong>
+        <button class="tb-btn" data-close="gpx-modal">✕</button>
+      </div>
+      <p class="modal-info">Wczytaj ślad GPX (trasy + punkty) albo wyeksportuj swoje punkty.</p>
+      <label class="btn-secondary file-label">
+        📂 Wczytaj plik GPX
+        <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden />
+      </label>
+      <button id="gpx-export" class="btn-secondary">💾 Eksportuj punkty do GPX</button>
+      <button id="gpx-clear" class="btn-secondary">🗑️ Usuń wczytane ślady</button>
+      <div id="gpx-status" class="modal-info"></div>
+      <div id="wpt-list" class="wpt-list"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="layers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
