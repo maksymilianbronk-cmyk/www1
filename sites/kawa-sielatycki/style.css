@@ -25,7 +25,7 @@ html { scroll-behavior: smooth; overflow-x: clip; }
 body {
   background: var(--bg);
   color: var(--cream);
-  font-family: "Jost", system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.65;
   overflow-x: hidden;
@@ -39,7 +39,7 @@ img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 
 h1, h2, h3, .display {
-  font-family: "Fraunces", "Playfair Display", serif;
+  font-family: "Space Grotesk", system-ui, sans-serif;
   font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.01em;
@@ -75,11 +75,11 @@ h1, h2, h3, .display {
 .logo svg { width: 42px; height: 42px; flex-shrink: 0; }
 .logo-text { display: flex; flex-direction: column; line-height: 1.05; }
 .logo-name {
-  font-family: "Fraunces", serif; font-size: 1.15rem; font-weight: 700;
+  font-family: "Space Grotesk", sans-serif; font-size: 1.15rem; font-weight: 700;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-2);
 }
 .logo-sub {
-  font-size: 0.62rem; letter-spacing: 0.34em; text-transform: uppercase;
+  font-size: 0.75rem; letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--muted);
 }
 
@@ -146,14 +146,14 @@ h1, h2, h3, .display {
 }
 .mobile-menu nav { display: flex; flex-direction: column; gap: 6px; }
 .mobile-menu nav a {
-  font-family: "Fraunces", serif; font-size: clamp(2rem, 8.5vw, 3.2rem);
+  font-family: "Space Grotesk", sans-serif; font-size: clamp(2rem, 8.5vw, 3.2rem);
   font-weight: 600; color: var(--cream); padding: 8px 0;
   display: flex; align-items: baseline; gap: 18px;
   opacity: 0; transform: translateY(34px);
   transition: opacity 0.5s var(--ease), transform 0.6s var(--ease), color 0.3s;
 }
 .mobile-menu nav a .idx {
-  font-family: "Jost", sans-serif; font-size: 0.75rem;
+  font-family: "Inter", sans-serif; font-size: 0.75rem;
   letter-spacing: 0.3em; color: var(--gold);
 }
 .mobile-menu nav a:hover { color: var(--gold-2); }
@@ -240,17 +240,17 @@ body.menu-locked { overflow: hidden; }
 }
 .hero-stat { display: flex; flex-direction: column; gap: 2px; }
 .hero-stat b {
-  font-family: "Fraunces", serif; font-size: clamp(1.7rem, 3vw, 2.4rem);
+  font-family: "Space Grotesk", sans-serif; font-size: clamp(1.7rem, 3vw, 2.4rem);
   font-weight: 600; color: var(--gold-2);
 }
 .hero-stat span {
-  font-size: 0.72rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted);
+  font-size: 0.76rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted);
 }
 
 .hero-scroll {
   position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
   display: flex; flex-direction: column; align-items: center; gap: 10px;
-  color: var(--muted); font-size: 0.66rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--muted); font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase;
 }
 .hero-scroll .line {
   width: 1px; height: 46px; background: linear-gradient(var(--gold), transparent);
@@ -287,7 +287,7 @@ body.menu-locked { overflow: hidden; }
 }
 .marquee-track span {
   display: inline-flex; align-items: center; gap: 54px;
-  font-family: "Fraunces", serif; font-size: 1.05rem; letter-spacing: 0.22em;
+  font-family: "Space Grotesk", sans-serif; font-size: 1.05rem; letter-spacing: 0.22em;
   text-transform: uppercase; color: var(--gold-2); white-space: nowrap;
 }
 .marquee-track svg { width: 16px; height: 16px; opacity: 0.85; }
@@ -300,7 +300,7 @@ section { position: relative; }
 .section-head.center { margin-inline: auto; text-align: center; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: 12px;
-  font-size: 0.74rem; letter-spacing: 0.32em; text-transform: uppercase;
+  font-size: 0.78rem; letter-spacing: 0.3em; text-transform: uppercase;
   color: var(--gold); margin-bottom: 18px;
 }
 .eyebrow svg { width: 15px; height: 15px; }
@@ -321,7 +321,7 @@ section { position: relative; }
 }
 .bean-lane .lane-label {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-size: clamp(0.62rem, 1.6vw, 0.78rem); letter-spacing: 0.5em; text-transform: uppercase;
+  font-size: clamp(0.75rem, 1.6vw, 0.82rem); letter-spacing: 0.38em; text-transform: uppercase;
   color: rgba(164, 151, 127, 0.4); pointer-events: none;
 }
 .bean-traveller {
@@ -359,12 +359,12 @@ section { position: relative; }
   position: absolute; right: -18px; bottom: 34px;
   background: linear-gradient(135deg, var(--gold), var(--gold-2));
   color: var(--dark-ink); border-radius: 14px; padding: 18px 22px;
-  font-family: "Fraunces", serif; text-align: center;
+  font-family: "Space Grotesk", sans-serif; text-align: center;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 .about-badge b { display: block; font-size: 1.9rem; line-height: 1; }
 .about-badge span {
-  font-family: "Jost", sans-serif; font-size: 0.62rem;
+  font-family: "Inter", sans-serif; font-size: 0.72rem;
   letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600;
 }
 .about-text h2 { font-size: clamp(1.9rem, 3.8vw, 3rem); margin-bottom: 22px; font-weight: 560; }
@@ -384,7 +384,7 @@ section { position: relative; }
   margin-top: 30px; display: flex; align-items: center; gap: 16px;
 }
 .signature .sig-name {
-  font-family: "Fraunces", serif; font-style: italic; font-size: 1.3rem; color: var(--gold-2);
+  font-family: "Space Grotesk", sans-serif; font-style: italic; font-size: 1.3rem; color: var(--gold-2);
 }
 .signature .sig-role { font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
 
@@ -413,7 +413,7 @@ section { position: relative; }
   position: absolute; top: 16px; left: 16px;
   background: rgba(10, 8, 6, 0.78); backdrop-filter: blur(8px);
   border: 1px solid var(--line); border-radius: 999px;
-  font-size: 0.64rem; letter-spacing: 0.24em; text-transform: uppercase;
+  font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--gold-2); padding: 7px 14px;
 }
 .offer-body { padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
@@ -423,8 +423,8 @@ section { position: relative; }
   display: flex; align-items: center; justify-content: space-between;
   padding-top: 16px; border-top: 1px solid var(--line);
 }
-.offer-price { font-family: "Fraunces", serif; font-size: 1.35rem; color: var(--gold-2); }
-.offer-price small { font-family: "Jost", sans-serif; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.12em; }
+.offer-price { font-family: "Space Grotesk", sans-serif; font-size: 1.35rem; color: var(--gold-2); }
+.offer-price small { font-family: "Inter", sans-serif; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.12em; }
 .offer-link {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 0.76rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
@@ -449,7 +449,7 @@ section { position: relative; }
 .process-step::before {
   counter-increment: step; content: "0" counter(step);
   position: absolute; top: 18px; right: 22px;
-  font-family: "Fraunces", serif; font-size: 2.6rem; font-weight: 600;
+  font-family: "Space Grotesk", sans-serif; font-size: 2.6rem; font-weight: 600;
   color: transparent; -webkit-text-stroke: 1px rgba(201, 162, 75, 0.4);
 }
 .process-step .ico {
@@ -477,7 +477,7 @@ section { position: relative; }
 }
 .fact-chip:hover { transform: translateY(-8px); border-color: rgba(201, 162, 75, 0.5); }
 .fact-chip .num {
-  font-family: "Fraunces", serif; font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-family: "Space Grotesk", sans-serif; font-size: clamp(2.2rem, 4vw, 3.2rem);
   color: var(--gold-2); line-height: 1;
 }
 .fact-chip .num small { font-size: 0.55em; }
@@ -516,7 +516,7 @@ section { position: relative; }
   width: 44px; height: 44px; border-radius: 50%;
   background: linear-gradient(135deg, var(--gold), var(--gold-2));
   color: var(--dark-ink); display: grid; place-items: center;
-  font-family: "Fraunces", serif; font-weight: 700;
+  font-family: "Space Grotesk", sans-serif; font-weight: 700;
 }
 .review-who b { display: block; color: var(--cream); font-weight: 500; font-size: 0.95rem; }
 .review-who span { color: var(--muted); font-size: 0.78rem; letter-spacing: 0.08em; }
@@ -542,7 +542,7 @@ section { position: relative; }
   border: 1px solid var(--line); display: grid; place-items: center;
 }
 .contact-row .ico svg { width: 22px; height: 22px; }
-.contact-row span { display: block; font-size: 0.68rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); }
+.contact-row span { display: block; font-size: 0.76rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
 .contact-row b { color: var(--cream); font-weight: 500; font-size: 1.05rem; }
 
 .contact-form {
@@ -553,7 +553,7 @@ section { position: relative; }
 .contact-form .form-sub { color: var(--muted); font-size: 0.9rem; font-weight: 300; margin-bottom: 26px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.field label { font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+.field label { font-size: 0.75rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
 .field input, .field select, .field textarea {
   background: rgba(10, 8, 6, 0.65); border: 1px solid var(--line); border-radius: 10px;
   color: var(--cream); font-family: inherit; font-size: 0.95rem;
@@ -611,7 +611,7 @@ section { position: relative; }
 }
 .fact-row:hover { transform: translateX(10px); border-color: rgba(201, 162, 75, 0.5); }
 .fact-row .fact-no {
-  font-family: "Fraunces", serif; font-size: clamp(2rem, 4vw, 3rem); line-height: 1;
+  font-family: "Space Grotesk", sans-serif; font-size: clamp(2rem, 4vw, 3rem); line-height: 1;
   color: transparent; -webkit-text-stroke: 1px var(--gold);
 }
 .fact-row h3 { font-size: 1.3rem; color: var(--cream); margin-bottom: 10px; font-weight: 560; }
@@ -635,7 +635,7 @@ section { position: relative; }
 .method-params { display: flex; flex-wrap: wrap; gap: 10px; }
 .method-params span {
   border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px;
-  font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-2);
+  font-size: 0.76rem; letter-spacing: 0.13em; text-transform: uppercase; color: var(--gold-2);
 }
 
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }

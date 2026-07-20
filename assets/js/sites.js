@@ -270,7 +270,7 @@ const SITES = [
     preview: true,
     meta: {
       colors: ["#0a0806", "#120e09", "#c9a24b", "#e3c47c", "#f3ecdd"],
-      fonts: ["Fraunces", "Jost"],
+      fonts: ["Space Grotesk", "Inter"],
       tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash"],
     },
   },
