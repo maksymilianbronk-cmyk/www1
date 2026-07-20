@@ -122,7 +122,8 @@ foreach (($payload['entry'] ?? []) as $entry) {
             $extra['_info'] = 'Brak Page Access Token klienta — zapisano tylko identyfikatory leada.';
         }
 
-        insert_lead((int)$clientRow['id'], 'facebook', $fields, $extra, $formName, $campaign);
+        $newId = insert_lead((int)$clientRow['id'], 'facebook', $fields, $extra, $formName, $campaign);
+        crm_notify_new_lead($clientRow, $fields, 'facebook', $newId);
         $saved++;
     }
 }

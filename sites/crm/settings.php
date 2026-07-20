@@ -19,6 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('ok', 'Ustawienia Facebooka zapisane.');
     }
 
+    if ($action === 'notify') {
+        $agencyEmail = trim(mb_strtolower((string)($_POST['notify_admin_email'] ?? '')));
+        $mailFrom    = trim(mb_strtolower((string)($_POST['mail_from'] ?? '')));
+        if ($agencyEmail !== '' && !filter_var($agencyEmail, FILTER_VALIDATE_EMAIL)) {
+            flash('error', 'Nieprawidłowy e-mail powiadomień agencji.');
+        } elseif ($mailFrom !== '' && !filter_var($mailFrom, FILTER_VALIDATE_EMAIL)) {
+            flash('error', 'Nieprawidłowy adres nadawcy.');
+        } else {
+            setting_set('notify_admin_email', $agencyEmail);
+            setting_set('mail_from', $mailFrom);
+            flash('ok', 'Ustawienia powiadomień zapisane.');
+        }
+    }
+
     if ($action === 'password') {
         $current = (string)($_POST['current'] ?? '');
         $new     = (string)($_POST['new'] ?? '');
@@ -82,6 +96,27 @@ ui_flash();
 </section>
 
 <section class="card">
+  <h2>📬 Powiadomienia e-mail o nowych leadach</h2>
+  <p class="muted">
+    Powiadomienie wysyłane jest natychmiast po odebraniu leada przez webhook —
+    do agencji (adres poniżej) oraz do klienta, jeśli w zakładce Klienci
+    ustawisz jego „e-mail do powiadomień”. Wysyłka przez funkcję
+    <code>mail()</code> hostingu.
+  </p>
+  <form method="post" class="grid-form">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="notify">
+    <label>E-mail agencji — powiadomienia o KAŻDYM leadzie (puste = wyłączone)
+      <input type="email" name="notify_admin_email" value="<?= e(setting_get('notify_admin_email')) ?>" maxlength="200" placeholder="ty@twojaagencja.pl">
+    </label>
+    <label>Adres nadawcy wiadomości (puste = crm@twojadomena)
+      <input type="email" name="mail_from" value="<?= e(setting_get('mail_from')) ?>" maxlength="200" placeholder="crm@twojadomena.pl">
+    </label>
+    <div class="form-actions"><button type="submit" class="btn">💾 Zapisz</button></div>
+  </form>
+</section>
+
+<section class="card">
   <h2>🔑 Zmiana hasła super admina</h2>
   <form method="post" class="grid-form">
     <?= csrf_field() ?>
@@ -90,6 +125,26 @@ ui_flash();
     <label>Nowe hasło (min. 8 znaków)<input type="password" name="new" required minlength="8"></label>
     <div class="form-actions"><button type="submit" class="btn">Zmień hasło</button></div>
   </form>
+</section>
+
+<section class="card">
+  <h2>🩺 Diagnostyka serwera</h2>
+  <?php
+  $checks = [
+      'PHP ' . PHP_VERSION . ' (wymagane 8.1+)' => version_compare(PHP_VERSION, '8.1.0', '>='),
+      'Rozszerzenie pdo_sqlite (baza danych)'   => extension_loaded('pdo_sqlite'),
+      'curl lub allow_url_fopen (Graph API)'    => extension_loaded('curl') || (bool)ini_get('allow_url_fopen'),
+      'Zapis w folderze data/'                  => is_writable(__DIR__ . '/data'),
+      'Funkcja mail() (powiadomienia)'          => function_exists('mail'),
+      'Połączenie HTTPS (wymagane przez Meta)'  => is_https(),
+  ];
+  ?>
+  <dl class="info-list">
+    <?php foreach ($checks as $label => $ok): ?>
+      <dt><?= $ok ? '<span class="check-ok">✔</span>' : '<span class="check-bad">✘</span>' ?></dt>
+      <dd><?= e($label) ?></dd>
+    <?php endforeach; ?>
+  </dl>
 </section>
 
 <section class="card">

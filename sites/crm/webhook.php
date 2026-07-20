@@ -78,6 +78,15 @@ if (!$clientRow || !hash_equals($clientRow['token'], $token)) {
 }
 
 /* ── Zapis leada ── */
+// honeypot antyspamowy: ukryte pole wypełniają tylko boty —
+// odpowiadamy sukcesem, ale zgłoszenia nie zapisujemy
+foreach (['_gotcha', '_honey', '_honeypot'] as $trap) {
+    if (!empty($data[$trap])) {
+        json_out(['ok' => true, 'lead_id' => 0]);
+    }
+    unset($data[$trap]);
+}
+
 $source = (string)($_GET['source'] ?? $data['source'] ?? 'www');
 if (!isset(CRM_SOURCES[$source])) {
     $source = 'inne';
@@ -105,6 +114,13 @@ if (!array_filter($fields) && !$extra) {
     json_out(['ok' => false, 'error' => 'Puste zgłoszenie — brak rozpoznawalnych pól.'], 400);
 }
 
+// podwójne wysłanie tego samego formularza w ciągu minuty → zwracamy istniejący lead
+$dupId = find_recent_duplicate((int)$clientRow['id'], $fields, $extra);
+if ($dupId !== null) {
+    json_out(['ok' => true, 'lead_id' => $dupId, 'duplicate' => true]);
+}
+
 $leadId = insert_lead((int)$clientRow['id'], $source, $fields, $extra, $formName, $campaign);
+crm_notify_new_lead($clientRow, $fields, $source, $leadId);
 
 json_out(['ok' => true, 'lead_id' => $leadId]);

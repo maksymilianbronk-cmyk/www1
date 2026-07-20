@@ -40,7 +40,23 @@ ui_flash();
 </div>
 <?php
 ui_stats($where, $params);
+ui_chart(['client_id = ?'], [(int)$client['id']]);
 ui_filter_form();
 ui_leads_table($leads, false, $backUrl);
 ui_pagination($page, $pages, $query);
+?>
+<details class="dev-box">
+  <summary>🔌 Dla webmastera — jak podpiąć formularz Twojej strony</summary>
+  <div class="dev-box-body">
+    <p>Wyślij żądanie <code>POST</code> (JSON lub pola formularza) na adres:</p>
+    <code class="webhook-url" data-copy><?= e(base_url() . '/webhook.php?token=' . $client['token']) ?></code>
+    <p class="muted" style="margin-top:8px">
+      Rozpoznawane pola: <code>name</code>/<code>imie</code>, <code>email</code>,
+      <code>phone</code>/<code>telefon</code>, <code>message</code>/<code>wiadomosc</code> —
+      pozostałe pola trafią do szczegółów leada. Gotowe przykłady kodu znajdziesz
+      w dokumentacji systemu (README).
+    </p>
+  </div>
+</details>
+<?php
 ui_footer();

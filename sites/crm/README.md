@@ -7,6 +7,10 @@ Lekki, samodzielny CRM (PHP 8 + SQLite, zero zależności) zbierający leady
 - **Panel super admina** — leady wszystkich klientów, zarządzanie kontami, filtry, eksport CSV.
 - **Panel klienta** — każdy klient po zalogowaniu widzi **wyłącznie własne** leady.
 - Statusy leadów (Nowy → W kontakcie → Umówiony → Wygrany/Przegrany), notatki, wyszukiwarka, statystyki.
+- **Wykres leadów** z ostatnich 14 dni w obu panelach.
+- **Powiadomienia e-mail** o każdym nowym leadzie — do agencji i/lub klienta.
+- Antyspam (honeypot), deduplikacja zgłoszeń, blokada brute-force logowania,
+  diagnostyka serwera w ustawieniach.
 
 ---
 
@@ -68,6 +72,16 @@ document.getElementById('kontakt').addEventListener('submit', async e => {
 ```
 
 *(CORS jest otwarty — formularz może stać na dowolnej domenie klienta.)*
+
+**Antyspam:** dodaj do formularza ukryte pole-pułapkę — boty je wypełnią,
+a CRM po cichu odrzuci takie zgłoszenie:
+
+```html
+<input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+```
+
+**Deduplikacja:** identyczne zgłoszenie od tego samego klienta w ciągu 60 sekund
+(podwójne kliknięcie „Wyślij") nie tworzy drugiego leada.
 
 ### B. WordPress
 
@@ -135,21 +149,39 @@ Bez Page Access Tokena CRM zapisze lead z samymi identyfikatorami
 
 ---
 
-## 4. Bezpieczeństwo
+## 4. Powiadomienia e-mail
+
+CRM wysyła powiadomienie natychmiast po odebraniu leada (funkcją `mail()`
+hostingu — na typowych hostingach współdzielonych działa od ręki):
+
+- **do agencji** — ustaw swój e-mail w **Ustawienia → Powiadomienia**
+  (otrzymujesz powiadomienie o KAŻDYM leadzie każdego klienta),
+- **do klienta** — ustaw jego „e-mail do powiadomień” w **Klienci → Ustawienia klienta**.
+
+Możesz też ustawić własny adres nadawcy (np. `crm@twojadomena.pl`) — poprawia
+dostarczalność. Stan funkcji `mail()` sprawdzisz w **Ustawienia → Diagnostyka serwera**.
+
+---
+
+## 5. Bezpieczeństwo
 
 - hasła: `password_hash()` (bcrypt), formularze chronione tokenem CSRF,
   sesje HttpOnly/SameSite,
+- blokada brute-force: 8 nieudanych prób logowania z jednego IP = 15 minut przerwy,
 - każdy klient ma osobny 40-znakowy token webhooka (można unieważnić jednym kliknięciem),
 - klient widzi wyłącznie swoje leady (wymuszone w SQL po stronie serwera),
-- baza w `data/` zablokowana przez `.htaccess`; wpisy ograniczone długością,
-  zapytania wyłącznie parametryzowane (PDO),
-- opcjonalna weryfikacja podpisu `X-Hub-Signature-256` dla webhooka Meta.
+- baza w `data/` zablokowana przez `.htaccess`; dodatkowy `.htaccess` w katalogu
+  głównym blokuje listowanie i pobieranie plików wewnętrznych,
+- wpisy ograniczone długością, zapytania wyłącznie parametryzowane (PDO),
+  wyjście escapowane (XSS),
+- opcjonalna weryfikacja podpisu `X-Hub-Signature-256` dla webhooka Meta,
+- poprawne wykrywanie HTTPS także za proxy/CDN (`X-Forwarded-Proto`).
 
 **Kopia zapasowa** = skopiowanie pliku `data/crm.sqlite`.
 
 ---
 
-## 5. Struktura plików
+## 6. Struktura plików
 
 ```
 crm/
@@ -163,7 +195,9 @@ crm/
 ├── fb-webhook.php   # bezpośredni webhook Meta Lead Ads
 ├── lead-action.php  # zmiana statusu / notatki leada
 ├── export.php       # eksport CSV
-├── config.php       # rdzeń: baza, sesje, helpery
+├── config.php       # rdzeń: baza, sesje, powiadomienia, helpery
 ├── ui.php / filters.php / crm.css / crm.js
+├── .htaccess        # blokada listowania i plików wewnętrznych
+├── CHANGELOG.md     # historia zmian
 └── data/            # baza SQLite (chroniona .htaccess)
 ```

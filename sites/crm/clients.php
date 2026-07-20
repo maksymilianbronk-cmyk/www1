@@ -42,17 +42,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'update') {
-        $id = (int)($_POST['id'] ?? 0);
-        $pdo->prepare('UPDATE clients SET name = ?, company = ?, fb_page_id = ?, fb_page_token = ?, active = ? WHERE id = ?')
-            ->execute([
-                trim((string)($_POST['name'] ?? '')),
-                trim((string)($_POST['company'] ?? '')),
-                trim((string)($_POST['fb_page_id'] ?? '')),
-                trim((string)($_POST['fb_page_token'] ?? '')),
-                isset($_POST['active']) ? 1 : 0,
-                $id,
-            ]);
-        flash('ok', 'Dane klienta zapisane.');
+        $id     = (int)($_POST['id'] ?? 0);
+        $name   = trim((string)($_POST['name'] ?? ''));
+        $notify = trim(mb_strtolower((string)($_POST['notify_email'] ?? '')));
+        if ($name === '') {
+            flash('error', 'Nazwa klienta nie może być pusta.');
+        } elseif ($notify !== '' && !filter_var($notify, FILTER_VALIDATE_EMAIL)) {
+            flash('error', 'Nieprawidłowy e-mail do powiadomień.');
+        } else {
+            $pdo->prepare('UPDATE clients SET name = ?, company = ?, fb_page_id = ?, fb_page_token = ?, notify_email = ?, active = ? WHERE id = ?')
+                ->execute([
+                    $name,
+                    trim((string)($_POST['company'] ?? '')),
+                    trim((string)($_POST['fb_page_id'] ?? '')),
+                    trim((string)($_POST['fb_page_token'] ?? '')),
+                    $notify,
+                    isset($_POST['active']) ? 1 : 0,
+                    $id,
+                ]);
+            flash('ok', 'Dane klienta zapisane.');
+        }
     }
 
     if ($action === 'password') {
@@ -149,6 +158,9 @@ ui_flash();
           </label>
           <label>Token dostępu strony (Page Access Token)
             <input type="text" name="fb_page_token" value="<?= e($c['fb_page_token']) ?>" placeholder="EAAB… (do pobierania szczegółów leadów)">
+          </label>
+          <label>E-mail klienta do powiadomień o nowych leadach
+            <input type="email" name="notify_email" value="<?= e($c['notify_email'] ?? '') ?>" maxlength="200" placeholder="puste = bez powiadomień">
           </label>
           <label class="check-label"><input type="checkbox" name="active" <?= $c['active'] ? 'checked' : '' ?>> Konto aktywne</label>
           <div class="form-actions"><button type="submit" class="btn btn-sm">💾 Zapisz</button></div>

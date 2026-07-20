@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-const CRM_VERSION  = '1.0.0';
+const CRM_VERSION  = '1.1.0';
 const CRM_DB_PATH  = __DIR__ . '/data/crm.sqlite';
 const CRM_PER_PAGE = 25;
 
@@ -40,7 +40,7 @@ function crm_session_start(): void
         'path'     => '/',
         'httponly' => true,
         'samesite' => 'Lax',
-        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'secure'   => is_https(),
     ]);
     session_start();
 }
@@ -121,6 +121,20 @@ function crm_migrate(PDO $pdo): void
         value TEXT NOT NULL DEFAULT ''
     )
     SQL);
+
+    $pdo->exec(<<<'SQL'
+    CREATE TABLE IF NOT EXISTS login_attempts (
+        ip           TEXT NOT NULL,
+        attempted_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+    )
+    SQL);
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_attempts_ip ON login_attempts(ip)');
+
+    // migracje z v1.0 — dodawane kolumny (błąd "duplicate column" ignorujemy)
+    try {
+        $pdo->exec("ALTER TABLE clients ADD COLUMN notify_email TEXT NOT NULL DEFAULT ''");
+    } catch (PDOException) {
+    }
 }
 
 /* ── Ustawienia ── */
@@ -150,12 +164,17 @@ function random_token(int $bytes = 20): string
     return bin2hex(random_bytes($bytes));
 }
 
+function is_https(): bool
+{
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https'); // za proxy/CDN
+}
+
 function base_url(): string
 {
-    $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-    $host  = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $dir   = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
-    return ($https ? 'https://' : 'http://') . $host . $dir;
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $dir  = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
+    return (is_https() ? 'https://' : 'http://') . $host . $dir;
 }
 
 function redirect(string $to): never
@@ -280,6 +299,89 @@ function map_lead_fields(array $data): array
         }
     }
     return $out;
+}
+
+/* ── Ochrona logowania przed brute-force ── */
+function login_blocked(string $ip): bool
+{
+    $st = db()->prepare("SELECT COUNT(*) FROM login_attempts
+                         WHERE ip = ? AND attempted_at >= datetime('now','localtime','-15 minutes')");
+    $st->execute([$ip]);
+    return (int)$st->fetchColumn() >= 8;
+}
+
+function login_fail(string $ip): void
+{
+    db()->prepare('INSERT INTO login_attempts (ip) VALUES (?)')->execute([$ip]);
+    db()->exec("DELETE FROM login_attempts WHERE attempted_at < datetime('now','localtime','-1 day')");
+}
+
+function login_success(string $ip): void
+{
+    db()->prepare('DELETE FROM login_attempts WHERE ip = ?')->execute([$ip]);
+}
+
+/* ── Powiadomienia e-mail ── */
+function crm_send_mail(string $to, string $subject, string $body): bool
+{
+    if (!filter_var($to, FILTER_VALIDATE_EMAIL) || !function_exists('mail')) {
+        return false;
+    }
+    $host = (string)(parse_url(base_url(), PHP_URL_HOST) ?: 'localhost');
+    $from = setting_get('mail_from');
+    if (!filter_var($from, FILTER_VALIDATE_EMAIL)) {
+        $from = 'crm@' . preg_replace('/^www\./', '', $host);
+    }
+    $headers = 'From: LeadFlow CRM <' . $from . ">\r\n"
+             . "Content-Type: text/plain; charset=UTF-8\r\n"
+             . "Content-Transfer-Encoding: 8bit\r\n"
+             . 'X-Mailer: LeadFlow CRM ' . CRM_VERSION;
+    return @mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
+}
+
+/** Wysyła powiadomienia o nowym leadzie: do klienta (notify_email) i do agencji (ustawienia). */
+function crm_notify_new_lead(array $client, array $fields, string $source, int $leadId): void
+{
+    $srcLabel = CRM_SOURCES[$source][0] ?? $source;
+    $subject  = '⚡ Nowy lead' . ($fields['name'] !== '' ? ': ' . $fields['name'] : '') . ' (' . $srcLabel . ')';
+
+    $lines = ['Nowy lead w LeadFlow CRM', ''];
+    $lines[] = 'Klient:  ' . $client['name'] . ($client['company'] !== '' ? ' — ' . $client['company'] : '');
+    $lines[] = 'Źródło:  ' . $srcLabel;
+    if ($fields['name'] !== '')    { $lines[] = 'Osoba:   ' . $fields['name']; }
+    if ($fields['phone'] !== '')   { $lines[] = 'Telefon: ' . $fields['phone']; }
+    if ($fields['email'] !== '')   { $lines[] = 'E-mail:  ' . $fields['email']; }
+    if ($fields['message'] !== '') { $lines[] = ''; $lines[] = 'Wiadomość:'; $lines[] = $fields['message']; }
+    $lines[] = '';
+    $lines[] = 'Zaloguj się do panelu: ' . base_url() . '/login.php';
+    $body = implode("\n", $lines);
+
+    if (($client['notify_email'] ?? '') !== '') {
+        crm_send_mail((string)$client['notify_email'], $subject, $body);
+    }
+    $agencyEmail = setting_get('notify_admin_email');
+    if ($agencyEmail !== '' && $agencyEmail !== ($client['notify_email'] ?? '')) {
+        crm_send_mail($agencyEmail, $subject, $body);
+    }
+}
+
+/**
+ * Deduplikacja zgłoszeń ze stron www: identyczne dane od tego samego klienta
+ * w ciągu 60 sekund (podwójne kliknięcie "Wyślij") zwracają istniejący lead.
+ */
+function find_recent_duplicate(int $clientId, array $fields, array $raw): ?int
+{
+    $st = db()->prepare("SELECT id FROM leads
+                         WHERE client_id = ? AND name = ? AND email = ? AND phone = ? AND message = ? AND raw = ?
+                           AND created_at >= datetime('now','localtime','-60 seconds')
+                         ORDER BY id DESC LIMIT 1");
+    $st->execute([
+        $clientId,
+        $fields['name'] ?? '', $fields['email'] ?? '', $fields['phone'] ?? '', $fields['message'] ?? '',
+        json_encode($raw, JSON_UNESCAPED_UNICODE),
+    ]);
+    $id = $st->fetchColumn();
+    return $id === false ? null : (int)$id;
 }
 
 /** Zapisuje leada do bazy i zwraca jego ID. */

@@ -110,6 +110,37 @@ function ui_stats(array $where, array $params): void
     </div>';
 }
 
+/** Wykres słupkowy: liczba leadów dziennie z ostatnich 14 dni. */
+function ui_chart(array $where, array $params): void
+{
+    $w = array_merge($where, ["created_at >= datetime('now','localtime','-13 days','start of day')"]);
+    $st = db()->prepare('SELECT date(created_at) AS d, COUNT(*) AS c FROM leads WHERE '
+                        . implode(' AND ', $w) . ' GROUP BY d');
+    $st->execute($params);
+    $byDay = $st->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    $days = [];
+    $max  = 1;
+    for ($i = 13; $i >= 0; $i--) {
+        $date = date('Y-m-d', strtotime("-$i days"));
+        $c    = (int)($byDay[$date] ?? 0);
+        $days[] = [$date, $c];
+        $max = max($max, $c);
+    }
+
+    echo '<div class="card chart-card"><h2>📈 Leady — ostatnie 14 dni</h2><div class="chart">';
+    foreach ($days as [$date, $c]) {
+        $h     = (int)round($c / $max * 100);
+        $label = date('d.m', strtotime($date));
+        echo '<div class="chart-col" title="' . e($label) . ': ' . $c . '">'
+           . '<span class="chart-val">' . ($c > 0 ? $c : '') . '</span>'
+           . '<div class="chart-bar" style="--h:' . max($h, 2) . '%"></div>'
+           . '<span class="chart-day">' . e($label) . '</span>'
+           . '</div>';
+    }
+    echo '</div></div>';
+}
+
 function ui_status_badge(string $status): string
 {
     $label = CRM_STATUSES[$status] ?? $status;

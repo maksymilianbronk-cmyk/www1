@@ -37,12 +37,19 @@ if ($hasAdmin && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '
     csrf_check();
     $email = trim(mb_strtolower((string)($_POST['email'] ?? '')));
     $pass  = (string)($_POST['password'] ?? '');
+    $ip    = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+
+    if (login_blocked($ip)) {
+        $error = 'Zbyt wiele nieudanych prób logowania. Spróbuj ponownie za 15 minut.';
+        goto render;
+    }
 
     $st = $pdo->prepare('SELECT * FROM admins WHERE email = ?');
     $st->execute([$email]);
     $admin = $st->fetch();
 
     if ($admin && password_verify($pass, $admin['password_hash'])) {
+        login_success($ip);
         session_regenerate_id(true);
         unset($_SESSION['client_id']);
         $_SESSION['admin_id'] = (int)$admin['id'];
@@ -54,15 +61,18 @@ if ($hasAdmin && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '
     $client = $st->fetch();
 
     if ($client && password_verify($pass, $client['password_hash'])) {
+        login_success($ip);
         session_regenerate_id(true);
         unset($_SESSION['admin_id']);
         $_SESSION['client_id'] = (int)$client['id'];
         redirect('panel.php');
     }
 
+    login_fail($ip);
     usleep(300000); // spowolnienie prób brute-force
     $error = 'Nieprawidłowy e-mail lub hasło.';
 }
+render:
 
 // zalogowanych przekierowujemy od razu
 if (current_admin())  { redirect('admin.php'); }

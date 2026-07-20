@@ -43,6 +43,7 @@ ui_flash();
 </div>
 <?php
 ui_stats($where, $params);
+ui_chart($where, $params);
 ui_filter_form($clients);
 ui_leads_table($leads, true, $backUrl);
 ui_pagination($page, $pages, $query);

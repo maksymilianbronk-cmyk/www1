@@ -31,7 +31,7 @@ $head = ['Data', 'Klient', 'Źródło', 'Imię i nazwisko', 'E-mail', 'Telefon',
 if ($client) {
     unset($head[1]);
 }
-fputcsv($out, array_values($head), ';');
+fputcsv($out, array_values($head), ';', '"', '');
 
 while ($l = $st->fetch()) {
     $row = [
@@ -50,6 +50,6 @@ while ($l = $st->fetch()) {
     if ($client) {
         unset($row[1]);
     }
-    fputcsv($out, array_values($row), ';');
+    fputcsv($out, array_values($row), ';', '"', '');
 }
 fclose($out);
