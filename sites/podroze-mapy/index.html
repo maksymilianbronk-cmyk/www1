@@ -2,9 +2,9 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#181a1f" />
-  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z kilkudziesięcioma warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków). Inspirowana Locus Pro / OsmAnd." />
+  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z 86 warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków), profilami map, trybem porównywania i menedżerem POI. Inspirowana Locus Pro / OsmAnd." />
   <title>Trasa — mapy podróżnicze</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -15,27 +15,28 @@
 
   <!-- Górny pasek -->
   <header class="topbar">
-    <button id="btn-menu" class="tb-btn" title="Warstwy map (M)">☰</button>
+    <button id="btn-menu" class="tb-btn" title="Warstwy map (M)" aria-label="Warstwy map">☰</button>
     <div class="tb-title">
       <span class="tb-logo">🧭</span>
       <span class="tb-name">Trasa</span>
-      <button id="btn-prev-map" class="tb-btn tb-arrow" title="Poprzednia mapa (,)">‹</button>
-      <span id="active-map-name" class="tb-active" title="Aktywna mapa bazowa">OSM Standard</span>
-      <button id="btn-next-map" class="tb-btn tb-arrow" title="Następna mapa (.)">›</button>
+      <button id="btn-prev-map" class="tb-btn tb-arrow" title="Poprzednia mapa (,)" aria-label="Poprzednia mapa">‹</button>
+      <button id="active-map-name" class="tb-mapname" title="Aktywna mapa — kliknij, aby otworzyć warstwy">OSM Standard</button>
+      <button id="btn-next-map" class="tb-btn tb-arrow" title="Następna mapa (.)" aria-label="Następna mapa">›</button>
     </div>
     <div class="tb-actions">
-      <button id="btn-search" class="tb-btn" title="Szukaj miejsca (S)">🔍</button>
-      <button id="btn-locate" class="tb-btn" title="Moja pozycja (L)">📍</button>
-      <button id="btn-measure" class="tb-btn" title="Pomiar odległości (P)">📏</button>
-      <button id="btn-waypoint" class="tb-btn" title="Dodaj punkt (W)">📌</button>
-      <button id="btn-gpx" class="tb-btn" title="Import / eksport GPX">🛰️</button>
-      <button id="btn-keys" class="tb-btn" title="Klucze API">🔑</button>
+      <button class="tb-btn act" data-action="search" title="Szukaj miejsca (S)">🔍</button>
+      <button class="tb-btn act" data-action="locate" title="Moja pozycja (L)">📍</button>
+      <button class="tb-btn act" data-action="measure" title="Pomiar odległości (P)">📏</button>
+      <button class="tb-btn act" data-action="poi-add" title="Dodaj punkt POI (W)">📌</button>
+      <button class="tb-btn act" data-action="poi-panel" title="Moje punkty POI (O)">🗂️</button>
+      <button class="tb-btn act" data-action="gpx" title="Ślady GPX">🛰️</button>
+      <button class="tb-btn act" data-action="keys" title="Klucze API">🔑</button>
     </div>
   </header>
 
   <!-- Pasek wyszukiwania -->
   <div id="search-bar" class="search-bar hidden">
-    <input id="search-input" type="text" placeholder="Szukaj miejsca (Nominatim)… np. Rumia, Giewont, Paryż" autocomplete="off" />
+    <input id="search-input" type="text" placeholder="Szukaj miejsca… np. Rumia, Giewont, Paryż" autocomplete="off" />
     <button id="search-go">Szukaj</button>
     <button id="search-close" title="Zamknij">✕</button>
     <ul id="search-results" class="search-results"></ul>
@@ -44,15 +45,21 @@
   <!-- Panel warstw (sidebar) -->
   <aside id="sidebar" class="sidebar">
     <div class="sb-head">
-      <strong>Manager warstw</strong>
+      <strong>Warstwy</strong>
       <span id="layer-count" class="sb-count"></span>
+      <button id="btn-compare" class="tb-btn" title="Tryb porównywania dwóch map">🆚</button>
+      <button class="tb-btn act sb-keys" data-action="keys" title="Klucze API">🔑</button>
       <button id="sb-close" class="tb-btn" title="Zamknij">✕</button>
     </div>
+    <div class="sb-presets">
+      <div class="sb-presets-label">Profile map</div>
+      <div id="preset-chips" class="preset-chips"></div>
+    </div>
     <div class="sb-filter">
-      <input id="layer-filter" type="text" placeholder="Filtruj warstwy… (np. topo, orto, szlaki)" />
+      <input id="layer-filter" type="text" placeholder="Filtruj 86 warstw… (topo, orto, szlaki…)" />
     </div>
     <div class="sb-hint">
-      ⭐ ulubione &nbsp;·&nbsp; ⚡ test dostępności kategorii &nbsp;·&nbsp; suwak = krycie nakładki
+      ⭐ ulubione · ⚡ test dostępności · ▶ przelot do zasięgu · suwak = krycie
     </div>
     <nav id="layer-list" class="layer-list"></nav>
     <div class="sb-foot">
@@ -64,6 +71,9 @@
 
   <!-- Mapa -->
   <div id="map"></div>
+  <div id="compare-divider" class="compare-divider hidden" title="Przeciągnij, aby porównać mapy">
+    <div class="cd-handle">◂▸</div>
+  </div>
 
   <!-- Dolny pasek statusu -->
   <footer class="statusbar">
@@ -71,7 +81,18 @@
     <span id="st-zoom" title="Poziom przybliżenia">z—</span>
     <span id="st-measure" class="hidden" title="Długość pomiaru"></span>
     <span id="st-follow" class="hidden">🎯 śledzenie</span>
+    <button id="st-compare" class="st-chip hidden" title="Wyłącz porównywanie">🆚 <span></span> ✕</button>
   </footer>
+
+  <!-- Dolny pasek akcji (mobile) -->
+  <nav class="bottombar">
+    <button class="bb-btn act" data-action="search" title="Szukaj"><span>🔍</span><small>Szukaj</small></button>
+    <button class="bb-btn act" data-action="locate" title="Moja pozycja"><span>📍</span><small>GPS</small></button>
+    <button class="bb-btn act bb-main" data-action="poi-add" title="Dodaj POI"><span>📌</span><small>+POI</small></button>
+    <button class="bb-btn act" data-action="poi-panel" title="Moje punkty"><span>🗂️</span><small>Punkty</small></button>
+    <button class="bb-btn act" data-action="measure" title="Pomiar"><span>📏</span><small>Pomiar</small></button>
+    <button class="bb-btn act" data-action="gpx" title="Ślady GPX"><span>🛰️</span><small>GPX</small></button>
+  </nav>
 
   <!-- Modal kluczy API -->
   <div id="keys-modal" class="modal hidden">
@@ -89,26 +110,84 @@
     </div>
   </div>
 
-  <!-- Modal GPX -->
+  <!-- Modal GPX (ślady) -->
   <div id="gpx-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <strong>🛰️ GPX — trasy i punkty</strong>
+        <strong>🛰️ Ślady GPX</strong>
         <button class="tb-btn" data-close="gpx-modal">✕</button>
       </div>
-      <p class="modal-info">Wczytaj ślad GPX (trasy + punkty) albo wyeksportuj swoje punkty.</p>
+      <p class="modal-info">Wczytaj ślad GPX — trasy pojawią się na mapie, a punkty
+        <code>&lt;wpt&gt;</code> możesz dopisać do swoich POI.</p>
+      <label class="modal-check"><input id="gpx-wpt-as-poi" type="checkbox" checked />
+        importuj punkty <code>wpt</code> jako moje POI</label>
       <label class="btn-secondary file-label">
         📂 Wczytaj plik GPX
         <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden />
       </label>
-      <button id="gpx-export" class="btn-secondary">💾 Eksportuj punkty do GPX</button>
-      <button id="gpx-clear" class="btn-secondary">🗑️ Usuń wczytane ślady</button>
+      <button id="gpx-clear" class="btn-secondary">🗑️ Usuń wczytane ślady z mapy</button>
       <div id="gpx-status" class="modal-info"></div>
-      <div id="wpt-list" class="wpt-list"></div>
     </div>
   </div>
 
-  <div id="toast" class="toast hidden"></div>
+  <!-- Modal edytora POI -->
+  <div id="poi-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong id="poi-modal-title">📌 Nowy punkt</strong>
+        <button class="tb-btn" data-close="poi-modal">✕</button>
+      </div>
+      <label class="fld">Nazwa
+        <input id="poi-name" type="text" placeholder="np. Bacówka pod Honem" maxlength="80" />
+      </label>
+      <label class="fld">Kategoria</label>
+      <div id="poi-cats" class="chip-row"></div>
+      <label class="fld">Kolor</label>
+      <div id="poi-colors" class="chip-row"></div>
+      <label class="fld">Notatka
+        <textarea id="poi-note" rows="3" placeholder="opcjonalny opis, godziny, ceny…" maxlength="500"></textarea>
+      </label>
+      <div id="poi-coords" class="modal-info"></div>
+      <button id="poi-save" class="btn-primary">Zapisz punkt</button>
+      <button id="poi-delete" class="btn-danger hidden">🗑️ Usuń punkt</button>
+    </div>
+  </div>
+
+  <!-- Modal listy POI -->
+  <div id="poi-panel" class="modal hidden">
+    <div class="modal-box modal-tall">
+      <div class="modal-head">
+        <strong>🗂️ Moje punkty <span id="poi-count" class="sb-count"></span></strong>
+        <button class="tb-btn" data-close="poi-panel">✕</button>
+      </div>
+      <input id="poi-filter" type="text" class="poi-filter" placeholder="Szukaj w punktach…" />
+      <div id="poi-cat-filter" class="chip-row"></div>
+      <div id="poi-list" class="poi-list"></div>
+      <div class="modal-btn-row">
+        <button id="poi-export-gpx" class="btn-secondary">💾 GPX</button>
+        <button id="poi-export-json" class="btn-secondary">💾 GeoJSON</button>
+        <label class="btn-secondary file-label">📂 Import
+          <input id="poi-import" type="file" accept=".gpx,.geojson,.json" hidden />
+        </label>
+        <button id="poi-wipe" class="btn-secondary danger">🗑️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal nazwy (profile map) -->
+  <div id="name-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong id="name-modal-title">Zapisz profil map</strong>
+        <button class="tb-btn" data-close="name-modal">✕</button>
+      </div>
+      <p class="modal-info">Profil zapamięta mapę bazową, włączone nakładki i ich krycie.</p>
+      <input id="name-input" type="text" placeholder="np. Moja turystyka" maxlength="40" />
+      <button id="name-save" class="btn-primary">Zapisz</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"><span id="toast-msg"></span><button id="toast-act" class="hidden"></button></div>
 
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="layers.js"></script>

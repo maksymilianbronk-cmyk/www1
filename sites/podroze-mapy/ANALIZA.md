@@ -80,7 +80,41 @@ pasują wprost do siatki Leaflet. WMS-y renderowane są przez `L.tileLayer.wms`.
   w aplikację Android (TWA/WebView); offline'owe kafelki celowo zostawione
   wersji natywnej ze względu na regulaminy dostawców.
 
-## 6. Uwagi prawne
+## 6. Silnik warstw i POI (wersja 2)
+
+Po audycie mobilnym aplikacja dostała własną „inżynierię" pracy z warstwami
+i punktami:
+
+**Warstwy:**
+- **Profile map** — zapisywane zestawy `mapa bazowa + nakładki + krycie`
+  (wbudowane: Turystyka, Rower, Zima, Satelita+, Orto+działki; własne
+  zapisywane pod dowolną nazwą) — odpowiednik szybkich motywów w Locusie.
+- **Tryb porównywania 🆚** — druga mapa bazowa renderowana w osobnym panelu
+  Leaflet (`pane` z `clip-path: inset()`), przeciągany uchwyt dzieli ekran;
+  idealne do porównania orto vs topo albo starych map sztabowych z OSM.
+- **🕘 Ostatnio używane** — automatyczna kategoria z historią 8 map.
+- Test dostępności ⚡, ulubione i przelot ▶ jak w wersji 1.
+
+**POI:**
+- Schemat v2: `{id, lat, lng, name, cat, color, note, ts}` z migracją ze
+  starych waypointów; zapis w `localStorage` po każdej zmianie.
+- 9 kategorii (nocleg, jedzenie, woda, szczyt, widok, zabytek, transport,
+  uwaga, ogólny) z kolorowymi pinami SVG i emoji.
+- Edytor: nazwa, kategoria, kolor (paleta 8 + auto z kategorii), notatka.
+- Dodawanie: przycisk 📌, **long-press na mapie** (mobile) lub prawy przycisk
+  (desktop) — szybkie menu miejsca (Dodaj POI / Kopiuj współrzędne / Nawiguj).
+- Panel listy: sortowanie po odległości od środka mapy, szukajka, filtr
+  kategorii, ukrywanie kategorii na mapie (2× klik na chip).
+- Usuwanie z **cofnięciem (undo)** w toaście; eksport GPX i GeoJSON,
+  import GPX/GeoJSON; wpt ze śladów GPX można dopisywać do POI.
+
+**Audyt mobilny (Chromium, 390×844, touch)** wykrył i naprawiono:
+43 cele dotykowe < 40 px, ściętą nazwę mapy, 9 przycisków stłoczonych
+w topbarze (przeniesione do dolnego paska akcji), brak `safe-area`,
+`prompt()` zamiast edytora, brak long-pressa i wibracji (haptyka
+`navigator.vibrate`).
+
+## 7. Uwagi prawne
 
 Endpointy Google, 2GIS, nakarte, marshruty itp. pochodzą z nieoficjalnych
 pakietów społeczności Locusa — dostawcy mogą je zmieniać lub ograniczać.

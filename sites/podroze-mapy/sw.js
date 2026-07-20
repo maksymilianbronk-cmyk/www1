@@ -2,7 +2,7 @@
    Kafelki map celowo NIE są cache'owane — regulaminy większości dostawców
    zabraniają masowego zapisu; offline'owe mapy to zadanie wersji Android. */
 
-const CACHE = "trasa-shell-v1";
+const CACHE = "trasa-shell-v2";
 const SHELL = [
   "./",
   "./index.html",
