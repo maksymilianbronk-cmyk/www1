@@ -15,6 +15,19 @@
  */
 const SITES = [
   {
+    slug: "crm",
+    title: "LeadFlow CRM — leady agencji Meta Ads",
+    desc: "Samodzielny system CRM (PHP 8 + SQLite) zbierający leady ze stron www klientów i z formularzy Facebook Lead Ads techniką webhooków / modułu HTTP Request (Make, Zapier lub bezpośrednio z Meta). Panel super admina z leadami wszystkich klientów oraz osobne panele klientów (każdy widzi tylko swoje leady). Statusy, notatki, filtry, wyszukiwarka, eksport CSV, tokeny webhooków per klient. Wymaga hostingu z PHP — instrukcja w sites/crm/README.md.",
+    icon: "⚡",
+    tag: "narzędzie",
+    preview: false,
+    meta: {
+      colors: ["#0e1320", "#182138", "#4f7cff", "#f5b942", "#2ecc8f"],
+      fonts: ["Segoe UI / system-ui"],
+      tech: ["PHP 8", "SQLite", "Webhooki", "Meta Graph API", "Vanilla JS"],
+    },
+  },
+  {
     slug: "drzewo-bronk",
     title: "Drzewo genealogiczne rodziny von Bronk",
     desc: "Interaktywne, edytowalne drzewo genealogiczne rodziny von Bronk (Niepoczołowski) w stylu MyHeritage, odtworzone z 11 fotografii papierowego wydruku: od Michała Piotra von Bronk (ur. 1721) do dziś, 10 pokoleń i 368 osób na jednej planszy SVG. Karty z awatarami, panel szczegółów osoby z relacjami, edycja / dodawanie małżonków i dzieci / usuwanie z autozapisem w przeglądarce, eksport i import JSON, wyszukiwarka, zoom i podświetlanie linii krwi.",
