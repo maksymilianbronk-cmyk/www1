@@ -13,24 +13,72 @@
 </head>
 <body>
 
+  <!-- Sprite ikon SVG (styl stroke, 24×24) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+    <symbol id="i-gps" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-ruler" viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21l-4-4z"/><path d="M7.5 12.5l2 2M10.5 9.5l2 2M13.5 6.5l2 2"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.5S5 15.3 5 10a7 7 0 0 1 14 0c0 5.3-7 11.5-7 11.5z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-pin-plus" viewBox="0 0 24 24"><path d="M12 21.5S5 15.3 5 10a7 7 0 0 1 14 0c0 5.3-7 11.5-7 11.5z"/><path d="M12 7v6M9 10h6"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8.5 6h12M8.5 12h12M8.5 18h12"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19h7a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7h7"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.7 12.3L21 2M15 7l3.5 3.5"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8l-2.3 5.7L8 16l2.3-5.7z"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-compare" viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M9 5H5.5A2.5 2.5 0 0 0 3 7.5v9A2.5 2.5 0 0 0 5.5 19H9M15 5h3.5A2.5 2.5 0 0 1 21 7.5v9a2.5 2.5 0 0 1-2.5 2.5H15"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17.1l-5.7 3.1 1.2-6.3L2.8 9.5l6.4-.8z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11H12z"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3L2 8.5 12 14l10-5.5z"/><path d="M2 13l10 5.5L22 13"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M17 3.5a2.6 2.6 0 0 1 3.7 3.7L8 20l-5 1 1-5z"/></symbol>
+    <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2.5-7.5z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15"/><path d="M10 10.5v6M14 10.5v6"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 4v6h6"/><path d="M3.5 13a9 9 0 1 0 2.2-6.5L3 10"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M4 21h16"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3L2 20h20z"/><path d="M12 10v4M12 17.2h.01"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <!-- kategorie POI -->
+    <symbol id="i-bed" viewBox="0 0 24 24"><path d="M2 8v11M2 15h20M22 19v-6a3 3 0 0 0-3-3H9"/><circle cx="5.5" cy="10.5" r="1.7"/></symbol>
+    <symbol id="i-food" viewBox="0 0 24 24"><path d="M7 3v7M4 3v4a3 3 0 0 0 6 0V3M7 12v9"/><path d="M17 3c-1.6 0-3 1.9-3 4.5V11h3M17 3v18"/></symbol>
+    <symbol id="i-water" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+    <symbol id="i-peak" viewBox="0 0 24 24"><path d="M3 20L10 7l4 6.5L17 9l4 11z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7l1.5-3h3L15 7"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-castle" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8M19 21V8M5 8V4h3v2h3V4h2v2h3V4h3v4z"/><path d="M10 21v-4a2 2 0 0 1 4 0v4"/></symbol>
+    <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="13" rx="2.5"/><path d="M5 10h14"/><path d="M9 13h.01M15 13h.01"/><path d="M8 20l1.5-4M16 20l-1.5-4"/></symbol>
+    <!-- profile -->
+    <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="5.5" cy="17" r="3.5"/><circle cx="18.5" cy="17" r="3.5"/><path d="M8 17l3-7h4l3.5 7M11 10L9.5 6H7M11.8 10l-1-3.5h4"/></symbol>
+    <symbol id="i-snow" viewBox="0 0 24 24"><path d="M12 2v20M4 6l16 12M20 6L4 18"/><path d="M12 5l-2-2M12 5l2-2M12 19l-2 2M12 19l2 2"/></symbol>
+    <symbol id="i-sat" viewBox="0 0 24 24"><rect x="9" y="9" width="6" height="6" rx="1" transform="rotate(45 12 12)"/><path d="M5 2l4 4M2 5l4 4M19 15l3 3-4 4-3-3M8 16l-4 4"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></symbol>
+  </svg>
+
   <!-- Górny pasek -->
   <header class="topbar">
-    <button id="btn-menu" class="tb-btn" title="Warstwy map (M)" aria-label="Warstwy map">☰</button>
+    <button id="btn-menu" class="tb-btn" title="Warstwy map (M)" aria-label="Warstwy map"><svg class="ic"><use href="#i-menu"/></svg></button>
     <div class="tb-title">
-      <span class="tb-logo">🧭</span>
+      <svg class="ic tb-logo"><use href="#i-compass"/></svg>
       <span class="tb-name">Trasa</span>
-      <button id="btn-prev-map" class="tb-btn tb-arrow" title="Poprzednia mapa (,)" aria-label="Poprzednia mapa">‹</button>
+      <button id="btn-prev-map" class="tb-btn tb-arrow" title="Poprzednia mapa (,)" aria-label="Poprzednia mapa"><svg class="ic"><use href="#i-chev-l"/></svg></button>
       <button id="active-map-name" class="tb-mapname" title="Aktywna mapa — kliknij, aby otworzyć warstwy">OSM Standard</button>
-      <button id="btn-next-map" class="tb-btn tb-arrow" title="Następna mapa (.)" aria-label="Następna mapa">›</button>
+      <button id="btn-next-map" class="tb-btn tb-arrow" title="Następna mapa (.)" aria-label="Następna mapa"><svg class="ic"><use href="#i-chev-r"/></svg></button>
     </div>
     <div class="tb-actions">
-      <button class="tb-btn act" data-action="search" title="Szukaj miejsca (S)">🔍</button>
-      <button class="tb-btn act" data-action="locate" title="Moja pozycja (L)">📍</button>
-      <button class="tb-btn act" data-action="measure" title="Pomiar odległości (P)">📏</button>
-      <button class="tb-btn act" data-action="poi-add" title="Dodaj punkt POI (W)">📌</button>
-      <button class="tb-btn act" data-action="poi-panel" title="Moje punkty POI (O)">🗂️</button>
-      <button class="tb-btn act" data-action="gpx" title="Ślady GPX">🛰️</button>
-      <button class="tb-btn act" data-action="keys" title="Klucze API">🔑</button>
+      <button class="tb-btn act" data-action="search" title="Szukaj miejsca (S)"><svg class="ic"><use href="#i-search"/></svg></button>
+      <button class="tb-btn act" data-action="locate" title="Moja pozycja (L)"><svg class="ic"><use href="#i-gps"/></svg></button>
+      <button class="tb-btn act" data-action="measure" title="Pomiar odległości (P)"><svg class="ic"><use href="#i-ruler"/></svg></button>
+      <button class="tb-btn act" data-action="poi-add" title="Dodaj punkt POI (W)"><svg class="ic"><use href="#i-pin-plus"/></svg></button>
+      <button class="tb-btn act" data-action="poi-panel" title="Moje punkty POI (O)"><svg class="ic"><use href="#i-list"/></svg></button>
+      <button class="tb-btn act" data-action="gpx" title="Ślady GPX"><svg class="ic"><use href="#i-route"/></svg></button>
+      <button class="tb-btn act" data-action="keys" title="Klucze API"><svg class="ic"><use href="#i-key"/></svg></button>
     </div>
   </header>
 
@@ -38,7 +86,7 @@
   <div id="search-bar" class="search-bar hidden">
     <input id="search-input" type="text" placeholder="Szukaj miejsca… np. Rumia, Giewont, Paryż" autocomplete="off" />
     <button id="search-go">Szukaj</button>
-    <button id="search-close" title="Zamknij">✕</button>
+    <button id="search-close" title="Zamknij"><svg class="ic"><use href="#i-x"/></svg></button>
     <ul id="search-results" class="search-results"></ul>
   </div>
 
@@ -47,9 +95,9 @@
     <div class="sb-head">
       <strong>Warstwy</strong>
       <span id="layer-count" class="sb-count"></span>
-      <button id="btn-compare" class="tb-btn" title="Tryb porównywania dwóch map">🆚</button>
-      <button class="tb-btn act sb-keys" data-action="keys" title="Klucze API">🔑</button>
-      <button id="sb-close" class="tb-btn" title="Zamknij">✕</button>
+      <button id="btn-compare" class="tb-btn" title="Tryb porównywania dwóch map"><svg class="ic"><use href="#i-compare"/></svg></button>
+      <button class="tb-btn act sb-keys" data-action="keys" title="Klucze API"><svg class="ic"><use href="#i-key"/></svg></button>
+      <button id="sb-close" class="tb-btn" title="Zamknij"><svg class="ic"><use href="#i-x"/></svg></button>
     </div>
     <div class="sb-presets">
       <div class="sb-presets-label">Profile map</div>
@@ -59,7 +107,9 @@
       <input id="layer-filter" type="text" placeholder="Filtruj 86 warstw… (topo, orto, szlaki…)" />
     </div>
     <div class="sb-hint">
-      ⭐ ulubione · ⚡ test dostępności · ▶ przelot do zasięgu · suwak = krycie
+      <svg class="ic ic-xs"><use href="#i-star"/></svg> ulubione ·
+      <svg class="ic ic-xs"><use href="#i-bolt"/></svg> test dostępności ·
+      <svg class="ic ic-xs"><use href="#i-play"/></svg> przelot do zasięgu · suwak = krycie
     </div>
     <nav id="layer-list" class="layer-list"></nav>
     <div class="sb-foot">
@@ -80,26 +130,26 @@
     <span id="st-coords" title="Współrzędne kursora / środka">—</span>
     <span id="st-zoom" title="Poziom przybliżenia">z—</span>
     <span id="st-measure" class="hidden" title="Długość pomiaru"></span>
-    <span id="st-follow" class="hidden">🎯 śledzenie</span>
-    <button id="st-compare" class="st-chip hidden" title="Wyłącz porównywanie">🆚 <span></span> ✕</button>
+    <span id="st-follow" class="hidden"><svg class="ic ic-xs"><use href="#i-target"/></svg> śledzenie</span>
+    <button id="st-compare" class="st-chip hidden" title="Wyłącz porównywanie"><svg class="ic ic-xs"><use href="#i-compare"/></svg> <span></span> <svg class="ic ic-xs"><use href="#i-x"/></svg></button>
   </footer>
 
   <!-- Dolny pasek akcji (mobile) -->
   <nav class="bottombar">
-    <button class="bb-btn act" data-action="search" title="Szukaj"><span>🔍</span><small>Szukaj</small></button>
-    <button class="bb-btn act" data-action="locate" title="Moja pozycja"><span>📍</span><small>GPS</small></button>
-    <button class="bb-btn act bb-main" data-action="poi-add" title="Dodaj POI"><span>📌</span><small>+POI</small></button>
-    <button class="bb-btn act" data-action="poi-panel" title="Moje punkty"><span>🗂️</span><small>Punkty</small></button>
-    <button class="bb-btn act" data-action="measure" title="Pomiar"><span>📏</span><small>Pomiar</small></button>
-    <button class="bb-btn act" data-action="gpx" title="Ślady GPX"><span>🛰️</span><small>GPX</small></button>
+    <button class="bb-btn act" data-action="search" title="Szukaj"><svg class="ic"><use href="#i-search"/></svg><small>Szukaj</small></button>
+    <button class="bb-btn act" data-action="locate" title="Moja pozycja"><svg class="ic"><use href="#i-gps"/></svg><small>GPS</small></button>
+    <button class="bb-btn act bb-main" data-action="poi-add" title="Dodaj POI"><svg class="ic"><use href="#i-pin-plus"/></svg><small>+POI</small></button>
+    <button class="bb-btn act" data-action="poi-panel" title="Moje punkty"><svg class="ic"><use href="#i-list"/></svg><small>Punkty</small></button>
+    <button class="bb-btn act" data-action="measure" title="Pomiar"><svg class="ic"><use href="#i-ruler"/></svg><small>Pomiar</small></button>
+    <button class="bb-btn act" data-action="gpx" title="Ślady GPX"><svg class="ic"><use href="#i-route"/></svg><small>GPX</small></button>
   </nav>
 
   <!-- Modal kluczy API -->
   <div id="keys-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <strong>🔑 Klucze API</strong>
-        <button class="tb-btn" data-close="keys-modal">✕</button>
+        <strong><svg class="ic"><use href="#i-key"/></svg> Klucze API</strong>
+        <button class="tb-btn" data-close="keys-modal"><svg class="ic"><use href="#i-x"/></svg></button>
       </div>
       <p class="modal-info">
         Warstwy „Premium” i „Pogoda” działają po wklejeniu darmowego klucza od dostawcy
@@ -114,18 +164,18 @@
   <div id="gpx-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <strong>🛰️ Ślady GPX</strong>
-        <button class="tb-btn" data-close="gpx-modal">✕</button>
+        <strong><svg class="ic"><use href="#i-route"/></svg> Ślady GPX</strong>
+        <button class="tb-btn" data-close="gpx-modal"><svg class="ic"><use href="#i-x"/></svg></button>
       </div>
       <p class="modal-info">Wczytaj ślad GPX — trasy pojawią się na mapie, a punkty
         <code>&lt;wpt&gt;</code> możesz dopisać do swoich POI.</p>
       <label class="modal-check"><input id="gpx-wpt-as-poi" type="checkbox" checked />
         importuj punkty <code>wpt</code> jako moje POI</label>
       <label class="btn-secondary file-label">
-        📂 Wczytaj plik GPX
+        <svg class="ic"><use href="#i-upload"/></svg> Wczytaj plik GPX
         <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden />
       </label>
-      <button id="gpx-clear" class="btn-secondary">🗑️ Usuń wczytane ślady z mapy</button>
+      <button id="gpx-clear" class="btn-secondary"><svg class="ic"><use href="#i-trash"/></svg> Usuń wczytane ślady z mapy</button>
       <div id="gpx-status" class="modal-info"></div>
     </div>
   </div>
@@ -134,8 +184,8 @@
   <div id="poi-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <strong id="poi-modal-title">📌 Nowy punkt</strong>
-        <button class="tb-btn" data-close="poi-modal">✕</button>
+        <strong id="poi-modal-title"><svg class="ic"><use href="#i-pin-plus"/></svg> Nowy punkt</strong>
+        <button class="tb-btn" data-close="poi-modal"><svg class="ic"><use href="#i-x"/></svg></button>
       </div>
       <label class="fld">Nazwa
         <input id="poi-name" type="text" placeholder="np. Bacówka pod Honem" maxlength="80" />
@@ -149,7 +199,7 @@
       </label>
       <div id="poi-coords" class="modal-info"></div>
       <button id="poi-save" class="btn-primary">Zapisz punkt</button>
-      <button id="poi-delete" class="btn-danger hidden">🗑️ Usuń punkt</button>
+      <button id="poi-delete" class="btn-danger hidden"><svg class="ic"><use href="#i-trash"/></svg> Usuń punkt</button>
     </div>
   </div>
 
@@ -157,19 +207,19 @@
   <div id="poi-panel" class="modal hidden">
     <div class="modal-box modal-tall">
       <div class="modal-head">
-        <strong>🗂️ Moje punkty <span id="poi-count" class="sb-count"></span></strong>
-        <button class="tb-btn" data-close="poi-panel">✕</button>
+        <strong><svg class="ic"><use href="#i-list"/></svg> Moje punkty <span id="poi-count" class="sb-count"></span></strong>
+        <button class="tb-btn" data-close="poi-panel"><svg class="ic"><use href="#i-x"/></svg></button>
       </div>
       <input id="poi-filter" type="text" class="poi-filter" placeholder="Szukaj w punktach…" />
       <div id="poi-cat-filter" class="chip-row"></div>
       <div id="poi-list" class="poi-list"></div>
       <div class="modal-btn-row">
-        <button id="poi-export-gpx" class="btn-secondary">💾 GPX</button>
-        <button id="poi-export-json" class="btn-secondary">💾 GeoJSON</button>
-        <label class="btn-secondary file-label">📂 Import
+        <button id="poi-export-gpx" class="btn-secondary"><svg class="ic"><use href="#i-download"/></svg> GPX</button>
+        <button id="poi-export-json" class="btn-secondary"><svg class="ic"><use href="#i-download"/></svg> GeoJSON</button>
+        <label class="btn-secondary file-label"><svg class="ic"><use href="#i-upload"/></svg> Import
           <input id="poi-import" type="file" accept=".gpx,.geojson,.json" hidden />
         </label>
-        <button id="poi-wipe" class="btn-secondary danger">🗑️</button>
+        <button id="poi-wipe" class="btn-secondary danger"><svg class="ic"><use href="#i-trash"/></svg></button>
       </div>
     </div>
   </div>
@@ -179,7 +229,7 @@
     <div class="modal-box">
       <div class="modal-head">
         <strong id="name-modal-title">Zapisz profil map</strong>
-        <button class="tb-btn" data-close="name-modal">✕</button>
+        <button class="tb-btn" data-close="name-modal"><svg class="ic"><use href="#i-x"/></svg></button>
       </div>
       <p class="modal-info">Profil zapamięta mapę bazową, włączone nakładki i ich krycie.</p>
       <input id="name-input" type="text" placeholder="np. Moja turystyka" maxlength="40" />

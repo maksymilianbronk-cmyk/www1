@@ -108,6 +108,10 @@ i punktami:
 - Usuwanie z **cofnięciem (undo)** w toaście; eksport GPX i GeoJSON,
   import GPX/GeoJSON; wpt ze śladów GPX można dopisywać do POI.
 
+**Ikonografia:** cały interfejs korzysta z autorskiego sprite'a 40+ ikon SVG
+(`<symbol>` w index.html, styl stroke à la Lucide, `currentColor`) — piny POI,
+chipy kategorii i profili, paski narzędzi, popupy; zero emoji w UI.
+
 **Audyt mobilny (Chromium, 390×844, touch)** wykrył i naprawiono:
 43 cele dotykowe < 40 px, ściętą nazwę mapy, 9 przycisków stłoczonych
 w topbarze (przeniesione do dolnego paska akcji), brak `safe-area`,

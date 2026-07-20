@@ -44,6 +44,11 @@ MAP_SOURCES.forEach(s => (byId[s.id] = s));
 
 function buzz(ms = 12) { try { navigator.vibrate && navigator.vibrate(ms); } catch {} }
 
+/* ikona SVG ze sprite'a w index.html */
+function ic(name, cls = "") {
+  return `<svg class="ic ${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+}
+
 function toast(msg, ms = 3200, action = null) {
   const el = document.getElementById("toast");
   document.getElementById("toast-msg").textContent = msg;
@@ -150,7 +155,7 @@ function setBase(id, { fly = false } = {}) {
   if (!src || src.overlay) return;
   if (compare.selecting) { setCompare(id); return; }
   if (keyMissing(src)) {
-    toast(`🔑 Warstwa „${src.name}" wymaga klucza ${KEY_PROVIDERS[src.key].name} — dodaj go w menu kluczy.`);
+    toast(`Warstwa „${src.name}" wymaga klucza ${KEY_PROVIDERS[src.key].name} — dodaj go w menu kluczy.`);
     openKeysModal();
     return;
   }
@@ -176,7 +181,7 @@ function toggleOverlay(id, silent = false) {
   } else {
     if (keyMissing(src)) {
       if (!silent) {
-        toast(`🔑 Nakładka „${src.name}" wymaga klucza ${KEY_PROVIDERS[src.key].name}.`);
+        toast(`Nakładka „${src.name}" wymaga klucza ${KEY_PROVIDERS[src.key].name}.`);
         openKeysModal();
       }
       return;
@@ -206,11 +211,11 @@ function onTileError(src) {
     if (errWarned.has(src.id)) return;
     errWarned.add(src.id);
     if (src.http && location.protocol === "https:") {
-      toast(`⚠️ „${src.name}" używa http — przeglądarka blokuje ją na stronie https.`);
+      toast(`„${src.name}" używa http — przeglądarka blokuje ją na stronie https.`);
     } else if (src.home) {
-      toast(`⚠️ „${src.name}" może nie pokrywać tego obszaru — użyj ▶ przy warstwie, aby przelecieć do jej zasięgu.`);
+      toast(`„${src.name}" może nie pokrywać tego obszaru — użyj przycisku przelotu przy warstwie, aby przelecieć do jej zasięgu.`);
     } else {
-      toast(`⚠️ Kafelki „${src.name}" nie odpowiadają (serwer/zasięg/limit).`);
+      toast(`Kafelki „${src.name}" nie odpowiadają (serwer/zasięg/limit).`);
     }
   };
 }
@@ -218,11 +223,11 @@ function onTileError(src) {
 /* ───────────────────────── Profile map (presety) ───────────────────────── */
 
 const BUILTIN_PRESETS = [
-  { name: "🥾 Turystyka", base: "opentopo", overlays: ["wt-hiking"] },
-  { name: "🚴 Rower", base: "cyclosm", overlays: ["wt-cycling"] },
-  { name: "⛷️ Zima", base: "opentopo", overlays: ["wt-slopes", "opensnowmap"] },
-  { name: "🛰️ Satelita+", base: "esri-imagery", overlays: ["google-roads"] },
-  { name: "🇵🇱 Orto+działki", base: "geoportal-orto", overlays: ["gugik-dzialki"] },
+  { name: "Turystyka", icon: "peak", base: "opentopo", overlays: ["wt-hiking"] },
+  { name: "Rower", icon: "bike", base: "cyclosm", overlays: ["wt-cycling"] },
+  { name: "Zima", icon: "snow", base: "opentopo", overlays: ["wt-slopes", "opensnowmap"] },
+  { name: "Satelita+", icon: "sat", base: "esri-imagery", overlays: ["google-roads"] },
+  { name: "Orto+działki", icon: "grid", base: "geoportal-orto", overlays: ["gugik-dzialki"] },
 ];
 
 function applyPreset(p) {
@@ -233,7 +238,7 @@ function applyPreset(p) {
   }
   setBase(p.base);
   (p.overlays || []).forEach(id => { if (byId[id]) toggleOverlay(id, true); });
-  toast(`🗺️ Profil: ${p.name}`, 1800);
+  toast(`Profil: ${p.name}`, 1800);
   buzz();
 }
 
@@ -245,7 +250,7 @@ function saveCurrentPreset(name) {
   state.presets.push({ name, base: state.baseId, overlays: [...state.overlays], opacity });
   LS.set("presets", state.presets);
   renderPresets();
-  toast(`💾 Zapisano profil „${name}".`);
+  toast(`Zapisano profil „${name}".`);
 }
 
 function renderPresets() {
@@ -254,9 +259,9 @@ function renderPresets() {
   const mk = (p, removable, idx) => {
     const chip = document.createElement("button");
     chip.className = "chip";
-    chip.innerHTML = `<span>${p.name}</span>${removable ? '<i class="chip-x" title="Usuń profil">✕</i>' : ""}`;
+    chip.innerHTML = `${p.icon ? ic(p.icon, "ic-xs") : ""}<span>${esc(p.name)}</span>${removable ? `<i class="chip-x" title="Usuń profil">${ic("x", "ic-xs")}</i>` : ""}`;
     chip.addEventListener("click", e => {
-      if (e.target.classList.contains("chip-x")) {
+      if (e.target.closest(".chip-x")) {
         state.presets.splice(idx, 1);
         LS.set("presets", state.presets);
         renderPresets();
@@ -270,7 +275,7 @@ function renderPresets() {
   state.presets.forEach((p, i) => mk(p, true, i));
   const add = document.createElement("button");
   add.className = "chip chip-add";
-  add.textContent = "＋ zapisz obecny";
+  add.innerHTML = `${ic("plus", "ic-xs")} zapisz obecny`;
   add.title = "Zapisz aktualną mapę + nakładki jako profil";
   add.addEventListener("click", () => openNameModal());
   box.appendChild(add);
@@ -302,7 +307,7 @@ document.getElementById("btn-compare").addEventListener("click", () => {
   if (compare.active) { stopCompare(); return; }
   compare.selecting = true;
   document.getElementById("btn-compare").classList.add("on");
-  toast("🆚 Wybierz z listy drugą mapę do porównania…", 4200);
+  toast("Porównywanie: wybierz z listy drugą mapę do porównania…", 4200);
 });
 
 function setCompare(id) {
@@ -319,7 +324,7 @@ function setCompare(id) {
   stCompare.classList.remove("hidden");
   stCompare.querySelector("span").textContent = src.name;
   updateCompareClip();
-  toast(`🆚 Porównujesz: ${byId[state.baseId].name} | ${src.name}. Przeciągnij uchwyt.`);
+  toast(`Porównujesz: ${byId[state.baseId].name} | ${src.name}. Przeciągnij uchwyt.`);
   refreshListUI();
   if (window.innerWidth < 720) closeSidebar();
 }
@@ -371,16 +376,21 @@ map.on("resize", updateCompareClip);
 const sidebar = document.getElementById("sidebar");
 const layerList = document.getElementById("layer-list");
 
+const PSEUDO_CATS = [
+  { key: "Ulubione", icon: "star" },
+  { key: "Ostatnio używane", icon: "clock" },
+];
+
 function buildList(filter = "") {
   const q = filter.trim().toLowerCase();
   layerList.innerHTML = "";
-  const cats = ["⭐ Ulubione", "🕘 Ostatnio używane", ...CATEGORY_ORDER];
+  const cats = [...PSEUDO_CATS.map(c => c.key), ...CATEGORY_ORDER];
   let shown = 0;
 
   cats.forEach(cat => {
     let items;
-    if (cat === "⭐ Ulubione") items = MAP_SOURCES.filter(s => state.favs.has(s.id));
-    else if (cat === "🕘 Ostatnio używane")
+    if (cat === "Ulubione") items = MAP_SOURCES.filter(s => state.favs.has(s.id));
+    else if (cat === "Ostatnio używane")
       items = state.recents.map(id => byId[id]).filter(Boolean);
     else items = MAP_SOURCES.filter(s => s.cat === cat);
 
@@ -388,13 +398,14 @@ function buildList(filter = "") {
       !q || (s.name + " " + (s.desc || "") + " " + s.id).toLowerCase().includes(q));
     if (!visible.length) return;
 
+    const catMeta = PSEUDO_CATS.find(c => c.key === cat);
     const sec = document.createElement("section");
     sec.className = "cat";
     const head = document.createElement("div");
     head.className = "cat-head";
-    head.innerHTML = `<span class="cat-name">${cat}</span>
+    head.innerHTML = `<span class="cat-name">${catMeta ? ic(catMeta.icon, "ic-xs") + " " : ""}${cat}</span>
       <span class="cat-n">${visible.length}</span>
-      <button class="cat-test" title="Testuj dostępność warstw w kategorii">⚡</button>`;
+      <button class="cat-test" title="Testuj dostępność warstw w kategorii">${ic("bolt")}</button>`;
     head.querySelector(".cat-test").addEventListener("click", e => {
       e.stopPropagation();
       testCategory(visible, sec);
@@ -409,7 +420,7 @@ function buildList(filter = "") {
 
     const hasActive = visible.some(s => s.id === state.baseId || activeOverlays[s.id]);
     if (!q && !hasActive &&
-        !["⭐ Ulubione", "🕘 Ostatnio używane", "OpenStreetMap", "Topo / Outdoor"].includes(cat)) {
+        !["Ulubione", "Ostatnio używane", "OpenStreetMap", "Topo / Outdoor"].includes(cat)) {
       sec.classList.add("closed");
     }
     layerList.appendChild(sec);
@@ -430,10 +441,10 @@ function rowFor(src) {
   if (isActive) row.classList.add("active");
   if (compare.srcId === src.id) row.classList.add("comparing");
 
-  const badge = src.overlay ? "🧩" : "🗺️";
-  const lock = keyMissing(src) ? " 🔒" : "";
+  const badge = ic(src.overlay ? "layers" : "map", "ic-xs lr-type-ic");
+  const lock = keyMissing(src) ? ` ${ic("lock", "ic-xs lr-lock")}` : "";
   const httpWarn = src.http ? ` <span class="http-badge" title="Serwer tylko http">http</span>` : "";
-  const cmp = compare.srcId === src.id ? ` <span class="cmp-badge">🆚</span>` : "";
+  const cmp = compare.srcId === src.id ? ` <span class="cmp-badge">${ic("compare", "ic-xs")}</span>` : "";
 
   row.innerHTML = `
     <button class="lr-main" title="${(src.desc || "").replace(/"/g, "&quot;")}">
@@ -441,8 +452,8 @@ function rowFor(src) {
       <span class="lr-name">${src.name}${lock}${httpWarn}${cmp}</span>
       <span class="lr-dot" title="Status testu"></span>
     </button>
-    ${src.home ? `<button class="lr-home" title="Przeleć do zasięgu mapy">▶</button>` : ""}
-    <button class="lr-fav ${state.favs.has(src.id) ? "on" : ""}" title="Ulubione">★</button>
+    ${src.home ? `<button class="lr-home" title="Przeleć do zasięgu mapy">${ic("play")}</button>` : ""}
+    <button class="lr-fav ${state.favs.has(src.id) ? "on" : ""}" title="Ulubione">${ic("star")}</button>
   `;
 
   row.querySelector(".lr-main").addEventListener("click", () => {
@@ -518,7 +529,7 @@ function testTileUrl(src) {
 }
 
 function testCategory(items, sec) {
-  toast("⚡ Testuję warstwy… (zielona kropka = OK)");
+  toast("Testuję warstwy… (zielona kropka = OK)");
   items.forEach(src => {
     const dot = sec.querySelector(`.layer-row[data-id="${src.id}"] .lr-dot`);
     if (!dot) return;
@@ -557,7 +568,7 @@ function cycleBase(dir) {
   const pool = baseCycle();
   const i = pool.findIndex(s => s.id === state.baseId);
   const next = pool[(i + dir + pool.length) % pool.length];
-  if (next) { buzz(); setBase(next.id); toast(`🗺️ ${next.name}`, 1600); }
+  if (next) { buzz(); setBase(next.id); toast(`${next.name}`, 1600); }
 }
 document.getElementById("btn-prev-map").addEventListener("click", () => cycleBase(-1));
 document.getElementById("btn-next-map").addEventListener("click", () => cycleBase(1));
@@ -617,7 +628,7 @@ const stFollow = document.getElementById("st-follow");
 function toggleLocate() {
   if (watchId != null) { stopLocate(); return; }
   if (!navigator.geolocation) { toast("Brak geolokalizacji w tej przeglądarce."); return; }
-  toast("📍 Ustalam pozycję…");
+  toast("Ustalam pozycję…");
   follow = true;
   watchId = navigator.geolocation.watchPosition(onPos, err => {
     toast("Nie udało się pobrać pozycji: " + err.message);
@@ -661,9 +672,9 @@ function toggleMeasure() {
   measuring = !measuring;
   setActionState("measure", measuring);
   if (measuring) {
-    toast("📏 Klikaj na mapie, aby mierzyć. Ponowne kliknięcie przycisku kończy i czyści.");
+    toast("Pomiar: klikaj na mapie, aby mierzyć. Ponowne kliknięcie przycisku kończy i czyści.");
     stMeasure.classList.remove("hidden");
-    stMeasure.textContent = "📏 0 m";
+    stMeasure.textContent = "0 m";
   } else clearMeasure();
 }
 
@@ -683,16 +694,17 @@ function fmtDist(m) {
 /* ───────────────────────── POI — silnik ───────────────────────── */
 
 const POI_CATS = {
-  other:     { e: "⭐", n: "Ogólny",     c: "#ff7a1a" },
-  sleep:     { e: "🛏️", n: "Nocleg",     c: "#8b5cf6" },
-  food:      { e: "🍴", n: "Jedzenie",   c: "#ef4444" },
-  water:     { e: "💧", n: "Woda",       c: "#2f8cff" },
-  peak:      { e: "⛰️", n: "Szczyt",     c: "#10b981" },
-  view:      { e: "📷", n: "Widok",      c: "#f59e0b" },
-  heritage:  { e: "🏰", n: "Zabytek",    c: "#b0813f" },
-  transport: { e: "🚉", n: "Transport",  c: "#64748b" },
-  danger:    { e: "⚠️", n: "Uwaga",      c: "#e5484d" },
+  other:     { i: "star",   n: "Ogólny",    c: "#ff7a1a" },
+  sleep:     { i: "bed",    n: "Nocleg",    c: "#8b5cf6" },
+  food:      { i: "food",   n: "Jedzenie",  c: "#ef4444" },
+  water:     { i: "water",  n: "Woda",      c: "#2f8cff" },
+  peak:      { i: "peak",   n: "Szczyt",    c: "#10b981" },
+  view:      { i: "camera", n: "Widok",     c: "#f59e0b" },
+  heritage:  { i: "castle", n: "Zabytek",   c: "#b0813f" },
+  transport: { i: "train",  n: "Transport", c: "#64748b" },
+  danger:    { i: "warn",   n: "Uwaga",     c: "#e5484d" },
 };
+function catIc(cat, cls = "") { return ic(POI_CATS[cat]?.i || "star", cls); }
 const POI_COLORS = ["#ff7a1a", "#ef4444", "#f59e0b", "#10b981", "#2f8cff",
   "#8b5cf6", "#e33fa1", "#64748b"];
 
@@ -708,7 +720,6 @@ function poiColor(p) { return p.color || POI_CATS[p.cat]?.c || "#ff7a1a"; }
 
 function poiIcon(p) {
   const c = poiColor(p);
-  const e = POI_CATS[p.cat]?.e || "⭐";
   return L.divIcon({
     className: "poi-div",
     iconSize: [34, 44], iconAnchor: [17, 42], popupAnchor: [0, -40],
@@ -718,7 +729,7 @@ function poiIcon(p) {
           fill="var(--pc)" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/>
         <circle cx="17" cy="16" r="11" fill="rgba(255,255,255,.92)"/>
       </svg>
-      <span class="poi-emoji">${e}</span>
+      ${catIc(p.cat, "poi-pin-ic")}
     </div>`,
   });
 }
@@ -744,24 +755,24 @@ function openPoiPopup(mk, p) {
   const div = document.createElement("div");
   div.className = "poi-popup";
   div.innerHTML = `
-    <strong>${POI_CATS[p.cat]?.e || "⭐"} ${esc(p.name)}</strong>
+    <strong><span class="poi-cat-ic" style="--pc:${poiColor(p)}">${catIc(p.cat)}</span> ${esc(p.name)}</strong>
     ${p.note ? `<p>${esc(p.note)}</p>` : ""}
     <small>${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</small>
     <div class="poi-popup-btns">
-      <button data-a="edit">✏️ Edytuj</button>
-      <button data-a="nav">🧭 Nawiguj</button>
-      <button data-a="copy">📋</button>
-      <button data-a="del" class="danger">🗑️</button>
+      <button data-a="edit">${ic("edit")} Edytuj</button>
+      <button data-a="nav">${ic("nav")} Nawiguj</button>
+      <button data-a="copy" title="Kopiuj współrzędne">${ic("copy")}</button>
+      <button data-a="del" class="danger" title="Usuń">${ic("trash")}</button>
     </div>`;
   div.addEventListener("click", e => {
-    const a = e.target.dataset?.a;
+    const a = e.target.closest("[data-a]")?.dataset.a;
     if (!a) return;
     if (a === "edit") { map.closePopup(); openPoiEditor(p); }
     else if (a === "nav") window.open(
       `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`, "_blank");
     else if (a === "copy") {
       navigator.clipboard?.writeText(`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`);
-      toast("📋 Skopiowano współrzędne.");
+      toast("Skopiowano współrzędne.");
     } else if (a === "del") { map.closePopup(); deletePoi(p.id); }
   });
   mk.bindPopup(div, { maxWidth: 260 }).openPopup();
@@ -774,8 +785,8 @@ function deletePoi(id) {
   state.pois.splice(i, 1);
   savePois(); renderPois(); renderPoiList();
   buzz(20);
-  toast(`🗑️ Usunięto „${lastDeleted.poi.name}".`, 6000, {
-    label: "↩️ Cofnij",
+  toast(`Usunięto „${lastDeleted.poi.name}".`, 6000, {
+    label: "Cofnij",
     fn: () => {
       state.pois.splice(lastDeleted.index, 0, lastDeleted.poi);
       savePois(); renderPois(); renderPoiList();
@@ -789,7 +800,7 @@ function setPoiAddMode(on) {
   poiAddMode = on;
   setActionState("poi-add", on);
   document.getElementById("map").style.cursor = on ? "crosshair" : "";
-  if (on) toast("📌 Kliknij na mapie, aby dodać punkt (albo przytrzymaj palec).");
+  if (on) toast("Kliknij na mapie, aby dodać punkt (albo przytrzymaj palec).");
 }
 
 map.on("click", e => {
@@ -803,7 +814,7 @@ map.on("click", e => {
     let d = 0;
     for (let i = 1; i < measure.pts.length; i++)
       d += map.distance(measure.pts[i - 1], measure.pts[i]);
-    stMeasure.textContent = "📏 " + fmtDist(d);
+    stMeasure.textContent = fmtDist(d);
     return;
   }
   if (poiAddMode) {
@@ -822,19 +833,19 @@ map.on("contextmenu", e => {
   div.innerHTML = `
     <small>${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}</small>
     <div class="poi-popup-btns">
-      <button data-a="add">📌 Dodaj POI</button>
-      <button data-a="copy">📋 Kopiuj</button>
-      <button data-a="nav">🧭 Nawiguj</button>
+      <button data-a="add">${ic("pin-plus")} Dodaj POI</button>
+      <button data-a="copy">${ic("copy")} Kopiuj</button>
+      <button data-a="nav">${ic("nav")} Nawiguj</button>
     </div>`;
   const pop = L.popup({ maxWidth: 240 }).setLatLng(ll).setContent(div).openOn(map);
   div.addEventListener("click", ev => {
-    const a = ev.target.dataset?.a;
+    const a = ev.target.closest("[data-a]")?.dataset.a;
     if (!a) return;
     map.closePopup(pop);
     if (a === "add") openPoiEditor(null, ll);
     else if (a === "copy") {
       navigator.clipboard?.writeText(`${ll.lat.toFixed(6)}, ${ll.lng.toFixed(6)}`);
-      toast("📋 Skopiowano współrzędne.");
+      toast("Skopiowano współrzędne.");
     } else if (a === "nav") window.open(
       `https://www.google.com/maps/dir/?api=1&destination=${ll.lat},${ll.lng}`, "_blank");
   });
@@ -849,8 +860,8 @@ function openPoiEditor(poi, latlng) {
   pendingLatLng = poi ? { lat: poi.lat, lng: poi.lng } : latlng;
   editCat = poi ? poi.cat : "other";
   editColor = poi ? poi.color : "";
-  document.getElementById("poi-modal-title").textContent =
-    poi ? "✏️ Edytuj punkt" : "📌 Nowy punkt";
+  document.getElementById("poi-modal-title").innerHTML =
+    poi ? `${ic("edit")} Edytuj punkt` : `${ic("pin-plus")} Nowy punkt`;
   document.getElementById("poi-name").value = poi ? poi.name : "";
   document.getElementById("poi-note").value = poi ? poi.note : "";
   document.getElementById("poi-coords").textContent =
@@ -868,7 +879,7 @@ function renderPoiCatChips() {
   Object.entries(POI_CATS).forEach(([id, c]) => {
     const b = document.createElement("button");
     b.className = "chip" + (editCat === id ? " sel" : "");
-    b.textContent = `${c.e} ${c.n}`;
+    b.innerHTML = `${ic(c.i, "ic-xs")} ${c.n}`;
     b.addEventListener("click", () => { editCat = id; renderPoiCatChips(); });
     box.appendChild(b);
   });
@@ -909,7 +920,7 @@ document.getElementById("poi-save").addEventListener("click", () => {
   savePois(); renderPois(); renderPoiList();
   closeModal("poi-modal");
   buzz();
-  toast(editingPoiId ? "✏️ Zapisano zmiany." : `📌 Dodano: ${name}`);
+  toast(editingPoiId ? "Zapisano zmiany." : `Dodano: ${name}`);
 });
 
 document.getElementById("poi-delete").addEventListener("click", () => {
@@ -941,9 +952,9 @@ function renderPoiCatFilter() {
   Object.entries(POI_CATS).forEach(([id, c]) => {
     if (!state.pois.some(p => p.cat === id)) return;
     const b = document.createElement("button");
-    b.className = "chip" + (poiPanelCat === id ? " sel" : "");
-    const hidden = state.poiHiddenCats.has(id);
-    b.innerHTML = `${c.e} ${c.n}${hidden ? " 🚫" : ""}`;
+    b.className = "chip" + (poiPanelCat === id ? " sel" : "") +
+      (state.poiHiddenCats.has(id) ? " muted" : "");
+    b.innerHTML = `${ic(c.i, "ic-xs")} ${c.n}`;
     b.title = "Klik: filtruj listę · długie przytrzymanie/2× klik: ukryj na mapie";
     b.addEventListener("click", () => { poiPanelCat = id; renderPoiCatFilter(); renderPoiList(); });
     b.addEventListener("dblclick", () => {
@@ -976,8 +987,8 @@ function renderPoiList() {
     state.pois.length ? `${state.pois.length}` : "";
 
   if (!items.length) {
-    box.innerHTML = `<div class="empty">Brak punktów. Dodaj pierwszy przyciskiem 📌
-      albo przytrzymując palec na mapie.</div>`;
+    box.innerHTML = `<div class="empty">Brak punktów. Dodaj pierwszy przyciskiem
+      „+POI" albo przytrzymując palec na mapie.</div>`;
     return;
   }
   box.innerHTML = "";
@@ -985,13 +996,13 @@ function renderPoiList() {
     const row = document.createElement("div");
     row.className = "poi-row";
     row.innerHTML = `
-      <span class="poi-row-ico" style="--pc:${poiColor(p)}">${POI_CATS[p.cat]?.e || "⭐"}</span>
+      <span class="poi-row-ico" style="--pc:${poiColor(p)}">${catIc(p.cat)}</span>
       <span class="poi-row-body">
         <b>${esc(p.name)}</b>
         ${p.note ? `<small>${esc(p.note.slice(0, 60))}${p.note.length > 60 ? "…" : ""}</small>` : ""}
       </span>
       <span class="poi-row-dist">${fmtDist(d)}</span>
-      <button class="poi-row-edit" title="Edytuj">✏️</button>`;
+      <button class="poi-row-edit" title="Edytuj">${ic("edit")}</button>`;
     row.querySelector(".poi-row-body").addEventListener("click", () => {
       closeModal("poi-panel");
       map.flyTo([p.lat, p.lng], Math.max(map.getZoom(), 15));
@@ -1027,7 +1038,7 @@ document.getElementById("poi-export-gpx").addEventListener("click", () => {
 <gpx version="1.1" creator="Trasa" xmlns="http://www.topografix.com/GPX/1/1">
 ${wpts}
 </gpx>`);
-  toast(`💾 Wyeksportowano ${state.pois.length} punktów (GPX).`);
+  toast(`Wyeksportowano ${state.pois.length} punktów (GPX).`);
 });
 
 document.getElementById("poi-export-json").addEventListener("click", () => {
@@ -1041,7 +1052,7 @@ document.getElementById("poi-export-json").addEventListener("click", () => {
     })),
   };
   download("trasa-poi.geojson", "application/geo+json", JSON.stringify(gj, null, 2));
-  toast(`💾 Wyeksportowano ${state.pois.length} punktów (GeoJSON).`);
+  toast(`Wyeksportowano ${state.pois.length} punktów (GeoJSON).`);
 });
 
 document.getElementById("poi-import").addEventListener("change", e => {
@@ -1083,9 +1094,9 @@ document.getElementById("poi-import").addEventListener("change", e => {
       }
       if (!n) throw new Error("brak punktów");
       savePois(); renderPois(); renderPoiCatFilter(); renderPoiList();
-      toast(`📂 Zaimportowano ${n} punktów.`);
+      toast(`Zaimportowano ${n} punktów.`);
     } catch (err) {
-      toast(`❌ Nie udało się zaimportować: ${err.message}`);
+      toast(`Nie udało się zaimportować: ${err.message}`);
     }
   };
   rd.readAsText(f);
@@ -1158,11 +1169,11 @@ function importGpx(xmlText, fname) {
       map.fitBounds(group.getBounds(), { padding: [40, 40] });
     }
     if (wptAsPoi && nWpt) { savePois(); renderPois(); }
-    status.textContent = `✅ ${fname}: ${nTrk} tras, ${nWpt} punktów${wptAsPoi && nWpt ? " (dopisano do POI)" : ""}.`;
+    status.textContent = `${fname}: ${nTrk} tras, ${nWpt} punktów${wptAsPoi && nWpt ? " (dopisano do POI)" : ""}.`;
     closeModal("gpx-modal");
-    toast(`🛰️ Wczytano ${fname}`);
+    toast(`Wczytano ${fname}`);
   } catch (err) {
-    status.textContent = `❌ Nie udało się wczytać ${fname} (${err.message}).`;
+    status.textContent = `Nie udało się wczytać ${fname} (${err.message}).`;
   }
 }
 
@@ -1204,7 +1215,7 @@ document.getElementById("keys-save").addEventListener("click", () => {
   });
   LS.set("keys", state.keys);
   closeModal("keys-modal");
-  toast("🔑 Zapisano klucze.");
+  toast("Zapisano klucze.");
   if (byId[state.baseId].key) setBase(state.baseId);
   Object.keys(activeOverlays).forEach(id => {
     if (byId[id].key) { toggleOverlay(id); toggleOverlay(id); }
