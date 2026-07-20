@@ -55,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('error', 'Nieprawidłowy e-mail do powiadomień.');
         } else {
             $pdo->prepare('UPDATE clients SET name = ?, company = ?, fb_page_id = ?, fb_page_token = ?,
-                             fb_ad_account_id = ?, fb_ads_token = ?, notify_email = ?, outbound_url = ?, active = ? WHERE id = ?')
+                             fb_ad_account_id = ?, fb_ads_token = ?, notify_email = ?, outbound_url = ?,
+                             industry = ?, city = ?, offer = ?, active = ? WHERE id = ?')
                 ->execute([
                     $name,
                     trim((string)($_POST['company'] ?? '')),
@@ -65,6 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     trim((string)($_POST['fb_ads_token'] ?? '')),
                     $notify,
                     trim((string)($_POST['outbound_url'] ?? '')),
+                    trim((string)($_POST['industry'] ?? '')),
+                    trim((string)($_POST['city'] ?? '')),
+                    trim((string)($_POST['offer'] ?? '')),
                     isset($_POST['active']) ? 1 : 0,
                     $id,
                 ]);
@@ -175,6 +179,15 @@ ui_flash();
           </label>
           <label>E-mail klienta do powiadomień o nowych leadach
             <input type="email" name="notify_email" value="<?= e($c['notify_email'] ?? '') ?>" maxlength="200" placeholder="puste = bez powiadomień">
+          </label>
+          <label>Branża (do generatora postów)
+            <input type="text" name="industry" value="<?= e($c['industry'] ?? '') ?>" maxlength="100" placeholder="np. fryzjerska, budowlana, beauty">
+          </label>
+          <label>Miasto
+            <input type="text" name="city" value="<?= e($c['city'] ?? '') ?>" maxlength="100" placeholder="np. Brusy">
+          </label>
+          <label>Oferta / usługa (jedno zdanie do postów)
+            <input type="text" name="offer" value="<?= e($c['offer'] ?? '') ?>" maxlength="200" placeholder="np. strzyżenie męskie i brody — bez czekania">
           </label>
           <label>Wychodzący webhook (ApixDrive / Make — catch hook; każdy nowy lead poleci POST-em)
             <input type="url" name="outbound_url" value="<?= e($c['outbound_url'] ?? '') ?>" maxlength="300" placeholder="https://…apix-drive.com/… (puste = wyłączone)">

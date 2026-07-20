@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-const CRM_VERSION  = '2.0.0';
+const CRM_VERSION  = '2.1.0';
 const CRM_DB_PATH  = __DIR__ . '/data/crm.sqlite';
 const CRM_PER_PAGE = 25;
 
@@ -156,6 +156,23 @@ function crm_migrate(PDO $pdo): void
     )
     SQL);
 
+    $pdo->exec(<<<'SQL'
+    CREATE TABLE IF NOT EXISTS posts (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id  INTEGER NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+        month      TEXT NOT NULL DEFAULT '',
+        publish_at TEXT NOT NULL DEFAULT '',
+        archetype  TEXT NOT NULL DEFAULT '',
+        body       TEXT NOT NULL DEFAULT '',
+        status     TEXT NOT NULL DEFAULT 'szkic',
+        fb_post_id TEXT NOT NULL DEFAULT '',
+        error      TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+    )
+    SQL);
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_posts_client ON posts(client_id, month)');
+
     // migracje — dodawane kolumny (błąd "duplicate column" ignorujemy)
     foreach ([
         "ALTER TABLE clients ADD COLUMN notify_email TEXT NOT NULL DEFAULT ''",
@@ -166,6 +183,9 @@ function crm_migrate(PDO $pdo): void
         "ALTER TABLE notes ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''",
         "ALTER TABLE clients ADD COLUMN slug TEXT NOT NULL DEFAULT ''",
         "ALTER TABLE clients ADD COLUMN outbound_url TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN industry TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN city TEXT NOT NULL DEFAULT ''",
+        "ALTER TABLE clients ADD COLUMN offer TEXT NOT NULL DEFAULT ''",
     ] as $sql) {
         try {
             $pdo->exec($sql);

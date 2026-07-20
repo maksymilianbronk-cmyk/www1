@@ -18,6 +18,7 @@
  */
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/lib/contentforge.php';
 
 if (PHP_SAPI !== 'cli') {
     $key = (string)($_SERVER['HTTP_X_CRON_KEY'] ?? $_GET['key'] ?? '');
@@ -124,6 +125,26 @@ foreach ($clients as $c) {
 
 if ($report['clients_synced'] > 0 || $report['campaigns'] > 0) {
     setting_set('ads_last_sync', date('Y-m-d H:i:s'));
+    bump_rev();
+}
+
+/* ── 1b. Publikacja zaplanowanych postów na Facebooku ── */
+$report['posts_published'] = 0;
+$due = $pdo->query("SELECT posts.*, clients.id AS cid FROM posts
+                    JOIN clients ON clients.id = posts.client_id AND clients.active = 1
+                    WHERE posts.status = 'gotowy' AND posts.publish_at <= datetime('now','localtime')
+                    ORDER BY posts.publish_at LIMIT 25")->fetchAll();
+foreach ($due as $post) {
+    $st = $pdo->prepare('SELECT * FROM clients WHERE id = ?');
+    $st->execute([(int)$post['cid']]);
+    $cRow = $st->fetch();
+    if ($cRow && fb_publish_post($pdo, $cRow, $post)) {
+        $report['posts_published']++;
+    } else {
+        $report['errors'][] = 'Post #' . $post['id'] . ': publikacja nieudana (szczegóły w panelu).';
+    }
+}
+if ($due) {
     bump_rev();
 }
 

@@ -11,6 +11,7 @@
  */
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/lib/contentforge.php';
 
 crm_session_start();
 $admin  = current_admin();
@@ -113,6 +114,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         json_out(['ok' => true, 'rev' => state_rev()]);
     }
 
+    /* ── Posty (plan treści) ── */
+    if ($action === 'posts-generate') {
+        if (!$isAdmin) {
+            json_out(['ok' => false, 'error' => 'forbidden'], 403);
+        }
+        $cid   = (int)($in['client_id'] ?? 0);
+        $month = (string)($in['month'] ?? '');
+        $count = (int)($in['count'] ?? 12);
+        if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+            json_out(['ok' => false, 'error' => 'month'], 400);
+        }
+        $st = $pdo->prepare('SELECT * FROM clients WHERE id = ?');
+        $st->execute([$cid]);
+        $clientRow = $st->fetch();
+        if (!$clientRow) {
+            json_out(['ok' => false, 'error' => 'client'], 404);
+        }
+        // kolejna generacja = świeży wariant (attempt rośnie), stare szkice miesiąca znikają
+        $st = $pdo->prepare("SELECT COUNT(*) FROM posts WHERE client_id = ? AND month = ?");
+        $st->execute([$cid, $month]);
+        $attempt = (int)$st->fetchColumn() > 0 ? (int)(microtime(true)) % 100000 : 1;
+        $pdo->prepare("DELETE FROM posts WHERE client_id = ? AND month = ? AND status = 'szkic'")
+            ->execute([$cid, $month]);
+        $ins = $pdo->prepare("INSERT INTO posts (client_id, month, publish_at, archetype, body, updated_at)
+                              VALUES (?,?,?,?,?, datetime('now','localtime'))");
+        $made = 0;
+        foreach (forge_generate($pdo, $clientRow, $month, $count, $attempt) as $p) {
+            $ins->execute([$cid, $month, $p['publish_at'], $p['archetype'], $p['body']]);
+            $made++;
+        }
+        bump_rev();
+        json_out(['ok' => true, 'generated' => $made, 'rev' => state_rev()]);
+    }
+
+    if (in_array($action, ['post-update', 'post-delete', 'post-publish'], true)) {
+        $id = (int)($in['id'] ?? 0);
+        $st = $pdo->prepare('SELECT * FROM posts WHERE id = ?');
+        $st->execute([$id]);
+        $post = $st->fetch();
+        if (!$post || (!$isAdmin && (int)$post['client_id'] !== $clientId)) {
+            json_out(['ok' => false, 'error' => 'not-found'], 404);
+        }
+
+        if ($action === 'post-delete') {
+            if (!$isAdmin) {
+                json_out(['ok' => false, 'error' => 'forbidden'], 403);
+            }
+            $pdo->prepare('DELETE FROM posts WHERE id = ?')->execute([$id]);
+            bump_rev();
+            json_out(['ok' => true, 'rev' => state_rev()]);
+        }
+
+        if ($action === 'post-publish') { // natychmiastowa publikacja (tylko admin)
+            if (!$isAdmin) {
+                json_out(['ok' => false, 'error' => 'forbidden'], 403);
+            }
+            $st = $pdo->prepare('SELECT * FROM clients WHERE id = ?');
+            $st->execute([(int)$post['client_id']]);
+            $ok = fb_publish_post($pdo, $st->fetch() ?: [], $post);
+            bump_rev();
+            json_out(['ok' => $ok, 'rev' => state_rev()]);
+        }
+
+        // post-update: treść / termin (admin) oraz status (admin i klient)
+        $body   = array_key_exists('body', $in) && $isAdmin
+            ? mb_substr(trim((string)$in['body']), 0, 5000) : (string)$post['body'];
+        $when   = array_key_exists('publish_at', $in) && $isAdmin
+            ? (string)$in['publish_at'] : (string)$post['publish_at'];
+        $status = array_key_exists('status', $in) ? (string)$in['status'] : (string)$post['status'];
+        // klient może tylko akceptować szkic (gotowy) lub cofać akceptację
+        if (!$isAdmin && !in_array($status, ['szkic', 'gotowy'], true)) {
+            json_out(['ok' => false, 'error' => 'status'], 400);
+        }
+        if (!in_array($status, ['szkic', 'gotowy', 'opublikowany', 'blad'], true)
+            || $body === '' || !preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/', $when)) {
+            json_out(['ok' => false, 'error' => 'input'], 400);
+        }
+        $pdo->prepare("UPDATE posts SET body = ?, publish_at = ?, status = ?, error = '',
+                         updated_at = datetime('now','localtime') WHERE id = ?")
+            ->execute([$body, $when, $status, $id]);
+        bump_rev();
+        json_out(['ok' => true, 'rev' => state_rev()]);
+    }
+
     json_out(['ok' => false, 'error' => 'action'], 400);
 }
 
@@ -170,6 +255,29 @@ function rows_notes(PDO $pdo, bool $isAdmin, ?int $clientId): array
         $r['id']        = (int)$r['id'];
         $r['client_id'] = (int)$r['client_id'];
         $r['pinned']    = (int)$r['pinned'];
+    }
+    return $rows;
+}
+
+/* Posty: okno 3 miesięcy (poprzedni..następny), zawsze w komplecie. */
+function rows_posts(PDO $pdo, bool $isAdmin, ?int $clientId): array
+{
+    $sql = "SELECT id, client_id, month, publish_at, archetype, body, status, fb_post_id, error, updated_at
+            FROM posts
+            WHERE month >= strftime('%Y-%m', 'now', 'localtime', '-1 months')
+              AND month <= strftime('%Y-%m', 'now', 'localtime', '+1 months')";
+    $params = [];
+    if (!$isAdmin) {
+        $sql     .= ' AND client_id = ?';
+        $params[] = $clientId;
+    }
+    $sql .= ' ORDER BY publish_at LIMIT 400';
+    $st = $pdo->prepare($sql);
+    $st->execute($params);
+    $rows = $st->fetchAll();
+    foreach ($rows as &$r) {
+        $r['id']        = (int)$r['id'];
+        $r['client_id'] = (int)$r['client_id'];
     }
     return $rows;
 }
@@ -255,6 +363,7 @@ if ($action === 'bootstrap') {
         'leads'     => rows_leads($pdo, $isAdmin, $clientId),
         'notes'     => rows_notes($pdo, $isAdmin, $clientId),
         'campaigns' => rows_campaigns($pdo, $isAdmin, $clientId),
+        'posts'     => rows_posts($pdo, $isAdmin, $clientId),
         'totals'    => lead_totals($pdo, $isAdmin, $clientId),
         'ads_last_sync' => setting_get('ads_last_sync'),
     ];
@@ -277,6 +386,7 @@ if ($action === 'delta') {
         'lead_ids'  => lead_ids($pdo, $isAdmin, $clientId),
         'notes'     => rows_notes($pdo, $isAdmin, $clientId),
         'campaigns' => rows_campaigns($pdo, $isAdmin, $clientId),
+        'posts'     => rows_posts($pdo, $isAdmin, $clientId),
         'totals'    => lead_totals($pdo, $isAdmin, $clientId),
         'ads_last_sync' => setting_get('ads_last_sync'),
     ];

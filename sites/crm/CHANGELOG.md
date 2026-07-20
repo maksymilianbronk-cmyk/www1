@@ -1,5 +1,28 @@
 # Historia zmian — LeadFlow CRM
 
+## v2.1.0 (2026-07-21) — REAKTOR ContentForge
+
+- ✍️ **ContentForge — autorski generator miesięcznych planów postów**:
+  łączy trzy źródła — DANE Z CRM KLIENTA (realna liczba leadów, wygrane,
+  nazwy kampanii trafiają do treści jako social proof), kalendarz
+  marketingowy PL (święta i dni nietypowe) oraz bank archetypów
+  (edukacja, promocja, kulisy, FAQ, CTA leadowe) × rotowane hooki.
+  Deterministyczny PRNG (mulberry32): ta sama próba = ten sam plan,
+  kolejna generacja = świeży wariant. Złote godziny publikacji,
+  równomierny rozkład dni, guardy jakości (nie chwalimy się 2 leadami).
+- 📅 **Zakładka „Posty”**: plan miesiąca pogrupowany dniami, statusy
+  szkic → zaakceptowany → opublikowany/błąd, edycja i „Publikuj teraz”
+  (admin), akceptacja jednym klikiem (klient), na żywo w obu panelach.
+- 🤖 **Automatyczna publikacja na Facebooku**: cron publikuje
+  zaakceptowane posty o zaplanowanej godzinie przez Graph API
+  (token strony, uprawnienie pages_manage_posts); fb_post_id i błędy
+  wracają do panelu. Baza Graph API konfigurowalna (sandbox/testy).
+- 🧑‍🎨 Profil treści klienta: branża, miasto, oferta (paliwo generatora).
+- ⚙️ Szlif silnika: renderowanie batchowane przez requestAnimationFrame,
+  adaptacyjny odstęp long-polla (0,8→3 s przy bezczynności), timeout API
+  15 s, automatyczne wykrycie nowej wersji po deployu MCP (toast+reload).
+
+
 ## v2.0.0 (2026-07-20) — silnik REAKTOR ⚛
 
 - 🚀 **Deploy przez MCP** (`deploy.php`): zdalna podmiana wszystkich plików

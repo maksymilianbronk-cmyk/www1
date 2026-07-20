@@ -377,4 +377,106 @@ function viewNotatki(s, ui) {
     <p>Jeszcze nie ma notatek — napisz pierwszą.</p></div>` : ''}`;
 }
 
-R.views = { leady: viewLeady, reklamy: viewReklamy, stats: viewStats, notatki: viewNotatki };
+/* ── Widok: POSTY (plan treści — REAKTOR ContentForge) ── */
+
+const POST_STATUS = {
+  szkic:        ['Szkic', 'warn'],
+  gotowy:       ['Zaakceptowany', 'ok2'],
+  opublikowany: ['Opublikowany', 'ok'],
+  blad:         ['Błąd publikacji', 'err'],
+};
+
+function monthShift(month, delta) {
+  const [y, m] = month.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function postCard(s, ui, p, isAdmin) {
+  const [label, cls] = POST_STATUS[p.status] || [p.status, 'mut'];
+  const editing = ui.editPost === p.id;
+  const time = String(p.publish_at).slice(11, 16);
+  const canApprove = p.status === 'szkic';
+  const canRevoke  = p.status === 'gotowy';
+  return `<div class="post-card post-${esc(p.status)}" data-key="p-${p.id}">
+    <div class="post-head">
+      <span class="post-time">${ico('clock', 13)} ${esc(time)}</span>
+      <span class="post-arch">${esc(p.archetype)}</span>
+      <span class="spacer"></span>
+      <span class="fbst fbst-${cls === 'ok2' ? 'ok' : cls}">${esc(label)}</span>
+    </div>
+    ${editing
+      ? `<textarea class="post-edit" id="post-edit-${p.id}" rows="7">${esc(p.body)}</textarea>
+         <div class="post-actions">
+           <button class="btn btn-sm" onclick="R.postAction(${p.id},{body:document.getElementById('post-edit-${p.id}').value.trim()})">${ico('check', 14)} Zapisz</button>
+           <button class="btn btn-sm btn-ghost" onclick="R.ui.editPost=0;R.render()">${ico('x', 14)} Anuluj</button>
+         </div>`
+      : `<div class="post-body">${esc(p.body)}</div>
+         ${p.error ? `<div class="post-error">${ico('x', 13)} ${esc(p.error)}</div>` : ''}
+         ${p.fb_post_id ? `<div class="post-fbid">${ico('facebook', 13)} ID posta: ${esc(p.fb_post_id)}</div>` : ''}
+         <div class="post-actions">
+           ${canApprove ? `<button class="btn btn-sm" onclick="R.postAction(${p.id},{status:'gotowy'})">${ico('check', 14)} Akceptuj</button>` : ''}
+           ${canRevoke ? `<button class="btn btn-sm btn-ghost" onclick="R.postAction(${p.id},{status:'szkic'})">${ico('refresh', 14)} Cofnij akceptację</button>` : ''}
+           ${isAdmin && p.status !== 'opublikowany' ? `
+             <button class="btn btn-sm btn-ghost" onclick="R.ui.editPost=${p.id};R.render()">${ico('pencil', 14)} Edytuj</button>
+             <button class="btn btn-sm btn-ghost" title="Opublikuj teraz na Facebooku"
+               onclick="if(confirm('Opublikować ten post na Facebooku TERAZ?'))R.publishPost(${p.id})">${ico('send', 14)} Publikuj teraz</button>
+             <button class="btn btn-sm btn-danger" onclick="if(confirm('Usunąć post?'))R.deletePost(${p.id})">${ico('trash', 14)}</button>` : ''}
+         </div>`}
+  </div>`;
+}
+
+function viewPosty(s, ui) {
+  const isAdmin = s.role === 'admin';
+  const nowMonth = (s.now || '').slice(0, 7) || new Date().toISOString().slice(0, 7);
+  const month = ui.postMonth || nowMonth;
+  const cid = isAdmin ? (ui.postClient || (s.clients[0] && s.clients[0].id) || 0) : (s.user.id || 0);
+
+  const posts = (s.posts || []).filter(p => p.month === month && p.client_id === cid);
+  const byDay = {};
+  for (const p of posts) (byDay[String(p.publish_at).slice(0, 10)] = byDay[String(p.publish_at).slice(0, 10)] || []).push(p);
+  const days = Object.keys(byDay).sort();
+
+  const monthLabel = new Date(month + '-01T00:00:00').toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+  const drafts = posts.filter(p => p.status === 'szkic').length;
+  const ready  = posts.filter(p => p.status === 'gotowy').length;
+  const pub    = posts.filter(p => p.status === 'opublikowany').length;
+
+  const clientSel = isAdmin ? `<select onchange="R.ui.postClient=+this.value;R.render()">
+      ${(s.clients || []).map(c => `<option value="${c.id}" ${cid === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}
+    </select>` : '';
+
+  const nav = `<div class="post-monthnav">
+      <button class="btn btn-sm btn-ghost" onclick="R.ui.postMonth='${monthShift(month, -1)}';R.render()">‹</button>
+      <span class="post-month">${esc(monthLabel)}</span>
+      <button class="btn btn-sm btn-ghost" onclick="R.ui.postMonth='${monthShift(month, 1)}';R.render()">›</button>
+    </div>`;
+
+  const genBar = isAdmin ? `<div class="post-genbar">
+      <label class="muted">Liczba postów
+        <input type="number" id="gen-count" min="4" max="24" value="12">
+      </label>
+      <button class="btn" onclick="R.generatePosts(${cid},'${month}',+document.getElementById('gen-count').value||12)">
+        ${ico('sparkles', 15)} ${posts.length ? 'Wygeneruj nowy wariant szkiców' : 'Wygeneruj plan ContentForge'}</button>
+      <span class="muted post-genhint">Generator personalizuje posty danymi z CRM klienta (leady, wygrane, kampanie),
+        kalendarzem świąt i bankiem archetypów. Szkice → akceptacja → cron publikuje na Facebooku o zaplanowanej godzinie.</span>
+    </div>` : '';
+
+  return `<div class="page-head"><h1>${ico('calendar', 22)} Plan postów ${isAdmin ? '— ' + esc(clientById(s, cid)?.name || '') : ''}</h1></div>
+  <div class="filters">${clientSel}${nav}
+    <span class="spacer"></span>
+    <span class="post-counts">${drafts} szkiców · ${ready} zaakceptowanych · ${pub} opublikowanych</span>
+  </div>
+  ${genBar}
+  ${days.length ? days.map(day => `
+    <div class="post-day" data-key="d-${day}">
+      <div class="post-day-label">${new Date(day + 'T12:00:00').toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+      <div class="post-day-grid">${byDay[day].map(p => postCard(s, ui, p, isAdmin)).join('')}</div>
+    </div>`).join('')
+  : `<div class="empty-state"><div class="empty-icon">${ico('calendar', 42)}</div>
+      <p>Brak planu na ${esc(monthLabel)}.</p>
+      ${isAdmin ? '<p class="empty-hint">Kliknij „Wygeneruj plan ContentForge" powyżej.</p>'
+                : '<p class="empty-hint">Twoja agencja przygotuje go wkrótce.</p>'}</div>`}`;
+}
+
+R.views = { leady: viewLeady, reklamy: viewReklamy, posty: viewPosty, stats: viewStats, notatki: viewNotatki };

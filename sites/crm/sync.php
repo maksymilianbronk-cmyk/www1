@@ -34,7 +34,7 @@ $deadline = time() + $window;
 do {
     $rev = state_rev();
     if ($rev !== $clientRev) {
-        json_out(['ok' => true, 'changed' => true, 'rev' => $rev]);
+        json_out(['ok' => true, 'changed' => true, 'rev' => $rev, 'ver' => CRM_VERSION]);
     }
     if (connection_aborted()) {
         exit;
@@ -42,4 +42,4 @@ do {
     usleep(1000000);
 } while (time() < $deadline);
 
-json_out(['ok' => true, 'changed' => false, 'rev' => $clientRev]);
+json_out(['ok' => true, 'changed' => false, 'rev' => $clientRev, 'ver' => CRM_VERSION]);

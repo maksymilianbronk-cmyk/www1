@@ -34,6 +34,8 @@ const CRM_ICONS = [
     'facebook' => '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
     'box'      => '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
     'clock'    => '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    'calendar' => '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
+    'sparkles' => '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>',
     'mail'     => '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
     'key'      => '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3-3.5 3.5"/>',
     'shield'   => '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
@@ -66,6 +68,7 @@ function ui_app_shell(string $role, string $userName, int $uid = 0): void
     $isAdmin = $role === 'admin';
     $nav = '<a href="#/leady" data-route="leady">' . svg_icon('inbox') . ' Leady</a>'
          . '<a href="#/reklamy" data-route="reklamy">' . svg_icon('megaphone') . ' Reklamy</a>'
+         . '<a href="#/posty" data-route="posty">' . svg_icon('calendar') . ' Posty</a>'
          . '<a href="#/stats" data-route="stats">' . svg_icon('chart') . ' Statystyki</a>'
          . '<a href="#/notatki" data-route="notatki">' . svg_icon('note') . ' Notatki</a>';
     if ($isAdmin) {
@@ -73,7 +76,7 @@ function ui_app_shell(string $role, string $userName, int $uid = 0): void
               . '<a href="clients.php">' . svg_icon('users') . ' Klienci</a>'
               . '<a href="settings.php">' . svg_icon('gear') . ' Ustawienia</a>';
     }
-    $boot = json_encode(['role' => $role, 'uid' => $uid, 'csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_APOS);
+    $boot = json_encode(['role' => $role, 'uid' => $uid, 'ver' => CRM_VERSION, 'csrf' => csrf_token()], JSON_HEX_TAG | JSON_HEX_APOS);
     $icons = json_encode(['paths' => CRM_ICONS, 'filled' => ['bolt', 'facebook']], JSON_HEX_TAG | JSON_HEX_APOS);
     echo '<!DOCTYPE html>
 <html lang="pl">

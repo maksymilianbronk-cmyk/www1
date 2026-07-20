@@ -131,12 +131,13 @@ function morphAttrs(from, to) {
 
 /* ── Rdzeń ── */
 const R = {
-  state: { leads: [], notes: [], campaigns: [], clients: [], totals: {}, statuses: {}, sources: {},
+  state: { leads: [], notes: [], campaigns: [], clients: [], posts: [], totals: {}, statuses: {}, sources: {},
            user: {}, role: '', now: '', ads_last_sync: '' },
   rev: 0,
   csrf: '',
   ui: { open: 0, q: '', client: 0, status: '', source: '', noteClient: 0,
         editNote: 0, paletteFor: 0, noteColor: '',
+        postClient: 0, postMonth: '', editPost: 0,
         sound: localStorage.getItem('rk_sound') !== '0' },
   views: {},          // rejestrowane przez views.js
   container: null,
@@ -188,7 +189,7 @@ const R = {
 
   applySnapshot(d) {
     const prevMax = this.ready ? Math.max(0, ...this.state.leads.map(l => l.id)) : null;
-    for (const k of ['leads', 'notes', 'campaigns', 'clients', 'totals', 'statuses', 'sources', 'user', 'role', 'now', 'ads_last_sync']) {
+    for (const k of ['leads', 'notes', 'campaigns', 'clients', 'posts', 'totals', 'statuses', 'sources', 'user', 'role', 'now', 'ads_last_sync']) {
       if (d[k] !== undefined) this.state[k] = d[k];
     }
     this.rev = d.rev;
@@ -216,6 +217,7 @@ const R = {
       this.state.notes = [...pending, ...d.notes];
     }
     if (d.campaigns) this.state.campaigns = d.campaigns;
+    if (d.posts) this.state.posts = d.posts;
     if (d.clients) this.state.clients = d.clients;
     if (d.totals) this.state.totals = d.totals;
     if (d.now) this.state.now = d.now;
@@ -254,13 +256,19 @@ const R = {
         if (r.status === 401) { location.href = 'login.php'; return; }
         const d = await r.json();
         this.setOnline(true);
+        if (d.ver && window.REAKTOR.ver && d.ver !== window.REAKTOR.ver) {
+          this.toast('Nowa wersja systemu — odświeżam…', 'info');
+          setTimeout(() => location.reload(), 1500);
+          return;
+        }
         if (d.changed) {
           const since = encodeURIComponent(this.state.now || '1970-01-01 00:00:00');
           const dr = await fetch('api.php?a=delta&since=' + since);
           const dd = await dr.json();
           if (dd.ok) this.merge(dd);
         }
-        await new Promise(res => setTimeout(res, 800));
+        this._idle = d.changed ? 0 : Math.min((this._idle || 0) + 1, 8);
+        await new Promise(res => setTimeout(res, 800 + this._idle * 300));
       } catch {
         this.setOnline(false);
         await new Promise(res => setTimeout(res, 6000));
@@ -278,11 +286,15 @@ const R = {
   /* mutacje optymistyczne */
   async api(action, payload, retried = false) {
     try {
+      const ctrl = new AbortController();
+      const tt = setTimeout(() => ctrl.abort(), 15000);
       const r = await fetch('api.php?a=' + action, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF': this.csrf },
         body: JSON.stringify(payload),
+        signal: ctrl.signal,
       });
+      clearTimeout(tt);
       const d = await r.json().catch(() => ({}));
       if (!d.ok) {
         // sesja zalogowana ponownie w innej karcie → świeży token i jedna ponowna próba
@@ -336,6 +348,37 @@ const R = {
     this.api('note-delete', { id });
   },
 
+  /* Plan postów (ContentForge) */
+  postAction(id, patch) {
+    const p = this.state.posts.find(x => x.id === id);
+    if (!p) return;
+    Object.assign(p, patch, { error: '' });
+    this.ui.editPost = 0;
+    this.persist(); this.render();
+    this.api('post-update', { id, ...patch });
+  },
+
+  deletePost(id) {
+    this.state.posts = this.state.posts.filter(p => p.id !== id);
+    this.persist(); this.render();
+    this.api('post-delete', { id });
+  },
+
+  async publishPost(id) {
+    const p = this.state.posts.find(x => x.id === id);
+    if (p) { p.status = 'opublikowany'; this.render(); }
+    const d = await this.api('post-publish', { id });
+    if (!d) return;
+    if (!d.ok) this.toast('Publikacja nieudana — sprawdź token strony klienta.', 'err');
+    else this.toast('Post opublikowany na Facebooku.', 'new');
+  },
+
+  async generatePosts(clientId, month, count) {
+    this.toast('ContentForge układa plan postów…', 'info');
+    const d = await this.api('posts-generate', { client_id: clientId, month, count });
+    if (d) this.toast('Wygenerowano ' + d.generated + ' postów — przejrzyj i zaakceptuj.', 'new');
+  },
+
   toggleSound(btn) {
     this.ui.sound = !this.ui.sound;
     localStorage.setItem('rk_sound', this.ui.sound ? '1' : '0');
@@ -357,7 +400,12 @@ const R = {
     return this.views[h] ? h : 'leady';
   },
 
-  render() {
+  render() { // koalescencja: dowolna liczba wywołań w jednej klatce = jeden morph
+    if (this._raf) return;
+    this._raf = requestAnimationFrame(() => { this._raf = 0; this.renderNow(); });
+  },
+
+  renderNow() {
     if (!this.container) return;
     const route = this.route();
     document.querySelectorAll('.mainnav a[data-route]').forEach(a =>

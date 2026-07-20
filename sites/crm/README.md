@@ -229,6 +229,25 @@ i bazy, rollback jedną komendą. Szczegóły: skill `.claude/skills/reaktor-mcp
 
 ---
 
+## 3g. ContentForge — automatyczne posty i publikacja na Facebooku
+
+Zakładka **Posty** generuje miesięczny plan treści dla klienta (4–24 postów)
+autorską techniką: szablony archetypów (edukacja, promocja, kulisy, FAQ,
+CTA leadowe) są personalizowane **prawdziwymi danymi z CRM** (liczba leadów,
+wygrane, nazwy kampanii), kalendarzem świąt PL i profilem klienta
+(**Klienci → branża, miasto, oferta** — uzupełnij je przed generacją!).
+
+Przepływ: **admin generuje szkice → klient (lub admin) akceptuje → cron
+publikuje** na stronie FB o zaplanowanej „złotej godzinie” przez Graph API.
+Wymagania publikacji: ID strony + token strony z uprawnieniem
+`pages_manage_posts` (ten sam token co dla Lead Ads może je zawierać).
+Status, ID posta na FB i ewentualny błąd wracają do panelu na żywo.
+„Publikuj teraz” (admin) omija harmonogram. Kolejna generacja tego samego
+miesiąca tworzy świeży wariant szkiców — zaakceptowane i opublikowane
+posty zostają nietknięte.
+
+---
+
 ## 4. Powiadomienia e-mail
 
 CRM wysyła powiadomienie natychmiast po odebraniu leada (funkcją `mail()`
