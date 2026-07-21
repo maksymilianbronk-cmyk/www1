@@ -43,6 +43,11 @@ www1/
   danego sprzedawcy Allegro (fan-out wyszukiwań web + walidacja slugów,
   fallback na wyszukiwanie w profilu) i generuje karty produktów skryptem
   `gen_prod_cards.py`. Użyj przy prośbach typu „podlinkuj aukcje z Allegro".
+- **`zrodla-map`** (`.claude/skills/zrodla-map/`) — wyszukiwanie, weryfikacja
+  i dodawanie źródeł map (XYZ/WMS/WMTS/ArcGIS REST) do aplikacji Trasa
+  (`sites/podroze-mapy`), z rejestrem znanych endpointów i pułapek układów
+  współrzędnych (`references/zrodla.md`). Użyj przy „dodaj mapę", „napraw
+  warstwę", „sprawdź czy mapa działa".
 
 ## Zasady
 
