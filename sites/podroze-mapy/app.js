@@ -166,6 +166,30 @@ const WikimapiaLayer = L.TileLayer.extend({
   },
 });
 
+/* ArcGIS REST „Export Map" — serwer przeprojektowuje obraz do EPSG:3857,
+   więc działają nim usługi Geoportalu publikowane natywnie w EPSG:2180
+   (Cieniowanie/Hipsometria REST z drzewka geoportalu). */
+function esriExportUrl(src, x, y, z) {
+  const EXT = 20037508.342789244;
+  const n = 2 ** z, size = (2 * EXT) / n;
+  const minx = -EXT + x * size, maxx = minx + size;
+  const maxy = EXT - y * size, miny = maxy - size;
+  const p = new URLSearchParams({
+    f: "image", format: "png32",
+    transparent: src.esri?.transparent ? "true" : "false",
+    size: "256,256", dpi: "96",
+    bboxSR: "3857", imageSR: "3857",
+    bbox: [minx, miny, maxx, maxy].join(","),
+  });
+  if (src.esri?.layers) p.set("layers", src.esri.layers);
+  return `${src.url}/export?${p}`;
+}
+const EsriExportLayer = L.TileLayer.extend({
+  getTileUrl(coords) {
+    return esriExportUrl(this.options.esriSrc, coords.x, coords.y, this._getZoomForUrl());
+  },
+});
+
 function makeLayer(src, extra = {}) {
   /* mapa zespolona (combo) — kilka źródeł jako jedna warstwa bazowa */
   if (src.combo) {
@@ -175,6 +199,9 @@ function makeLayer(src, extra = {}) {
   const opts = Object.assign({ crossOrigin: false }, src.opts, extra);
   if (state.opacity[src.id] != null && !extra.pane) opts.opacity = state.opacity[src.id];
   if (src.wm) return new WikimapiaLayer("", Object.assign(opts, { wmMode: src.wm }));
+  if (src.type === "esri") {
+    return new EsriExportLayer("", Object.assign(opts, { esriSrc: src }));
+  }
   if (src.type === "wms") {
     const wms = Object.assign({ version: "1.1.1", transparent: false }, src.wms, {
       format: src.wms.format || "image/png",
@@ -425,9 +452,11 @@ document.getElementById("btn-reset-layers").addEventListener("click", () => {
 
 /* Szybki dostęp na górze panelu: nakładki (przełączane) i mapy samodzielne */
 const QUICK_ITEMS = [
-  { id: "geoportal-nmt", mode: "overlay" },
+  { id: "geoportal-cien-rest", mode: "overlay" },
   { id: "wikimapia", mode: "overlay" },
   { id: "gugik-dzialki", mode: "overlay" },
+  { id: "geoportal-bdot10k-wiz", mode: "base" },
+  { id: "geoportal-hipso-rest", mode: "base" },
   { id: "geoportal-nmt-solo", mode: "base" },
   { id: "wikimapia-solo", mode: "base" },
 ];
@@ -731,6 +760,7 @@ function lngLatToTile(lat, lng, z) {
    używane przez test ⚡ i pobieranie obszaru offline. */
 function tileUrlFor(src, x, y, zz) {
   if (src.wm) return wikimapiaTileUrl(x, y, zz, src.wm);
+  if (src.type === "esri") return esriExportUrl(src, x, y, zz);
   if (src.type === "wms") {
     const v = (src.wms.version || "1.1.1");
     let bbox, epsg;
