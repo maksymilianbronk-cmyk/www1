@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#181a1f" />
-  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z 96 warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków), profilami map, trybem porównywania i menedżerem POI. Inspirowana Locus Pro / OsmAnd." />
+  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z 98 warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków), profilami map, trybem porównywania i menedżerem POI. Inspirowana Locus Pro / OsmAnd." />
   <title>Trasa — mapy podróżnicze</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -97,7 +97,7 @@
     <div class="sb-head">
       <strong>Warstwy</strong>
       <span id="layer-count" class="sb-count"></span>
-      <button id="btn-reset-layers" class="tb-btn" title="Zeruj widok warstw — wyłącz nakładki i wróć do OSM"><svg class="ic"><use href="#i-undo"/></svg></button>
+      <button id="btn-reset-layers" class="tb-btn" title="Zeruj mapę — skasuj wszystkie nakładki, ślady i pomiary, wróć do OSM"><svg class="ic"><use href="#i-undo"/></svg></button>
       <button class="tb-btn act" data-action="offline" title="Offline — bufor map w przeglądarce"><svg class="ic"><use href="#i-cloud"/></svg></button>
       <button id="btn-add-map" class="tb-btn" title="Dodaj własną mapę WMS / XYZ"><svg class="ic"><use href="#i-plus"/></svg></button>
       <button id="btn-compare" class="tb-btn" title="Tryb porównywania dwóch map"><svg class="ic"><use href="#i-compare"/></svg></button>
@@ -105,13 +105,13 @@
       <button id="sb-close" class="tb-btn" title="Zamknij"><svg class="ic"><use href="#i-x"/></svg></button>
     </div>
     <div class="sb-presets">
-      <div class="sb-presets-label">Szybkie nakładki</div>
+      <div class="sb-presets-label">Szybki dostęp</div>
       <div id="quick-toggles" class="preset-chips"></div>
       <div class="sb-presets-label">Profile map</div>
       <div id="preset-chips" class="preset-chips"></div>
     </div>
     <div class="sb-filter">
-      <input id="layer-filter" type="text" placeholder="Filtruj 96 warstw… (topo, orto, szlaki…)" />
+      <input id="layer-filter" type="text" placeholder="Filtruj 98 warstw… (topo, orto, szlaki…)" />
     </div>
     <div class="sb-hint">
       <svg class="ic ic-xs"><use href="#i-star"/></svg> ulubione ·

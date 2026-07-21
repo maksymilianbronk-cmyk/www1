@@ -167,6 +167,11 @@ const WikimapiaLayer = L.TileLayer.extend({
 });
 
 function makeLayer(src, extra = {}) {
+  /* mapa zespolona (combo) — kilka źródeł jako jedna warstwa bazowa */
+  if (src.combo) {
+    return L.layerGroup(
+      src.combo.map(id => byId[id]).filter(Boolean).map(m => makeLayer(m, extra)));
+  }
   const opts = Object.assign({ crossOrigin: false }, src.opts, extra);
   if (state.opacity[src.id] != null && !extra.pane) opts.opacity = state.opacity[src.id];
   if (src.wm) return new WikimapiaLayer("", Object.assign(opts, { wmMode: src.wm }));
@@ -251,7 +256,8 @@ function setBase(id, { fly = false } = {}) {
   }
   if (baseLayer) map.removeLayer(baseLayer);
   baseLayer = makeLayer(src).addTo(map);
-  baseLayer.on("tileerror", onTileError(src));
+  if (src.combo) baseLayer.eachLayer(l => l.on && l.on("tileerror", onTileError(src)));
+  else baseLayer.on("tileerror", onTileError(src));
   state.baseId = id;
   LS.set("baseId", id);
   noteRecent(id);
@@ -398,28 +404,51 @@ document.getElementById("name-input").addEventListener("keydown", e => {
 
 /* ───────────────────── Własne mapy WMS/XYZ ───────────────────── */
 
-/* Zerowanie widoku warstw: nakładki off, porównywanie off, baza → OSM */
+/* Zerowanie mapy: kasuje WSZYSTKIE aktywne mapy i rysunki —
+   nakładki, porównywanie, ślady GPX/KML, pomiar, marker wyszukiwania —
+   i wraca do czystego OSM. POI i zapisane ustawienia zostają. */
 document.getElementById("btn-reset-layers").addEventListener("click", () => {
   clearOverlays();
   if (compare.active || compare.selecting) stopCompare();
+  if (measuring) toggleMeasure();
+  clearMeasure();
+  gpxLayers.forEach(g => map.removeLayer(g));
+  gpxLayers.length = 0;
+  if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
   setBase("osm");
   buzz(18);
-  toast("Wyzerowano widok: OSM bez nakładek.");
+  toast("Wyzerowano mapę: czysty OSM — bez nakładek, śladów i pomiarów.");
 });
 
-/* Szybkie nakładki na górze panelu (cieniowanie ISOK itd.) */
-const QUICK_TOGGLES = ["geoportal-nmt", "wikimapia", "gugik-dzialki"];
+/* Szybki dostęp na górze panelu: nakładki (przełączane) i mapy samodzielne */
+const QUICK_ITEMS = [
+  { id: "geoportal-nmt", mode: "overlay" },
+  { id: "wikimapia", mode: "overlay" },
+  { id: "gugik-dzialki", mode: "overlay" },
+  { id: "geoportal-nmt-solo", mode: "base" },
+  { id: "wikimapia-solo", mode: "base" },
+];
 function renderQuickToggles() {
   const box = document.getElementById("quick-toggles");
   box.innerHTML = "";
-  QUICK_TOGGLES.forEach(id => {
+  QUICK_ITEMS.forEach(({ id, mode }) => {
     const src = byId[id];
     if (!src) return;
+    const isBase = mode === "base";
+    const active = isBase ? state.baseId === id : !!activeOverlays[id];
     const b = document.createElement("button");
-    b.className = "chip" + (activeOverlays[id] ? " sel" : "");
-    b.innerHTML = `${ic("layers", "ic-xs")} ${src.name.split(" — ")[0].split(" (")[0]}`;
-    b.title = src.desc || src.name;
-    b.addEventListener("click", () => { buzz(); toggleOverlay(id); });
+    b.className = "chip " + (isBase ? "q-base" : "q-ov") + (active ? " sel" : "");
+    const short = src.name.split(" — ")[0].split(" (")[0];
+    b.innerHTML = `${ic(isBase ? "map" : "layers", "ic-xs")} ${short}${isBase ? " <small>solo</small>" : ""}`;
+    b.title = (isBase ? "Mapa samodzielna: " : "Nakładka: ") + (src.desc || src.name);
+    b.addEventListener("click", () => {
+      buzz();
+      if (isBase) {
+        if (state.baseId === id) setBase("osm");
+        else setBase(id, { fly: !!src.home && !map.getBounds().contains(
+          src.home ? [src.home[0], src.home[1]] : map.getCenter()) });
+      } else toggleOverlay(id);
+    });
     box.appendChild(b);
   });
 }
@@ -618,7 +647,8 @@ function rowFor(src) {
   if (isActive) row.classList.add("active");
   if (compare.srcId === src.id) row.classList.add("comparing");
 
-  const badge = ic(src.overlay ? "layers" : "map", "ic-xs lr-type-ic");
+  const badge = ic(src.overlay ? "layers" : "map",
+    "ic-xs lr-type-ic" + (src.overlay ? " ov" : ""));
   const lock = keyMissing(src) ? ` ${ic("lock", "ic-xs lr-lock")}` : "";
   const httpWarn = src.http ? ` <span class="http-badge" title="Serwer tylko http">http</span>` : "";
   const cmp = compare.srcId === src.id ? ` <span class="cmp-badge">${ic("compare", "ic-xs")}</span>` : "";
@@ -726,6 +756,8 @@ function tileUrlFor(src, x, y, zz) {
 }
 
 function testTileUrl(src) {
+  /* mapę zespoloną testujemy po jej warstwie wierzchniej */
+  if (src.combo) src = byId[src.combo[src.combo.length - 1]] || src;
   const [lat, lng, z] = src.home || [52.2, 19.4, 6];
   const zz = Math.min(z, src.opts.maxZoom || 19);
   const { x, y } = lngLatToTile(lat, lng, zz);
@@ -2188,7 +2220,8 @@ document.getElementById("off-clear").addEventListener("click", async () => {
 document.getElementById("off-prefetch").addEventListener("click", async () => {
   const levels = +document.getElementById("off-depth").value;
   const srcs = [byId[state.baseId], ...Object.keys(activeOverlays).map(id => byId[id])]
-    .filter(Boolean);
+    .filter(Boolean)
+    .flatMap(s => s.combo ? s.combo.map(id => byId[id]).filter(Boolean) : [s]);
   const b = map.getBounds(), z0 = map.getZoom();
   const jobs = [];
   srcs.forEach(src => {
