@@ -492,6 +492,7 @@ const QUICK_ITEMS = [
   { id: "geoportal-cien-rest", mode: "overlay" },
   { id: "wikimapia", mode: "overlay" },
   { id: "gugik-dzialki", mode: "overlay" },
+  { id: "geoportal-bdot10k-karto", mode: "base" },
   { id: "geoportal-bdot", mode: "base" },
   { id: "geoportal-hipso-rest", mode: "base" },
   { id: "geoportal-nmt-solo", mode: "base" },
@@ -807,7 +808,8 @@ function tileUrlFor(src, x, y, zz) {
       const lonW = (x / n) * 360 - 180, lonE = ((x + 1) / n) * 360 - 180;
       const latN = (180 / Math.PI) * Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / n)));
       const latS = (180 / Math.PI) * Math.atan(Math.sinh(Math.PI * (1 - (2 * (y + 1)) / n)));
-      bbox = [lonW, latS, lonE, latN];
+      /* WMS 1.3.0 + EPSG:4326 = kolejność osi lat,lng; 1.1.1 = lng,lat */
+      bbox = v === "1.3.0" ? [latS, lonW, latN, lonE] : [lonW, latS, lonE, latN];
       epsg = "EPSG:4326";
     } else {
       const EXT = 20037508.342789244;
@@ -880,6 +882,10 @@ function openSidebar() { sidebar.classList.add("open"); }
 function closeSidebar() { sidebar.classList.remove("open"); }
 document.getElementById("btn-menu").addEventListener("click", () =>
   sidebar.classList.toggle("open"));
+document.getElementById("sb-tab").addEventListener("click", () => {
+  buzz();
+  sidebar.classList.toggle("open");
+});
 document.getElementById("active-map-name").addEventListener("click", openSidebar);
 document.getElementById("sb-close").addEventListener("click", closeSidebar);
 document.getElementById("layer-filter").addEventListener("input", e =>

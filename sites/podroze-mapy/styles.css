@@ -138,15 +138,31 @@ html, body {
 .sidebar {
   position: fixed; top: var(--topbar-h);
   bottom: calc(var(--status-h) + var(--bottombar-h) + var(--safe-b));
-  left: 0;
+  right: 0;
   width: 350px; max-width: 94vw;
-  background: var(--bg2); border-right: 1px solid var(--line);
-  transform: translateX(-102%);
+  background: var(--bg2); border-left: 1px solid var(--line);
+  transform: translateX(102%);
   transition: transform 0.22s ease;
   z-index: 1100;
   display: flex; flex-direction: column;
 }
 .sidebar.open { transform: translateX(0); }
+
+/* zawsze widoczny uchwyt chowania panelu (prawa krawędź ekranu) */
+.sb-tab {
+  position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+  width: 26px; height: 74px;
+  background: var(--bg2); border: 1px solid var(--line); border-right: 0;
+  border-radius: 10px 0 0 10px;
+  color: var(--accent); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1105;
+  transition: right 0.22s ease;
+  box-shadow: -4px 0 14px rgba(0, 0, 0, 0.35);
+}
+.sb-tab .ic { width: 17px; height: 17px; }
+#sidebar.open + .sb-tab { right: min(350px, 94vw); }
+#sidebar.open + .sb-tab .ic { transform: rotate(180deg); }
 .sb-head {
   display: flex; align-items: center; gap: 4px;
   padding: 8px 10px; border-bottom: 1px solid var(--line);
@@ -556,6 +572,7 @@ select.poi-filter { appearance: auto; }
   .bottombar { display: flex; gap: 2px; }
   .statusbar { font-size: 11px; gap: 10px; }
   .sidebar { width: 88vw; }
+  #sidebar.open + .sb-tab { right: 88vw; }
   .leaflet-control-zoom { display: none; } /* pinch-zoom wystarcza */
   .modal { padding: 8px; align-items: flex-end; }
   .modal-box { border-radius: 16px 16px 0 0; max-height: 80vh; }
