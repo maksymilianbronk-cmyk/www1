@@ -27,6 +27,7 @@ const KEY_PROVIDERS = {
   mapycz:        { name: "Mapy.cz API", url: "https://developer.mapy.cz/" },
   stadia:        { name: "Stadia Maps (Stamen)", url: "https://stadiamaps.com/" },
   tracestrack:   { name: "Tracestrack", url: "https://tracestrack.com/" },
+  okapi:         { name: "Opencaching.pl (OKAPI)", url: "https://opencaching.pl/okapi/signup.html" },
 };
 
 const MAP_SOURCES = [
@@ -412,6 +413,18 @@ const MAP_SOURCES = [
     opts: { maxZoom: 19, attribution: "© Esri" },
     desc: "Granice administracyjne i nazwy miejscowości." },
 
+  /* ─────────── Nakładki — geocaching ─────────── */
+  { id: "geocaching", name: "Geocaching.com — skrytki", cat: "Nakładki — geocaching", overlay: true,
+    url: "https://tiles0{s}.geocaching.com/map.png?x={x}&y={y}&z={z}",
+    opts: { maxZoom: 18, subdomains: "1234", attribution: "© Groundspeak / geocaching.com" },
+    desc: "Mapa skrytek geocaching.com (publiczny tile-serwer z pakietów SAS/AnyGIS). Serwis może okresowo wymagać zalogowania — sprawdź testem ⚡." },
+  { id: "opencaching-pl", name: "Opencaching.pl — skrytki (OKAPI)", cat: "Nakładki — geocaching", overlay: true,
+    key: "okapi",
+    url: "https://opencaching.pl/okapi/services/caches/map/tile?x={x}&y={y}&z={z}&consumer_key={key}",
+    opts: { maxZoom: 18, attribution: "© Opencaching.pl" },
+    home: [52.2, 19.4, 7],
+    desc: "Skrytki Opencaching.pl przez OKAPI — darmowy consumer key (rejestracja na opencaching.pl/okapi)." },
+
   /* ─────────── Nakładki — teren i kataster ─────────── */
   { id: "esri-hillshade", name: "Cieniowanie terenu (Esri)", cat: "Nakładki — teren i kataster", overlay: true,
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
@@ -532,6 +545,7 @@ const CATEGORY_ORDER = [
   "Rosja / Wschód",
   "Mapy historyczne",
   "Nakładki — szlaki",
+  "Nakładki — geocaching",
   "Nakładki — transport",
   "Nakładki — teren i kataster",
   "Pogoda (klucz API)",

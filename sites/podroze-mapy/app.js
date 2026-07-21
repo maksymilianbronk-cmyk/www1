@@ -1482,7 +1482,7 @@ async function sha256Hex(str) {
 async function accountRegister(login, pass) {
   const slug = userSlug(login);
   if (!slug || pass.length < 4) throw new Error("podaj login i hasło (min. 4 znaki)");
-  if (!writeToken()) throw new Error("chmura nie ma skonfigurowanego tokena aplikacji (cloud-config.js)");
+  if (!writeToken()) throw new Error("wklej najpierw token GitHub w polu powyżej");
   const existing = await ghApi(`contents/${CLOUD.root}/${slug}/_account.json?ref=${CLOUD.branch}`);
   if (existing) throw new Error("ten login jest już zajęty");
   const salt = [...crypto.getRandomValues(new Uint8Array(12))]
@@ -1654,6 +1654,12 @@ function renderCloudUI() {
     document.getElementById("acc-status").textContent =
       `Zalogowano jako ${state.cloud.user} · foldery synchronizują się z bazą poi-db.`;
   }
+  /* blok tokena pokazuj tylko, gdy aplikacja nie ma wbudowanego tokena aplikacji */
+  const hasAppToken = !!(window.TRASA_CLOUD && window.TRASA_CLOUD.appToken);
+  const tokBox = document.getElementById("acc-need-token");
+  const tokInput = document.getElementById("acc-token");
+  if (tokBox) tokBox.classList.toggle("hidden", hasAppToken || logged);
+  if (tokInput) tokInput.value = state.cloud.token || "";
   cloudStatus(cloudReady()
     ? `Konto: ${state.cloud.user} · auto-sync ${state.cloud.auto ? "włączony" : "wyłączony"}`
     : (window.TRASA_CLOUD?.appToken
@@ -1661,7 +1667,20 @@ function renderCloudUI() {
       : "Tryb offline — punkty zapisują się tylko w tej przeglądarce (brak tokena aplikacji)."));
 }
 
+/* token z pola konta → zapisz do stanu przed operacją chmury */
+function grabAccToken() {
+  const t = document.getElementById("acc-token");
+  if (t && t.value.trim()) {
+    state.cloud.token = t.value.trim();
+    LS.set("cloud", state.cloud);
+  }
+}
+document.getElementById("acc-token").addEventListener("change", () => {
+  grabAccToken(); renderCloudUI();
+});
+
 document.getElementById("acc-register-btn").addEventListener("click", async () => {
+  grabAccToken();
   const login = document.getElementById("acc-login").value.trim();
   const pass = document.getElementById("acc-pass").value;
   cloudStatus("Zakładam konto…");
@@ -1675,6 +1694,7 @@ document.getElementById("acc-register-btn").addEventListener("click", async () =
 });
 
 document.getElementById("acc-login-btn").addEventListener("click", async () => {
+  grabAccToken();
   const login = document.getElementById("acc-login").value.trim();
   const pass = document.getElementById("acc-pass").value;
   cloudStatus("Loguję…");
