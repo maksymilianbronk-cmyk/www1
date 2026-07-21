@@ -20,11 +20,15 @@ const state = {
   recents: LS.get("recents", []),             // ostatnio używane mapy bazowe
   keys: LS.get("keys", {}),                   // provider → klucz
   presets: LS.get("presets", []),             // własne profile map
+  custom: LS.get("customSources", []),        // własne mapy WMS/XYZ
   pois: null,                                 // ładowane niżej (z migracją)
   poiHiddenCats: new Set(LS.get("poiHiddenCats", [])),
+  groups: LS.get("poiGroups", ["Moje punkty"]), // foldery POI
+  cloud: LS.get("cloud", { user: "", token: "", auto: true }),
 };
+const DEFAULT_GROUP = "Moje punkty";
 
-/* POI v2 + migracja ze starego formatu waypoints */
+/* POI v2 + migracja ze starego formatu waypoints; v3 dodaje foldery (group) */
 (function loadPois() {
   let pois = LS.get("pois", null);
   if (!pois) {
@@ -36,11 +40,34 @@ const state = {
     }));
     if (pois.length) LS.set("pois", pois);
   }
-  state.pois = pois || [];
+  state.pois = (pois || []).map(p => ({ group: DEFAULT_GROUP, ...p }));
+  if (!state.groups.includes(DEFAULT_GROUP)) state.groups.unshift(DEFAULT_GROUP);
 })();
 
+/* Indeks źródeł: katalog wbudowany + własne mapy użytkownika (WMS/XYZ) */
 const byId = {};
-MAP_SOURCES.forEach(s => (byId[s.id] = s));
+function customToSrc(c) {
+  return {
+    id: c.id, name: c.name, cat: "Moje mapy (własne)",
+    url: c.url, type: c.type === "wms" ? "wms" : undefined,
+    wms: c.type === "wms"
+      ? { layers: c.wmsLayers, format: c.format || "image/png",
+          transparent: !!c.transparent }
+      : undefined,
+    overlay: !!c.overlay, custom: true,
+    http: c.url.startsWith("http://"),
+    opts: { maxZoom: c.maxZoom || 19, attribution: c.name },
+    desc: (c.type === "wms" ? "Własna usługa WMS: " : "Własne kafelki XYZ: ") + c.url,
+  };
+}
+function allSources() {
+  return [...MAP_SOURCES, ...state.custom.map(customToSrc)];
+}
+function rebuildIndex() {
+  Object.keys(byId).forEach(k => delete byId[k]);
+  allSources().forEach(s => (byId[s.id] = s));
+}
+rebuildIndex();
 
 function buzz(ms = 12) { try { navigator.vibrate && navigator.vibrate(ms); } catch {} }
 
@@ -78,9 +105,27 @@ function resolveUrl(src) {
   return u;
 }
 
+/* Wikimapia: subdomena liczona z kafelka — hash = x%4 + (y%4)*4 → i0..i15
+   (wzór z leaflet.wikimapia / SAS.Planet / pakietów AnyGIS).
+   Tryb "proxy" opakowuje kafelek w https przez wsrv.nl (images.weserv.nl),
+   dzięki czemu nakładka działa także na stronach https. */
+function wikimapiaTileUrl(x, y, z, mode) {
+  const hash = ((x % 4) + 4) % 4 + (((y % 4) + 4) % 4) * 4;
+  const raw = `i${hash}.wikimapia.org/?x=${x}&y=${y}&zoom=${z}&type=hybrid&lng=0`;
+  return mode === "proxy"
+    ? "https://wsrv.nl/?url=" + encodeURIComponent(raw)
+    : "http://" + raw;
+}
+const WikimapiaLayer = L.TileLayer.extend({
+  getTileUrl(coords) {
+    return wikimapiaTileUrl(coords.x, coords.y, this._getZoomForUrl(), this.options.wmMode);
+  },
+});
+
 function makeLayer(src, extra = {}) {
   const opts = Object.assign({ crossOrigin: false }, src.opts, extra);
   if (state.opacity[src.id] != null && !extra.pane) opts.opacity = state.opacity[src.id];
+  if (src.wm) return new WikimapiaLayer("", Object.assign(opts, { wmMode: src.wm }));
   if (src.type === "wms") {
     const wms = Object.assign({ version: "1.1.1", transparent: false }, src.wms, {
       format: src.wms.format || "image/png",
@@ -228,6 +273,9 @@ const BUILTIN_PRESETS = [
   { name: "Zima", icon: "snow", base: "opentopo", overlays: ["wt-slopes", "opensnowmap"] },
   { name: "Satelita+", icon: "sat", base: "esri-imagery", overlays: ["google-roads"] },
   { name: "Orto+działki", icon: "grid", base: "geoportal-orto", overlays: ["gugik-dzialki"] },
+  { name: "Wikimapia", icon: "layers", base: "osm", overlays: ["wikimapia"] },
+  { name: "Google+Wikimapia", icon: "map", base: "google-road", overlays: ["wikimapia"] },
+  { name: "Google Sat+Wikimapia", icon: "sat", base: "google-sat", overlays: ["wikimapia"] },
 ];
 
 function applyPreset(p) {
@@ -277,24 +325,81 @@ function renderPresets() {
   add.className = "chip chip-add";
   add.innerHTML = `${ic("plus", "ic-xs")} zapisz obecny`;
   add.title = "Zapisz aktualną mapę + nakładki jako profil";
-  add.addEventListener("click", () => openNameModal());
+  add.addEventListener("click", () =>
+    openNamePrompt("Zapisz profil map", "np. Moja turystyka", saveCurrentPreset));
   box.appendChild(add);
 }
 
-function openNameModal() {
+/* Uniwersalny modal nazwy (profile, foldery POI, zmiany nazw) */
+let namePromptCb = null;
+function openNamePrompt(title, placeholder, cb, initial = "") {
+  namePromptCb = cb;
+  document.getElementById("name-modal-title").textContent = title;
   const inp = document.getElementById("name-input");
-  inp.value = "";
+  inp.placeholder = placeholder;
+  inp.value = initial;
   openModal("name-modal");
   setTimeout(() => inp.focus(), 60);
 }
 document.getElementById("name-save").addEventListener("click", () => {
   const name = document.getElementById("name-input").value.trim();
-  if (!name) { toast("Podaj nazwę profilu."); return; }
-  saveCurrentPreset(name);
+  if (!name) { toast("Podaj nazwę."); return; }
   closeModal("name-modal");
+  if (namePromptCb) namePromptCb(name);
 });
 document.getElementById("name-input").addEventListener("keydown", e => {
   if (e.key === "Enter") document.getElementById("name-save").click();
+});
+
+/* ───────────────────── Własne mapy WMS/XYZ ───────────────────── */
+
+document.getElementById("btn-add-map").addEventListener("click", () => {
+  document.getElementById("wms-name").value = "";
+  document.getElementById("wms-url").value = "";
+  document.getElementById("wms-layers").value = "";
+  document.getElementById("wms-overlay").checked = false;
+  document.getElementById("wms-transparent").checked = true;
+  document.querySelector('input[name="wms-type"][value="wms"]').checked = true;
+  syncWmsTypeUI();
+  openModal("wms-modal");
+});
+document.querySelectorAll('input[name="wms-type"]').forEach(r =>
+  r.addEventListener("change", syncWmsTypeUI));
+function syncWmsTypeUI() {
+  const isWms = document.querySelector('input[name="wms-type"]:checked').value === "wms";
+  document.getElementById("wms-only").style.display = isWms ? "" : "none";
+  document.getElementById("wms-url").placeholder = isWms
+    ? "https://serwer/uslugi/WMS…  (endpoint GetMap)"
+    : "https://serwer/kafelki/{z}/{x}/{y}.png";
+}
+
+document.getElementById("wms-save").addEventListener("click", () => {
+  const name = document.getElementById("wms-name").value.trim();
+  const url = document.getElementById("wms-url").value.trim();
+  const type = document.querySelector('input[name="wms-type"]:checked').value;
+  const wmsLayers = document.getElementById("wms-layers").value.trim();
+  if (!name || !url) { toast("Podaj nazwę i adres URL."); return; }
+  if (type === "wms" && !wmsLayers) { toast("Dla WMS podaj nazwy warstw (LAYERS)."); return; }
+  if (type === "xyz" && !/\{x\}/.test(url)) {
+    toast("Szablon XYZ musi zawierać {z}/{x}/{y}."); return;
+  }
+  const c = {
+    id: "c_" + Date.now(),
+    name, url, type, wmsLayers,
+    format: document.getElementById("wms-format").value,
+    transparent: document.getElementById("wms-transparent").checked,
+    overlay: document.getElementById("wms-overlay").checked,
+    maxZoom: 19,
+  };
+  state.custom.push(c);
+  LS.set("customSources", state.custom);
+  rebuildIndex();
+  closeModal("wms-modal");
+  const src = byId[c.id];
+  if (src.overlay) toggleOverlay(c.id);
+  else setBase(c.id);
+  refreshListUI();
+  toast(`Dodano mapę „${name}" — sprawdź, czy kafelki się wczytują.`);
 });
 
 /* ───────────────────────── Tryb porównywania (🆚) ───────────────────────── */
@@ -387,12 +492,13 @@ function buildList(filter = "") {
   const cats = [...PSEUDO_CATS.map(c => c.key), ...CATEGORY_ORDER];
   let shown = 0;
 
+  const sources = allSources();
   cats.forEach(cat => {
     let items;
-    if (cat === "Ulubione") items = MAP_SOURCES.filter(s => state.favs.has(s.id));
+    if (cat === "Ulubione") items = sources.filter(s => state.favs.has(s.id));
     else if (cat === "Ostatnio używane")
       items = state.recents.map(id => byId[id]).filter(Boolean);
-    else items = MAP_SOURCES.filter(s => s.cat === cat);
+    else items = sources.filter(s => s.cat === cat);
 
     const visible = items.filter(s =>
       !q || (s.name + " " + (s.desc || "") + " " + s.id).toLowerCase().includes(q));
@@ -427,7 +533,7 @@ function buildList(filter = "") {
     shown += visible.length;
   });
 
-  document.getElementById("layer-count").textContent = `${MAP_SOURCES.length} warstw`;
+  document.getElementById("layer-count").textContent = `${allSources().length} warstw`;
   if (q && !shown) {
     layerList.innerHTML = `<div class="empty">Brak warstw dla „${filter}”.</div>`;
   }
@@ -453,6 +559,7 @@ function rowFor(src) {
       <span class="lr-dot" title="Status testu"></span>
     </button>
     ${src.home ? `<button class="lr-home" title="Przeleć do zasięgu mapy">${ic("play")}</button>` : ""}
+    ${src.custom ? `<button class="lr-del" title="Usuń własną mapę">${ic("trash")}</button>` : ""}
     <button class="lr-fav ${state.favs.has(src.id) ? "on" : ""}" title="Ulubione">${ic("star")}</button>
   `;
 
@@ -465,6 +572,18 @@ function rowFor(src) {
   if (homeBtn) homeBtn.addEventListener("click", () => {
     map.flyTo([src.home[0], src.home[1]], src.home[2]);
     if (window.innerWidth < 720) closeSidebar();
+  });
+  const delBtn = row.querySelector(".lr-del");
+  if (delBtn) delBtn.addEventListener("click", () => {
+    if (!confirm(`Usunąć własną mapę „${src.name}"?`)) return;
+    if (activeOverlays[src.id]) toggleOverlay(src.id);
+    if (state.baseId === src.id) setBase("osm");
+    state.custom = state.custom.filter(c => c.id !== src.id);
+    LS.set("customSources", state.custom);
+    state.recents = state.recents.filter(x => x !== src.id);
+    LS.set("recents", state.recents);
+    rebuildIndex();
+    refreshListUI();
   });
   row.querySelector(".lr-fav").addEventListener("click", () => {
     if (state.favs.has(src.id)) state.favs.delete(src.id);
@@ -507,6 +626,7 @@ function testTileUrl(src) {
   const [lat, lng, z] = src.home || [52.2, 19.4, 6];
   const zz = Math.min(z, src.opts.maxZoom || 19);
   let { x, y } = lngLatToTile(lat, lng, zz);
+  if (src.wm) return wikimapiaTileUrl(x, y, zz, src.wm);
   if (src.type === "wms") {
     const R = 6378137, d = 20037508.34 / 2 ** zz;
     const mx = (lng * Math.PI * R) / 180;
@@ -784,12 +904,14 @@ function deletePoi(id) {
   lastDeleted = { poi: state.pois[i], index: i };
   state.pois.splice(i, 1);
   savePois(); renderPois(); renderPoiList();
+  markDirty(lastDeleted.poi.group);
   buzz(20);
   toast(`Usunięto „${lastDeleted.poi.name}".`, 6000, {
     label: "Cofnij",
     fn: () => {
       state.pois.splice(lastDeleted.index, 0, lastDeleted.poi);
       savePois(); renderPois(); renderPoiList();
+      markDirty(lastDeleted.poi.group);
       toast("Przywrócono punkt.");
     },
   });
@@ -853,13 +975,16 @@ map.on("contextmenu", e => {
 
 /* ── edytor POI ── */
 
-let editCat = "other", editColor = "";
+let editCat = "other", editColor = "", editGroup = DEFAULT_GROUP;
 
 function openPoiEditor(poi, latlng) {
   editingPoiId = poi ? poi.id : null;
   pendingLatLng = poi ? { lat: poi.lat, lng: poi.lng } : latlng;
   editCat = poi ? poi.cat : "other";
   editColor = poi ? poi.color : "";
+  editGroup = poi ? (poi.group || DEFAULT_GROUP)
+    : (poiPanelGroup && state.groups.includes(poiPanelGroup) ? poiPanelGroup : DEFAULT_GROUP);
+  renderPoiGroupChips();
   document.getElementById("poi-modal-title").innerHTML =
     poi ? `${ic("edit")} Edytuj punkt` : `${ic("pin-plus")} Nowy punkt`;
   document.getElementById("poi-name").value = poi ? poi.name : "";
@@ -871,6 +996,32 @@ function openPoiEditor(poi, latlng) {
   renderPoiColorChips();
   openModal("poi-modal");
   setTimeout(() => document.getElementById("poi-name").focus(), 60);
+}
+
+function renderPoiGroupChips() {
+  const box = document.getElementById("poi-groups-edit");
+  box.innerHTML = "";
+  state.groups.forEach(g => {
+    const b = document.createElement("button");
+    b.className = "chip" + (editGroup === g ? " sel" : "");
+    b.innerHTML = `${ic("folder", "ic-xs")} ${esc(g)}`;
+    b.addEventListener("click", () => { editGroup = g; renderPoiGroupChips(); });
+    box.appendChild(b);
+  });
+  const add = document.createElement("button");
+  add.className = "chip chip-add";
+  add.innerHTML = `${ic("plus", "ic-xs")} nowy folder`;
+  add.addEventListener("click", () =>
+    openNamePrompt("Nowy folder punktów", "np. Wakacje 2026", name => {
+      if (!state.groups.includes(name)) {
+        state.groups.push(name);
+        LS.set("poiGroups", state.groups);
+      }
+      editGroup = name;
+      openModal("poi-modal");
+      renderPoiGroupChips();
+    }));
+  box.appendChild(add);
 }
 
 function renderPoiCatChips() {
@@ -909,18 +1060,22 @@ document.getElementById("poi-save").addEventListener("click", () => {
   const note = document.getElementById("poi-note").value.trim();
   if (editingPoiId) {
     const p = state.pois.find(x => x.id === editingPoiId);
-    if (p) Object.assign(p, { name, note, cat: editCat, color: editColor });
+    if (p) {
+      if (p.group !== editGroup) markDirty(p.group);
+      Object.assign(p, { name, note, cat: editCat, color: editColor, group: editGroup });
+    }
   } else {
     state.pois.push({
       id: "p" + Date.now() + "_" + Math.floor(Math.random() * 1e4),
       lat: pendingLatLng.lat, lng: pendingLatLng.lng,
-      name, note, cat: editCat, color: editColor, ts: Date.now(),
+      name, note, cat: editCat, color: editColor, group: editGroup, ts: Date.now(),
     });
   }
   savePois(); renderPois(); renderPoiList();
+  markDirty(editGroup);
   closeModal("poi-modal");
   buzz();
-  toast(editingPoiId ? "Zapisano zmiany." : `Dodano: ${name}`);
+  toast(editingPoiId ? "Zapisano zmiany." : `Dodano: ${name} → ${editGroup}`);
 });
 
 document.getElementById("poi-delete").addEventListener("click", () => {
@@ -931,14 +1086,98 @@ document.getElementById("poi-delete").addEventListener("click", () => {
 
 /* ── panel listy POI ── */
 
-let poiPanelQ = "", poiPanelCat = null;
+let poiPanelQ = "", poiPanelCat = null, poiPanelGroup = null;
 
 function openPoiPanel() {
   poiPanelQ = "";
   document.getElementById("poi-filter").value = "";
+  renderPoiFolders();
   renderPoiCatFilter();
   renderPoiList();
+  renderCloudUI();
   openModal("poi-panel");
+}
+
+/* Foldery (grupy) POI — pasek jak w menedżerze plików */
+function groupCount(g) { return state.pois.filter(p => (p.group || DEFAULT_GROUP) === g).length; }
+
+function renderPoiFolders() {
+  const box = document.getElementById("poi-folders");
+  box.innerHTML = "";
+  const all = document.createElement("button");
+  all.className = "chip" + (poiPanelGroup === null ? " sel" : "");
+  all.innerHTML = `${ic("list", "ic-xs")} wszystkie (${state.pois.length})`;
+  all.addEventListener("click", () => { poiPanelGroup = null; renderPoiFolders(); renderPoiList(); });
+  box.appendChild(all);
+
+  state.groups.forEach(g => {
+    const b = document.createElement("button");
+    b.className = "chip" + (poiPanelGroup === g ? " sel" : "");
+    b.innerHTML = `${ic("folder", "ic-xs")} ${esc(g)} (${groupCount(g)})`;
+    b.addEventListener("click", () => { poiPanelGroup = g; renderPoiFolders(); renderPoiList(); });
+    box.appendChild(b);
+  });
+
+  const add = document.createElement("button");
+  add.className = "chip chip-add";
+  add.innerHTML = `${ic("plus", "ic-xs")} folder`;
+  add.title = "Nowy folder punktów";
+  add.addEventListener("click", () =>
+    openNamePrompt("Nowy folder punktów", "np. Wakacje 2026", name => {
+      if (!state.groups.includes(name)) {
+        state.groups.push(name);
+        LS.set("poiGroups", state.groups);
+      }
+      poiPanelGroup = name;
+      openModal("poi-panel");
+      renderPoiFolders(); renderPoiList();
+    }));
+  box.appendChild(add);
+
+  // akcje na wybranym folderze
+  const act = document.getElementById("poi-folder-actions");
+  act.innerHTML = "";
+  if (poiPanelGroup) {
+    const ren = document.createElement("button");
+    ren.className = "chip";
+    ren.innerHTML = `${ic("edit", "ic-xs")} zmień nazwę`;
+    ren.addEventListener("click", () =>
+      openNamePrompt("Zmień nazwę folderu", poiPanelGroup, name => {
+        const old = poiPanelGroup;
+        if (name === old) { openModal("poi-panel"); return; }
+        state.groups = state.groups.map(g => (g === old ? name : g));
+        state.pois.forEach(p => { if ((p.group || DEFAULT_GROUP) === old) p.group = name; });
+        LS.set("poiGroups", state.groups);
+        savePois();
+        cloudDeleteGroupFile(old);
+        markDirty(name);
+        poiPanelGroup = name;
+        openModal("poi-panel");
+        renderPoiFolders(); renderPoiList();
+      }, poiPanelGroup));
+    act.appendChild(ren);
+
+    if (poiPanelGroup !== DEFAULT_GROUP) {
+      const del = document.createElement("button");
+      del.className = "chip";
+      del.innerHTML = `${ic("trash", "ic-xs")} usuń folder`;
+      del.addEventListener("click", () => {
+        const n = groupCount(poiPanelGroup);
+        if (!confirm(`Usunąć folder „${poiPanelGroup}"?` +
+          (n ? ` ${n} punktów trafi do „${DEFAULT_GROUP}".` : ""))) return;
+        const old = poiPanelGroup;
+        state.pois.forEach(p => { if ((p.group || DEFAULT_GROUP) === old) p.group = DEFAULT_GROUP; });
+        state.groups = state.groups.filter(g => g !== old);
+        LS.set("poiGroups", state.groups);
+        savePois();
+        cloudDeleteGroupFile(old);
+        markDirty(DEFAULT_GROUP);
+        poiPanelGroup = null;
+        renderPoiFolders(); renderPoiList();
+      });
+      act.appendChild(del);
+    }
+  }
 }
 
 function renderPoiCatFilter() {
@@ -977,6 +1216,7 @@ function renderPoiList() {
   if (!box) return;
   const center = map.getCenter();
   let items = state.pois
+    .filter(p => !poiPanelGroup || (p.group || DEFAULT_GROUP) === poiPanelGroup)
     .filter(p => !poiPanelCat || p.cat === poiPanelCat)
     .filter(p => !poiPanelQ ||
       (p.name + " " + p.note).toLowerCase().includes(poiPanelQ))
@@ -1014,6 +1254,244 @@ function renderPoiList() {
     box.appendChild(row);
   });
 }
+
+/* ───────────── Chmura GitHub — baza plików POI w repozytorium ─────────────
+   Struktura: gałąź "poi-db", pliki poi-db/<użytkownik>/<folder>.json
+   Odczyt jest publiczny (repo publiczne, bez tokena). Zapis wymaga
+   fine-grained tokena GitHub z uprawnieniem Contents:write do tego repo.
+   Auto-sync: każda zmiana folderu POI zapisuje jego plik po 4 s ciszy. */
+
+const CLOUD = {
+  repo: "maksymilianbronk-cmyk/www1",
+  branch: "poi-db",
+  root: "poi-db",
+};
+const shaCache = LS.get("cloudSha", {});
+
+function b64enc(str) { return btoa(unescape(encodeURIComponent(str))); }
+function b64dec(b64) { return decodeURIComponent(escape(atob(b64.replace(/\n/g, "")))); }
+const PL_CHARS = { ą: "a", ć: "c", ę: "e", ł: "l", ń: "n", ó: "o", ś: "s", ź: "z", ż: "z" };
+function groupSlug(name) {
+  return name.toLowerCase()
+    .replace(/[ąćęłńóśźż]/g, ch => PL_CHARS[ch])
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "folder";
+}
+function userSlug(name) {
+  return name.toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+async function ghApi(path, opts = {}) {
+  /* Accept jest nagłówkiem CORS-safelisted — publiczny odczyt obywa się bez
+     preflight; Authorization (tylko przy zapisie) preflight wymusza i GitHub
+     API poprawnie go obsługuje. */
+  const headers = Object.assign({ Accept: "application/vnd.github+json" }, opts.headers || {});
+  const needsAuth = opts.method && opts.method !== "GET";
+  if (state.cloud.token && (needsAuth || opts.auth)) {
+    headers.Authorization = "Bearer " + state.cloud.token.trim();
+  }
+  const r = await fetch(`https://api.github.com/repos/${CLOUD.repo}/${path}`,
+    Object.assign({}, opts, { headers }));
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`GitHub ${r.status}: ${(await r.text()).slice(0, 140)}`);
+  return r.json();
+}
+
+function cloudStatus(msg, ok = true) {
+  const el = document.getElementById("cloud-status");
+  if (el) { el.textContent = msg; el.style.color = ok ? "" : "var(--bad)"; }
+}
+
+function cloudReady() {
+  return !!(state.cloud.user.trim() && state.cloud.token.trim());
+}
+
+function groupFilePath(g) {
+  return `${CLOUD.root}/${userSlug(state.cloud.user)}/${groupSlug(g)}.json`;
+}
+
+async function cloudSaveGroup(g) {
+  if (!cloudReady()) return;
+  const path = groupFilePath(g);
+  const pois = state.pois.filter(p => (p.group || DEFAULT_GROUP) === g);
+  const body = {
+    message: `poi: ${state.cloud.user} / ${g} (${pois.length} punktów)`,
+    branch: CLOUD.branch,
+    content: b64enc(JSON.stringify({
+      name: g, user: state.cloud.user, updated: new Date().toISOString(),
+      pois,
+    }, null, 2)),
+  };
+  if (shaCache[path]) body.sha = shaCache[path];
+  try {
+    let res;
+    try {
+      res = await ghApi(`contents/${path}`, { method: "PUT", body: JSON.stringify(body) });
+    } catch (err) {
+      if (/409|422/.test(err.message)) {
+        const cur = await ghApi(`contents/${encodeURI(path)}?ref=${CLOUD.branch}`);
+        if (cur && cur.sha) { body.sha = cur.sha; }
+        else delete body.sha;
+        res = await ghApi(`contents/${path}`, { method: "PUT", body: JSON.stringify(body) });
+      } else throw err;
+    }
+    shaCache[path] = res.content.sha;
+    LS.set("cloudSha", shaCache);
+    cloudStatus(`Zapisano „${g}" (${pois.length} pkt) — ${new Date().toLocaleTimeString()}`);
+  } catch (err) {
+    cloudStatus("Błąd zapisu: " + err.message, false);
+  }
+}
+
+async function cloudSaveAll() {
+  if (!cloudReady()) { cloudStatus("Podaj użytkownika i token GitHub.", false); return; }
+  cloudStatus("Zapisuję wszystkie foldery…");
+  for (const g of state.groups) await cloudSaveGroup(g);
+  toast("Foldery POI zapisane w repozytorium GitHub.");
+}
+
+async function cloudDeleteGroupFile(g) {
+  if (!cloudReady()) return;
+  const path = groupFilePath(g);
+  try {
+    const cur = shaCache[path]
+      ? { sha: shaCache[path] }
+      : await ghApi(`contents/${encodeURI(path)}?ref=${CLOUD.branch}`);
+    if (!cur) return;
+    await ghApi(`contents/${path}`, {
+      method: "DELETE",
+      body: JSON.stringify({ message: `poi: usuń ${g}`, branch: CLOUD.branch, sha: cur.sha }),
+    });
+    delete shaCache[path];
+    LS.set("cloudSha", shaCache);
+  } catch { /* plik mógł nie istnieć */ }
+}
+
+async function cloudListUsers() {
+  const list = await ghApi(`contents/${CLOUD.root}?ref=${CLOUD.branch}`);
+  return (list || []).filter(e => e.type === "dir").map(e => e.name);
+}
+async function cloudListGroups(user) {
+  const list = await ghApi(`contents/${CLOUD.root}/${user}?ref=${CLOUD.branch}`);
+  return (list || []).filter(e => e.type === "file" && e.name.endsWith(".json"));
+}
+
+async function cloudLoadGroupFile(user, fileName, { asForeign = false } = {}) {
+  const data = await ghApi(
+    `contents/${CLOUD.root}/${user}/${encodeURIComponent(fileName)}?ref=${CLOUD.branch}`);
+  if (!data) throw new Error("plik nie istnieje");
+  const doc = JSON.parse(b64dec(data.content));
+  const gName = asForeign ? `${user}/${doc.name || fileName.replace(/\.json$/, "")}`
+    : (doc.name || fileName.replace(/\.json$/, ""));
+  if (!state.groups.includes(gName)) state.groups.push(gName);
+  // zastąp zawartość folderu wersją z chmury
+  state.pois = state.pois.filter(p => (p.group || DEFAULT_GROUP) !== gName);
+  (doc.pois || []).forEach((p, i) => state.pois.push(Object.assign({}, p, {
+    id: p.id || "p" + Date.now() + "_" + i,
+    group: gName,
+  })));
+  if (!asForeign) shaCache[`${CLOUD.root}/${user}/${fileName}`] = data.sha;
+  LS.set("cloudSha", shaCache);
+  LS.set("poiGroups", state.groups);
+  savePois();
+  return { gName, n: (doc.pois || []).length };
+}
+
+async function cloudLoadMine() {
+  if (!state.cloud.user.trim()) { cloudStatus("Podaj nazwę użytkownika.", false); return; }
+  cloudStatus("Wczytuję foldery z chmury…");
+  try {
+    const files = await cloudListGroups(userSlug(state.cloud.user));
+    if (!files.length) { cloudStatus("Brak folderów w chmurze dla tego użytkownika."); return; }
+    let total = 0;
+    for (const f of files) {
+      const { n } = await cloudLoadGroupFile(userSlug(state.cloud.user), f.name);
+      total += n;
+    }
+    renderPois(); renderPoiFolders(); renderPoiCatFilter(); renderPoiList();
+    cloudStatus(`Wczytano ${files.length} folderów, ${total} punktów.`);
+  } catch (err) {
+    cloudStatus("Błąd odczytu: " + err.message, false);
+  }
+}
+
+/* auto-sync: folder „brudny" → zapis po 4 s ciszy */
+const dirtyGroups = new Set();
+let dirtyTimer = null;
+function markDirty(g) {
+  if (!g) g = DEFAULT_GROUP;
+  dirtyGroups.add(g);
+  if (!state.cloud.auto || !cloudReady()) return;
+  clearTimeout(dirtyTimer);
+  dirtyTimer = setTimeout(() => {
+    const gs = [...dirtyGroups];
+    dirtyGroups.clear();
+    gs.forEach(g2 => { if (state.groups.includes(g2)) cloudSaveGroup(g2); });
+  }, 4000);
+}
+
+/* UI chmury w panelu POI */
+function renderCloudUI() {
+  document.getElementById("cloud-user").value = state.cloud.user;
+  document.getElementById("cloud-token").value = state.cloud.token;
+  document.getElementById("cloud-auto").checked = !!state.cloud.auto;
+  cloudStatus(cloudReady()
+    ? `Konto: ${state.cloud.user} · auto-sync ${state.cloud.auto ? "włączony" : "wyłączony"}`
+    : "Tryb offline — punkty zapisują się tylko w tej przeglądarce.");
+}
+function saveCloudSettings() {
+  state.cloud.user = document.getElementById("cloud-user").value.trim();
+  state.cloud.token = document.getElementById("cloud-token").value.trim();
+  state.cloud.auto = document.getElementById("cloud-auto").checked;
+  LS.set("cloud", state.cloud);
+  renderCloudUI();
+}
+["cloud-user", "cloud-token"].forEach(id =>
+  document.getElementById(id).addEventListener("change", saveCloudSettings));
+document.getElementById("cloud-auto").addEventListener("change", saveCloudSettings);
+document.getElementById("cloud-save").addEventListener("click", () => {
+  saveCloudSettings(); cloudSaveAll();
+});
+document.getElementById("cloud-load").addEventListener("click", () => {
+  saveCloudSettings(); cloudLoadMine();
+});
+document.getElementById("cloud-browse-btn").addEventListener("click", async () => {
+  const box = document.getElementById("cloud-browse");
+  box.innerHTML = "<em>Wczytuję listę użytkowników…</em>";
+  try {
+    const users = await cloudListUsers();
+    if (!users.length) { box.innerHTML = "<em>Baza jest jeszcze pusta.</em>"; return; }
+    box.innerHTML = "";
+    for (const u of users) {
+      const uDiv = document.createElement("div");
+      uDiv.className = "cloud-user-row";
+      uDiv.innerHTML = `<strong>${ic("target", "ic-xs")} ${esc(u)}</strong>`;
+      const gBox = document.createElement("div");
+      gBox.className = "chip-row";
+      try {
+        const files = await cloudListGroups(u);
+        files.forEach(f => {
+          const chip = document.createElement("button");
+          chip.className = "chip";
+          chip.innerHTML = `${ic("folder", "ic-xs")} ${esc(f.name.replace(/\.json$/, ""))}`;
+          chip.title = "Wczytaj ten folder na mapę";
+          chip.addEventListener("click", async () => {
+            try {
+              const { gName, n } = await cloudLoadGroupFile(u, f.name,
+                { asForeign: u !== userSlug(state.cloud.user) });
+              renderPois(); renderPoiFolders(); renderPoiCatFilter(); renderPoiList();
+              toast(`Wczytano „${gName}" (${n} punktów).`);
+            } catch (err) { toast("Nie udało się wczytać: " + err.message); }
+          });
+          gBox.appendChild(chip);
+        });
+      } catch { gBox.innerHTML = "<em>błąd listowania</em>"; }
+      uDiv.appendChild(gBox);
+      box.appendChild(uDiv);
+    }
+  } catch (err) {
+    box.innerHTML = `<em>Błąd: ${esc(err.message)}</em>`;
+  }
+});
 
 /* ── eksport / import POI ── */
 
@@ -1062,6 +1540,7 @@ document.getElementById("poi-import").addEventListener("change", e => {
   rd.onload = () => {
     let n = 0;
     try {
+      const targetGroup = poiPanelGroup || DEFAULT_GROUP;
       if (/\.(geojson|json)$/i.test(f.name)) {
         const gj = JSON.parse(rd.result);
         (gj.features || []).forEach(ft => {
@@ -1073,7 +1552,7 @@ document.getElementById("poi-import").addEventListener("change", e => {
             name: ft.properties?.name || "Punkt",
             note: ft.properties?.note || "",
             cat: POI_CATS[ft.properties?.cat] ? ft.properties.cat : "other",
-            color: ft.properties?.color || "", ts: Date.now(),
+            color: ft.properties?.color || "", group: targetGroup, ts: Date.now(),
           });
           n++;
         });
@@ -1087,13 +1566,14 @@ document.getElementById("poi-import").addEventListener("change", e => {
             note: w.querySelector("desc")?.textContent || "",
             cat: POI_CATS[w.querySelector("sym")?.textContent] ?
               w.querySelector("sym").textContent : "other",
-            color: "", ts: Date.now(),
+            color: "", group: targetGroup, ts: Date.now(),
           });
           n++;
         });
       }
       if (!n) throw new Error("brak punktów");
-      savePois(); renderPois(); renderPoiCatFilter(); renderPoiList();
+      savePois(); renderPois(); renderPoiFolders(); renderPoiCatFilter(); renderPoiList();
+      markDirty(targetGroup);
       toast(`Zaimportowano ${n} punktów.`);
     } catch (err) {
       toast(`Nie udało się zaimportować: ${err.message}`);
@@ -1106,8 +1586,10 @@ document.getElementById("poi-import").addEventListener("change", e => {
 document.getElementById("poi-wipe").addEventListener("click", () => {
   if (!state.pois.length) return;
   if (!confirm(`Usunąć wszystkie punkty (${state.pois.length})? Zrób wcześniej eksport!`)) return;
+  const touched = new Set(state.pois.map(p => p.group || DEFAULT_GROUP));
   state.pois = [];
-  savePois(); renderPois(); renderPoiList(); renderPoiCatFilter();
+  savePois(); renderPois(); renderPoiFolders(); renderPoiList(); renderPoiCatFilter();
+  touched.forEach(g => markDirty(g));
 });
 
 /* ───────────────────────── GPX — ślady ───────────────────────── */
@@ -1154,7 +1636,7 @@ function importGpx(xmlText, fname) {
         state.pois.push({
           id: "p" + Date.now() + "_" + nWpt, lat, lng, name,
           note: w.querySelector("desc")?.textContent || "",
-          cat: "other", color: "", ts: Date.now(),
+          cat: "other", color: "", group: DEFAULT_GROUP, ts: Date.now(),
         });
       } else {
         L.marker([lat, lng]).bindPopup(esc(name)).addTo(group);
@@ -1168,7 +1650,7 @@ function importGpx(xmlText, fname) {
       gpxLayers.push(group);
       map.fitBounds(group.getBounds(), { padding: [40, 40] });
     }
-    if (wptAsPoi && nWpt) { savePois(); renderPois(); }
+    if (wptAsPoi && nWpt) { savePois(); renderPois(); markDirty(DEFAULT_GROUP); }
     status.textContent = `${fname}: ${nTrk} tras, ${nWpt} punktów${wptAsPoi && nWpt ? " (dopisano do POI)" : ""}.`;
     closeModal("gpx-modal");
     toast(`Wczytano ${fname}`);

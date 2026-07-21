@@ -118,7 +118,56 @@ w topbarze (przeniesione do dolnego paska akcji), brak `safe-area`,
 `prompt()` zamiast edytora, brak long-pressa i wibracji (haptyka
 `navigator.vibrate`).
 
-## 7. Uwagi prawne
+## 7. Wikimapia — inżynieria wsteczna wariantów
+
+Po ponownej analizie pakietów AnyGIS/melda i implementacji z
+[leaflet.wikimapia](https://github.com/olegsmetanin/leaflet.wikimapia)
+(ten sam wzór stosują SAS.Planet i pakiety Locusa):
+
+- kafelek: `http://i{hash}.wikimapia.org/?x={x}&y={y}&zoom={z}&type=hybrid&lng=0`,
+  gdzie **hash = x%4 + (y%4)·4** (subdomeny `i0`–`i15`) — zaimplementowane
+  jako własna klasa `L.TileLayer` z nadpisanym `getTileUrl` (Leaflet nie umie
+  liczyć subdomeny z kafelka);
+- serwery Wikimapii nie mają https, więc wariant domyślny opakowuje kafelek
+  w `https://wsrv.nl/?url=…` (publiczny cache obrazków images.weserv.nl) —
+  dzięki temu nakładka działa też na stronie https (github.io) bez żadnego
+  klucza API; wariant bezpośredni (http) zostaje dla Androida/WebView;
+- gotowe profile: **Wikimapia** (OSM+obiekty), **Google+Wikimapia**,
+  **Google Sat+Wikimapia** — odpowiedniki hybryd z pakietów rosyjskich.
+
+## 8. Baza plików POI w repozytorium GitHub (konta użytkowników)
+
+Architektura „chmury" bez własnego backendu:
+
+- dane trzyma osobna gałąź **`poi-db`** (nie uruchamia wdrożeń Pages),
+  struktura: `poi-db/<użytkownik>/<folder>.json`, a każdy plik to jeden
+  folder punktów: `{ name, user, updated, pois[] }`;
+- **odczyt jest publiczny** — GitHub Contents API pozwala czytać publiczne
+  repo bez tokena i wysyła nagłówki CORS, więc „Przeglądaj bazę" działa
+  u każdego (nagłówek `Accept` jest CORS-safelisted — zero preflight);
+- **zapis** wymaga fine-grained tokena (Contents: write) wklejanego
+  w aplikacji (trzymany w localStorage) — commit przez `PUT /contents`,
+  konflikt SHA rozwiązywany strategią last-write-wins z ponownym pobraniem;
+- **auto-sync**: każda zmiana oznacza folder jako „brudny" i po 4 s ciszy
+  zapisuje tylko zmienione pliki (debounce), więc nie trzeba niczego
+  eksportować ręcznie; foldery można tworzyć, zmieniać nazwy i usuwać,
+  a operacje odbijają się w plikach repo;
+- pełna historia zmian punktów = historia commitów gałęzi `poi-db`.
+
+To model lepszy niż w Locus/OsmAnd o tyle, że baza jest jawna, wersjonowana
+i współdzielona linkiem, a „konto" nie wymaga rejestracji — wystarczy nazwa
+katalogu i token.
+
+## 9. Własne mapy WMS/XYZ
+
+Manager warstw pozwala dopisać dowolną usługę WMS (endpoint + LAYERS +
+format + przezroczystość, np. geoportale wojewódzkie, ISOK) albo serwer
+kafelków XYZ; wpisy trafiają do kategorii „Moje mapy (własne)"
+w localStorage i zachowują się jak wbudowane (ulubione, test ⚡, profile).
+Z Geoportalu dołączona jest też ortofotomapa **HighResolution** (piksel
+5–10 cm) obok standardowej i cieniowania NMT z lidaru.
+
+## 10. Uwagi prawne
 
 Endpointy Google, 2GIS, nakarte, marshruty itp. pochodzą z nieoficjalnych
 pakietów społeczności Locusa — dostawcy mogą je zmieniać lub ograniczać.

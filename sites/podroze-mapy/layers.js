@@ -168,6 +168,13 @@ const MAP_SOURCES = [
     opts: { maxZoom: 19, attribution: "© GUGiK / geoportal.gov.pl" },
     home: [52.2, 19.4, 6],
     desc: "Państwowa ortofotomapa Polski — bardzo wysoka rozdzielczość." },
+  { id: "geoportal-orto-hd", name: "Geoportal Ortofotomapa HD (WMS)", cat: "Polska — Geoportal",
+    type: "wms",
+    url: "https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/HighResolution",
+    wms: { layers: "Raster", format: "image/jpeg" },
+    opts: { maxZoom: 21, attribution: "© GUGiK / geoportal.gov.pl" },
+    home: [52.2, 19.4, 12],
+    desc: "Ortofotomapa wysokiej rozdzielczości (piksel 5–10 cm) — usługa WMS HighResolution PZGiK." },
   { id: "geoportal-topo", name: "Geoportal Mapa topograficzna (WMS)", cat: "Polska — Geoportal",
     type: "wms",
     url: "https://mapy.geoportal.gov.pl/wss/service/PZGIK/mapy/WMS/MapyTopograficzne",
@@ -354,10 +361,20 @@ const MAP_SOURCES = [
     opts: { maxZoom: 18, opacity: 0.5, attribution: "© GUGiK" },
     home: [52.2, 19.4, 6],
     desc: "Precyzyjne cieniowanie z lidarowego NMT Polski." },
-  { id: "wikimapia", name: "Wikimapia — obrysy obiektów", cat: "Nakładki — teren i kataster", overlay: true, http: true,
-    url: "http://i{s}.wikimapia.org/?x={x}&y={y}&zoom={z}&type=hybrid&lng=0",
-    opts: { maxZoom: 19, subdomains: "0123", attribution: "© Wikimapia" },
-    desc: "Obrysy i nazwy obiektów z Wikimapii (z pakietów AnyGIS/melda; tylko http)." },
+  /* Wikimapia — kafelki hybrid z subdomeną liczoną wzorem hash = x%4 + (y%4)*4
+     (i0–i15.wikimapia.org), jak w pluginie leaflet.wikimapia i pakietach
+     AnyGIS/SAS.Planet. Serwery są tylko http, więc wariant „https" idzie
+     przez publiczny proxy obrazków wsrv.nl (images.weserv.nl). */
+  { id: "wikimapia", name: "Wikimapia — obiekty (https, zawsze działa)", cat: "Nakładki — teren i kataster",
+    overlay: true, wm: "proxy",
+    url: "wikimapia-hash",
+    opts: { maxZoom: 19, attribution: "© Wikimapia / wsrv.nl" },
+    desc: "Obrysy i nazwy obiektów Wikimapii przez proxy https wsrv.nl — działa też na stronie https (github.io). Nakładaj na Google, satelitę, OSM." },
+  { id: "wikimapia-direct", name: "Wikimapia — obiekty (bezpośrednio, http)", cat: "Nakładki — teren i kataster",
+    overlay: true, wm: "direct", http: true,
+    url: "wikimapia-hash",
+    opts: { maxZoom: 19, attribution: "© Wikimapia" },
+    desc: "Bezpośrednie kafelki i0–i15.wikimapia.org (jak w Locus/AnyGIS) — szybsze, ale http: działa lokalnie i w aplikacji Android." },
   { id: "gugik-dzialki", name: "Działki ewidencyjne GUGiK (PL)", cat: "Nakładki — teren i kataster", overlay: true,
     type: "wms",
     url: "https://integracja.gugik.gov.pl/cgi-bin/KrajowaIntegracjaEwidencjiGruntow",
@@ -433,6 +450,7 @@ const MAP_SOURCES = [
 
 /* Kolejność kategorii w managerze warstw */
 const CATEGORY_ORDER = [
+  "Moje mapy (własne)",
   "OpenStreetMap",
   "Topo / Outdoor",
   "Satelitarne",

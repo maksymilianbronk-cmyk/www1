@@ -257,6 +257,13 @@ html, body {
 .lr-home:hover { color: var(--accent2); }
 .lr-fav.on { color: var(--warn); }
 .lr-fav.on .ic { fill: var(--warn); }
+.lr-del {
+  background: none; border: 0; cursor: pointer;
+  padding: 9px 6px; color: var(--fg2);
+  display: inline-flex; align-items: center;
+}
+.lr-del .ic { width: 15px; height: 15px; }
+.lr-del:hover { color: var(--bad); }
 .lr-opacity {
   width: 100%; margin: 0 8px 8px 30px; accent-color: var(--accent);
   height: 22px;
@@ -422,6 +429,32 @@ html, body {
   padding: 8px; color: var(--fg2);
 }
 .poi-row-edit:hover { color: var(--accent); }
+
+/* ── Chmura GitHub / własne mapy ── */
+.cloud-box {
+  margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px;
+}
+.cloud-box summary {
+  cursor: pointer; font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0;
+}
+.cloud-box summary::-webkit-details-marker { display: none; }
+.cloud-user-row {
+  border-top: 1px solid var(--line); padding: 8px 0; font-size: 13px;
+}
+.cloud-user-row strong {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+}
+#cloud-browse { margin-top: 8px; max-height: 34vh; overflow-y: auto; }
+#cloud-status { margin-top: 8px; }
+
+.chip input[type="radio"] { accent-color: var(--accent); margin: 0 2px 0 0; }
+.chip:has(input[type="radio"]:checked) {
+  background: var(--accent); color: #14100a; border-color: var(--accent);
+  font-weight: 600;
+}
+select.poi-filter { appearance: auto; }
 
 /* ── Toast ── */
 .toast {
