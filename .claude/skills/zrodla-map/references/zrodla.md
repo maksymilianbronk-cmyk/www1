@@ -36,6 +36,8 @@ Status: ✅ działa (zweryfikowane w aplikacji/konfiguracjach), 🔑 wymaga kluc
 | `WMTS/guest/wmts/{ORTO,TOPO,BDOT10k,G2_MOBILE_500}` | WMTS KVP | ✅ EPSG:3857 | wprost XYZ-KVP |
 | `WMTS .../ISOK_CIEN`, `NMT/GRID1/WMTS/ShadedRelief` | WMTS | ❌ tylko 2180 | NIE w Leaflet |
 | `img/guest/{CIEN,HIPSO}/MapServer` | ArcGIS REST | export → 3857 | typ `esri` (serwer reprojektuje) |
+| `gprest/services/G2_MOBILE_500/MapServer` | ArcGIS REST | export → 3857 | ✅ POTWIERDZONE przez użytkownika (mapa topo BDOT10k, szybkie z size=512) |
+| `pub/guest/kompozycja_BDOT10k_WMS/MapServer` | REST/WMS | ？ | export NIEPOTWIERDZONY (użytkownik potwierdził tylko gprest) — nie używać bez testu |
 | `PZGIK/NMT/GRID1/WMS/ShadedRelief` (1m) | WMS | 2180/4326 | `crs4326:true`, v1.1.1 |
 | `PZGIK/mapy/WMS/MapyTopograficzne`, `PZGIK/ORTO/WMS/HighResolution` | WMS | j.w. | `crs4326:true` |
 | `integracja.gugik.gov.pl/cgi-bin/KrajowaIntegracjaEwidencjiGruntow` | WMS | ✅ 3857 | dzialki,numery_dzialek (ELI/JOSM) |

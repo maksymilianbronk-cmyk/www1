@@ -488,7 +488,7 @@ const QUICK_ITEMS = [
   { id: "geoportal-cien-rest", mode: "overlay" },
   { id: "wikimapia", mode: "overlay" },
   { id: "gugik-dzialki", mode: "overlay" },
-  { id: "geoportal-bdot10k-wiz", mode: "base" },
+  { id: "geoportal-bdot", mode: "base" },
   { id: "geoportal-hipso-rest", mode: "base" },
   { id: "geoportal-nmt-solo", mode: "base" },
   { id: "wikimapia-solo", mode: "base" },
