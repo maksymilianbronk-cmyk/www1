@@ -1,0 +1,11 @@
+{
+  "name": "Miejsca testowe",
+  "user": "demo",
+  "updated": "2026-07-21T00:00:00Z",
+  "pois": [
+    { "id": "demo_1", "lat": 54.5189, "lng": 18.5305, "name": "Molo w Sopocie", "cat": "view", "color": "", "note": "Najdłuższe drewniane molo w Europie.", "group": "Miejsca testowe", "ts": 0 },
+    { "id": "demo_2", "lat": 49.2992, "lng": 19.9496, "name": "Giewont", "cat": "peak", "color": "", "note": "1894 m n.p.m., krzyż na szczycie.", "group": "Miejsca testowe", "ts": 0 },
+    { "id": "demo_3", "lat": 50.0547, "lng": 19.9352, "name": "Wawel", "cat": "heritage", "color": "", "note": "Zamek Królewski w Krakowie.", "group": "Miejsca testowe", "ts": 0 },
+    { "id": "demo_4", "lat": 53.9264, "lng": 18.5273, "name": "Wdzydze Kiszewskie", "cat": "water", "color": "", "note": "Kaszubskie Morze — krzyżówka jezior.", "group": "Miejsca testowe", "ts": 0 }
+  ]
+}
