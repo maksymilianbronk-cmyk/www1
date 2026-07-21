@@ -337,7 +337,26 @@ function clearOverlays() {
   LS.set("overlays", state.overlays);
 }
 
-/* Zgłoś raz problem z kafelkami danej warstwy */
+/* Diagnostyka kafelka: pobierz próbkę i pokaż, co NAPRAWDĘ odpowiada serwer
+   (status, typ treści, fragment komunikatu błędu WMS/REST). */
+async function diagnoseTile(src) {
+  const url = testTileUrl(src);
+  console.warn("[Trasa] diagnoza warstwy", src.id, url);
+  try {
+    const r = await fetch(url);
+    const ct = (r.headers.get("content-type") || "?").split(";")[0];
+    if (ct.startsWith("image/")) {
+      const size = (await r.blob()).size;
+      return `serwer odpowiada obrazem (${ct}, ${size} B, HTTP ${r.status}) — jeśli mapa pusta, to zasięg/zoom, nie awaria`;
+    }
+    const txt = (await r.text()).replace(/\s+/g, " ").slice(0, 180);
+    return `HTTP ${r.status}, ${ct}: ${txt}`;
+  } catch (e) {
+    return "nie można pobrać (sieć/CORS): " + e.message;
+  }
+}
+
+/* Zgłoś raz problem z kafelkami danej warstwy + automatyczna diagnoza */
 const errWarned = new Set();
 function onTileError(src) {
   return () => {
@@ -345,8 +364,15 @@ function onTileError(src) {
     errWarned.add(src.id);
     if (src.http && location.protocol === "https:") {
       toast(`„${src.name}" używa http — przeglądarka blokuje ją na stronie https.`);
-    } else if (src.home) {
-      toast(`„${src.name}" może nie pokrywać tego obszaru — użyj przycisku przelotu przy warstwie, aby przelecieć do jej zasięgu.`);
+      return;
+    }
+    if (src.type === "wms" || src.type === "esri") {
+      toast(`Kafelki „${src.name}" nie wczytują się — diagnozuję…`);
+      diagnoseTile(src).then(d => toast(`„${src.name}": ${d}`, 12000));
+      return;
+    }
+    if (src.home) {
+      toast(`„${src.name}" może nie pokrywać tego obszaru — użyj przycisku przelotu przy warstwie.`);
     } else {
       toast(`Kafelki „${src.name}" nie odpowiadają (serwer/zasięg/limit).`);
     }
@@ -833,6 +859,14 @@ function testCategory(items, sec) {
     img.onerror = () => done(false);
     img.src = testTileUrl(src);
     setTimeout(() => { if (dot.className.includes("pending")) done(false); }, 12000);
+    /* czerwona/żółta kropka jest klikalna → pełna diagnoza w toaście */
+    dot.style.cursor = "pointer";
+    dot.addEventListener("click", async e => {
+      if (dot.className.includes("ok") || dot.className.includes("pending")) return;
+      e.stopPropagation();
+      toast(`Diagnozuję „${src.name}"…`);
+      toast(`„${src.name}": ${await diagnoseTile(src)}`, 15000);
+    });
   });
 }
 
