@@ -207,7 +207,7 @@ const MAP_SOURCES = [
     autoLayers: true,
     opts: { maxZoom: 19, tileSize: 512, attribution: "© GUGiK / geoportal.gov.pl" },
     home: [52.2, 19.4, 9],
-    desc: "Właściwa wizualizacja kartograficzna BDOT10k/BDOO (skale 1:1000–1:8 mln) z oficjalnej usługi WMS kompozycji — styl jak na geoportal.gov.pl. Samonaprawa: przy błędzie warstwa sama odczytuje nazwy z GetCapabilities." },
+    desc: "Właściwa wizualizacja kartograficzna BDOT10k/BDOO (skale 1:1000–1:8 mln) z oficjalnej usługi WMS kompozycji — styl jak na geoportal.gov.pl. Samonaprawa: przy pierwszym włączeniu warstwa odczytuje nazwy z GetCapabilities i żąda pełnej kompozycji (wszystkie podwarstwy), nie tylko podwarstwy „0”." },
   { id: "geoportal-bdot", name: "BDOT10k — styl mobilny (szybka)", cat: "Polska — Geoportal",
     type: "esri",
     url: "https://mapy.geoportal.gov.pl/gprest/services/G2_MOBILE_500/MapServer",

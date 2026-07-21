@@ -202,7 +202,7 @@ const wmsLayersOverride = LS.get("wmsLayersOverride", {});
    i przekonfiguruj źródło (dla usług, których dokumentacji nie da się
    zweryfikować z góry — np. kompozycja kartograficzna BDOT10k). */
 const autoFixTried = new Set();
-async function autoFixWmsLayers(src) {
+async function autoFixWmsLayers(src, proactive = false) {
   if (autoFixTried.has(src.id)) return false;
   autoFixTried.add(src.id);
   try {
@@ -212,10 +212,16 @@ async function autoFixWmsLayers(src) {
     const names = [...doc.querySelectorAll("Layer > Name")]
       .map(n => n.textContent.trim()).filter(Boolean);
     if (!names.length) return false;
-    /* korzeń kompozycji (pierwszy Name) renderuje całość; jeśli obecna
-       wartość już jest poprawna — nic nie zmieniaj */
+    /* Wybór warstw do wyrenderowania pełnej kompozycji:
+       - usługi ArcGIS MapServer/WMS wystawiają numerowane podwarstwy
+         (0,1,2,…) będące tematami mapy (drogi, budynki, woda…) — pełny
+         obraz powstaje po zażądaniu ICH WSZYSTKICH naraz,
+       - usługi z jedną nazwaną kompozycją (grupą) — bierzemy tę nazwę. */
+    const numeric = names.every(n => /^\d+$/.test(n));
+    const want = numeric ? names.join(",") : names[0];
     const current = wmsLayersOverride[src.id] || src.wms.layers;
-    const pick = names.includes(current) ? null : names[0];
+    /* nic nie zmieniaj tylko jeśli już żądamy dokładnie tego samego zestawu */
+    const pick = current === want ? null : want;
     console.warn("[Trasa] GetCapabilities", src.id, "warstwy:", names, "wybrano:", pick);
     if (!pick) return false;
     wmsLayersOverride[src.id] = pick;
@@ -223,7 +229,9 @@ async function autoFixWmsLayers(src) {
     /* przeładuj warstwę z nową konfiguracją */
     if (state.baseId === src.id) setBase(src.id);
     if (activeOverlays[src.id]) { toggleOverlay(src.id); toggleOverlay(src.id); }
-    toast(`Warstwa „${src.name}" przekonfigurowana automatycznie (LAYERS=${pick}).`, 6000);
+    toast(proactive
+      ? `Warstwa „${src.name}" skonfigurowana z usługi (LAYERS=${pick}).`
+      : `Warstwa „${src.name}" przekonfigurowana automatycznie (LAYERS=${pick}).`, 5000);
     return true;
   } catch (e) {
     console.warn("[Trasa] samonaprawa nieudana", src.id, e.message);
@@ -233,6 +241,16 @@ async function autoFixWmsLayers(src) {
 
 function effectiveWmsLayers(src) {
   return wmsLayersOverride[src.id] || src.wms.layers;
+}
+
+/* Proaktywna konfiguracja: przy pierwszej aktywacji warstwy z autoLayers,
+   jeśli nie mamy jeszcze zapisanego wyboru, od razu odczytaj właściwe
+   nazwy z GetCapabilities (bez czekania na błąd kafelka — usługa może
+   zwracać poprawny, lecz NIEPEŁNY obraz przy domyślnym LAYERS). */
+function maybeAutoLayers(src) {
+  if (!src || !src.autoLayers) return;
+  if (wmsLayersOverride[src.id] || autoFixTried.has(src.id)) return;
+  autoFixWmsLayers(src, true).catch(() => {});
 }
 
 function makeLayer(src, extra = {}) {
@@ -340,6 +358,7 @@ function setBase(id, { fly = false } = {}) {
   baseLayer = makeLayer(src).addTo(map);
   if (src.combo) baseLayer.eachLayer(l => l.on && l.on("tileerror", onTileError(src)));
   else baseLayer.on("tileerror", onTileError(src));
+  maybeAutoLayers(src);
   state.baseId = id;
   LS.set("baseId", id);
   noteRecent(id);
@@ -366,6 +385,7 @@ function toggleOverlay(id, silent = false) {
     }
     const ly = makeLayer(src).addTo(map);
     ly.on("tileerror", onTileError(src));
+    maybeAutoLayers(src);
     activeOverlays[id] = ly;
     if (!state.overlays.includes(id)) state.overlays.push(id);
   }

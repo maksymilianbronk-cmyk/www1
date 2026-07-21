@@ -37,7 +37,7 @@ Status: ✅ działa (zweryfikowane w aplikacji/konfiguracjach), 🔑 wymaga kluc
 | `WMTS .../ISOK_CIEN`, `NMT/GRID1/WMTS/ShadedRelief` | WMTS | ❌ tylko 2180 | NIE w Leaflet |
 | `img/guest/{CIEN,HIPSO}/MapServer` | ArcGIS REST | export → 3857 | typ `esri` (serwer reprojektuje) |
 | `gprest/services/G2_MOBILE_500/MapServer` | ArcGIS REST | export → 3857 | ✅ POTWIERDZONE przez użytkownika (mapa topo BDOT10k, szybkie z size=512) |
-| `pub/guest/kompozycja_BDOT10k_WMS/MapServer` | REST/WMS | ？ | export NIEPOTWIERDZONY (użytkownik potwierdził tylko gprest) — nie używać bez testu |
+| `pub/guest/kompozycja_BDOT10k_WMS/MapServer/WMSServer` | WMS (ArcGIS) | 4326 | `crs4326:true`, v1.3.0 + `autoLayers:true` (samonaprawa) — patrz niżej |
 | `PZGIK/NMT/GRID1/WMS/ShadedRelief` (1m) | WMS | 2180/4326 | `crs4326:true`, v1.1.1 |
 | `PZGIK/mapy/WMS/MapyTopograficzne`, `PZGIK/ORTO/WMS/HighResolution` | WMS | j.w. | `crs4326:true` |
 | `integracja.gugik.gov.pl/cgi-bin/KrajowaIntegracjaEwidencjiGruntow` | WMS | ✅ 3857 | dzialki,numery_dzialek (ELI/JOSM) |
@@ -53,6 +53,30 @@ MapQuest, ChartBundle, toolserver HikeBike, tiles.wmflabs.org, Kosmosnimki,
 stara Strava heatmap (wymaga logowania), mail.ru/navitel, mapy z IP
 `91.237.82.95:8086` (genshtab/Strelbitsky z pakietów Orux — niestabilne),
 Yandex (EPSG:3395 — poza Leafletem), HERE/Mapbox bez tokena.
+
+## ArcGIS MapServer/WMS — kompozycje (np. kartograficzna BDOT10k)
+
+Usługi `.../MapServer/WMSServer` z Geoportalu to serwery ArcGIS. W ich
+`GetCapabilities`:
+- korzeń `<Layer>` często NIE ma `<Name>` (tylko `<Title>`),
+- podwarstwy tematyczne są **numerowane** `0,1,2,…` (drogi, wody, budynki…).
+
+Żeby narysować **pełną kompozycję** trzeba zażądać `LAYERS=0,1,2,3,…`
+(wszystkich naraz) — samo `LAYERS=0` daje tylko jeden temat (pusty/częściowy
+obraz, często BEZ błędu HTTP → self-heal wyzwalany błędem kafelka się nie
+uruchomi). Dlatego:
+
+- Flaga `autoLayers:true` + `maybeAutoLayers()` w app.js odpytuje
+  `GetCapabilities` **proaktywnie przy pierwszym włączeniu** warstwy
+  (nie czeka na `tileerror`).
+- `autoFixWmsLayers`: jeśli wszystkie nazwy są numeryczne →
+  `LAYERS = names.join(",")`; jeśli jest nazwana grupa/kompozycja →
+  `LAYERS = names[0]`. Wynik zapisany w `wmsLayersOverride` (localStorage).
+- WMS 1.3.0 + EPSG:4326: kolejność osi BBOX to `lat,lon`
+  (Leaflet `L.CRS.EPSG4326` robi to sam; w ręcznym `tileUrlFor` pamiętaj).
+- Test E2E: `serviceWorkers:"block"`, `route.fulfill` z nagłówkiem
+  `Access-Control-Allow-Origin:*` dla GetCapabilities i mały PNG dla GetMap
+  (inaczej `route.abort()` wywoła `tileerror` → diagnoza nadpisze toast).
 
 ## Wiedza o środowisku pracy
 
