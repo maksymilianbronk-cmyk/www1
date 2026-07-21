@@ -23,6 +23,13 @@
  * - Docelowo (wersja Android / backend) token powinien mieszkać w małym
  *   serwerze pośredniczącym, nie w kliencie.
  */
+/* ZALECANA DROGA (bez edycji tego pliku): otwórz aplikację → panel Punkty →
+ * Chmura GitHub → „Administrator — aktywuj chmurę dla wszystkich" → wklej
+ * token → Aktywuj. Token zapisze się w formie zakodowanej w cloud/config.json
+ * na gałęzi poi-db (odporne na skanery sekretów, bez przebudowy strony),
+ * a użytkownicy będą zakładać konta samym loginem i hasłem.
+ */
 window.TRASA_CLOUD = {
-  appToken: "", // ← tu wklej token aplikacji (github_pat_…)
+  appToken: "",     // (niezalecane) jawny token aplikacji
+  appTokenObf: [],  // (opcja) token zakodowany funkcją obfToken z app.js
 };

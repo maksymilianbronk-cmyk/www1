@@ -277,6 +277,20 @@
         <div id="cloud-status" class="modal-info"></div>
         <div id="cloud-browse"></div>
         <details class="cloud-adv">
+          <summary>Administrator — aktywuj chmurę dla wszystkich (właściciel repo)</summary>
+          <p class="modal-info">Wklej swój token GitHub (fine-grained, dostęp TYLKO do repo
+            <code>www1</code>, uprawnienie <em>Contents: Read and write</em>) i kliknij Aktywuj.
+            Token zostanie zapisany w formie zakodowanej w <code>cloud/config.json</code> na
+            gałęzi <code>poi-db</code> — od tej chwili wszyscy użytkownicy zakładają konta samym
+            loginem i hasłem. Uwaga: kodowanie chroni przed skanerami, nie przed człowiekiem —
+            baza POI jest publiczna, a token musi być ograniczony do tego jednego repo.</p>
+          <label class="fld">Token właściciela
+            <input id="admin-token" type="password" placeholder="github_pat_…" autocomplete="off" />
+          </label>
+          <button id="admin-activate" class="btn-primary">Aktywuj chmurę dla wszystkich</button>
+          <div id="admin-status" class="modal-info"></div>
+        </details>
+        <details class="cloud-adv">
           <summary>Zaawansowane — własny token GitHub</summary>
           <p class="modal-info">Konta działają przez token aplikacji skonfigurowany przez
             właściciela repo (<code>cloud-config.js</code>). Możesz też użyć

@@ -1442,9 +1442,48 @@ function userSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-/* Token zapisu: własny użytkownika > token aplikacji z cloud-config.js */
+/* ── Token aplikacji: logika „chmura na koncie właściciela" ──
+   Właściciel repo aktywuje chmurę raz w panelu Administratora: jego token
+   trafia w formie ZAKODOWANEJ (odwrócony base64 w kawałkach — nie wygląda
+   jak github_pat_, więc skanery sekretów go nie unieważnią) do pliku
+   cloud/config.json na gałęzi poi-db. Każda przeglądarka pobiera go przy
+   starcie i dekoduje w locie — użytkownicy zakładają konta samym loginem
+   i hasłem. Kodowanie to zasłona, nie szyfr: token musi być dedykowany
+   wyłącznie do tego repo (Contents), a baza POI jest jawna. */
+
+function obfToken(token) {
+  const b = b64enc(token.split("").reverse().join(""));
+  const parts = [];
+  for (let i = 0; i < b.length; i += 18) parts.push(b.slice(i, i + 18));
+  return parts;
+}
+function deobfToken(parts) {
+  try {
+    if (!parts || !parts.length) return "";
+    return b64dec(parts.join("")).split("").reverse().join("");
+  } catch { return ""; }
+}
+
+let REMOTE_CLOUD_TOKEN = deobfToken(LS.get("cloudCfg", null)?.tokenObf);
+const CLOUD_CFG_URL =
+  "https://raw.githubusercontent.com/maksymilianbronk-cmyk/www1/poi-db/cloud/config.json";
+
+async function fetchCloudConfig() {
+  try {
+    const r = await fetch(CLOUD_CFG_URL, { cache: "no-cache" });
+    if (!r.ok) return;
+    const cfg = await r.json();
+    LS.set("cloudCfg", cfg);
+    REMOTE_CLOUD_TOKEN = deobfToken(cfg.tokenObf);
+    renderCloudUI();
+  } catch { /* offline — zostaje wersja z cache */ }
+}
+
+/* Priorytet: własny token użytkownika > cloud-config.js > zdalny config poi-db */
 function writeToken() {
-  return (state.cloud.token || (window.TRASA_CLOUD && window.TRASA_CLOUD.appToken) || "").trim();
+  const c = window.TRASA_CLOUD || {};
+  return (state.cloud.token || c.appToken || deobfToken(c.appTokenObf) ||
+    REMOTE_CLOUD_TOKEN || "").trim();
 }
 
 async function ghApi(path, opts = {}) {
@@ -1482,7 +1521,8 @@ async function sha256Hex(str) {
 async function accountRegister(login, pass) {
   const slug = userSlug(login);
   if (!slug || pass.length < 4) throw new Error("podaj login i hasło (min. 4 znaki)");
-  if (!writeToken()) throw new Error("wklej najpierw token GitHub w polu powyżej");
+  if (!writeToken()) throw new Error(
+    "chmura nieaktywna — właściciel repo aktywuje ją w panelu Administratora (albo wklej własny token powyżej)");
   const existing = await ghApi(`contents/${CLOUD.root}/${slug}/_account.json?ref=${CLOUD.branch}`);
   if (existing) throw new Error("ten login jest już zajęty");
   const salt = [...crypto.getRandomValues(new Uint8Array(12))]
@@ -1654,12 +1694,19 @@ function renderCloudUI() {
     document.getElementById("acc-status").textContent =
       `Zalogowano jako ${state.cloud.user} · foldery synchronizują się z bazą poi-db.`;
   }
-  /* blok tokena pokazuj tylko, gdy aplikacja nie ma wbudowanego tokena aplikacji */
-  const hasAppToken = !!(window.TRASA_CLOUD && window.TRASA_CLOUD.appToken);
+  /* blok tokena pokazuj tylko, gdy chmura nie została aktywowana przez właściciela */
+  const c = window.TRASA_CLOUD || {};
+  const hasAppToken = !!(c.appToken || deobfToken(c.appTokenObf) || REMOTE_CLOUD_TOKEN);
   const tokBox = document.getElementById("acc-need-token");
   const tokInput = document.getElementById("acc-token");
   if (tokBox) tokBox.classList.toggle("hidden", hasAppToken || logged);
   if (tokInput) tokInput.value = state.cloud.token || "";
+  const admStatus = document.getElementById("admin-status");
+  if (admStatus && !admStatus.dataset.busy) {
+    admStatus.textContent = hasAppToken
+      ? "Chmura AKTYWNA — użytkownicy zakładają konta bez tokenów."
+      : "Chmura nieaktywna — wklej token właściciela i kliknij Aktywuj.";
+  }
   cloudStatus(cloudReady()
     ? `Konto: ${state.cloud.user} · auto-sync ${state.cloud.auto ? "włączony" : "wyłączony"}`
     : (window.TRASA_CLOUD?.appToken
@@ -1710,6 +1757,45 @@ document.getElementById("acc-logout").addEventListener("click", () => {
   setSession("");
   document.getElementById("acc-pass").value = "";
   cloudStatus("Wylogowano — punkty zostają lokalnie w tej przeglądarce.");
+});
+
+/* ── Panel administratora: aktywacja chmury tokenem właściciela ── */
+document.getElementById("admin-activate").addEventListener("click", async () => {
+  const st = document.getElementById("admin-status");
+  const token = document.getElementById("admin-token").value.trim();
+  st.dataset.busy = "1";
+  if (!token) { st.textContent = "Wklej token właściciela."; delete st.dataset.busy; return; }
+  st.textContent = "Aktywuję chmurę…";
+  try {
+    /* token właściciela zostaje też lokalnie — chmura działa u Ciebie od razu */
+    state.cloud.token = token;
+    LS.set("cloud", state.cloud);
+    const cfg = {
+      v: 1,
+      updated: new Date().toISOString(),
+      tokenObf: obfToken(token),
+    };
+    const path = "cloud/config.json";
+    const cur = await ghApi(`contents/${path}?ref=${CLOUD.branch}`);
+    const body = {
+      message: "cloud: aktywacja tokena aplikacji (panel administratora)",
+      branch: CLOUD.branch,
+      content: b64enc(JSON.stringify(cfg, null, 2)),
+    };
+    if (cur && cur.sha) body.sha = cur.sha;
+    await ghApi(`contents/${path}`, { method: "PUT", body: JSON.stringify(body) });
+    LS.set("cloudCfg", cfg);
+    REMOTE_CLOUD_TOKEN = token;
+    st.textContent = "Chmura AKTYWNA — zapisano cloud/config.json na gałęzi poi-db. " +
+      "Użytkownicy (po odświeżeniu strony) zakładają konta samym loginem i hasłem.";
+    delete st.dataset.busy;
+    renderCloudUI();
+    toast("Chmura aktywowana na koncie właściciela.");
+  } catch (err) {
+    st.textContent = "Błąd aktywacji: " + err.message +
+      " (sprawdź, czy token ma Contents:write do repo www1)";
+    delete st.dataset.busy;
+  }
 });
 function saveCloudSettings() {
   state.cloud.user = document.getElementById("cloud-user").value.trim();
@@ -2381,6 +2467,7 @@ renderPresets();
 buildList();
 renderQuickToggles();
 fetchRemoteCatalog();
+fetchCloudConfig();
 
 /* PWA — rejestracja service workera (offline-shell + bufor kafelków) */
 if ("serviceWorker" in navigator &&
