@@ -1,4 +1,4 @@
-# LeadFlow CRM — pełna dokumentacja techniczna (v2.4.0)
+# LeadFlow CRM — pełna dokumentacja techniczna (v2.5.0)
 
 Samodzielny system CRM dla agencji Meta Ads na zwykłym hostingu PHP.
 Silnik **REAKTOR** — „React bez Node'a”: SPA z danymi na żywo, bez Node.js,
@@ -93,7 +93,7 @@ Zmiana silnika na MySQL: utwórz `data/config.local.php` wg wzoru w `lib/db.php`
 - **Sync**: pętla long-poll (`sync.php?rev=N`, okno 20 s, odczyt 1 wiersza/s)
   → przy zmianie delta `api.php?a=delta&since=TS` (wiersze od znacznika +
   autorytatywny zbiór id leadów — usunięcia znikają na żywo). Odstęp adaptacyjny
-  0,8→3 s; pauza w ukrytej karcie; wykrycie nowej wersji po deployu → auto-reload.
+  0,8→3,2 s; pauza w ukrytej karcie; wykrycie nowej wersji po deployu → auto-reload.
 - **Mutacje optymistyczne**: zmiana widoczna od razu, POST w tle
   (nagłówek `X-CSRF`); błąd → toast + powrót do stanu serwera; wygasły CSRF →
   automatyczne odświeżenie tokena i jedno ponowienie.

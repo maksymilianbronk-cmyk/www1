@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-const CRM_VERSION  = '2.4.0';
+const CRM_VERSION  = '2.5.0';
 const CRM_DB_PATH  = __DIR__ . '/data/crm.sqlite';
 const CRM_PER_PAGE = 25;
 

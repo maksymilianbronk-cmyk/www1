@@ -166,7 +166,16 @@ function viewLeady(s, ui) {
   </div>
   <div class="lead-list">${list ||
     `<div class="empty-state"><div class="empty-icon">${ico('inbox',42)}</div><p>Brak leadów dla tych filtrów.</p></div>`}</div>
-  ${rows.length > 200 ? `<p class="muted" style="margin-top:10px">Pokazano 200 z ${rows.length} — zawęź filtry lub użyj eksportu CSV.</p>` : ''}`;
+  ${rows.length > 200 ? `<p class="muted" style="margin-top:10px">Pokazano 200 z ${rows.length} — zawęź filtry lub użyj eksportu CSV.</p>` : ''}
+  ${!isAdmin && s.user.webhook_url ? `<details class="dev-box">
+    <summary>${ico('globe', 15)} Dla webmastera — jak podpiąć formularz Twojej strony</summary>
+    <div class="dev-box-body">
+      <p>Wyślij żądanie <code>POST</code> (JSON lub pola formularza) na adres:</p>
+      <code class="webhook-url" onclick="navigator.clipboard&&navigator.clipboard.writeText(this.textContent.trim())">${esc(s.user.webhook_url)}</code>
+      <p class="muted" style="margin-top:8px">Rozpoznawane pola: <code>name</code>/<code>imie</code>, <code>email</code>,
+        <code>phone</code>/<code>telefon</code>, <code>message</code>/<code>wiadomosc</code> — pozostałe trafią do szczegółów leada.</p>
+    </div>
+  </details>` : ''}`;
 }
 
 /* ── Widok: REKLAMY ── */
@@ -415,7 +424,7 @@ function postCard(s, ui, p, isAdmin) {
          </div>`
       : `<div class="post-body">${esc(p.body)}</div>
          ${p.error ? `<div class="post-error">${ico('x', 13)} ${esc(p.error)}</div>` : ''}
-         ${p.fb_post_id ? `<div class="post-fbid">${ico('facebook', 13)} ID posta: ${esc(p.fb_post_id)}</div>` : ''}
+         ${p.fb_post_id ? `<div class="post-fbid">${ico('facebook', 13)} <a href="https://www.facebook.com/${esc(p.fb_post_id)}" target="_blank" rel="noopener">Zobacz post na Facebooku</a></div>` : ''}
          <div class="post-actions">
            ${canApprove ? `<button class="btn btn-sm" onclick="R.postAction(${p.id},{status:'gotowy'})">${ico('check', 14)} Akceptuj</button>` : ''}
            ${canRevoke ? `<button class="btn btn-sm btn-ghost" onclick="R.postAction(${p.id},{status:'szkic'})">${ico('refresh', 14)} Cofnij akceptację</button>` : ''}

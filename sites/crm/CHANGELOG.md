@@ -1,5 +1,19 @@
 # Historia zmian — LeadFlow CRM
 
+## v2.5.0 (2026-07-21) — pakiet dokumentacji + poprawki z fact-checku
+
+- 📚 **Kompletny pakiet dokumentacji** (`docs/`): PODRECZNIK-WLASCICIELA
+  (instalacja i praca krok po kroku, bez żargonu), INSTRUKCJA-KLIENTA
+  (do rozesłania klientom agencji), AI-OPERATOR (procedury operacyjne dla
+  Claude przez MCP), START-TUTAJ (mapa pakietu).
+- 🤖 Nowy skill `reaktor-operator`: diagnostyka żywego systemu, lead
+  testowy, checklisty wdrożenia klienta, cykliczna opieka.
+- ✅ Dokumentacja zweryfikowana workflow fact-check (4 agentów vs kod);
+  poprawki: przywrócony box „Dla webmastera" w panelu klienta (zgubiony
+  przy przepisaniu na SPA w v2.0), ID opublikowanego posta jest teraz
+  klikalnym linkiem do Facebooka, doprecyzowany opis synchronizacji.
+
+
 ## v2.4.0 (2026-07-21) — audyt, wersja mobilna, PWA, dokumentacja
 
 - 📱 **Pełny audyt mobilny + przeprojektowanie**: kompaktowy pasek górny

@@ -366,7 +366,8 @@ if ($action === 'bootstrap') {
         'user'      => $isAdmin
             ? ['name' => $admin['name']]
             : ['name' => $client['name'], 'company' => $client['company'], 'id' => $clientId,
-               'has_ads_api' => $client['fb_ad_account_id'] !== ''],
+               'has_ads_api' => $client['fb_ad_account_id'] !== '',
+               'webhook_url' => base_url() . '/webhook.php?token=' . $client['token']],
         'csrf'      => csrf_token(),
         'statuses'  => CRM_STATUSES,
         'sources'   => array_map(fn($s) => $s[0], CRM_SOURCES),
