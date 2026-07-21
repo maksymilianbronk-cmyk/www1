@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#181a1f" />
-  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z 104 warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków), profilami map, trybem porównywania i menedżerem POI. Inspirowana Locus Pro / OsmAnd." />
+  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z 105 warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków), profilami map, trybem porównywania i menedżerem POI. Inspirowana Locus Pro / OsmAnd." />
   <title>Trasa — mapy podróżnicze</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -111,7 +111,7 @@
       <div id="preset-chips" class="preset-chips"></div>
     </div>
     <div class="sb-filter">
-      <input id="layer-filter" type="text" placeholder="Filtruj 104 warstw… (topo, orto, szlaki…)" />
+      <input id="layer-filter" type="text" placeholder="Filtruj 105 warstw… (topo, orto, szlaki…)" />
     </div>
     <div class="sb-hint">
       <svg class="ic ic-xs"><use href="#i-star"/></svg> ulubione ·
@@ -243,15 +243,6 @@
           z każdego urządzenia po zalogowaniu.
         </p>
         <div id="acc-forms">
-          <div id="acc-need-token" class="acc-token-box hidden">
-            <strong><svg class="ic ic-xs"><use href="#i-key"/></svg> Jednorazowa konfiguracja tokenem</strong>
-            <p class="modal-info">Ta aplikacja nie ma wbudowanego tokena. Aby konta zapisywały
-              punkty w chmurze, wklej swój token GitHub — zostaje <b>tylko w tej przeglądarce</b>,
-              nie trafia do repozytorium.
-              <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Wygeneruj token</a>
-              (fine-grained, dostęp do repo <code>www1</code>, uprawnienie <em>Contents: Read and write</em>).</p>
-            <input id="acc-token" type="password" placeholder="github_pat_… (wklej i zacznij)" autocomplete="off" />
-          </div>
           <label class="fld">Login
             <input id="acc-login" type="text" placeholder="np. maks" maxlength="30" autocomplete="username" />
           </label>
@@ -276,7 +267,7 @@
         </div>
         <div id="cloud-status" class="modal-info"></div>
         <div id="cloud-browse"></div>
-        <details class="cloud-adv">
+        <details class="cloud-adv" id="admin-panel">
           <summary>Administrator — aktywuj chmurę dla wszystkich (właściciel repo)</summary>
           <p class="modal-info">Wklej swój token GitHub (fine-grained, dostęp TYLKO do repo
             <code>www1</code>, uprawnienie <em>Contents: Read and write</em>) i kliknij Aktywuj.
@@ -290,7 +281,7 @@
           <button id="admin-activate" class="btn-primary">Aktywuj chmurę dla wszystkich</button>
           <div id="admin-status" class="modal-info"></div>
         </details>
-        <details class="cloud-adv">
+        <details class="cloud-adv" id="adv-panel">
           <summary>Zaawansowane — własny token GitHub</summary>
           <p class="modal-info">Konta działają przez token aplikacji skonfigurowany przez
             właściciela repo (<code>cloud-config.js</code>). Możesz też użyć

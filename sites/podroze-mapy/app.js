@@ -1427,6 +1427,7 @@ const CLOUD = {
   repo: "maksymilianbronk-cmyk/www1",
   branch: "poi-db",
   root: "poi-db",
+  admin: "max", // konto właściciela — tylko ono widzi panele tokenów
 };
 const shaCache = LS.get("cloudSha", {});
 
@@ -1522,7 +1523,7 @@ async function accountRegister(login, pass) {
   const slug = userSlug(login);
   if (!slug || pass.length < 4) throw new Error("podaj login i hasło (min. 4 znaki)");
   if (!writeToken()) throw new Error(
-    "chmura nieaktywna — właściciel repo aktywuje ją w panelu Administratora (albo wklej własny token powyżej)");
+    "chmura chwilowo nieaktywna — spróbuj później albo skontaktuj się z administratorem");
   const existing = await ghApi(`contents/${CLOUD.root}/${slug}/_account.json?ref=${CLOUD.branch}`);
   if (existing) throw new Error("ten login jest już zajęty");
   const salt = [...crypto.getRandomValues(new Uint8Array(12))]
@@ -1694,16 +1695,17 @@ function renderCloudUI() {
     document.getElementById("acc-status").textContent =
       `Zalogowano jako ${state.cloud.user} · foldery synchronizują się z bazą poi-db.`;
   }
-  /* blok tokena pokazuj tylko, gdy chmura nie została aktywowana przez właściciela */
+  /* Panele tokenów (Administrator + własny token) widzi wyłącznie zalogowany
+     admin (CLOUD.admin). Wyjątek bootstrapowy: gdy chmura jeszcze nieaktywna,
+     panel Administratora jest widoczny, by właściciel mógł ją uruchomić. */
   const c = window.TRASA_CLOUD || {};
-  const hasAppToken = !!(c.appToken || deobfToken(c.appTokenObf) || REMOTE_CLOUD_TOKEN);
-  const tokBox = document.getElementById("acc-need-token");
-  const tokInput = document.getElementById("acc-token");
-  if (tokBox) tokBox.classList.toggle("hidden", hasAppToken || logged);
-  if (tokInput) tokInput.value = state.cloud.token || "";
+  const cloudActive = !!(c.appToken || deobfToken(c.appTokenObf) || REMOTE_CLOUD_TOKEN);
+  const isAdmin = !!logged && state.cloud.user === CLOUD.admin;
+  document.getElementById("admin-panel")?.classList.toggle("hidden", cloudActive && !isAdmin);
+  document.getElementById("adv-panel")?.classList.toggle("hidden", !isAdmin);
   const admStatus = document.getElementById("admin-status");
   if (admStatus && !admStatus.dataset.busy) {
-    admStatus.textContent = hasAppToken
+    admStatus.textContent = cloudActive
       ? "Chmura AKTYWNA — użytkownicy zakładają konta bez tokenów."
       : "Chmura nieaktywna — wklej token właściciela i kliknij Aktywuj.";
   }
@@ -1714,20 +1716,7 @@ function renderCloudUI() {
       : "Tryb offline — punkty zapisują się tylko w tej przeglądarce (brak tokena aplikacji)."));
 }
 
-/* token z pola konta → zapisz do stanu przed operacją chmury */
-function grabAccToken() {
-  const t = document.getElementById("acc-token");
-  if (t && t.value.trim()) {
-    state.cloud.token = t.value.trim();
-    LS.set("cloud", state.cloud);
-  }
-}
-document.getElementById("acc-token").addEventListener("change", () => {
-  grabAccToken(); renderCloudUI();
-});
-
 document.getElementById("acc-register-btn").addEventListener("click", async () => {
-  grabAccToken();
   const login = document.getElementById("acc-login").value.trim();
   const pass = document.getElementById("acc-pass").value;
   cloudStatus("Zakładam konto…");
@@ -1741,7 +1730,6 @@ document.getElementById("acc-register-btn").addEventListener("click", async () =
 });
 
 document.getElementById("acc-login-btn").addEventListener("click", async () => {
-  grabAccToken();
   const login = document.getElementById("acc-login").value.trim();
   const pass = document.getElementById("acc-pass").value;
   cloudStatus("Loguję…");

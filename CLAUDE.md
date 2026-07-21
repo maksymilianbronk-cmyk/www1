@@ -48,6 +48,11 @@ www1/
   (`sites/podroze-mapy`), z rejestrem znanych endpointów i pułapek układów
   współrzędnych (`references/zrodla.md`). Użyj przy „dodaj mapę", „napraw
   warstwę", „sprawdź czy mapa działa".
+- **`trasa-app`** (`.claude/skills/trasa-app/`) — playbook rozwoju aplikacji
+  Trasa: architektura modułów, chmura POI na gałęzi `poi-db` (konta, token
+  właściciela, panel administratora), checklista zmian (liczniki, SW, testy
+  Playwright), wdrożenie na Pages i wyniesione lekcje. Użyj przy każdej pracy
+  nad `sites/podroze-mapy`.
 
 ## Zasady
 
