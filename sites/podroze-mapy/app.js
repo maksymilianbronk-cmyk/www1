@@ -174,10 +174,11 @@ function esriExportUrl(src, x, y, z) {
   const n = 2 ** z, size = (2 * EXT) / n;
   const minx = -EXT + x * size, maxx = minx + size;
   const maxy = EXT - y * size, miny = maxy - size;
+  const px = src.opts?.tileSize || 256; // 512 = 4× mniej żądań do Geoportalu
   const p = new URLSearchParams({
     f: "image", format: "png32",
     transparent: src.esri?.transparent ? "true" : "false",
-    size: "256,256", dpi: "96",
+    size: `${px},${px}`, dpi: "96",
     bboxSR: "3857", imageSR: "3857",
     bbox: [minx, miny, maxx, maxy].join(","),
   });
@@ -198,6 +199,12 @@ function makeLayer(src, extra = {}) {
   }
   const opts = Object.assign({ crossOrigin: false }, src.opts, extra);
   if (state.opacity[src.id] != null && !extra.pane) opts.opacity = state.opacity[src.id];
+  /* usługi dynamiczne (WMS/REST) renderują wolniej niż kafelki —
+     trzymaj większy bufor gotowych obrazów wokół widoku */
+  if (src.type === "wms" || src.type === "esri") {
+    opts.keepBuffer = opts.keepBuffer ?? 4;
+    opts.updateWhenIdle = true;
+  }
   if (src.wm) return new WikimapiaLayer("", Object.assign(opts, { wmMode: src.wm }));
   if (src.type === "esri") {
     return new EsriExportLayer("", Object.assign(opts, { esriSrc: src }));
@@ -782,7 +789,7 @@ function tileUrlFor(src, x, y, zz) {
     }
     const p = new URLSearchParams({
       SERVICE: "WMS", REQUEST: "GetMap", VERSION: v,
-      LAYERS: src.wms.layers, STYLES: "",
+      LAYERS: src.wms.layers, STYLES: src.wms.styles || "",
       [v === "1.3.0" ? "CRS" : "SRS"]: epsg,
       BBOX: bbox.join(","),
       WIDTH: 256, HEIGHT: 256,
