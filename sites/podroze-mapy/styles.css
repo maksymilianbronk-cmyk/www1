@@ -338,6 +338,8 @@ html, body {
 .modal-check input { width: 18px; height: 18px; accent-color: var(--accent); }
 .modal-btn-row { display: flex; gap: 6px; margin-top: 10px; }
 .modal-btn-row .btn-secondary { margin-top: 0; flex: 1; }
+.modal-btn-row.wrap { flex-wrap: wrap; }
+.modal-btn-row.wrap .btn-secondary { flex: 1 1 30%; min-width: 90px; }
 .fld { display: block; font-size: 12.5px; color: var(--fg2); margin: 10px 0 2px; }
 .fld input, .fld textarea, #name-input, .poi-filter {
   display: block; width: 100%; margin-top: 4px;
@@ -448,6 +450,19 @@ html, body {
 }
 #cloud-browse { margin-top: 8px; max-height: 34vh; overflow-y: auto; }
 #cloud-status { margin-top: 8px; }
+.cloud-adv { margin-top: 10px; }
+.cloud-adv summary { font-size: 12px; color: var(--fg2); cursor: pointer; padding: 4px 0; }
+
+.off-host {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 2px; border-top: 1px solid var(--line); font-size: 12.5px;
+}
+.off-host-name {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; font-family: monospace;
+}
+.off-host b { color: var(--accent); font-variant-numeric: tabular-nums; }
+#off-hosts { max-height: 30vh; overflow-y: auto; margin-top: 6px; }
 
 .chip input[type="radio"] { accent-color: var(--accent); margin: 0 2px 0 0; }
 .chip:has(input[type="radio"]:checked) {

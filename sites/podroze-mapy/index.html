@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#181a1f" />
-  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z 89 warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków), profilami map, trybem porównywania i menedżerem POI. Inspirowana Locus Pro / OsmAnd." />
+  <meta name="description" content="Trasa — podróżnicza aplikacja mapowa z 96 warstwami map (OSM, topo, satelity, Geoportal, mapy krajowe, nakładki szlaków), profilami map, trybem porównywania i menedżerem POI. Inspirowana Locus Pro / OsmAnd." />
   <title>Trasa — mapy podróżnicze</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -97,17 +97,21 @@
     <div class="sb-head">
       <strong>Warstwy</strong>
       <span id="layer-count" class="sb-count"></span>
+      <button id="btn-reset-layers" class="tb-btn" title="Zeruj widok warstw — wyłącz nakładki i wróć do OSM"><svg class="ic"><use href="#i-undo"/></svg></button>
+      <button class="tb-btn act" data-action="offline" title="Offline — bufor map w przeglądarce"><svg class="ic"><use href="#i-cloud"/></svg></button>
       <button id="btn-add-map" class="tb-btn" title="Dodaj własną mapę WMS / XYZ"><svg class="ic"><use href="#i-plus"/></svg></button>
       <button id="btn-compare" class="tb-btn" title="Tryb porównywania dwóch map"><svg class="ic"><use href="#i-compare"/></svg></button>
       <button class="tb-btn act sb-keys" data-action="keys" title="Klucze API"><svg class="ic"><use href="#i-key"/></svg></button>
       <button id="sb-close" class="tb-btn" title="Zamknij"><svg class="ic"><use href="#i-x"/></svg></button>
     </div>
     <div class="sb-presets">
+      <div class="sb-presets-label">Szybkie nakładki</div>
+      <div id="quick-toggles" class="preset-chips"></div>
       <div class="sb-presets-label">Profile map</div>
       <div id="preset-chips" class="preset-chips"></div>
     </div>
     <div class="sb-filter">
-      <input id="layer-filter" type="text" placeholder="Filtruj 89 warstw… (topo, orto, szlaki…)" />
+      <input id="layer-filter" type="text" placeholder="Filtruj 96 warstw… (topo, orto, szlaki…)" />
     </div>
     <div class="sb-hint">
       <svg class="ic ic-xs"><use href="#i-star"/></svg> ulubione ·
@@ -167,16 +171,16 @@
   <div id="gpx-modal" class="modal hidden">
     <div class="modal-box">
       <div class="modal-head">
-        <strong><svg class="ic"><use href="#i-route"/></svg> Ślady GPX</strong>
+        <strong><svg class="ic"><use href="#i-route"/></svg> Ślady GPX / KML / KMZ</strong>
         <button class="tb-btn" data-close="gpx-modal"><svg class="ic"><use href="#i-x"/></svg></button>
       </div>
-      <p class="modal-info">Wczytaj ślad GPX — trasy pojawią się na mapie, a punkty
-        <code>&lt;wpt&gt;</code> możesz dopisać do swoich POI.</p>
+      <p class="modal-info">Wczytaj ślad GPX, KML lub KMZ — trasy pojawią się na mapie,
+        a punkty możesz dopisać do swoich POI.</p>
       <label class="modal-check"><input id="gpx-wpt-as-poi" type="checkbox" checked />
-        importuj punkty <code>wpt</code> jako moje POI</label>
+        importuj punkty jako moje POI</label>
       <label class="btn-secondary file-label">
-        <svg class="ic"><use href="#i-upload"/></svg> Wczytaj plik GPX
-        <input id="gpx-file" type="file" accept=".gpx,application/gpx+xml" hidden />
+        <svg class="ic"><use href="#i-upload"/></svg> Wczytaj plik GPX / KML / KMZ
+        <input id="gpx-file" type="file" accept=".gpx,.kml,.kmz,application/gpx+xml,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz" hidden />
       </label>
       <button id="gpx-clear" class="btn-secondary"><svg class="ic"><use href="#i-trash"/></svg> Usuń wczytane ślady z mapy</button>
       <div id="gpx-status" class="modal-info"></div>
@@ -220,29 +224,40 @@
       <input id="poi-filter" type="text" class="poi-filter" placeholder="Szukaj w punktach…" />
       <div id="poi-cat-filter" class="chip-row"></div>
       <div id="poi-list" class="poi-list"></div>
-      <div class="modal-btn-row">
+      <div class="modal-btn-row wrap">
         <button id="poi-export-gpx" class="btn-secondary"><svg class="ic"><use href="#i-download"/></svg> GPX</button>
+        <button id="poi-export-kml" class="btn-secondary"><svg class="ic"><use href="#i-download"/></svg> KML</button>
+        <button id="poi-export-kmz" class="btn-secondary"><svg class="ic"><use href="#i-download"/></svg> KMZ</button>
         <button id="poi-export-json" class="btn-secondary"><svg class="ic"><use href="#i-download"/></svg> GeoJSON</button>
         <label class="btn-secondary file-label"><svg class="ic"><use href="#i-upload"/></svg> Import
-          <input id="poi-import" type="file" accept=".gpx,.geojson,.json" hidden />
+          <input id="poi-import" type="file" accept=".gpx,.geojson,.json,.kml,.kmz" hidden />
         </label>
         <button id="poi-wipe" class="btn-secondary danger"><svg class="ic"><use href="#i-trash"/></svg></button>
       </div>
 
-      <details class="cloud-box">
-        <summary><svg class="ic"><use href="#i-cloud"/></svg> Chmura GitHub — foldery POI w repozytorium</summary>
+      <details class="cloud-box" open>
+        <summary><svg class="ic"><use href="#i-cloud"/></svg> Chmura GitHub — konto i foldery POI</summary>
         <p class="modal-info">
-          Foldery punktów zapisują się jako pliki <code>poi-db/&lt;użytkownik&gt;/&lt;folder&gt;.json</code>
-          na gałęzi <code>poi-db</code> tego repo. Odczyt jest publiczny; zapis wymaga
-          <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">tokena GitHub</a>
-          (fine-grained, uprawnienie <em>Contents: write</em> do repo www1). Token zostaje w Twojej przeglądarce.
+          Załóż konto (login + hasło), a Twoje foldery punktów będą zapisywać się
+          automatycznie w bazie <code>poi-db</code> tego repozytorium i będą dostępne
+          z każdego urządzenia po zalogowaniu.
         </p>
-        <label class="fld">Użytkownik (nazwa Twojego katalogu)
-          <input id="cloud-user" type="text" placeholder="np. maks" maxlength="30" />
-        </label>
-        <label class="fld">Token GitHub (do zapisu)
-          <input id="cloud-token" type="password" placeholder="github_pat_…" />
-        </label>
+        <div id="acc-forms">
+          <label class="fld">Login
+            <input id="acc-login" type="text" placeholder="np. maks" maxlength="30" autocomplete="username" />
+          </label>
+          <label class="fld">Hasło
+            <input id="acc-pass" type="password" placeholder="hasło do konta Trasa" autocomplete="current-password" />
+          </label>
+          <div class="modal-btn-row">
+            <button id="acc-login-btn" class="btn-secondary"><svg class="ic"><use href="#i-key"/></svg> Zaloguj</button>
+            <button id="acc-register-btn" class="btn-secondary"><svg class="ic"><use href="#i-plus"/></svg> Załóż konto</button>
+          </div>
+        </div>
+        <div id="acc-session" class="hidden">
+          <div id="acc-status" class="modal-info"></div>
+          <button id="acc-logout" class="btn-secondary">Wyloguj</button>
+        </div>
         <label class="modal-check"><input id="cloud-auto" type="checkbox" checked />
           auto-sync: zapisuj folder po każdej zmianie</label>
         <div class="modal-btn-row">
@@ -252,6 +267,19 @@
         </div>
         <div id="cloud-status" class="modal-info"></div>
         <div id="cloud-browse"></div>
+        <details class="cloud-adv">
+          <summary>Zaawansowane — własny token GitHub</summary>
+          <p class="modal-info">Konta działają przez token aplikacji skonfigurowany przez
+            właściciela repo (<code>cloud-config.js</code>). Możesz też użyć
+            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">własnego tokena</a>
+            (fine-grained, <em>Contents: write</em> do www1) — ma pierwszeństwo i zostaje w tej przeglądarce.</p>
+          <label class="fld">Nazwa katalogu (bez konta)
+            <input id="cloud-user" type="text" placeholder="np. maks" maxlength="30" />
+          </label>
+          <label class="fld">Własny token
+            <input id="cloud-token" type="password" placeholder="github_pat_…" />
+          </label>
+        </details>
       </details>
     </div>
   </div>
@@ -294,6 +322,32 @@
     </div>
   </div>
 
+  <!-- Modal offline — bufor map -->
+  <div id="offline-modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong><svg class="ic"><use href="#i-cloud"/></svg> Offline — bufor map</strong>
+        <button class="tb-btn" data-close="offline-modal"><svg class="ic"><use href="#i-x"/></svg></button>
+      </div>
+      <label class="modal-check"><input id="off-enabled" type="checkbox" />
+        buforuj przeglądane kafelki (serwowane z cache, gdy brak sieci)</label>
+      <div class="modal-btn-row">
+        <select id="off-depth" class="poi-filter" style="margin:0">
+          <option value="1">tylko ten zoom</option>
+          <option value="2" selected>ten zoom + 1</option>
+          <option value="3">ten zoom + 2</option>
+        </select>
+        <button id="off-prefetch" class="btn-secondary"><svg class="ic"><use href="#i-download"/></svg> Pobierz widoczny obszar</button>
+      </div>
+      <div id="off-stats" class="modal-info"></div>
+      <div id="off-hosts"></div>
+      <button id="off-clear" class="btn-danger"><svg class="ic"><use href="#i-trash"/></svg> Wyczyść cały bufor map</button>
+      <p class="modal-info">Bufor obejmuje aktywną mapę bazową i włączone nakładki.
+        Pobieraj małe obszary — regulaminy dostawców kafelków zabraniają masowego
+        zgrywania map; pełne mapy offline to zadanie wersji Android.</p>
+    </div>
+  </div>
+
   <!-- Modal nazwy (profile map) -->
   <div id="name-modal" class="modal hidden">
     <div class="modal-box">
@@ -310,6 +364,7 @@
   <div id="toast" class="toast hidden"><span id="toast-msg"></span><button id="toast-act" class="hidden"></button></div>
 
   <script src="vendor/leaflet/leaflet.js"></script>
+  <script src="cloud-config.js"></script>
   <script src="layers.js"></script>
   <script src="app.js"></script>
 </body>

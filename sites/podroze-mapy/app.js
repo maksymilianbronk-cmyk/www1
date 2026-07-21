@@ -60,14 +60,58 @@ function customToSrc(c) {
     desc: (c.type === "wms" ? "Własna usługa WMS: " : "Własne kafelki XYZ: ") + c.url,
   };
 }
+/* Zdalny katalog map — system szybkich aktualizacji bez wdrożenia:
+   plik catalog/extra.json na gałęzi poi-db może DODAWAĆ nowe źródła,
+   WYŁĄCZAĆ zepsute (disable) i ŁATAĆ istniejące (patch, np. nowy URL).
+   Aplikacja pobiera go przy starcie i cache'uje w localStorage. */
+let REMOTE_CATALOG = LS.get("remoteCatalog", null);
+const REMOTE_CATALOG_URL =
+  "https://raw.githubusercontent.com/maksymilianbronk-cmyk/www1/poi-db/catalog/extra.json";
+
+function normalizeRemoteSrc(s) {
+  const out = Object.assign({ opts: {} }, s);
+  out.opts = Object.assign({ maxZoom: 19, attribution: s.name }, s.opts || {});
+  if (!CATEGORY_ORDER.includes(out.cat)) out.cat = "Moje mapy (własne)";
+  out.remote = true;
+  return out;
+}
+
 function allSources() {
-  return [...MAP_SOURCES, ...state.custom.map(customToSrc)];
+  const dis = new Set(REMOTE_CATALOG?.disable || []);
+  const patch = REMOTE_CATALOG?.patch || {};
+  const base = MAP_SOURCES
+    .filter(s => !dis.has(s.id))
+    .map(s => {
+      if (!patch[s.id]) return s;
+      const p = patch[s.id];
+      return Object.assign({}, s, p, { opts: Object.assign({}, s.opts, p.opts || {}) });
+    });
+  const extra = (REMOTE_CATALOG?.sources || [])
+    .filter(s => s && s.id && s.url).map(normalizeRemoteSrc);
+  return [...base, ...extra, ...state.custom.map(customToSrc)];
 }
 function rebuildIndex() {
   Object.keys(byId).forEach(k => delete byId[k]);
   allSources().forEach(s => (byId[s.id] = s));
 }
 rebuildIndex();
+
+async function fetchRemoteCatalog() {
+  try {
+    const r = await fetch(REMOTE_CATALOG_URL, { cache: "no-cache" });
+    if (!r.ok) return;
+    const doc = await r.json();
+    const changed = JSON.stringify(doc) !== JSON.stringify(REMOTE_CATALOG);
+    REMOTE_CATALOG = doc;
+    LS.set("remoteCatalog", doc);
+    if (changed) {
+      rebuildIndex();
+      refreshListUI();
+      const n = (doc.sources || []).length;
+      if (n) toast(`Zdalny katalog map: +${n} źródeł, aktualizacje wgrane.`);
+    }
+  } catch { /* offline — zostaje wersja z cache */ }
+}
 
 function buzz(ms = 12) { try { navigator.vibrate && navigator.vibrate(ms); } catch {} }
 
@@ -177,6 +221,7 @@ const actions = {
   "poi-panel": () => openPoiPanel(),
   gpx: () => openModal("gpx-modal"),
   keys: () => openKeysModal(),
+  offline: () => openOfflineModal(),
 };
 document.querySelectorAll("[data-action]").forEach(b =>
   b.addEventListener("click", () => { buzz(); actions[b.dataset.action](); }));
@@ -352,6 +397,32 @@ document.getElementById("name-input").addEventListener("keydown", e => {
 });
 
 /* ───────────────────── Własne mapy WMS/XYZ ───────────────────── */
+
+/* Zerowanie widoku warstw: nakładki off, porównywanie off, baza → OSM */
+document.getElementById("btn-reset-layers").addEventListener("click", () => {
+  clearOverlays();
+  if (compare.active || compare.selecting) stopCompare();
+  setBase("osm");
+  buzz(18);
+  toast("Wyzerowano widok: OSM bez nakładek.");
+});
+
+/* Szybkie nakładki na górze panelu (cieniowanie ISOK itd.) */
+const QUICK_TOGGLES = ["geoportal-nmt", "wikimapia", "gugik-dzialki"];
+function renderQuickToggles() {
+  const box = document.getElementById("quick-toggles");
+  box.innerHTML = "";
+  QUICK_TOGGLES.forEach(id => {
+    const src = byId[id];
+    if (!src) return;
+    const b = document.createElement("button");
+    b.className = "chip" + (activeOverlays[id] ? " sel" : "");
+    b.innerHTML = `${ic("layers", "ic-xs")} ${src.name.split(" — ")[0].split(" (")[0]}`;
+    b.title = src.desc || src.name;
+    b.addEventListener("click", () => { buzz(); toggleOverlay(id); });
+    box.appendChild(b);
+  });
+}
 
 document.getElementById("btn-add-map").addEventListener("click", () => {
   document.getElementById("wms-name").value = "";
@@ -611,6 +682,7 @@ function rowFor(src) {
 
 function refreshListUI() {
   buildList(document.getElementById("layer-filter").value);
+  if (typeof renderQuickToggles === "function") renderQuickToggles();
 }
 
 /* Test dostępności: ładuje 1 kafelek testowy każdej warstwy w kategorii */
@@ -622,30 +694,42 @@ function lngLatToTile(lat, lng, z) {
   return { x, y };
 }
 
-function testTileUrl(src) {
-  const [lat, lng, z] = src.home || [52.2, 19.4, 6];
-  const zz = Math.min(z, src.opts.maxZoom || 19);
-  let { x, y } = lngLatToTile(lat, lng, zz);
+/* Zbuduj konkretny URL kafelka (x,y,z) dla dowolnego typu źródła —
+   używane przez test ⚡ i pobieranie obszaru offline. */
+function tileUrlFor(src, x, y, zz) {
   if (src.wm) return wikimapiaTileUrl(x, y, zz, src.wm);
   if (src.type === "wms") {
-    const R = 6378137, d = 20037508.34 / 2 ** zz;
-    const mx = (lng * Math.PI * R) / 180;
-    const my = R * Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
-    const bbox = [mx - d, my - d, mx + d, my + d].join(",");
+    const EXT = 20037508.342789244;
+    const n = 2 ** zz, size = (2 * EXT) / n;
+    const minx = -EXT + x * size, maxx = minx + size;
+    const maxy = EXT - y * size, miny = maxy - size;
+    const v = (src.wms.version || "1.1.1");
     const p = new URLSearchParams({
-      SERVICE: "WMS", REQUEST: "GetMap", VERSION: "1.1.1",
-      LAYERS: src.wms.layers, STYLES: "", SRS: "EPSG:3857",
-      BBOX: bbox, WIDTH: 256, HEIGHT: 256,
+      SERVICE: "WMS", REQUEST: "GetMap", VERSION: v,
+      LAYERS: src.wms.layers, STYLES: "",
+      [v === "1.3.0" ? "CRS" : "SRS"]: "EPSG:3857",
+      BBOX: [minx, miny, maxx, maxy].join(","),
+      WIDTH: 256, HEIGHT: 256,
       FORMAT: src.wms.format || "image/png",
       TRANSPARENT: src.wms.transparent ? "TRUE" : "FALSE",
     });
     return src.url + (src.url.includes("?") ? "&" : "?") + p;
   }
-  if (src.opts.tms) y = 2 ** zz - 1 - y;
+  let ty = src.opts.tms ? 2 ** zz - 1 - y : y;
   let u = resolveUrl(src)
-    .replace("{z}", zz).replace("{x}", x).replace("{y}", y).replace("{r}", "");
-  if (src.opts.subdomains) u = u.replace("{s}", String(src.opts.subdomains)[0]);
+    .replace("{z}", zz).replace("{x}", x).replace("{y}", ty).replace("{r}", "");
+  if (src.opts.subdomains) {
+    const subs = String(src.opts.subdomains);
+    u = u.replace("{s}", subs[(x + y) % subs.length]);
+  }
   return u;
+}
+
+function testTileUrl(src) {
+  const [lat, lng, z] = src.home || [52.2, 19.4, 6];
+  const zz = Math.min(z, src.opts.maxZoom || 19);
+  const { x, y } = lngLatToTile(lat, lng, zz);
+  return tileUrlFor(src, x, y, zz);
 }
 
 function testCategory(items, sec) {
@@ -1280,14 +1364,19 @@ function userSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
+/* Token zapisu: własny użytkownika > token aplikacji z cloud-config.js */
+function writeToken() {
+  return (state.cloud.token || (window.TRASA_CLOUD && window.TRASA_CLOUD.appToken) || "").trim();
+}
+
 async function ghApi(path, opts = {}) {
   /* Accept jest nagłówkiem CORS-safelisted — publiczny odczyt obywa się bez
      preflight; Authorization (tylko przy zapisie) preflight wymusza i GitHub
      API poprawnie go obsługuje. */
   const headers = Object.assign({ Accept: "application/vnd.github+json" }, opts.headers || {});
   const needsAuth = opts.method && opts.method !== "GET";
-  if (state.cloud.token && (needsAuth || opts.auth)) {
-    headers.Authorization = "Bearer " + state.cloud.token.trim();
+  if (writeToken() && (needsAuth || opts.auth)) {
+    headers.Authorization = "Bearer " + writeToken();
   }
   const r = await fetch(`https://api.github.com/repos/${CLOUD.repo}/${path}`,
     Object.assign({}, opts, { headers }));
@@ -1302,7 +1391,52 @@ function cloudStatus(msg, ok = true) {
 }
 
 function cloudReady() {
-  return !!(state.cloud.user.trim() && state.cloud.token.trim());
+  return !!(state.cloud.user.trim() && writeToken());
+}
+
+/* ── Konta: login + hasło (hasz w poi-db/<login>/_account.json) ── */
+
+async function sha256Hex(str) {
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function accountRegister(login, pass) {
+  const slug = userSlug(login);
+  if (!slug || pass.length < 4) throw new Error("podaj login i hasło (min. 4 znaki)");
+  if (!writeToken()) throw new Error("chmura nie ma skonfigurowanego tokena aplikacji (cloud-config.js)");
+  const existing = await ghApi(`contents/${CLOUD.root}/${slug}/_account.json?ref=${CLOUD.branch}`);
+  if (existing) throw new Error("ten login jest już zajęty");
+  const salt = [...crypto.getRandomValues(new Uint8Array(12))]
+    .map(b => b.toString(16).padStart(2, "0")).join("");
+  const hash = await sha256Hex(salt + ":" + pass);
+  await ghApi(`contents/${CLOUD.root}/${slug}/_account.json`, {
+    method: "PUT",
+    body: JSON.stringify({
+      message: `poi: nowe konto ${slug}`,
+      branch: CLOUD.branch,
+      content: b64enc(JSON.stringify({ login: slug, salt, hash,
+        created: new Date().toISOString() }, null, 2)),
+    }),
+  });
+  return slug;
+}
+
+async function accountLogin(login, pass) {
+  const slug = userSlug(login);
+  const data = await ghApi(`contents/${CLOUD.root}/${slug}/_account.json?ref=${CLOUD.branch}`);
+  if (!data) throw new Error("konto nie istnieje — załóż je przyciskiem obok");
+  const acc = JSON.parse(b64dec(data.content));
+  if (await sha256Hex(acc.salt + ":" + pass) !== acc.hash)
+    throw new Error("błędne hasło");
+  return slug;
+}
+
+function setSession(login) {
+  state.cloud.user = login;
+  state.cloud.logged = !!login;
+  LS.set("cloud", state.cloud);
+  renderCloudUI();
 }
 
 function groupFilePath(g) {
@@ -1372,7 +1506,8 @@ async function cloudListUsers() {
 }
 async function cloudListGroups(user) {
   const list = await ghApi(`contents/${CLOUD.root}/${user}?ref=${CLOUD.branch}`);
-  return (list || []).filter(e => e.type === "file" && e.name.endsWith(".json"));
+  return (list || []).filter(e =>
+    e.type === "file" && e.name.endsWith(".json") && !e.name.startsWith("_"));
 }
 
 async function cloudLoadGroupFile(user, fileName, { asForeign = false } = {}) {
@@ -1434,10 +1569,50 @@ function renderCloudUI() {
   document.getElementById("cloud-user").value = state.cloud.user;
   document.getElementById("cloud-token").value = state.cloud.token;
   document.getElementById("cloud-auto").checked = !!state.cloud.auto;
+  const logged = !!state.cloud.logged && state.cloud.user;
+  document.getElementById("acc-forms").classList.toggle("hidden", !!logged);
+  document.getElementById("acc-session").classList.toggle("hidden", !logged);
+  if (logged) {
+    document.getElementById("acc-status").textContent =
+      `Zalogowano jako ${state.cloud.user} · foldery synchronizują się z bazą poi-db.`;
+  }
   cloudStatus(cloudReady()
     ? `Konto: ${state.cloud.user} · auto-sync ${state.cloud.auto ? "włączony" : "wyłączony"}`
-    : "Tryb offline — punkty zapisują się tylko w tej przeglądarce.");
+    : (window.TRASA_CLOUD?.appToken
+      ? "Zaloguj się lub załóż konto, aby zapisywać foldery w chmurze."
+      : "Tryb offline — punkty zapisują się tylko w tej przeglądarce (brak tokena aplikacji)."));
 }
+
+document.getElementById("acc-register-btn").addEventListener("click", async () => {
+  const login = document.getElementById("acc-login").value.trim();
+  const pass = document.getElementById("acc-pass").value;
+  cloudStatus("Zakładam konto…");
+  try {
+    const slug = await accountRegister(login, pass);
+    setSession(slug);
+    cloudStatus(`Konto ${slug} założone.`);
+    toast(`Witaj, ${slug}! Twoje foldery będą zapisywać się w chmurze.`);
+    cloudSaveAll();
+  } catch (err) { cloudStatus("Rejestracja: " + err.message, false); }
+});
+
+document.getElementById("acc-login-btn").addEventListener("click", async () => {
+  const login = document.getElementById("acc-login").value.trim();
+  const pass = document.getElementById("acc-pass").value;
+  cloudStatus("Loguję…");
+  try {
+    const slug = await accountLogin(login, pass);
+    setSession(slug);
+    cloudStatus(`Zalogowano jako ${slug}.`);
+    cloudLoadMine();
+  } catch (err) { cloudStatus("Logowanie: " + err.message, false); }
+});
+
+document.getElementById("acc-logout").addEventListener("click", () => {
+  setSession("");
+  document.getElementById("acc-pass").value = "";
+  cloudStatus("Wylogowano — punkty zostają lokalnie w tej przeglądarce.");
+});
 function saveCloudSettings() {
   state.cloud.user = document.getElementById("cloud-user").value.trim();
   state.cloud.token = document.getElementById("cloud-token").value.trim();
@@ -1493,6 +1668,184 @@ document.getElementById("cloud-browse-btn").addEventListener("click", async () =
   }
 });
 
+/* ───────────── KML / KMZ — szybki import i eksport ─────────────
+   KMZ czytany własnym minimalnym parserem ZIP (DecompressionStream
+   "deflate-raw" dla wpisów skompresowanych), zapisywany jako ZIP
+   bez kompresji (metoda stored + CRC32) — zero zewnętrznych bibliotek. */
+
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c;
+  }
+  return t;
+})();
+function crc32(u8) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+function storedZipBlob(fileName, u8data, mime) {
+  const nameB = new TextEncoder().encode(fileName);
+  const crc = crc32(u8data);
+  const lh = new Uint8Array(30 + nameB.length);
+  let dv = new DataView(lh.buffer);
+  dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true);
+  dv.setUint32(14, crc, true);
+  dv.setUint32(18, u8data.length, true); dv.setUint32(22, u8data.length, true);
+  dv.setUint16(26, nameB.length, true);
+  lh.set(nameB, 30);
+  const cd = new Uint8Array(46 + nameB.length);
+  dv = new DataView(cd.buffer);
+  dv.setUint32(0, 0x02014b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 20, true);
+  dv.setUint32(16, crc, true);
+  dv.setUint32(20, u8data.length, true); dv.setUint32(24, u8data.length, true);
+  dv.setUint16(28, nameB.length, true);
+  cd.set(nameB, 46);
+  const eocd = new Uint8Array(22);
+  dv = new DataView(eocd.buffer);
+  dv.setUint32(0, 0x06054b50, true); dv.setUint16(8, 1, true); dv.setUint16(10, 1, true);
+  dv.setUint32(12, cd.length, true);
+  dv.setUint32(16, lh.length + u8data.length, true);
+  return new Blob([lh, u8data, cd, eocd], { type: mime });
+}
+
+async function kmzExtractKml(buf) {
+  const u8 = new Uint8Array(buf), dv = new DataView(buf);
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= 0 && i > u8.length - 22 - 65536; i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error("uszkodzony KMZ");
+  const count = dv.getUint16(eocd + 10, true);
+  let off = dv.getUint32(eocd + 16, true);
+  for (let i = 0; i < count; i++) {
+    if (dv.getUint32(off, true) !== 0x02014b50) break;
+    const method = dv.getUint16(off + 10, true);
+    const csize = dv.getUint32(off + 20, true);
+    const nameLen = dv.getUint16(off + 28, true);
+    const extraLen = dv.getUint16(off + 30, true);
+    const cmtLen = dv.getUint16(off + 32, true);
+    const lho = dv.getUint32(off + 42, true);
+    const name = new TextDecoder().decode(u8.subarray(off + 46, off + 46 + nameLen));
+    if (/\.kml$/i.test(name)) {
+      const dataStart = lho + 30 +
+        dv.getUint16(lho + 26, true) + dv.getUint16(lho + 28, true);
+      const data = u8.slice(dataStart, dataStart + csize);
+      if (method === 0) return new TextDecoder().decode(data);
+      if (method === 8) {
+        return await new Response(
+          new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))
+        ).text();
+      }
+      throw new Error("nieobsługiwana kompresja w KMZ");
+    }
+    off += 46 + nameLen + extraLen + cmtLen;
+  }
+  throw new Error("brak pliku .kml w archiwum KMZ");
+}
+
+/* Placemarki KML → punkty i linie (Point, LineString, Polygon, gx:Track) */
+function parseKmlDoc(doc) {
+  const points = [], lines = [];
+  const coordPairs = txt => txt.trim().split(/\s+/).map(c => {
+    const [lng, lat] = c.split(",").map(Number);
+    return [lat, lng];
+  }).filter(p => isFinite(p[0]) && isFinite(p[1]));
+
+  doc.querySelectorAll("Placemark").forEach(pm => {
+    const name = pm.querySelector("name")?.textContent.trim() || "Punkt";
+    const note = pm.querySelector("description")?.textContent.trim() || "";
+    pm.querySelectorAll("Point > coordinates").forEach(c => {
+      const [lng, lat] = c.textContent.trim().split(",").map(Number);
+      if (isFinite(lat) && isFinite(lng)) points.push({ lat, lng, name, note });
+    });
+    pm.querySelectorAll("LineString > coordinates").forEach(c => {
+      const pts = coordPairs(c.textContent);
+      if (pts.length > 1) lines.push(pts);
+    });
+    pm.querySelectorAll("LinearRing > coordinates").forEach(c => {
+      const pts = coordPairs(c.textContent);
+      if (pts.length > 2) lines.push(pts);
+    });
+    const gxCoords = pm.getElementsByTagName("gx:coord");
+    if (gxCoords.length > 1) {
+      const pts = [...gxCoords].map(c => {
+        const [lng, lat] = c.textContent.trim().split(/\s+/).map(Number);
+        return [lat, lng];
+      }).filter(p => isFinite(p[0]) && isFinite(p[1]));
+      if (pts.length > 1) lines.push(pts);
+    }
+  });
+  return { points, lines };
+}
+
+function poisToKml() {
+  const byGroup = {};
+  state.pois.forEach(p => {
+    const g = p.group || DEFAULT_GROUP;
+    (byGroup[g] = byGroup[g] || []).push(p);
+  });
+  const folders = Object.entries(byGroup).map(([g, pois]) => `  <Folder>
+    <name>${esc(g)}</name>
+${pois.map(p => `    <Placemark>
+      <name>${esc(p.name)}</name>${p.note ? `\n      <description>${esc(p.note)}</description>` : ""}
+      <Point><coordinates>${p.lng},${p.lat},0</coordinates></Point>
+    </Placemark>`).join("\n")}
+  </Folder>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+<Document>
+  <name>Trasa — punkty</name>
+${folders}
+</Document>
+</kml>`;
+}
+
+/* import KML jako ślad (linie na mapę, punkty → POI/markery) */
+function importKmlTracks(xmlText, fname) {
+  const status = document.getElementById("gpx-status");
+  const wptAsPoi = document.getElementById("gpx-wpt-as-poi").checked;
+  try {
+    const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+    if (doc.querySelector("parsererror")) throw new Error("zły XML");
+    const { points, lines } = parseKmlDoc(doc);
+    if (!points.length && !lines.length) throw new Error("brak Placemarków");
+    const group = L.featureGroup();
+    lines.forEach(pts =>
+      L.polyline(pts, { color: "#e33fa1", weight: 4, opacity: 0.85 }).addTo(group));
+    points.forEach((p, i) => {
+      if (wptAsPoi) {
+        state.pois.push({
+          id: "p" + Date.now() + "_k" + i, lat: p.lat, lng: p.lng,
+          name: p.name, note: p.note, cat: "other", color: "",
+          group: DEFAULT_GROUP, ts: Date.now(),
+        });
+      } else {
+        L.marker([p.lat, p.lng]).bindPopup(esc(p.name)).addTo(group);
+      }
+    });
+    if (lines.length || (!wptAsPoi && points.length)) {
+      group.addTo(map);
+      gpxLayers.push(group);
+      if (group.getBounds().isValid()) map.fitBounds(group.getBounds(), { padding: [40, 40] });
+    }
+    if (wptAsPoi && points.length) {
+      savePois(); renderPois(); markDirty(DEFAULT_GROUP);
+      if (points.length && !lines.length) map.fitBounds(
+        L.latLngBounds(points.map(p => [p.lat, p.lng])), { padding: [40, 40] });
+    }
+    status.textContent = `OK — ${fname}: ${lines.length} tras, ${points.length} punktów${wptAsPoi && points.length ? " (dopisano do POI)" : ""}.`;
+    closeModal("gpx-modal");
+    toast(`Wczytano ${fname}`);
+  } catch (err) {
+    status.textContent = `Nie udało się wczytać ${fname} (${err.message}).`;
+  }
+}
+
 /* ── eksport / import POI ── */
 
 function download(name, mime, text) {
@@ -1519,6 +1872,24 @@ ${wpts}
   toast(`Wyeksportowano ${state.pois.length} punktów (GPX).`);
 });
 
+document.getElementById("poi-export-kml").addEventListener("click", () => {
+  if (!state.pois.length) { toast("Brak punktów do eksportu."); return; }
+  download("trasa-poi.kml", "application/vnd.google-earth.kml+xml", poisToKml());
+  toast(`Wyeksportowano ${state.pois.length} punktów (KML).`);
+});
+
+document.getElementById("poi-export-kmz").addEventListener("click", () => {
+  if (!state.pois.length) { toast("Brak punktów do eksportu."); return; }
+  const blob = storedZipBlob("doc.kml", new TextEncoder().encode(poisToKml()),
+    "application/vnd.google-earth.kmz");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "trasa-poi.kmz";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(`Wyeksportowano ${state.pois.length} punktów (KMZ).`);
+});
+
 document.getElementById("poi-export-json").addEventListener("click", () => {
   if (!state.pois.length) { toast("Brak punktów do eksportu."); return; }
   const gj = {
@@ -1533,12 +1904,41 @@ document.getElementById("poi-export-json").addEventListener("click", () => {
   toast(`Wyeksportowano ${state.pois.length} punktów (GeoJSON).`);
 });
 
-document.getElementById("poi-import").addEventListener("change", e => {
+document.getElementById("poi-import").addEventListener("change", async e => {
   const f = e.target.files[0];
   if (!f) return;
+  e.target.value = "";
+  let n = 0;
+  try {
+    const targetGroup = poiPanelGroup || DEFAULT_GROUP;
+    const sniff = await sniffGeoFile(f);
+    if (sniff === "kmz" || sniff.kind === "kml") {
+      const xml = sniff === "kmz"
+        ? await kmzExtractKml(await f.arrayBuffer())
+        : sniff.text;
+      const doc = new DOMParser().parseFromString(xml, "application/xml");
+      if (doc.querySelector("parsererror")) throw new Error("zły XML");
+      parseKmlDoc(doc).points.forEach((p, i) => {
+        state.pois.push({
+          id: "p" + Date.now() + "_k" + i, lat: p.lat, lng: p.lng,
+          name: p.name, note: p.note, cat: "other", color: "",
+          group: targetGroup, ts: Date.now(),
+        });
+        n++;
+      });
+      if (!n) throw new Error("brak punktów");
+      savePois(); renderPois(); renderPoiFolders(); renderPoiCatFilter(); renderPoiList();
+      markDirty(targetGroup);
+      toast(`Zaimportowano ${n} punktów z ${f.name}.`);
+      return;
+    }
+  } catch (err) {
+    toast(`Nie udało się zaimportować: ${err.message}`);
+    return;
+  }
   const rd = new FileReader();
   rd.onload = () => {
-    let n = 0;
+    n = 0;
     try {
       const targetGroup = poiPanelGroup || DEFAULT_GROUP;
       if (/\.(geojson|json)$/i.test(f.name)) {
@@ -1596,13 +1996,30 @@ document.getElementById("poi-wipe").addEventListener("click", () => {
 
 const gpxLayers = [];
 
-document.getElementById("gpx-file").addEventListener("change", e => {
+/* Rozpoznawanie formatu po zawartości (magic bytes), nie tylko rozszerzeniu */
+async function sniffGeoFile(f) {
+  const head = new Uint8Array(await f.slice(0, 4).arrayBuffer());
+  if (head[0] === 0x50 && head[1] === 0x4B) return "kmz"; // "PK" = ZIP
+  const text = await f.text();
+  if (/\.kml$/i.test(f.name) || /<kml[\s>]/i.test(text.slice(0, 2000))) return { kind: "kml", text };
+  if (/\.gpx$/i.test(f.name) || /<gpx[\s>]/i.test(text.slice(0, 2000))) return { kind: "gpx", text };
+  if (/^\s*\{/.test(text)) return { kind: "geojson", text };
+  return { kind: "unknown", text };
+}
+
+document.getElementById("gpx-file").addEventListener("change", async e => {
   const f = e.target.files[0];
   if (!f) return;
-  const rd = new FileReader();
-  rd.onload = () => importGpx(rd.result, f.name);
-  rd.readAsText(f);
   e.target.value = "";
+  const status = document.getElementById("gpx-status");
+  try {
+    const s = await sniffGeoFile(f);
+    if (s === "kmz") importKmlTracks(await kmzExtractKml(await f.arrayBuffer()), f.name);
+    else if (s.kind === "kml") importKmlTracks(s.text, f.name);
+    else importGpx(s.text, f.name);
+  } catch (err) {
+    status.textContent = `Nie udało się wczytać ${f.name} (${err.message}).`;
+  }
 });
 
 function importGpx(xmlText, fname) {
@@ -1705,6 +2122,115 @@ document.getElementById("keys-save").addEventListener("click", () => {
   refreshListUI();
 });
 
+/* ───────────── Offline — bufor kafelków w Cache Storage ─────────────
+   Strona zapisuje kafelki (fetch no-cors → cache.put), service worker
+   dosyła je z bufora, gdy sieć zawiedzie. Panel pokazuje zawartość
+   bufora per serwer, pozwala pobrać widoczny obszar i czyścić. */
+
+const TILE_CACHE = "trasa-tiles-v1";
+state.tilesCache = LS.get("tilesCache", false);
+
+function syncTilesFlag() {
+  try {
+    navigator.serviceWorker?.controller?.postMessage({ type: "tiles", on: !!state.tilesCache });
+  } catch {}
+}
+
+function openOfflineModal() { renderOfflineUI(); openModal("offline-modal"); }
+
+async function renderOfflineUI() {
+  document.getElementById("off-enabled").checked = !!state.tilesCache;
+  const stats = document.getElementById("off-stats");
+  const hostsBox = document.getElementById("off-hosts");
+  if (!("caches" in window)) {
+    stats.textContent = "Ta przeglądarka nie udostępnia Cache Storage (wymagane https).";
+    return;
+  }
+  const c = await caches.open(TILE_CACHE);
+  const keys = await c.keys();
+  const hosts = {};
+  keys.forEach(rq => { const h = new URL(rq.url).host; hosts[h] = (hosts[h] || 0) + 1; });
+  let quota = "";
+  if (navigator.storage?.estimate) {
+    const est = await navigator.storage.estimate();
+    quota = ` · magazyn strony: ${(est.usage / 1048576).toFixed(1)} MB z ${(est.quota / 1073741824).toFixed(1)} GB`;
+  }
+  stats.textContent = `W buforze: ${keys.length} kafelków${quota}`;
+  hostsBox.innerHTML = "";
+  Object.entries(hosts).sort((a, b) => b[1] - a[1]).forEach(([h, n]) => {
+    const row = document.createElement("div");
+    row.className = "off-host";
+    row.innerHTML = `<span class="off-host-name">${esc(h)}</span><b>${n}</b>
+      <button class="tb-btn" title="Usuń kafelki tego serwera">${ic("trash", "ic-xs")}</button>`;
+    row.querySelector("button").addEventListener("click", async () => {
+      for (const rq of keys) if (new URL(rq.url).host === h) await c.delete(rq);
+      renderOfflineUI();
+    });
+    hostsBox.appendChild(row);
+  });
+}
+
+document.getElementById("off-enabled").addEventListener("change", e => {
+  state.tilesCache = e.target.checked;
+  LS.set("tilesCache", state.tilesCache);
+  syncTilesFlag();
+  toast(state.tilesCache
+    ? "Buforowanie kafelków włączone — przeglądane mapy będą działać offline."
+    : "Buforowanie wyłączone (zapisany bufor zostaje).");
+});
+
+document.getElementById("off-clear").addEventListener("click", async () => {
+  await caches.delete(TILE_CACHE);
+  renderOfflineUI();
+  toast("Wyczyszczono bufor map.");
+});
+
+document.getElementById("off-prefetch").addEventListener("click", async () => {
+  const levels = +document.getElementById("off-depth").value;
+  const srcs = [byId[state.baseId], ...Object.keys(activeOverlays).map(id => byId[id])]
+    .filter(Boolean);
+  const b = map.getBounds(), z0 = map.getZoom();
+  const jobs = [];
+  srcs.forEach(src => {
+    for (let dz = 0; dz < levels; dz++) {
+      const z = z0 + dz;
+      if (z > (src.opts.maxZoom || 19)) continue;
+      const a = lngLatToTile(b.getNorth(), b.getWest(), z);
+      const d = lngLatToTile(b.getSouth(), b.getEast(), z);
+      for (let x = a.x; x <= d.x; x++)
+        for (let y = a.y; y <= d.y; y++)
+          jobs.push(tileUrlFor(src, x, y, z));
+    }
+  });
+  if (!jobs.length) { toast("Brak kafelków do pobrania."); return; }
+  if (jobs.length > 600) {
+    toast(`Za duży obszar: ${jobs.length} kafelków (limit 600) — przybliż mapę lub zmniejsz głębokość.`);
+    return;
+  }
+  const btn = document.getElementById("off-prefetch");
+  btn.disabled = true;
+  const c = await caches.open(TILE_CACHE);
+  let done = 0, fail = 0;
+  const queue = [...jobs];
+  const worker = async () => {
+    while (queue.length) {
+      const u = queue.shift();
+      try {
+        const r = await fetch(u, { mode: "no-cors", cache: "no-store" });
+        await c.put(u, r);
+      } catch { fail++; }
+      done++;
+      if (done % 40 === 0) btn.textContent = `Pobieram… ${done}/${jobs.length}`;
+    }
+  };
+  await Promise.all(Array.from({ length: 8 }, worker));
+  btn.disabled = false;
+  btn.innerHTML = `${ic("download")} Pobierz widoczny obszar`;
+  renderOfflineUI();
+  buzz(20);
+  toast(`Zbuforowano ${done - fail}/${jobs.length} kafelków (${srcs.length} warstw).`);
+});
+
 /* ───────────────────────── Pasek statusu / skróty ───────────────────────── */
 
 const stCoords = document.getElementById("st-coords");
@@ -1754,8 +2280,15 @@ state.overlays.slice().forEach(id => {
 renderPois();
 renderPresets();
 buildList();
+renderQuickToggles();
+fetchRemoteCatalog();
 
-/* PWA — rejestracja service workera (fundament pod aplikację Android/TWA) */
-if ("serviceWorker" in navigator && location.protocol === "https:") {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+/* PWA — rejestracja service workera (offline-shell + bufor kafelków) */
+if ("serviceWorker" in navigator &&
+    (location.protocol === "https:" || location.hostname === "localhost")) {
+  navigator.serviceWorker.register("sw.js")
+    .then(() => navigator.serviceWorker.ready)
+    .then(syncTilesFlag)
+    .catch(() => {});
+  navigator.serviceWorker.addEventListener("controllerchange", syncTilesFlag);
 }

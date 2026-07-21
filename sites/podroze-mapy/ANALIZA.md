@@ -167,7 +167,54 @@ w localStorage i zachowują się jak wbudowane (ulubione, test ⚡, profile).
 Z Geoportalu dołączona jest też ortofotomapa **HighResolution** (piksel
 5–10 cm) obok standardowej i cieniowania NMT z lidaru.
 
-## 10. Uwagi prawne
+## 10. Mapy historyczne i poprawki Geoportalu
+
+- Kategoria **Mapy historyczne**: rosyjskie sztabówki (nakarte.me 1:25k/50k/100k
+  + marshruty.ru), polskie **WIG 1:100 000** i pruskie **Messtischblätter 1:25 000**
+  (serwer HGIS Cartomatic), skany **USGS** (Esri USA_Topo_Maps) i **OS 1919–47**
+  (National Library of Scotland).
+- WMS-y Geoportalu przełączone na **wersję 1.3.0** (w 1.1.1 część usług GUGiK
+  nie zna EPSG:3857 — to była przyczyna nieładowania cieniowania); warstwa
+  przemianowana na „Cieniowanie ISOK — NMT lidar" i dostępna jako szybki
+  przełącznik na górze panelu warstw (obok Wikimapii i działek). TopPlusOpen
+  (BKG) dodany jako ogólnoeuropejski backup topo z listy leaflet-providers.
+
+## 11. KML / KMZ
+
+Import i eksport bez bibliotek: własny czytnik ZIP (parsowanie central
+directory + `DecompressionStream("deflate-raw")`) i zapis KMZ jako ZIP
+w trybie *stored* z liczonym CRC32. Parser KML obsługuje Point, LineString,
+LinearRing i gx:Track; format pliku rozpoznawany po zawartości (magic bytes),
+nie tylko rozszerzeniu. Eksport POI zachowuje foldery jako `<Folder>`.
+
+## 12. Offline — bufor kafelków
+
+Panel „Offline — bufor map": włączany bufor Cache Storage (service worker
+dosyła kafelki z bufora przy braku sieci; strategia network-first),
+pobieranie widocznego obszaru do 3 poziomów zoomu (limit 600 kafelków,
+pula 8 równoległych pobrań `no-cors`), podgląd zawartości bufora per serwer
+z czyszczeniem per-host i całości oraz licznik zajętości magazynu
+(`navigator.storage.estimate`). SW przycina bufor powyżej 4000 wpisów.
+
+## 13. System szybkich aktualizacji map
+
+Plik `catalog/extra.json` na gałęzi `poi-db` to kanał aktualizacji katalogu
+bez wdrożenia: `sources` dodaje źródła, `disable` ukrywa martwe, `patch`
+łata istniejące (np. nowy URL). Aplikacja pobiera go przy starcie
+(raw.githubusercontent, CORS), cache'uje w localStorage i stosuje także
+offline. Edycja JSON-a w repo = natychmiastowa aktualizacja map u wszystkich.
+
+## 14. Konta użytkowników (login + hasło)
+
+Rejestracja tworzy `poi-db/<login>/_account.json` z solą i haszem SHA-256
+hasła (WebCrypto); logowanie weryfikuje hasz po stronie klienta i otwiera
+sesję auto-sync folderów POI. Zapisy idą przez **token aplikacji** właściciela
+repo z `cloud-config.js` (fine-grained, Contents:write tylko do www1) —
+użytkownicy nie potrzebują własnych tokenów. Ograniczenia bezpieczeństwa
+(token jawny w kliencie, weryfikacja umowna) opisane w cloud-config.js;
+docelowo token powinien mieszkać w lekkim backendzie.
+
+## 15. Uwagi prawne
 
 Endpointy Google, 2GIS, nakarte, marshruty itp. pochodzą z nieoficjalnych
 pakietów społeczności Locusa — dostawcy mogą je zmieniać lub ograniczać.
