@@ -195,6 +195,46 @@ const EsriExportLayer = L.TileLayer.extend({
   },
 });
 
+/* Nadpisane parametry LAYERS wykryte przez samonaprawę WMS (GetCapabilities) */
+const wmsLayersOverride = LS.get("wmsLayersOverride", {});
+
+/* Samonaprawa WMS: pobierz GetCapabilities, odczytaj prawdziwe nazwy warstw
+   i przekonfiguruj źródło (dla usług, których dokumentacji nie da się
+   zweryfikować z góry — np. kompozycja kartograficzna BDOT10k). */
+const autoFixTried = new Set();
+async function autoFixWmsLayers(src) {
+  if (autoFixTried.has(src.id)) return false;
+  autoFixTried.add(src.id);
+  try {
+    const r = await fetch(src.url + (src.url.includes("?") ? "&" : "?") +
+      "SERVICE=WMS&REQUEST=GetCapabilities");
+    const doc = new DOMParser().parseFromString(await r.text(), "application/xml");
+    const names = [...doc.querySelectorAll("Layer > Name")]
+      .map(n => n.textContent.trim()).filter(Boolean);
+    if (!names.length) return false;
+    /* korzeń kompozycji (pierwszy Name) renderuje całość; jeśli obecna
+       wartość już jest poprawna — nic nie zmieniaj */
+    const current = wmsLayersOverride[src.id] || src.wms.layers;
+    const pick = names.includes(current) ? null : names[0];
+    console.warn("[Trasa] GetCapabilities", src.id, "warstwy:", names, "wybrano:", pick);
+    if (!pick) return false;
+    wmsLayersOverride[src.id] = pick;
+    LS.set("wmsLayersOverride", wmsLayersOverride);
+    /* przeładuj warstwę z nową konfiguracją */
+    if (state.baseId === src.id) setBase(src.id);
+    if (activeOverlays[src.id]) { toggleOverlay(src.id); toggleOverlay(src.id); }
+    toast(`Warstwa „${src.name}" przekonfigurowana automatycznie (LAYERS=${pick}).`, 6000);
+    return true;
+  } catch (e) {
+    console.warn("[Trasa] samonaprawa nieudana", src.id, e.message);
+    return false;
+  }
+}
+
+function effectiveWmsLayers(src) {
+  return wmsLayersOverride[src.id] || src.wms.layers;
+}
+
 function makeLayer(src, extra = {}) {
   /* mapa zespolona (combo) — kilka źródeł jako jedna warstwa bazowa */
   if (src.combo) {
@@ -216,6 +256,7 @@ function makeLayer(src, extra = {}) {
   if (src.type === "wms") {
     const wms = Object.assign({ version: "1.1.1", transparent: false }, src.wms, {
       format: src.wms.format || "image/png",
+      layers: effectiveWmsLayers(src),
     });
     /* crs4326: usługi Geoportalu publikują rastry w EPSG:2180/4326 (bez 3857) —
        Leaflet może żądać WMS w EPSG:4326 na mapie 3857 (opcja crs warstwy) */
@@ -372,7 +413,11 @@ function onTileError(src) {
     }
     if (src.type === "wms" || src.type === "esri") {
       toast(`Kafelki „${src.name}" nie wczytują się — diagnozuję…`);
-      diagnoseTile(src).then(d => toast(`„${src.name}": ${d}`, 12000));
+      (async () => {
+        /* najpierw samonaprawa (GetCapabilities), potem zwykła diagnoza */
+        if (src.autoLayers && await autoFixWmsLayers(src)) return;
+        toast(`„${src.name}": ${await diagnoseTile(src)}`, 12000);
+      })();
       return;
     }
     if (src.home) {
@@ -501,9 +546,9 @@ const QUICK_ITEMS = [
 function renderQuickToggles() {
   const box = document.getElementById("quick-toggles");
   box.innerHTML = "";
-  QUICK_ITEMS.forEach(({ id, mode }) => {
+  const mkChip = ({ id, mode }) => {
     const src = byId[id];
-    if (!src) return;
+    if (!src) return null;
     const isBase = mode === "base";
     const active = isBase ? state.baseId === id : !!activeOverlays[id];
     const b = document.createElement("button");
@@ -519,7 +564,22 @@ function renderQuickToggles() {
           src.home ? [src.home[0], src.home[1]] : map.getCenter()) });
       } else toggleOverlay(id);
     });
-    box.appendChild(b);
+    return b;
+  };
+  /* po staremu: dwa czytelne rzędy — nakładki, potem mapy solo */
+  const groups = [
+    { label: "Nakładki", items: QUICK_ITEMS.filter(i => i.mode === "overlay") },
+    { label: "Mapy solo", items: QUICK_ITEMS.filter(i => i.mode === "base") },
+  ];
+  groups.forEach(g => {
+    const lab = document.createElement("div");
+    lab.className = "qt-label";
+    lab.textContent = g.label;
+    box.appendChild(lab);
+    const row = document.createElement("div");
+    row.className = "preset-chips";
+    g.items.forEach(it => { const c = mkChip(it); if (c) row.appendChild(c); });
+    box.appendChild(row);
   });
 }
 
@@ -821,7 +881,7 @@ function tileUrlFor(src, x, y, zz) {
     }
     const p = new URLSearchParams({
       SERVICE: "WMS", REQUEST: "GetMap", VERSION: v,
-      LAYERS: src.wms.layers, STYLES: src.wms.styles || "",
+      LAYERS: effectiveWmsLayers(src), STYLES: src.wms.styles || "",
       [v === "1.3.0" ? "CRS" : "SRS"]: epsg,
       BBOX: bbox.join(","),
       WIDTH: 256, HEIGHT: 256,

@@ -175,6 +175,11 @@ html, body {
   color: var(--fg2); margin-bottom: 5px;
 }
 .preset-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.qt-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--fg2); margin: 6px 0 4px;
+}
+#quick-toggles .qt-label:first-child { margin-top: 0; }
 .sb-filter { padding: 8px 10px 0; }
 .sb-filter input {
   width: 100%; background: var(--bg3); color: var(--fg);
