@@ -179,6 +179,9 @@ function makeLayer(src, extra = {}) {
     const wms = Object.assign({ version: "1.1.1", transparent: false }, src.wms, {
       format: src.wms.format || "image/png",
     });
+    /* crs4326: usługi Geoportalu publikują rastry w EPSG:2180/4326 (bez 3857) —
+       Leaflet może żądać WMS w EPSG:4326 na mapie 3857 (opcja crs warstwy) */
+    if (wms.crs4326) { wms.crs = L.CRS.EPSG4326; delete wms.crs4326; }
     return L.tileLayer.wms(src.url, Object.assign({}, opts, wms));
   }
   return L.tileLayer(resolveUrl(src), opts);
@@ -729,16 +732,29 @@ function lngLatToTile(lat, lng, z) {
 function tileUrlFor(src, x, y, zz) {
   if (src.wm) return wikimapiaTileUrl(x, y, zz, src.wm);
   if (src.type === "wms") {
-    const EXT = 20037508.342789244;
-    const n = 2 ** zz, size = (2 * EXT) / n;
-    const minx = -EXT + x * size, maxx = minx + size;
-    const maxy = EXT - y * size, miny = maxy - size;
     const v = (src.wms.version || "1.1.1");
+    let bbox, epsg;
+    if (src.wms.crs4326) {
+      /* bbox kafelka w stopniach (EPSG:4326) */
+      const n = 2 ** zz;
+      const lonW = (x / n) * 360 - 180, lonE = ((x + 1) / n) * 360 - 180;
+      const latN = (180 / Math.PI) * Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / n)));
+      const latS = (180 / Math.PI) * Math.atan(Math.sinh(Math.PI * (1 - (2 * (y + 1)) / n)));
+      bbox = [lonW, latS, lonE, latN];
+      epsg = "EPSG:4326";
+    } else {
+      const EXT = 20037508.342789244;
+      const n = 2 ** zz, size = (2 * EXT) / n;
+      const minx = -EXT + x * size, maxx = minx + size;
+      const maxy = EXT - y * size, miny = maxy - size;
+      bbox = [minx, miny, maxx, maxy];
+      epsg = "EPSG:3857";
+    }
     const p = new URLSearchParams({
       SERVICE: "WMS", REQUEST: "GetMap", VERSION: v,
       LAYERS: src.wms.layers, STYLES: "",
-      [v === "1.3.0" ? "CRS" : "SRS"]: "EPSG:3857",
-      BBOX: [minx, miny, maxx, maxy].join(","),
+      [v === "1.3.0" ? "CRS" : "SRS"]: epsg,
+      BBOX: bbox.join(","),
       WIDTH: 256, HEIGHT: 256,
       FORMAT: src.wms.format || "image/png",
       TRANSPARENT: src.wms.transparent ? "TRUE" : "FALSE",

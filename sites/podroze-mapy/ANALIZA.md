@@ -173,10 +173,13 @@ Z Geoportalu dołączona jest też ortofotomapa **HighResolution** (piksel
   + marshruty.ru), polskie **WIG 1:100 000** i pruskie **Messtischblätter 1:25 000**
   (serwer HGIS Cartomatic), skany **USGS** (Esri USA_Topo_Maps) i **OS 1919–47**
   (National Library of Scotland).
-- WMS-y Geoportalu przełączone na **wersję 1.3.0** (w 1.1.1 część usług GUGiK
-  nie zna EPSG:3857 — to była przyczyna nieładowania cieniowania); warstwa
-  przemianowana na „Cieniowanie ISOK — NMT lidar" i dostępna jako szybki
-  przełącznik na górze panelu warstw (obok Wikimapii i działek). TopPlusOpen
+- Cieniowanie 1 m z ISOK: kafelkowe usługi Geoportalu (WMTS `ISOK_CIEN`,
+  `NMT/GRID1/WMTS/ShadedRelief`) publikują wyłącznie układ **EPSG:2180**,
+  którego Leaflet nie reprojektuje — dlatego warstwa korzysta z WMS
+  z wymuszonym **EPSG:4326** (`crs: L.CRS.EPSG4326`, gwarantowany przez
+  INSPIRE); tak samo topo raster i orto HD. Wizualizacja BDOT10k dodana
+  z kafelkowego WMTS `guest/wmts/BDOT10k` (ten ma zestaw EPSG:3857, jak ORTO).
+  Cieniowanie jest szybkim przełącznikiem na górze panelu warstw. TopPlusOpen
   (BKG) dodany jako ogólnoeuropejski backup topo z listy leaflet-providers.
 
 ## 11. KML / KMZ
