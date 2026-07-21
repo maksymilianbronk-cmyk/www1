@@ -99,6 +99,8 @@ function leadDetail(s, l) {
           <textarea id="lead-note-${l.id}" rows="3" placeholder="np. umówiony na czwartek 12:00">${esc(l.note)}</textarea>
         </label>
         <button class="btn" onclick="R.setLead(${l.id},{note:document.getElementById('lead-note-${l.id}').value})">${ico('check',15)} Zapisz notatkę</button>
+        ${s.role === 'admin' ? `<button class="btn btn-sm btn-danger" style="align-self:flex-start"
+          onclick="if(confirm('Usunąć ten lead bezpowrotnie (RODO)?'))R.deleteLead(${l.id})">${ico('trash',14)} Usuń lead</button>` : ''}
       </div>
     </div>
   </div></div>`;

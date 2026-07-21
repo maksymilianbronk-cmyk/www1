@@ -705,3 +705,61 @@ table.leads td { padding: 11px 13px; border-bottom: 1px solid var(--line); font-
   border-radius: 9px; color: var(--text); padding: 10px 12px;
   font-size: .9rem; font-family: inherit; resize: vertical;
 }
+
+/* ═══ Wersja mobilna — dolny pasek zakładek (jak aplikacja) ═══ */
+@media (max-width: 740px) {
+  /* backdrop-filter tworzyłby containing block dla fixed → dolny pasek
+     przyklejałby się do topbara zamiast do dołu okna */
+  .topbar { padding: 10px 14px; gap: 10px; flex-wrap: nowrap; position: sticky; backdrop-filter: none; background: rgba(14, 19, 32, .97); }
+  .brand { font-size: 1.02rem; white-space: nowrap; }
+  .user-box { margin-left: auto; gap: 7px; }
+  .user-role { display: none; }
+  .user-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; }
+  .logout span { display: none; }
+
+  /* nawigacja → przyklejony dolny pasek z ikonami */
+  .mainnav {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 90;
+    background: rgba(14, 19, 32, .96);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-around;
+    gap: 0;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+  .mainnav a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 2px;
+    font-size: .58rem;
+    letter-spacing: .2px;
+    border-radius: 10px;
+    min-height: 44px;
+    justify-content: center;
+  }
+  .mainnav a .ico { width: 21px; height: 21px; margin: 0; }
+  .mainnav a.active { background: transparent; color: var(--accent-2); }
+  .nav-sep { display: none; }
+
+  .wrap { margin: 14px auto; }
+  body { padding-bottom: 76px; } /* miejsce na dolny pasek */
+  .foot { margin-bottom: 0; padding-bottom: 8px; }
+
+  .page-head h1 { font-size: 1.15rem; }
+  .filters select, .filters input { font-size: .84rem; padding: 9px 10px; }
+  .lead-line { gap: 8px; padding: 10px 12px; }
+  .ll-date { font-size: .72rem; }
+  .stat { padding: 11px 13px; }
+  .stat-num { font-size: 1.35rem; }
+  .post-day-grid { grid-template-columns: 1fr; }
+  .post-genhint { display: none; }
+  .keep-composer { margin-bottom: 18px; }
+  #toasts { bottom: 84px; right: 10px; left: 10px; }
+  .toast { max-width: none; }
+}

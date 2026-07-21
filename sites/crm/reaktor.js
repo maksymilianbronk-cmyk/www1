@@ -342,6 +342,13 @@ const R = {
     this.api('note-update', { id, ...patch });
   },
 
+  deleteLead(id) {
+    this.state.leads = this.state.leads.filter(l => l.id !== id);
+    this.ui.open = 0;
+    this.persist(); this.render();
+    this.api('lead-delete', { id });
+  },
+
   deleteNote(id) {
     this.state.notes = this.state.notes.filter(n => n.id !== id);
     this.persist(); this.render();

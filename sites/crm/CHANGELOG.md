@@ -1,5 +1,24 @@
 # Historia zmian — LeadFlow CRM
 
+## v2.4.0 (2026-07-21) — audyt, wersja mobilna, PWA, dokumentacja
+
+- 📱 **Pełny audyt mobilny + przeprojektowanie**: kompaktowy pasek górny
+  i **dolny pasek zakładek jak w natywnej aplikacji** (ikony, cele dotykowe
+  ≥44 px, safe-area pod notch); naprawiony containing block fixed/backdrop-
+  filter; układy jednokolumnowe, zero przewijania poziomego.
+- 📲 **PWA**: manifest + ikona — panel można dodać do ekranu głównego
+  telefonu i używać jak aplikacji (pełny ekran, własna ikona).
+- 🔑 **Reset hasła** („nie pamiętam hasła"): jednorazowy link e-mail ważny
+  30 minut, token hashowany, bez ujawniania istnienia konta, limitowany
+  blokadą brute-force.
+- 🗑 **Usuwanie pojedynczego leada** (RODO) — przycisk w szczegółach leada
+  i akcja API (tylko admin), znika u wszystkich na żywo.
+- 🌐 **Lista landingów w panelu** (Ustawienia → Landingi) z linkami.
+- 📚 **DOKUMENTACJA.md** — kompletna dokumentacja techniczna: architektura,
+  wszystkie moduły i endpointy, schemat bazy, bezpieczeństwo, mobile/PWA,
+  rozwiązywanie problemów.
+
+
 ## v2.3.0 (2026-07-21) — Landing Kreator: sekcje + szablony branżowe
 
 - 🧩 **7 nowych sekcji landinga** (razem 16): `steps` (jak działamy,

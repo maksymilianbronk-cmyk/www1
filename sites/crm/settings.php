@@ -186,6 +186,23 @@ ui_flash();
 </section>
 
 <section class="card">
+  <h2><?= svg_icon('globe', 18) ?> Landingi (Landing Kreator)</h2>
+  <?php $landings = $pdo->query('SELECT slug, title, published, updated_at FROM landings ORDER BY updated_at DESC')->fetchAll(); ?>
+  <?php if (!$landings): ?>
+    <p class="muted">Brak landingów. Tworzysz je przez MCP — zobacz sekcję „Przebudowa systemu przez MCP”
+      (skill <code>reaktor-landing</code>, szablony branżowe: <code>GET landing-api.php?templates=1</code>).</p>
+  <?php else: ?>
+    <dl class="info-list">
+      <?php foreach ($landings as $l): ?>
+        <dt><?= e($l['title']) ?></dt>
+        <dd><a href="lp.php?s=<?= e(rawurlencode($l['slug'])) ?>" target="_blank" rel="noopener">lp.php?s=<?= e($l['slug']) ?></a>
+          <span class="muted">· aktualizacja <?= e($l['updated_at']) ?><?= $l['published'] ? '' : ' · ukryty' ?></span></dd>
+      <?php endforeach; ?>
+    </dl>
+  <?php endif; ?>
+</section>
+
+<section class="card">
   <h2><?= svg_icon('activity', 18) ?> Diagnostyka serwera</h2>
   <?php
   $checks = [

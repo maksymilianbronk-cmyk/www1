@@ -86,6 +86,11 @@ function ui_app_shell(string $role, string $userName, int $uid = 0): void
 <meta name="robots" content="noindex, nofollow">
 <title>LeadFlow CRM</title>
 <link rel="icon" href="data:image/svg+xml,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#f5b942" d="M13 2 4.8 13.2H11L9.5 22l9.7-12.2H13L15 2z"/></svg>') . '">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e1320">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.svg">
 <link rel="stylesheet" href="crm.css?v=' . CRM_VERSION . '">
 </head>
 <body>
@@ -139,6 +144,11 @@ function ui_header(string $title, string $role = '', string $userName = '', stri
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>' . e($title) . ' — LeadFlow CRM</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e1320">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.svg">
 <link rel="stylesheet" href="crm.css">
 </head>
 <body>

@@ -99,6 +99,11 @@ if (!empty($_GET['panel'])) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title><?= $hasAdmin ? 'Logowanie' : 'Pierwsze uruchomienie' ?> — LeadFlow CRM</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e1320">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.svg">
 <link rel="stylesheet" href="crm.css">
 </head>
 <body class="auth-body">
@@ -146,6 +151,7 @@ if (!empty($_GET['panel'])) {
       </label>
       <button type="submit" class="btn btn-full">Zaloguj się</button>
     </form>
+    <p class="auth-hint" style="margin-top:12px"><a href="reset.php">Nie pamiętam hasła</a></p>
     <?php if ($panelClient): ?>
       <p class="auth-hint">Logujesz się do panelu klienta „<?= e($panelClient['name']) ?>”.<br>Widzisz wyłącznie swoje leady, reklamy, statystyki i notatki.</p>
     <?php else: ?>

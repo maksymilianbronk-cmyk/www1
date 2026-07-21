@@ -114,6 +114,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         json_out(['ok' => true, 'rev' => state_rev()]);
     }
 
+    // usunięcie leada (RODO / porządki) — wyłącznie admin
+    if ($action === 'lead-delete') {
+        if (!$isAdmin) {
+            json_out(['ok' => false, 'error' => 'forbidden'], 403);
+        }
+        $pdo->prepare('DELETE FROM leads WHERE id = ?')->execute([(int)($in['id'] ?? 0)]);
+        bump_rev();
+        json_out(['ok' => true, 'rev' => state_rev()]);
+    }
+
     /* ── Posty (plan treści) ── */
     if ($action === 'posts-generate') {
         if (!$isAdmin) {
