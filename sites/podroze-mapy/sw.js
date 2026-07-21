@@ -4,7 +4,7 @@
       do cache, a przy braku sieci kafelki wracają z bufora.
    Limity i czyszczenie bufora obsługuje strona (panel Offline). */
 
-const CACHE = "trasa-shell-v18";
+const CACHE = "trasa-shell-v19";
 const TILE_CACHE = "trasa-tiles-v1";
 const CONFIG_CACHE = "trasa-config";
 const TILE_LIMIT = 4000;

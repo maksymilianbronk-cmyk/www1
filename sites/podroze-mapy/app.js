@@ -171,10 +171,14 @@ const WikimapiaLayer = L.TileLayer.extend({
    (Cieniowanie/Hipsometria REST z drzewka geoportalu). */
 function esriExportUrl(src, x, y, z) {
   const EXT = 20037508.342789244;
-  const n = 2 ** z, size = (2 * EXT) / n;
+  const px = src.opts?.tileSize || 256; // 512 = 4× mniej żądań do Geoportalu
+  /* przy tileSize 512 Leaflet numeruje kafelki w siatce 2^(z-1) —
+     liczba kafelków w osi zależy od tileSize, inaczej bbox trafia
+     w złe miejsce świata (błąd, przez który REST-y nie rysowały) */
+  const n = (2 ** z) * (256 / px);
+  const size = (2 * EXT) / n;
   const minx = -EXT + x * size, maxx = minx + size;
   const maxy = EXT - y * size, miny = maxy - size;
-  const px = src.opts?.tileSize || 256; // 512 = 4× mniej żądań do Geoportalu
   const p = new URLSearchParams({
     f: "image", format: "png32",
     transparent: src.esri?.transparent ? "true" : "false",
