@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strona testowa ze zdjęciami — obrazy generowane kodem</title>
+<style>
+  :root{
+    --bg:#0b0d16; --panel:#12151f; --line:#232838;
+    --txt:#eef0f6; --muted:#9aa1b4; --accent:#ff7a1a; --accent2:#2f8cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent2)}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+
+  /* HERO */
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .hero img{display:block;width:100%;height:auto}
+  .hero .cap{
+    position:absolute;left:0;bottom:0;right:0;
+    padding:16px 24px;font-size:.85rem;color:#fff;
+    background:linear-gradient(to top,rgba(0,0,0,.55),transparent);
+  }
+
+  header.info{padding:48px 0 8px;text-align:center}
+  header.info h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.02em}
+  header.info p{color:var(--muted);max-width:640px;margin:12px auto 0}
+  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  .badge{
+    font-size:.78rem;padding:6px 12px;border:1px solid var(--line);
+    border-radius:999px;color:var(--muted);background:var(--panel)
+  }
+
+  section{padding:40px 0}
+  h2{font-size:1.3rem;margin-bottom:6px}
+  .sub{color:var(--muted);margin-bottom:22px}
+
+  /* GALERIA */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  figure{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;transition:transform .25s,border-color .25s;cursor:pointer
+  }
+  figure:hover{transform:translateY(-4px);border-color:var(--accent)}
+  figure img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+  figcaption{padding:14px 16px}
+  figcaption b{display:block;font-size:.98rem}
+  figcaption span{color:var(--muted);font-size:.85rem}
+
+  /* metody / źródła */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{font-size:1.02rem;margin-bottom:6px}
+  .card .lvl{font-size:.75rem;color:var(--accent);font-weight:700;letter-spacing:.06em}
+  .card p{color:var(--muted);font-size:.9rem;margin-top:8px}
+  .card .key{margin-top:12px;font-size:.8rem}
+  .key.ok{color:#43d9b8}
+  .key.need{color:#ff6b6b}
+
+  /* lightbox */
+  .lb{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;
+      align-items:center;justify-content:center;padding:24px;z-index:50}
+  .lb.open{display:flex}
+  .lb img{max-width:100%;max-height:100%;border-radius:10px}
+  .lb .x{position:absolute;top:18px;right:24px;font-size:2rem;color:#fff;cursor:pointer}
+
+  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:.85rem;text-align:center}
+  code{background:#1b1f2c;padding:2px 6px;border-radius:5px;font-size:.85em}
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <img src="img/hero.png" alt="Plakat gradientowy wygenerowany kodem">
+    <div class="cap">img/hero.png — gradient + typografia (Pillow)</div>
+  </div>
+
+  <header class="info">
+    <div class="wrap">
+      <h1>Strona testowa ze zdjęciami</h1>
+      <p>Demonstracja osadzania obrazów. Wszystkie grafiki poniżej zostały
+      <b>wygenerowane lokalnie kodem</b> (Pillow&nbsp;+&nbsp;NumPy) — bez klucza API,
+      bez pobierania z internetu. To „Poziom&nbsp;1" podejścia znanego ze skilla
+      <code>claude-image-generation</code>.</p>
+      <div class="badges">
+        <span class="badge">Pillow 12</span>
+        <span class="badge">NumPy 2</span>
+        <span class="badge">bez API key</span>
+        <span class="badge">100% offline</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="wrap">
+    <h2>Galeria wygenerowanych obrazów</h2>
+    <p class="sub">Kliknij, aby powiększyć. Skrypt: <code>gen_images.py</code></p>
+    <div class="grid">
+      <figure onclick="zoom('img/hero.png')">
+        <img src="img/hero.png" alt="Plakat gradientowy">
+        <figcaption><b>Plakat gradientowy</b><span>Gradient diagonalny + świecące kręgi + tekst</span></figcaption>
+      </figure>
+      <figure onclick="zoom('img/flowfield.png')">
+        <img src="img/flowfield.png" alt="Pole przepływu">
+        <figcaption><b>Pole przepływu</b><span>1400 cząsteczek w polu sin/cos</span></figcaption>
+      </figure>
+      <figure onclick="zoom('img/geo.png')">
+        <img src="img/geo.png" alt="Geometria koncentryczna">
+        <figcaption><b>Geometria</b><span>Koncentryczne obracane sześciokąty</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Metody generowania obrazów</h2>
+    <p class="sub">Co jest dostępne od ręki, a co wymaga klucza API</p>
+    <div class="cards">
+      <div class="card">
+        <span class="lvl">POZIOM 1</span>
+        <h3>Rysowanie kodem</h3>
+        <p>Pillow / NumPy — gradienty, typografia, geometria, pola przepływu. Renderuje się lokalnie.</p>
+        <div class="key ok">✓ bez klucza API — użyte na tej stronie</div>
+      </div>
+      <div class="card">
+        <span class="lvl">POZIOM 2</span>
+        <h3>Render 3D</h3>
+        <p>Three.js buduje scenę 3D i zrzuca klatkę. Dobre do product-shotów. Wymaga Node.js.</p>
+        <div class="key ok">✓ bez klucza API (potrzebny Node)</div>
+      </div>
+      <div class="card">
+        <span class="lvl">POZIOM 3</span>
+        <h3>Model dyfuzyjny</h3>
+        <p>Flux (schnell) przez Cloudflare Workers AI — obrazy foto-realistyczne z opisu tekstowego.</p>
+        <div class="key need">✕ wymaga klucza: Cloudflare Account ID + token</div>
+      </div>
+      <div class="card">
+        <span class="lvl">ALTERNATYWA</span>
+        <h3>Gemini / GPT Image</h3>
+        <p>Skille <i>banana-claude</i>, <i>hex/claude-image-generation</i> — generowanie i edycja obrazów przez API.</p>
+        <div class="key need">✕ wymaga klucza Google AI Studio / OpenAI</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lb" id="lb" onclick="this.classList.remove('open')">
+    <span class="x">&times;</span>
+    <img id="lbimg" src="" alt="">
+  </div>
+
+  <footer>
+    <div class="wrap">
+      Obrazy generowane skryptem <code>gen_images.py</code> — odtwarzalne przez
+      <code>pip install Pillow numpy &amp;&amp; python3 gen_images.py</code>.
+      Strona testowa w kolekcji www.
+    </div>
+  </footer>
+
+<script>
+  function zoom(src){
+    document.getElementById('lbimg').src = src;
+    document.getElementById('lb').classList.add('open');
+  }
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') document.getElementById('lb').classList.remove('open');
+  });
+</script>
+</body>
+</html>
