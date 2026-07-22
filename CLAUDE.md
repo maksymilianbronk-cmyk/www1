@@ -39,6 +39,11 @@ www1/
 ## Skille pomocnicze
 
 - **`nowa-strona`** — dodaje nową stronę do kolekcji (opis wyżej).
+- **`grafika-1min`** (`.claude/skills/grafika-1min/`) — generuje grafiki AI
+  (tekst→obraz) przez API 1min.ai i osadza je na stronach. Wybór modelu
+  (jakość/cena), promptowanie, generator `scripts/gen.py` (klucz z env
+  `ONEMIN_API_KEY`, nigdy w repo), tabela modeli i kosztów w
+  `references/modele.md`. Użyj przy „wygeneruj zdjęcie/grafikę AI".
 - **`allegro-aukcje`** (`.claude/skills/allegro-aukcje/`) — wyszukuje aukcje
   danego sprzedawcy Allegro (fan-out wyszukiwań web + walidacja slugów,
   fallback na wyszukiwanie w profilu) i generuje karty produktów skryptem
