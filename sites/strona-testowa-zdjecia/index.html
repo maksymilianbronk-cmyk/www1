@@ -116,6 +116,30 @@
   </section>
 
   <section class="wrap">
+    <h2>Zdjęcia AI z opisu — bez klucza (Pollinations)</h2>
+    <p class="sub">Realne generowanie AI „tekst→obraz", całkowicie za darmo i bez klucza API.
+    Obrazy ładują się z <code>image.pollinations.ai</code> w Twojej przeglądarce.
+    Wpisz własny opis i kliknij <b>Generuj</b>.</p>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      <input id="prompt" type="text" value="a cozy mountain cabin at sunset, photorealistic"
+        style="flex:1;min-width:260px;padding:12px 14px;border-radius:10px;border:1px solid var(--line);
+        background:var(--panel);color:var(--txt);font-size:.95rem">
+      <button onclick="genAI()"
+        style="padding:12px 22px;border:0;border-radius:10px;background:var(--accent);
+        color:#111;font-weight:700;cursor:pointer;font-size:.95rem">Generuj</button>
+    </div>
+    <figure style="cursor:default;max-width:720px">
+      <img id="aiimg" alt="Obraz AI z Pollinations"
+        src="https://image.pollinations.ai/prompt/a%20cozy%20mountain%20cabin%20at%20sunset%2C%20photorealistic?width=1024&height=683&nologo=true">
+      <figcaption><b>Wynik AI</b><span id="aicap">a cozy mountain cabin at sunset, photorealistic</span></figcaption>
+    </figure>
+    <p class="sub" style="margin-top:14px;font-size:.82rem">
+      Uwaga: pierwszy render trwa kilka–kilkanaście sekund (model liczy obraz na żywo).
+    </p>
+  </section>
+
+  <section class="wrap">
     <h2>Metody generowania obrazów</h2>
     <p class="sub">Co jest dostępne od ręki, a co wymaga klucza API</p>
     <div class="cards">
@@ -160,6 +184,15 @@
   </footer>
 
 <script>
+  function genAI(){
+    const p = document.getElementById('prompt').value.trim() || 'random art';
+    const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(p)
+              + '?width=1024&height=683&nologo=true&seed=' + Math.floor(Math.random()*1e6);
+    const el = document.getElementById('aiimg');
+    el.removeAttribute('src');
+    el.src = url;
+    document.getElementById('aicap').textContent = p;
+  }
   function zoom(src){
     document.getElementById('lbimg').src = src;
     document.getElementById('lb').classList.add('open');

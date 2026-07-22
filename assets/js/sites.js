@@ -17,7 +17,7 @@ const SITES = [
   {
     slug: "strona-testowa-zdjecia",
     title: "Strona testowa ze zdjęciami",
-    desc: "Testowa strona demonstrująca osadzanie obrazów. Wszystkie grafiki (plakat gradientowy, pole przepływu, geometria) wygenerowane lokalnie kodem — Pillow + NumPy, bez klucza API i bez pobierania z sieci (Poziom 1 podejścia claude-image-generation). Galeria z lightboxem, sekcja porównująca metody generowania (rysowanie kodem, render 3D Three.js, model dyfuzyjny Flux/Cloudflare, Gemini/GPT Image). Skrypt gen_images.py odtwarza obrazy jednym poleceniem.",
+    desc: "Testowa strona demonstrująca osadzanie obrazów. Wszystkie grafiki (plakat gradientowy, pole przepływu, geometria) wygenerowane lokalnie kodem — Pillow + NumPy, bez klucza API i bez pobierania z sieci (Poziom 1 podejścia claude-image-generation). Galeria z lightboxem, sekcja porównująca metody generowania (rysowanie kodem, render 3D Three.js, model dyfuzyjny Flux/Cloudflare, Gemini/GPT Image). Skrypt gen_images.py odtwarza obrazy jednym poleceniem. Dodatkowo sekcja z generowaniem zdjęć AI „tekst→obraz" przez Pollinations.ai — całkowicie bez klucza API, z polem na własny opis.",
     icon: "🖼️",
     tag: "test",
     preview: true,
