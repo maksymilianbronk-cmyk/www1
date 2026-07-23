@@ -86,7 +86,7 @@
 
   <!-- Pasek wyszukiwania -->
   <div id="search-bar" class="search-bar hidden">
-    <input id="search-input" type="text" placeholder="Szukaj miejsca… np. Rumia, Giewont, Paryż" autocomplete="off" />
+    <input id="search-input" type="text" placeholder="Miejsce, współrzędne (54.519, 18.530 / DMS) lub link Google Maps…" autocomplete="off" />
     <button id="search-go">Szukaj</button>
     <button id="search-close" title="Zamknij"><svg class="ic"><use href="#i-x"/></svg></button>
     <ul id="search-results" class="search-results"></ul>
@@ -126,13 +126,23 @@
 
   <!-- Mapa -->
   <div id="map"></div>
+  <!-- Krzyżyk celowniczy na środku kadru (współrzędne na pasku statusu) -->
+  <div id="crosshair" class="crosshair" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor">
+      <line x1="12" y1="2.5" x2="12" y2="8.5"/>
+      <line x1="12" y1="15.5" x2="12" y2="21.5"/>
+      <line x1="2.5" y1="12" x2="8.5" y2="12"/>
+      <line x1="15.5" y1="12" x2="21.5" y2="12"/>
+      <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+    </svg>
+  </div>
   <div id="compare-divider" class="compare-divider hidden" title="Przeciągnij, aby porównać mapy">
     <div class="cd-handle">◂▸</div>
   </div>
 
   <!-- Dolny pasek statusu -->
   <footer class="statusbar">
-    <span id="st-coords" title="Współrzędne kursora / środka">—</span>
+    <span id="st-coords" class="st-coords" title="Współrzędne krzyżyka na środku kadru — kliknij, aby skopiować"><svg class="ic ic-xs"><use href="#i-target"/></svg> <span id="st-coords-val">—</span></span>
     <span id="st-zoom" title="Poziom przybliżenia">z—</span>
     <span id="st-measure" class="hidden" title="Długość pomiaru"></span>
     <span id="st-follow" class="hidden"><svg class="ic ic-xs"><use href="#i-target"/></svg> śledzenie</span>

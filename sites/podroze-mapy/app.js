@@ -1002,9 +1002,94 @@ document.getElementById("search-close").addEventListener("click", () => {
 });
 
 let searchMarker = null;
-async function doSearch() {
-  const q = searchInput.value.trim();
-  if (!q) return;
+
+/* Przelot do punktu + pinezka z podpisem (wspólne dla linków/współrzędnych) */
+function goToPoint(lat, lng, zoom, label) {
+  map.flyTo([lat, lng], zoom);
+  if (searchMarker) map.removeLayer(searchMarker);
+  searchMarker = L.marker([lat, lng]).addTo(map)
+    .bindPopup(`${label ? esc(label) + "<br>" : ""}<b>${lat.toFixed(6)}, ${lng.toFixed(6)}</b>`)
+    .openPopup();
+  searchResults.innerHTML = "";
+  searchBar.classList.add("hidden");
+}
+
+/* ── Parsowanie linku Google Maps ──
+   Obsługiwane: pinezka miejsca (!3d…!4d…), parametry q/ll/query/center/
+   destination=lat,lng, widok @lat,lng,zoomz, nazwa z /maps/place/<nazwa>.
+   Krótkich linków (maps.app.goo.gl) nie da się rozwinąć w przeglądarce
+   (CORS) — podpowiadamy, skąd wziąć pełny adres. */
+function parseGoogleLink(text) {
+  const m = text.match(/https?:\/\/\S+/);
+  if (!m) return null;
+  let url;
+  try { url = new URL(m[0]); } catch { return null; }
+  const h = url.hostname;
+  const isGoogle = /(^|\.)google\.[a-z]+(\.[a-z]+)?$/.test(h) ||
+    /(^|\.)goo\.gl$/.test(h);
+  if (!isGoogle) return null;
+  let s = m[0];
+  try { s = decodeURIComponent(s.replace(/\+/g, " ")); } catch { /* zostaw surowy */ }
+  const place = s.match(/\/maps\/(?:place|search)\/([^/@?]+)/);
+  const label = place ? place[1].replace(/\s+/g, " ").trim() : null;
+  /* 1) pinezka miejsca — najdokładniejsza */
+  let mm = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+  if (mm) return { lat: +mm[1], lng: +mm[2], zoom: 17, label };
+  /* 2) parametry ze współrzędnymi */
+  mm = s.match(/[?&](?:q|ll|query|center|destination|daddr|saddr|viewpoint)=(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+  if (mm) return { lat: +mm[1], lng: +mm[2], zoom: 16, label };
+  /* 3) środek widoku @lat,lng,zoomz */
+  mm = s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)(?:,(\d+(?:\.\d+)?)z)?/);
+  if (mm) return { lat: +mm[1], lng: +mm[2], zoom: mm[3] ? Math.round(+mm[3]) : 15, label };
+  /* 4) tylko nazwa miejsca — geokodujemy */
+  if (label) return { query: label };
+  mm = s.match(/[?&](?:q|query|destination)=([^&]+)/);
+  if (mm) return { query: mm[1].replace(/\s+/g, " ").trim() };
+  if (/goo\.gl$/.test(h)) return { short: true };
+  return null;
+}
+
+/* ── Parsowanie współrzędnych ──
+   Formaty: dziesiętne (54.51889, 18.53054 · -33.9 18.4 · 54,5189 18,5305),
+   z literami (N54.5 E18.5 · 54.5N 18.5E), stopnie-minuty (54°31.13'N),
+   pełny DMS (54°31'08"N 18°31'50"E), same liczby (54 31 08 18 31 50). */
+function parseCoordHalf(s) {
+  const neg = /[SWsw]/.test(s) || /^\s*-/.test(s);
+  const nums = (s.match(/\d+(?:[.,]\d+)?/g) || [])
+    .map(n => parseFloat(n.replace(",", ".")));
+  if (!nums.length || nums.length > 3) return null;
+  const [d, mi = 0, sec = 0] = nums;
+  if (mi >= 60 || sec >= 60) return null;
+  return (neg ? -1 : 1) * (d + mi / 60 + sec / 3600);
+}
+function parseCoords(text) {
+  const t = text.trim().replace(/[−–]/g, "-").replace(/[′’]/g, "'").replace(/[″”]/g, '"');
+  if (!/\d/.test(t) || !/^[0-9NSEWnsew\s°'",;.+-]+$/.test(t)) return null;
+  let hA = null, hB = null;
+  const iNS = t.search(/[NSns]/), iEW = t.search(/[EWew]/);
+  if (iNS >= 0 && iEW >= 0) {
+    /* litery kierunków wyznaczają połówki: "54.5N 18.5E" lub "N54.5 E18.5" */
+    if (/\d/.test(t.slice(0, iNS))) { hA = t.slice(0, iNS + 1); hB = t.slice(iNS + 1); }
+    else { hA = t.slice(0, iEW); hB = t.slice(iEW); }
+  } else if (t.includes(";")) {
+    [hA, hB] = t.split(";");
+  } else if ((t.match(/,/g) || []).length === 1) {
+    [hA, hB] = t.split(",");
+  } else {
+    /* bez separatora: parzysta liczba liczb → pół na pół (2, 4 lub 6) */
+    const nums = t.match(/-?\d+(?:[.,]\d+)?/g) || [];
+    if (![2, 4, 6].includes(nums.length)) return null;
+    hA = nums.slice(0, nums.length / 2).join(" ");
+    hB = nums.slice(nums.length / 2).join(" ");
+  }
+  if (hA == null || hB == null) return null;
+  const lat = parseCoordHalf(hA), lng = parseCoordHalf(hB);
+  if (lat == null || lng == null) return null;
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return { lat, lng };
+}
+
+async function nominatimSearch(q) {
   searchResults.innerHTML = `<li class="sr-info">Szukam…</li>`;
   try {
     const r = await fetch(
@@ -1016,19 +1101,41 @@ async function doSearch() {
       const li = document.createElement("li");
       li.textContent = hit.display_name;
       li.addEventListener("click", () => {
-        const lat = +hit.lat, lng = +hit.lon;
-        map.flyTo([lat, lng], Math.max(map.getZoom(), 13));
-        if (searchMarker) map.removeLayer(searchMarker);
-        searchMarker = L.marker([lat, lng]).addTo(map)
-          .bindPopup(hit.display_name).openPopup();
-        searchResults.innerHTML = "";
-        searchBar.classList.add("hidden");
+        goToPoint(+hit.lat, +hit.lon, Math.max(map.getZoom(), 13), hit.display_name);
       });
       searchResults.appendChild(li);
     });
   } catch {
     searchResults.innerHTML = `<li class="sr-info">Błąd sieci — spróbuj ponownie.</li>`;
   }
+}
+
+async function doSearch() {
+  const q = searchInput.value.trim();
+  if (!q) return;
+  /* 1) link Google Maps */
+  const g = parseGoogleLink(q);
+  if (g) {
+    if (g.short) {
+      searchResults.innerHTML = `<li class="sr-info">To skrócony link Google (goo.gl) —
+        przeglądarka nie może go rozwinąć. Otwórz go i skopiuj pełny adres z paska
+        (ten z „@" i współrzędnymi) albo współrzędne miejsca.</li>`;
+      return;
+    }
+    if (g.lat != null) {
+      goToPoint(g.lat, g.lng, g.zoom || 16, g.label || "Punkt z linku Google");
+      return;
+    }
+    if (g.query) { searchInput.value = g.query; return nominatimSearch(g.query); }
+  }
+  /* 2) współrzędne wpisane wprost */
+  const c = parseCoords(q);
+  if (c) {
+    goToPoint(c.lat, c.lng, Math.max(map.getZoom(), 14), "Wpisane współrzędne");
+    return;
+  }
+  /* 3) zwykłe wyszukiwanie nazwy */
+  return nominatimSearch(q);
 }
 document.getElementById("search-go").addEventListener("click", doSearch);
 searchInput.addEventListener("keydown", e => { if (e.key === "Enter") doSearch(); });
@@ -2543,14 +2650,23 @@ const stZoom = document.getElementById("st-zoom");
 function fmtLL(ll) {
   return `${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}`;
 }
-map.on("mousemove", e => { stCoords.textContent = fmtLL(e.latlng); });
+/* pasek statusu pokazuje współrzędne krzyżyka na środku kadru (na żywo) */
+const stCoordsVal = document.getElementById("st-coords-val");
+function updateCenterCoords() { stCoordsVal.textContent = fmtLL(map.getCenter()); }
+map.on("move", updateCenterCoords);
 map.on("moveend zoomend", () => {
   stZoom.textContent = "z" + map.getZoom();
-  if (!matchMedia("(pointer:fine)").matches) stCoords.textContent = fmtLL(map.getCenter());
+  updateCenterCoords();
   writeHash();
 });
+stCoords.addEventListener("click", () => {
+  const txt = fmtLL(map.getCenter());
+  (navigator.clipboard?.writeText(txt) || Promise.reject())
+    .then(() => toast(`Skopiowano współrzędne środka: ${txt}`))
+    .catch(() => toast(txt, 6000));
+});
 stZoom.textContent = "z" + map.getZoom();
-stCoords.textContent = fmtLL(map.getCenter());
+updateCenterCoords();
 
 document.addEventListener("keydown", e => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;

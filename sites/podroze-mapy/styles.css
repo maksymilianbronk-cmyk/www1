@@ -322,6 +322,21 @@ html, body {
   user-select: none;
 }
 
+/* ── Krzyżyk celowniczy (środek kadru mapy) ── */
+.crosshair {
+  position: fixed;
+  top: var(--topbar-h); left: 0; right: 0;
+  bottom: calc(var(--status-h) + var(--bottombar-h) + var(--safe-b));
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 640;
+  color: rgba(255, 255, 255, 0.92);
+}
+.crosshair svg {
+  stroke-width: 1.7; stroke-linecap: round;
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.95));
+}
+.crosshair circle { fill: var(--accent); }
+
 /* ── Pasek statusu ── */
 .statusbar {
   position: fixed; left: 0; right: 0;
@@ -334,6 +349,11 @@ html, body {
   font-variant-numeric: tabular-nums;
   z-index: 1200;
 }
+.st-coords {
+  display: inline-flex; align-items: center; gap: 5px;
+  cursor: pointer; user-select: none;
+}
+.st-coords:hover { color: var(--accent); }
 #st-measure { color: var(--accent); font-weight: 600; }
 #st-follow { color: var(--accent2); }
 .st-chip {
