@@ -299,14 +299,14 @@ const SITES = [
   {
     slug: "abba1",
     title: "ABBA1 — kasy fiskalne online, Warszawa",
-    desc: "Redesign abba1.pl (lead: kamola@abba1.pl): eko-zielony wielostronicowy serwis firmy fiskalnej z Pragi Północ w estetyce paragonu (perforacje, font mono, hero z drukarką drukującą paragon). 8 podstron — Start, Sklep (symulacja: 20 realnych produktów Novitus/Posnet/Elzab/Dotykačka, filtry, koszyk-paragon z localStorage, lot produktu do koszyka, 3-krokowy checkout mailto z numerem zamówienia), Serwis, Szkolenia, Dotykačka z interaktywnym demo ekranu POS (nabijanie rachunku), Galeria z lightboxem (blur, miniatury, klawiatura, gesty), O firmie (oś czasu 2006–2026, dane KRS), Kontakt z rysowaną mapką SVG Pragi. Do tego PANEL SKLEPU (panel.html): pulpit z KPI i wykresem sprzedaży 7 dni, realizacja zamówień w kanbanie (Nowe→W realizacji→Wysłane→Zakończone, drag&drop + przycisk, szczegóły jako paragon ze stepperem, notatki, druk, anulowanie, szukajka), magazyn z przełącznikami dostępności sterującymi sklepem (brak na stanie blokuje zakup), dane demo + reset — zamówienia ze sklepu wpadają do panelu automatycznie (wspólny localStorage, katalog w products.js). Pływająca zawieszka „Weź w leasing teraz” z kalkulatorem rat, autorskie logo SVG (paragon+listek), ikony SVG, marquee marek, liczniki, parallax, reveal, fullscreen hamburger. Pełny audyt Playwright: 8 stron × 4 viewporty + E2E koszyka i panelu. Prawdziwe dane: al. Tysiąclecia 151, tel. 22 619 40 80, 600 323 994, biuro@abba1.pl, NIP 113-259-98-56, KRS 0000252651.",
+    desc: "Redesign abba1.pl (lead: kamola@abba1.pl): korporacyjny serwis firmy fiskalnej z Pragi Północ (stonowana zieleń szmaragdowa + grafit, typografia Archivo/IBM Plex Mono) w estetyce paragonu (perforacje, font mono, hero z drukarką drukującą paragon). 8 podstron — Start, Sklep (symulacja: 20 realnych produktów Novitus/Posnet/Elzab/Dotykačka, filtry, koszyk-paragon z localStorage, lot produktu do koszyka, 3-krokowy checkout mailto z numerem zamówienia), Serwis, Szkolenia, Dotykačka z interaktywnym demo ekranu POS (nabijanie rachunku), Galeria z lightboxem (blur, miniatury, klawiatura, gesty), O firmie (oś czasu 2006–2026, dane KRS), Kontakt z rysowaną mapką SVG Pragi. Do tego PANEL SKLEPU (panel.html): pulpit z KPI i wykresem sprzedaży 7 dni, realizacja zamówień w kanbanie (Nowe→W realizacji→Wysłane→Zakończone, drag&drop + przycisk, szczegóły jako paragon ze stepperem, notatki, druk, anulowanie, szukajka), magazyn z przełącznikami dostępności sterującymi sklepem (brak na stanie blokuje zakup), dane demo + reset — zamówienia ze sklepu wpadają do panelu automatycznie (wspólny localStorage, katalog w products.js). Pływająca zawieszka „Weź w leasing teraz” z kalkulatorem rat, autorskie logo SVG (paragon+listek), ikony SVG, marquee marek, liczniki, parallax, reveal, fullscreen hamburger. Pełny audyt Playwright: 8 stron × 4 viewporty + E2E koszyka i panelu. Prawdziwe dane: al. Tysiąclecia 151, tel. 22 619 40 80, 600 323 994, biuro@abba1.pl, NIP 113-259-98-56, KRS 0000252651.",
     icon: "🧾",
     tag: "landing",
     status: "klient-w-trakcie",
     preview: true,
     meta: {
-      colors: ["#f4f8f1", "#0a2b1c", "#0d5c3f", "#7fc548", "#eab63f"],
-      fonts: ["Unbounded", "Manrope", "Space Mono"],
+      colors: ["#f4f6f4", "#0a1f18", "#0e5041", "#3f9d6d", "#d9a441"],
+      fonts: ["Archivo", "Manrope", "IBM Plex Mono"],
       tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash", "localStorage"],
     },
   },
