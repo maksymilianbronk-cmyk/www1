@@ -28,15 +28,15 @@
     encodeURIComponent(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">' +
         '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0" stop-color="#0d3623"/><stop offset="1" stop-color="#0a2b1c"/>' +
+        '<stop offset="0" stop-color="#0d2a20"/><stop offset="1" stop-color="#0a1f18"/>' +
         "</linearGradient></defs>" +
         '<rect width="800" height="600" fill="url(#g)"/>' +
-        '<g fill="none" stroke="#7fc548" stroke-width="4" opacity="0.85" transform="translate(400 300)">' +
+        '<g fill="none" stroke="#3f9d6d" stroke-width="4" opacity="0.85" transform="translate(400 300)">' +
         '<rect x="-90" y="-70" width="180" height="110" rx="12"/>' +
         '<path d="M-60 40 h120 M-60 60 h80" stroke-dasharray="6 8"/>' +
         '<path d="M-40 -70 v-30 h80 v30"/>' +
         "</g>" +
-        '<text x="400" y="430" text-anchor="middle" fill="#a5e063" font-family="monospace" font-size="26">ABBA1 • kasy fiskalne</text>' +
+        '<text x="400" y="430" text-anchor="middle" fill="#7cc9a4" font-family="monospace" font-size="26">ABBA1 • kasy fiskalne</text>' +
         "</svg>"
     );
 
@@ -401,12 +401,12 @@
     '<svg viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">' +
     '<path d="M50 2 C 50 26, 50 26, 50 30" stroke="#8fae9c" stroke-width="2.5" fill="none" stroke-dasharray="4 4"/>' +
     '<g>' +
-    '<path d="M50 24 L78 44 L78 132 Q78 142 68 142 L32 142 Q22 142 22 132 L22 44 Z" fill="#eab63f" stroke="#0a2b1c" stroke-width="2.5"/>' +
-    '<circle cx="50" cy="44" r="6" fill="#0a2b1c"/>' +
-    '<circle class="tag-pulse" cx="50" cy="44" r="6" fill="none" stroke="#0a2b1c" stroke-width="1.5"/>' +
-    '<text x="50" y="76" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="800" font-size="15" fill="#0a2b1c">0%</text>' +
-    '<text x="50" y="97" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="10.5" fill="#0a2b1c">WEŹ W</text>' +
-    '<text x="50" y="111" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="10.5" fill="#0a2b1c">LEASING</text>' +
+    '<path d="M50 24 L78 44 L78 132 Q78 142 68 142 L32 142 Q22 142 22 132 L22 44 Z" fill="#d9a441" stroke="#0a1f18" stroke-width="2.5"/>' +
+    '<circle cx="50" cy="44" r="6" fill="#0a1f18"/>' +
+    '<circle class="tag-pulse" cx="50" cy="44" r="6" fill="none" stroke="#0a1f18" stroke-width="1.5"/>' +
+    '<text x="50" y="76" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="800" font-size="15" fill="#0a1f18">0%</text>' +
+    '<text x="50" y="97" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="10.5" fill="#0a1f18">WEŹ W</text>' +
+    '<text x="50" y="111" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="10.5" fill="#0a1f18">LEASING</text>' +
     '<text x="50" y="127" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="700" font-size="8.5" fill="#5c4308">→ teraz</text>' +
     "</g></svg></button>";
   document.body.insertAdjacentHTML("beforeend", tagHtml);
@@ -415,7 +415,7 @@
     '<div class="modal-backdrop" id="leasingModal">' +
     '  <div class="modal" role="dialog" aria-modal="true" aria-label="Kalkulator leasingu">' +
     '    <button class="modal-close" data-close-leas aria-label="Zamknij">✕</button>' +
-    "    <h3>Weź w leasing teraz 🌿</h3>" +
+    "    <h3>Weź w leasing teraz</h3>" +
     '    <p class="modal-sub">Kasa, terminal lub cały zestaw POS — od ręki, bez zamrażania gotówki. Policz orientacyjną ratę:</p>' +
     '    <div class="leas-calc">' +
     '      <div class="leas-row"><label>Wartość sprzętu (netto) <output id="leasVal">4 000 zł</output></label>' +
@@ -606,7 +606,7 @@
       window.location.href = href;
       var status = form.querySelector(".form-status");
       if (status) status.textContent = "Otwieramy Twój program pocztowy z gotową wiadomością…";
-      toast("Przygotowano wiadomość e-mail ✉");
+      toast("Przygotowano wiadomość e-mail");
     });
   });
 
@@ -638,7 +638,7 @@
     });
     document.getElementById("pbPay").addEventListener("click", function () {
       if (!bill.length) { toast("Rachunek jest pusty"); return; }
-      toast("Rachunek zamknięty — paragon wydrukowany 🧾");
+      toast("Rachunek zamknięty — paragon wydrukowany");
       bill = [];
       renderBill();
     });
