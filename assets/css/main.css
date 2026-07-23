@@ -27,13 +27,26 @@ body {
 
 /* ── Header ── */
 .site-header {
-  padding: 56px var(--gap) 40px;
+  padding: 60px var(--gap) 36px;
   text-align: center;
   border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.header-glow {
+  position: absolute;
+  inset: -60% -20% auto;
+  height: 200%;
+  background:
+    radial-gradient(480px 260px at 30% 30%, rgba(108, 99, 255, .16), transparent 70%),
+    radial-gradient(420px 240px at 72% 20%, rgba(141, 123, 255, .1), transparent 70%);
+  pointer-events: none;
 }
 
 .site-header h1 {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  position: relative;
+  font-size: clamp(1.7rem, 4vw, 2.7rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   background: linear-gradient(135deg, #fff 30%, var(--accent));
@@ -42,10 +55,41 @@ body {
   background-clip: text;
 }
 
+.site-header h1 .author {
+  background: linear-gradient(135deg, var(--accent), #b3a6ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  white-space: nowrap;
+}
+
 .subtitle {
+  position: relative;
   margin-top: 10px;
   color: var(--text-dim);
   font-size: 1rem;
+}
+
+.header-note {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  max-width: 640px;
+  padding: 11px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-dim);
+  background: rgba(108, 99, 255, .1);
+  color: #cfcaff;
+  font-size: .88rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.header-note svg { flex: none; color: var(--accent); }
+
+@media (max-width: 640px) {
+  .header-note { border-radius: 16px; }
 }
 
 /* ── Toolbar: szukajka + kategorie ── */
@@ -134,7 +178,14 @@ body {
   box-shadow: 0 6px 18px -6px rgba(108, 99, 255, .55);
 }
 
-.cat-chip .cat-ico { font-size: 1rem; line-height: 1; }
+.cat-chip .cat-ico { font-size: 1rem; line-height: 1; display: inline-flex; }
+
+/* Ikony SVG w chipach i kartach */
+.ico { width: 17px; height: 17px; flex: none; }
+.cat-chip .ico { color: var(--accent); }
+.cat-chip.active .ico { color: #fff; }
+.status-chip .ico { color: var(--text-dim); }
+.status-chip.active .ico { color: #fff; }
 
 .cat-chip .cat-count {
   font-size: .72rem;
@@ -298,6 +349,29 @@ body {
   flex-direction: column;
   position: relative;
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  /* wydajność: karty poza ekranem nie są renderowane */
+  content-visibility: auto;
+  contain-intrinsic-size: 320px 420px;
+  animation: cardIn .5s ease backwards;
+}
+
+.card:nth-child(1) { animation-delay: .03s; }
+.card:nth-child(2) { animation-delay: .08s; }
+.card:nth-child(3) { animation-delay: .13s; }
+.card:nth-child(4) { animation-delay: .18s; }
+.card:nth-child(5) { animation-delay: .23s; }
+.card:nth-child(6) { animation-delay: .28s; }
+.card:nth-child(7) { animation-delay: .33s; }
+.card:nth-child(8) { animation-delay: .38s; }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .preview-shimmer { animation: none !important; }
+  .card-preview iframe { transition: none; opacity: 1; }
 }
 
 .card:hover {
@@ -334,7 +408,8 @@ body {
 
 /* Miniatura strony: iframe renderowany w 2× szerokości karty i skalowany 0.5,
    zakotwiczony absolutnie w lewym górnym rogu — bez tego flex centrował
-   przeskalowany prostokąt i podgląd wyświetlał się jako ucięty kwadrat. */
+   przeskalowany prostokąt i podgląd wyświetlał się jako ucięty kwadrat.
+   Iframe montowany jest leniwie (IntersectionObserver) w .preview-slot. */
 .card-preview iframe {
   position: absolute;
   top: 0;
@@ -345,7 +420,33 @@ body {
   transform-origin: top left;
   pointer-events: none;
   border: none;
+  opacity: 0;
+  transition: opacity .45s ease;
 }
+
+.preview-slot.loaded iframe { opacity: 1; }
+
+.preview-slot { position: absolute; inset: 0; display: block; }
+
+.preview-shimmer {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .06) 50%, transparent 70%),
+    var(--accent-dim);
+  background-size: 240% 100%, auto;
+  animation: shimmer 1.5s linear infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 130% 0, 0 0; }
+  to { background-position: -110% 0, 0 0; }
+}
+
+.card-icon .ico { width: 44px; height: 44px; color: var(--accent); }
+.mi-icon .ico { width: 30px; height: 30px; color: var(--accent); }
+.empty-ico .ico { width: 40px; height: 40px; color: var(--text-dim); }
+.empty-ico { display: inline-block; margin-bottom: 12px; }
 
 .card-body {
   padding: 16px 18px 18px;
