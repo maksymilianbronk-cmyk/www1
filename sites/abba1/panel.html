@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel sklepu ABBA1 — zamówienia i magazyn (demo)</title>
+<meta name="description" content="Demo panelu sklepu ABBA1: pulpit ze statystykami, realizacja zamówień w widoku kanban, magazyn produktów.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;800&family=Manrope:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M14 4h36q4 0 4 4v48l-5.5-4-5.5 4-5.5-4-5.5 4-5.5-4-5.5 4-5.5-4-5.5 4V8q0-4 4-4Z' fill='%230a2b1c'/%3E%3Cpath d='M32 14c11 4 13 17 2 26-9-7-11-20-2-26Z' fill='%23eab63f'/%3E%3C/svg%3E">
+<style>
+/* ================= PANEL — style własne ================= */
+body { background: #eef3ea; }
+.panel-top {
+  position: sticky; top: 0; z-index: 500;
+  background: rgba(10, 43, 28, 0.97); color: #eef7ea;
+  backdrop-filter: blur(10px);
+}
+.panel-top .inner {
+  max-width: 1360px; margin: 0 auto; padding: 12px 22px;
+  display: flex; align-items: center; gap: 16px;
+}
+.panel-top .brand svg { height: 40px; }
+.panel-top .brand-name { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; }
+.panel-top .brand-name em { font-style: normal; color: var(--lime); }
+.panel-badge {
+  font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.2em;
+  border: 1px dashed rgba(165, 224, 99, 0.6); color: var(--lime-bright);
+  padding: 5px 10px; border-radius: 999px; text-transform: uppercase;
+}
+.panel-top .spacer { flex: 1; }
+.panel-top a.back {
+  font-weight: 700; font-size: 0.85rem; opacity: 0.85; display: inline-flex; gap: 7px; align-items: center;
+}
+.panel-top a.back:hover { opacity: 1; color: var(--lime-bright); }
+.panel-top .reset-btn {
+  font-size: 0.8rem; font-weight: 700; padding: 9px 16px; border-radius: 999px;
+  border: 1.5px solid rgba(238, 247, 234, 0.3); color: #eef7ea; transition: all 0.25s;
+}
+.panel-top .reset-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+.panel-wrap { max-width: 1360px; margin: 0 auto; padding: 26px 22px 90px; }
+
+.panel-tabs { display: flex; gap: 8px; margin-bottom: 26px; flex-wrap: wrap; }
+.panel-tab {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 12px 22px; border-radius: 14px; font-weight: 800; font-size: 0.95rem;
+  background: #fff; color: var(--ink-soft); box-shadow: 0 2px 10px rgba(10,43,28,0.07);
+  transition: all 0.25s;
+}
+.panel-tab:hover { transform: translateY(-2px); }
+.panel-tab.active { background: var(--pine); color: #fff; }
+.panel-tab .cnt {
+  font-family: var(--font-mono); font-size: 0.72rem; background: rgba(127,197,72,0.25);
+  color: inherit; border-radius: 999px; padding: 2px 9px;
+}
+.panel-tab.active .cnt { background: rgba(255,255,255,0.2); }
+.panel-view { display: none; }
+.panel-view.on { display: block; animation: view-in 0.35s ease; }
+@keyframes view-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* ---- pulpit ---- */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+.kpi {
+  background: #fff; border-radius: 18px; padding: 22px 22px 18px;
+  box-shadow: 0 2px 14px rgba(10,43,28,0.07); position: relative; overflow: hidden;
+}
+.kpi::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--lime); }
+.kpi.k-amber::after { background: var(--amber); }
+.kpi.k-pine::after { background: var(--pine); }
+.kpi.k-red::after { background: var(--red); }
+.kpi .k-label { font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; }
+.kpi .k-value { font-family: var(--font-mono); font-weight: 700; font-size: clamp(1.5rem, 2.6vw, 2.1rem); color: var(--ink); margin-top: 6px; }
+.kpi .k-sub { font-size: 0.76rem; color: var(--ink-soft); margin-top: 3px; }
+
+.dash-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; }
+.dash-card { background: #fff; border-radius: 18px; padding: 24px; box-shadow: 0 2px 14px rgba(10,43,28,0.07); min-width: 0; }
+.dash-card h3 { font-size: 1.02rem; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: baseline; }
+.dash-card h3 small { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-soft); font-weight: 400; }
+
+.chart7 { display: flex; align-items: flex-end; gap: 10px; height: 170px; padding-top: 10px; }
+.chart7 .bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.chart7 .bar i {
+  width: 100%; border-radius: 8px 8px 4px 4px; min-height: 4px;
+  background: linear-gradient(180deg, var(--lime), var(--pine));
+  transition: height 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  position: relative;
+}
+.chart7 .bar i .tip {
+  position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 0.6rem; color: var(--pine); white-space: nowrap; font-weight: 700;
+}
+.chart7 .bar b { font-family: var(--font-mono); font-size: 0.62rem; color: var(--ink-soft); font-weight: 400; }
+
+.mini-list { display: flex; flex-direction: column; gap: 10px; }
+.mini-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
+  background: #f5f8f2; cursor: pointer; transition: background 0.2s, transform 0.2s;
+}
+.mini-row:hover { background: var(--mint); transform: translateX(3px); }
+.mini-row .mr-id { font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; color: var(--pine); }
+.mini-row .mr-name { flex: 1; min-width: 0; font-weight: 700; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-row .mr-sum { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; }
+
+.top-prod { display: flex; flex-direction: column; gap: 12px; }
+.top-prod .tp-row { font-size: 0.85rem; }
+.top-prod .tp-head { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 5px; }
+.top-prod .tp-head span:last-child { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-soft); }
+.top-prod .tp-bar { height: 8px; border-radius: 4px; background: #eef3ea; overflow: hidden; }
+.top-prod .tp-bar i { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--pine), var(--lime)); transition: width 0.8s ease; }
+
+/* ---- statusy ---- */
+.st { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.st-nowe { background: rgba(234,182,63,0.2); color: #8a6208; }
+.st-realizacja { background: rgba(13,92,63,0.14); color: var(--pine); }
+.st-wyslane { background: rgba(47,140,255,0.14); color: #1c66c9; }
+.st-zakonczone { background: rgba(15,38,26,0.1); color: var(--ink-soft); }
+.st-anulowane { background: rgba(214,69,69,0.14); color: var(--red); }
+
+/* ---- kanban ---- */
+.orders-bar { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+.orders-bar input {
+  flex: 1; min-width: 220px; padding: 13px 18px; border-radius: 14px; border: 1.5px solid #dde7d8;
+  background: #fff; font-size: 0.95rem;
+}
+.orders-bar input:focus { outline: none; border-color: var(--pine); box-shadow: 0 0 0 4px rgba(13,92,63,0.1); }
+.kanban {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: start;
+}
+.kcol { background: #e5ecdf; border-radius: 16px; padding: 12px; min-height: 220px; transition: background 0.2s, outline 0.2s; outline: 2px dashed transparent; }
+.kcol.dragover { background: var(--mint); outline-color: var(--lime); }
+.kcol-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px 12px; }
+.kcol-head b { font-size: 0.85rem; letter-spacing: 0.04em; }
+.kcol-head .kc-cnt { font-family: var(--font-mono); font-size: 0.72rem; background: #fff; border-radius: 999px; padding: 2px 9px; }
+.kcol[data-col="nowe"] .kcol-head b { color: #8a6208; }
+.kcol[data-col="realizacja"] .kcol-head b { color: var(--pine); }
+.kcol[data-col="wyslane"] .kcol-head b { color: #1c66c9; }
+.kcol[data-col="zakonczone"] .kcol-head b { color: var(--ink-soft); }
+.kcard {
+  background: #fff; border-radius: 13px; padding: 14px 14px 12px; margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(10,43,28,0.08); cursor: grab; user-select: none;
+  transition: transform 0.2s, box-shadow 0.2s; position: relative;
+}
+.kcard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(10,43,28,0.14); }
+.kcard.dragging { opacity: 0.45; cursor: grabbing; }
+.kcard .kc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.kcard .kc-id { font-family: var(--font-mono); font-weight: 700; font-size: 0.78rem; color: var(--pine); }
+.kcard .kc-ago { font-size: 0.66rem; color: var(--ink-soft); font-family: var(--font-mono); }
+.kcard .kc-name { font-weight: 800; font-size: 0.92rem; margin-bottom: 3px; }
+.kcard .kc-meta { font-size: 0.75rem; color: var(--ink-soft); margin-bottom: 10px; }
+.kcard .kc-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.kcard .kc-sum { font-family: var(--font-mono); font-weight: 700; font-size: 0.92rem; }
+.kcard .kc-adv {
+  width: 34px; height: 34px; border-radius: 10px; background: var(--mint); color: var(--pine);
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.kcard .kc-adv:hover { background: var(--pine); color: #fff; transform: translateX(2px); }
+.kcard .kc-adv svg { width: 16px; height: 16px; }
+.kempty { text-align: center; font-size: 0.75rem; color: var(--ink-soft); padding: 26px 6px; font-family: var(--font-mono); }
+
+/* ---- drawer szczegółów ---- */
+.od-backdrop {
+  position: fixed; inset: 0; z-index: 800; background: rgba(10,43,28,0.5);
+  opacity: 0; visibility: hidden; transition: 0.3s;
+}
+.od-backdrop.open { opacity: 1; visibility: visible; }
+.od-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 810; width: min(460px, 96vw);
+  background: #fdfcf7; transform: translateX(105%); transition: transform 0.4s cubic-bezier(0.2,0.7,0.2,1);
+  display: flex; flex-direction: column; box-shadow: -18px 0 50px rgba(0,0,0,0.25);
+}
+.od-drawer.open { transform: none; }
+.od-head { padding: 22px 26px 14px; border-bottom: 1px dashed #c6cfc0; display: flex; align-items: center; gap: 12px; }
+.od-head .od-id { font-family: var(--font-mono); font-weight: 700; font-size: 1.05rem; color: var(--pine); }
+.od-head .od-close { margin-left: auto; width: 38px; height: 38px; border-radius: 50%; background: var(--mint); font-weight: 700; transition: 0.25s; }
+.od-head .od-close:hover { background: var(--lime); transform: rotate(90deg); }
+.od-body { flex: 1; overflow-y: auto; padding: 20px 26px; }
+
+.stepper { display: flex; gap: 0; margin-bottom: 22px; }
+.stepper .sp { flex: 1; text-align: center; position: relative; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); }
+.stepper .sp::before {
+  content: ""; display: block; width: 14px; height: 14px; border-radius: 50%;
+  background: #dde7d8; margin: 0 auto 7px; border: 3px solid #dde7d8; transition: 0.3s;
+}
+.stepper .sp::after {
+  content: ""; position: absolute; top: 7px; left: calc(-50% + 10px); right: calc(50% + 10px);
+  height: 2px; background: #dde7d8;
+}
+.stepper .sp:first-child::after { display: none; }
+.stepper .sp.done::before { background: var(--lime); border-color: var(--lime); }
+.stepper .sp.now::before { background: #fff; border-color: var(--pine); }
+.stepper .sp.done, .stepper .sp.now { color: var(--pine); }
+
+.od-receipt { font-family: var(--font-mono); font-size: 0.8rem; border: 1px dashed #c6cfc0; border-radius: 12px; padding: 16px; margin-bottom: 18px; background: #fff; }
+.od-receipt .orr { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+.od-receipt .or-sum { border-top: 2px solid #23301f; margin-top: 8px; padding-top: 8px; font-weight: 700; }
+.od-kv { font-size: 0.85rem; margin-bottom: 18px; display: grid; gap: 6px; }
+.od-kv div { display: flex; gap: 10px; }
+.od-kv b { min-width: 82px; color: var(--ink-soft); font-weight: 700; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+.od-note textarea { width: 100%; border: 1.5px solid #dde7d8; border-radius: 12px; padding: 12px 14px; min-height: 70px; font-size: 0.88rem; background: #fff; resize: vertical; }
+.od-note textarea:focus { outline: none; border-color: var(--pine); }
+.od-actions { padding: 18px 26px 24px; border-top: 1px dashed #c6cfc0; display: grid; gap: 10px; }
+.od-actions .btn { justify-content: center; }
+.od-actions .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-danger { border: 1.5px solid rgba(214,69,69,0.4); color: var(--red); border-radius: 999px; padding: 13px 20px; font-weight: 800; transition: 0.25s; }
+.btn-danger:hover { background: var(--red); color: #fff; }
+
+/* ---- magazyn ---- */
+.stock-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+.stock-row {
+  background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(10,43,28,0.06);
+  display: flex; align-items: center; gap: 14px;
+}
+.stock-row .sr-info { flex: 1; min-width: 0; }
+.stock-row .sr-brand { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pine); }
+.stock-row .sr-name { font-weight: 800; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stock-row .sr-price { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-soft); }
+.switch { position: relative; width: 52px; height: 30px; flex-shrink: 0; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; width: 100%; height: 100%; }
+.switch .track { position: absolute; inset: 0; border-radius: 999px; background: #d6ddd0; transition: 0.25s; pointer-events: none; }
+.switch .thumb { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: 0.25s; pointer-events: none; }
+.switch input:checked + .track { background: var(--lime); }
+.switch input:checked ~ .thumb { left: 26px; }
+.stock-row.out { opacity: 0.75; }
+.stock-row.out .sr-name { text-decoration: line-through; text-decoration-color: rgba(214,69,69,0.6); }
+
+/* ---- responsywność panelu ---- */
+@media (max-width: 1080px) {
+  .kanban { grid-template-columns: repeat(4, minmax(255px, 1fr)); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; }
+  .kcol { scroll-snap-align: start; }
+  .dash-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .panel-top .brand-sub, .panel-top a.back span, .panel-top .pt-sub { display: none; }
+  .panel-top .inner { padding: 10px 14px; gap: 10px; }
+  .panel-top .brand svg { height: 34px; }
+  .panel-top .reset-btn { padding: 8px 12px; font-size: 0.72rem; white-space: nowrap; }
+  .panel-badge { padding: 4px 8px; font-size: 0.55rem; }
+  .panel-wrap { padding: 18px 14px 70px; }
+}
+@media (max-width: 420px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi { padding: 16px 14px 14px; }
+  .panel-tab { padding: 10px 14px; font-size: 0.85rem; }
+}
+
+/* druk paragonu zamówienia */
+@media print {
+  body * { visibility: hidden; }
+  .od-drawer, .od-drawer * { visibility: visible; }
+  .od-drawer { position: static; width: 100%; box-shadow: none; transform: none; }
+  .od-actions, .od-head .od-close { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="panel-top">
+  <div class="inner">
+    <a class="brand" href="index.html" aria-label="ABBA1 — strona główna">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M14 4h36q4 0 4 4v48l-5.5-4-5.5 4-5.5-4-5.5 4-5.5-4-5.5 4-5.5-4-5.5 4V8q0-4 4-4Z" fill="#0d5c3f"/>
+        <path d="M32 16c11 4 13 17 2 26-9-7-11-20-2-26Z" fill="#7fc548"/>
+        <path d="M20 46h24" stroke="#eab63f" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text">
+        <span class="brand-name">abba<em>1</em> <span class="pt-sub" style="font-family:var(--font-body);font-weight:700;font-size:0.85em;opacity:0.8">· panel sklepu</span></span>
+      </span>
+    </a>
+    <span class="panel-badge">demo</span>
+    <span class="spacer"></span>
+    <a class="back" href="sklep.html">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      <span>Wróć do sklepu</span></a>
+    <button class="reset-btn" id="resetDemo" title="Wyczyść dane i wygeneruj przykładowe zamówienia">↺ Reset demo</button>
+  </div>
+</header>
+
+<main class="panel-wrap">
+  <nav class="panel-tabs" aria-label="Sekcje panelu">
+    <button class="panel-tab active" data-view="pulpit">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="10" rx="2"/><rect x="13" y="3" width="8" height="6" rx="2"/><rect x="13" y="11" width="8" height="10" rx="2"/><rect x="3" y="15" width="8" height="6" rx="2"/></svg>
+      Pulpit</button>
+    <button class="panel-tab" data-view="zamowienia">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 13 2 2 4-4"/></svg>
+      Zamówienia <span class="cnt" id="cntOrders">0</span></button>
+    <button class="panel-tab" data-view="magazyn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v13h18V8Z"/><path d="M9 21v-6h6v6"/></svg>
+      Magazyn <span class="cnt" id="cntStock">0</span></button>
+  </nav>
+
+  <!-- ===== PULPIT ===== -->
+  <section class="panel-view on" id="view-pulpit">
+    <div class="kpi-grid">
+      <div class="kpi k-amber"><div class="k-label">Nowe zamówienia</div><div class="k-value" id="kpiNew">—</div><div class="k-sub">czekają na przyjęcie</div></div>
+      <div class="kpi k-pine"><div class="k-label">W realizacji + wysyłka</div><div class="k-value" id="kpiWip">—</div><div class="k-sub">w toku</div></div>
+      <div class="kpi"><div class="k-label">Obrót 7 dni</div><div class="k-value" id="kpiRev">—</div><div class="k-sub">zamówienia opłacone i w toku</div></div>
+      <div class="kpi"><div class="k-label">Średni koszyk</div><div class="k-value" id="kpiAvg">—</div><div class="k-sub">z ostatnich 7 dni</div></div>
+    </div>
+    <div class="dash-grid">
+      <div class="dash-card">
+        <h3>Sprzedaż — ostatnie 7 dni <small>brutto</small></h3>
+        <div class="chart7" id="chart7"></div>
+      </div>
+      <div class="dash-card">
+        <h3>Ostatnie zamówienia <small>kliknij, aby otworzyć</small></h3>
+        <div class="mini-list" id="miniOrders"></div>
+      </div>
+      <div class="dash-card" style="grid-column:1/-1">
+        <h3>Najczęściej zamawiane <small>wg liczby sztuk</small></h3>
+        <div class="top-prod" id="topProd"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ZAMÓWIENIA ===== -->
+  <section class="panel-view" id="view-zamowienia">
+    <div class="orders-bar">
+      <input id="orderSearch" type="search" placeholder="Szukaj: numer, klient, produkt…" aria-label="Szukaj zamówienia">
+      <span class="st st-anulowane" id="cancelledInfo" style="cursor:pointer" title="Pokaż anulowane">anulowane: 0</span>
+    </div>
+    <div class="kanban" id="kanban">
+      <div class="kcol" data-col="nowe"><div class="kcol-head"><b>🟡 Nowe</b><span class="kc-cnt">0</span></div><div class="kcol-body"></div></div>
+      <div class="kcol" data-col="realizacja"><div class="kcol-head"><b>🟢 W realizacji</b><span class="kc-cnt">0</span></div><div class="kcol-body"></div></div>
+      <div class="kcol" data-col="wyslane"><div class="kcol-head"><b>🔵 Wysłane</b><span class="kc-cnt">0</span></div><div class="kcol-body"></div></div>
+      <div class="kcol" data-col="zakonczone"><div class="kcol-head"><b>⚪ Zakończone</b><span class="kc-cnt">0</span></div><div class="kcol-body"></div></div>
+    </div>
+    <p style="font-size:0.78rem;color:var(--ink-soft);margin-top:14px">
+      💡 Przeciągnij kartę między kolumnami albo użyj przycisku „→”, żeby przesunąć zamówienie do następnego etapu.
+      Zamówienia złożone w <a href="sklep.html" style="color:var(--pine);font-weight:700">sklepie</a> pojawiają się tu automatycznie.
+    </p>
+  </section>
+
+  <!-- ===== MAGAZYN ===== -->
+  <section class="panel-view" id="view-magazyn">
+    <p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:16px">
+      Wyłącz dostępność, a produkt w sklepie dostanie oznaczenie „brak na stanie” i zablokowany przycisk zakupu.
+    </p>
+    <div class="stock-list" id="stockList"></div>
+  </section>
+</main>
+
+<!-- drawer szczegółów zamówienia -->
+<div class="od-backdrop" id="odBackdrop"></div>
+<aside class="od-drawer" id="odDrawer" aria-label="Szczegóły zamówienia">
+  <div class="od-head">
+    <span class="od-id" id="odId">—</span>
+    <span class="st" id="odStatus">—</span>
+    <button class="od-close" id="odClose" aria-label="Zamknij">✕</button>
+  </div>
+  <div class="od-body">
+    <div class="stepper" id="odStepper"></div>
+    <div class="od-kv" id="odCustomer"></div>
+    <div class="od-receipt" id="odItems"></div>
+    <div class="od-note">
+      <label style="font-size:0.76rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);display:block;margin-bottom:7px">Notatka do zamówienia</label>
+      <textarea id="odNote" placeholder="np. kurier umówiony na czwartek…"></textarea>
+    </div>
+  </div>
+  <div class="od-actions">
+    <button class="btn btn-pine" id="odAdvance">Dalej →</button>
+    <div class="row2">
+      <button class="btn btn-outline-pine" id="odPrint" style="justify-content:center">🖨 Drukuj</button>
+      <button class="btn-danger" id="odCancel">Anuluj zam.</button>
+    </div>
+  </div>
+</aside>
+
+<script src="products.js"></script>
+<script>
+(function () {
+  "use strict";
+  var ORDERS_KEY = "abba1-orders-v1";
+  var FLOW = ["nowe", "realizacja", "wyslane", "zakonczone"];
+  var LABEL = { nowe: "Nowe", realizacja: "W realizacji", wyslane: "Wysłane", zakonczone: "Zakończone", anulowane: "Anulowane" };
+  var NEXT_LABEL = { nowe: "Przyjmij do realizacji →", realizacja: "Oznacz jako wysłane →", wyslane: "Zakończ zamówienie ✓", zakonczone: "Zakończone ✓", anulowane: "Przywróć jako nowe" };
+  var showCancelled = false;
+  var currentId = null;
+
+  function readOrders() { try { return JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; } catch (e) { return []; } }
+  function writeOrders(o) { localStorage.setItem(ORDERS_KEY, JSON.stringify(o)); }
+  function fmt(n) { return n.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " zł"; }
+  function ago(ts) {
+    var s = Math.max(1, Math.round((Date.now() - ts) / 1000));
+    if (s < 60) return s + " s temu";
+    var m = Math.round(s / 60); if (m < 60) return m + " min temu";
+    var h = Math.round(m / 60); if (h < 24) return h + " godz. temu";
+    return Math.round(h / 24) + " dn. temu";
+  }
+
+  /* ---------- toast ---------- */
+  var toastWrap = document.createElement("div");
+  toastWrap.className = "toast-wrap";
+  document.body.appendChild(toastWrap);
+  function toast(msg) {
+    var t = document.createElement("div");
+    t.className = "toast";
+    t.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' + msg;
+    toastWrap.appendChild(t);
+    setTimeout(function () { t.classList.add("out"); }, 2400);
+    setTimeout(function () { t.remove(); }, 2900);
+  }
+
+  /* ---------- dane demo ---------- */
+  var DEMO_NAMES = [
+    ["Bistro Zielona Praga", "601 220 110", "biuro@zielonapraga.pl"],
+    ["Sklep U Basi", "512 300 400", "ubasia@poczta.pl"],
+    ["Kawiarnia Kofeina", "700 800 900", "hej@kofeina.waw.pl"],
+    ["Salon Beauty Lux", "533 121 212", "recepcja@beautylux.pl"],
+    ["Warzywniak Pod Jabłonią", "660 010 020", "jablon@warzywa.pl"],
+    ["Food Truck Pan Burger", "790 555 111", "panburger@gmail.com"],
+    ["Apteka Zdrowie+", "22 811 22 33", "biuro@zdrowieplus.pl"],
+    ["Piekarnia Złoty Kłos", "604 404 404", "klos@piekarnia.pl"],
+    ["Serwis Rowerowy Szprycha", "608 700 600", "szprycha@rower.pl"]
+  ];
+  function seedDemo() {
+    var P = window.ABBA1_PRODUCTS;
+    var statuses = ["nowe", "nowe", "realizacja", "realizacja", "wyslane", "zakonczone", "zakonczone", "zakonczone", "anulowane"];
+    var orders = DEMO_NAMES.map(function (who, i) {
+      var count = 1 + (i % 3);
+      var items = [];
+      for (var j = 0; j < count; j++) {
+        var p = P[(i * 3 + j * 5) % P.length];
+        var ex = items.find(function (x) { return x.id === p.id; });
+        if (ex) ex.qty++;
+        else items.push({ id: p.id, name: p.name, price: p.price, qty: 1 + ((i + j) % 2) });
+      }
+      var total = items.reduce(function (s, it) { return s + it.price * it.qty; }, 0);
+      var ts = Date.now() - (i % 7) * 86400000 - (i + 2) * 3600000;
+      return {
+        id: "A1-" + (1020 + i),
+        ts: ts,
+        customer: { name: who[0], phone: who[1], mail: who[2], nip: "" },
+        items: items,
+        total: total,
+        status: statuses[i],
+        note: i === 2 ? "Klient prosi o fakturę na firmę." : "",
+        history: [{ status: "nowe", ts: ts }]
+      };
+    });
+    writeOrders(orders);
+    localStorage.setItem("abba1-order-seq", "1041");
+  }
+  if (!readOrders().length && !localStorage.getItem("abba1-panel-visited")) {
+    seedDemo();
+  }
+  localStorage.setItem("abba1-panel-visited", "1");
+
+  document.getElementById("resetDemo").addEventListener("click", function () {
+    seedDemo();
+    localStorage.removeItem(window.abbaStock.KEY);
+    renderAll();
+    toast("Dane demo zresetowane");
+  });
+
+  /* ---------- taby ---------- */
+  document.querySelectorAll(".panel-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll(".panel-tab").forEach(function (t) { t.classList.remove("active"); });
+      document.querySelectorAll(".panel-view").forEach(function (v) { v.classList.remove("on"); });
+      tab.classList.add("active");
+      document.getElementById("view-" + tab.dataset.view).classList.add("on");
+    });
+  });
+
+  /* ---------- pulpit ---------- */
+  function renderDash() {
+    var orders = readOrders();
+    var active = orders.filter(function (o) { return o.status !== "anulowane"; });
+    var week = active.filter(function (o) { return Date.now() - o.ts < 7 * 86400000; });
+    var rev = week.reduce(function (s, o) { return s + o.total; }, 0);
+    document.getElementById("kpiNew").textContent = orders.filter(function (o) { return o.status === "nowe"; }).length;
+    document.getElementById("kpiWip").textContent = orders.filter(function (o) { return o.status === "realizacja" || o.status === "wyslane"; }).length;
+    document.getElementById("kpiRev").textContent = fmt(rev).replace(",00", "");
+    document.getElementById("kpiAvg").textContent = week.length ? fmt(rev / week.length).replace(",00", "") : "0 zł";
+
+    /* wykres 7 dni */
+    var days = [], names = ["nd", "pn", "wt", "śr", "cz", "pt", "sb"];
+    for (var d = 6; d >= 0; d--) {
+      var day = new Date(); day.setHours(0, 0, 0, 0); day.setDate(day.getDate() - d);
+      var next = day.getTime() + 86400000;
+      var sum = active.filter(function (o) { return o.ts >= day.getTime() && o.ts < next; })
+        .reduce(function (s, o) { return s + o.total; }, 0);
+      days.push({ label: names[day.getDay()], sum: sum });
+    }
+    var max = Math.max.apply(null, days.map(function (x) { return x.sum; }).concat([1]));
+    document.getElementById("chart7").innerHTML = days.map(function (x) {
+      var h = Math.round((x.sum / max) * 100);
+      return '<div class="bar"><i style="height:' + Math.max(h, 3) + '%">' +
+        (x.sum ? '<span class="tip">' + Math.round(x.sum / 1000 * 10) / 10 + "k</span>" : "") +
+        "</i><b>" + x.label + "</b></div>";
+    }).join("");
+
+    /* ostatnie zamówienia */
+    document.getElementById("miniOrders").innerHTML = orders.slice(0, 5).map(function (o) {
+      return '<div class="mini-row" data-open="' + o.id + '">' +
+        '<span class="mr-id">' + o.id + '</span>' +
+        '<span class="mr-name">' + o.customer.name + '</span>' +
+        '<span class="st st-' + o.status + '">' + LABEL[o.status] + '</span>' +
+        '<span class="mr-sum">' + fmt(o.total) + "</span></div>";
+    }).join("") || '<div class="kempty">brak zamówień</div>';
+
+    /* top produkty */
+    var counts = {};
+    active.forEach(function (o) { o.items.forEach(function (it) { counts[it.name] = (counts[it.name] || 0) + it.qty; }); });
+    var top = Object.keys(counts).map(function (k) { return [k, counts[k]]; })
+      .sort(function (a, b) { return b[1] - a[1]; }).slice(0, 5);
+    var tmax = top.length ? top[0][1] : 1;
+    document.getElementById("topProd").innerHTML = top.map(function (t) {
+      return '<div class="tp-row"><div class="tp-head"><span>' + t[0] + "</span><span>" + t[1] + " szt.</span></div>" +
+        '<div class="tp-bar"><i style="width:' + Math.round((t[1] / tmax) * 100) + '%"></i></div></div>';
+    }).join("") || '<div class="kempty">brak danych</div>';
+  }
+
+  /* ---------- kanban ---------- */
+  function kcardHtml(o) {
+    var itemsCnt = o.items.reduce(function (s, it) { return s + it.qty; }, 0);
+    return '<div class="kcard" draggable="true" data-id="' + o.id + '">' +
+      '<div class="kc-top"><span class="kc-id">' + o.id + '</span><span class="kc-ago">' + ago(o.ts) + "</span></div>" +
+      '<div class="kc-name">' + o.customer.name + "</div>" +
+      '<div class="kc-meta">' + itemsCnt + " szt. · " + o.items.length + " poz." + (o.note ? " · 📝" : "") + "</div>" +
+      '<div class="kc-foot"><span class="kc-sum">' + fmt(o.total) + "</span>" +
+      (o.status !== "zakonczone"
+        ? '<button class="kc-adv" data-adv="' + o.id + '" aria-label="Następny etap" title="' + NEXT_LABEL[o.status] + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>'
+        : "") +
+      "</div></div>";
+  }
+
+  function renderKanban() {
+    var q = (document.getElementById("orderSearch").value || "").toLowerCase();
+    var orders = readOrders().filter(function (o) {
+      if (!q) return true;
+      return (o.id + " " + o.customer.name + " " + o.items.map(function (i) { return i.name; }).join(" ")).toLowerCase().includes(q);
+    });
+    var cancelled = orders.filter(function (o) { return o.status === "anulowane"; });
+    document.getElementById("cancelledInfo").textContent = "anulowane: " + cancelled.length + (showCancelled ? " ✓" : "");
+    FLOW.forEach(function (st) {
+      var col = document.querySelector('.kcol[data-col="' + st + '"]');
+      var list = orders.filter(function (o) { return o.status === st; });
+      if (st === "nowe" && showCancelled) list = list.concat(cancelled);
+      col.querySelector(".kc-cnt").textContent = list.length;
+      col.querySelector(".kcol-body").innerHTML =
+        list.map(kcardHtml).join("") || '<div class="kempty">— pusto —</div>';
+    });
+    document.getElementById("cntOrders").textContent = readOrders().filter(function (o) { return o.status === "nowe" || o.status === "realizacja"; }).length;
+  }
+
+  function setStatus(id, status) {
+    var orders = readOrders();
+    var o = orders.find(function (x) { return x.id === id; });
+    if (!o) return;
+    o.status = status;
+    (o.history = o.history || []).push({ status: status, ts: Date.now() });
+    writeOrders(orders);
+    renderAll();
+    toast(id + " → " + LABEL[status]);
+  }
+  function advance(id) {
+    var o = readOrders().find(function (x) { return x.id === id; });
+    if (!o) return;
+    if (o.status === "anulowane") return setStatus(id, "nowe");
+    var i = FLOW.indexOf(o.status);
+    if (i > -1 && i < FLOW.length - 1) setStatus(id, FLOW[i + 1]);
+  }
+
+  document.getElementById("kanban").addEventListener("click", function (e) {
+    var adv = e.target.closest("[data-adv]");
+    if (adv) { advance(adv.dataset.adv); e.stopPropagation(); return; }
+    var card = e.target.closest(".kcard");
+    if (card) openDrawer(card.dataset.id);
+  });
+  document.getElementById("orderSearch").addEventListener("input", renderKanban);
+  document.getElementById("cancelledInfo").addEventListener("click", function () {
+    showCancelled = !showCancelled; renderKanban();
+  });
+
+  /* drag & drop */
+  var dragId = null;
+  document.getElementById("kanban").addEventListener("dragstart", function (e) {
+    var card = e.target.closest(".kcard");
+    if (!card) return;
+    dragId = card.dataset.id;
+    card.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+  });
+  document.getElementById("kanban").addEventListener("dragend", function (e) {
+    var card = e.target.closest(".kcard");
+    if (card) card.classList.remove("dragging");
+    document.querySelectorAll(".kcol").forEach(function (c) { c.classList.remove("dragover"); });
+  });
+  document.querySelectorAll(".kcol").forEach(function (col) {
+    col.addEventListener("dragover", function (e) { e.preventDefault(); col.classList.add("dragover"); });
+    col.addEventListener("dragleave", function () { col.classList.remove("dragover"); });
+    col.addEventListener("drop", function (e) {
+      e.preventDefault();
+      col.classList.remove("dragover");
+      if (dragId) setStatus(dragId, col.dataset.col);
+      dragId = null;
+    });
+  });
+
+  /* ---------- drawer ---------- */
+  var odBackdrop = document.getElementById("odBackdrop");
+  var odDrawer = document.getElementById("odDrawer");
+  function openDrawer(id) {
+    var o = readOrders().find(function (x) { return x.id === id; });
+    if (!o) return;
+    currentId = id;
+    document.getElementById("odId").textContent = o.id;
+    var stEl = document.getElementById("odStatus");
+    stEl.textContent = LABEL[o.status];
+    stEl.className = "st st-" + o.status;
+    var flowIdx = FLOW.indexOf(o.status);
+    document.getElementById("odStepper").innerHTML = FLOW.map(function (s, i) {
+      var cls = o.status === "anulowane" ? "" : (i < flowIdx ? "done" : i === flowIdx ? "now" : "");
+      return '<div class="sp ' + cls + '">' + LABEL[s] + "</div>";
+    }).join("");
+    document.getElementById("odCustomer").innerHTML =
+      "<div><b>Klient</b><span>" + o.customer.name + "</span></div>" +
+      "<div><b>Telefon</b><span>" + o.customer.phone + "</span></div>" +
+      (o.customer.mail ? "<div><b>E-mail</b><span>" + o.customer.mail + "</span></div>" : "") +
+      (o.customer.nip ? "<div><b>NIP</b><span>" + o.customer.nip + "</span></div>" : "") +
+      "<div><b>Złożone</b><span>" + new Date(o.ts).toLocaleString("pl-PL") + "</span></div>";
+    var net = o.total / 1.23;
+    document.getElementById("odItems").innerHTML =
+      o.items.map(function (it) { return '<div class="orr"><span>' + it.qty + " × " + it.name + "</span><b>" + fmt(it.price * it.qty) + "</b></div>"; }).join("") +
+      '<div class="orr" style="opacity:0.7"><span>netto</span><span>' + fmt(net) + "</span></div>" +
+      '<div class="orr" style="opacity:0.7"><span>VAT 23%</span><span>' + fmt(o.total - net) + "</span></div>" +
+      '<div class="orr or-sum"><span>SUMA</span><span>' + fmt(o.total) + "</span></div>";
+    document.getElementById("odNote").value = o.note || "";
+    var advBtn = document.getElementById("odAdvance");
+    advBtn.textContent = NEXT_LABEL[o.status];
+    advBtn.disabled = o.status === "zakonczone";
+    advBtn.style.opacity = o.status === "zakonczone" ? 0.5 : 1;
+    document.getElementById("odCancel").style.display = o.status === "anulowane" ? "none" : "";
+    odBackdrop.classList.add("open");
+    odDrawer.classList.add("open");
+  }
+  function closeDrawer() {
+    if (currentId) {
+      var orders = readOrders();
+      var o = orders.find(function (x) { return x.id === currentId; });
+      if (o) { o.note = document.getElementById("odNote").value; writeOrders(orders); }
+    }
+    odBackdrop.classList.remove("open");
+    odDrawer.classList.remove("open");
+    currentId = null;
+    renderAll();
+  }
+  odBackdrop.addEventListener("click", closeDrawer);
+  document.getElementById("odClose").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+  document.getElementById("odAdvance").addEventListener("click", function () {
+    if (!currentId) return;
+    var id = currentId;
+    var orders = readOrders();
+    var o = orders.find(function (x) { return x.id === id; });
+    o.note = document.getElementById("odNote").value;
+    writeOrders(orders);
+    advance(id);
+    openDrawer(id);
+  });
+  document.getElementById("odCancel").addEventListener("click", function () {
+    if (!currentId) return;
+    var id = currentId;
+    setStatus(id, "anulowane");
+    openDrawer(id);
+  });
+  document.getElementById("odPrint").addEventListener("click", function () { window.print(); });
+  document.querySelector("#view-pulpit").addEventListener("click", function (e) {
+    var row = e.target.closest("[data-open]");
+    if (row) {
+      document.querySelector('[data-view="zamowienia"]').click();
+      openDrawer(row.dataset.open);
+    }
+  });
+
+  /* ---------- magazyn ---------- */
+  function renderStock() {
+    var P = window.ABBA1_PRODUCTS;
+    var out = 0;
+    document.getElementById("stockList").innerHTML = P.map(function (p) {
+      var available = !window.abbaStock.isOut(p.id);
+      if (!available) out++;
+      return '<div class="stock-row' + (available ? "" : " out") + '">' +
+        '<div class="sr-info"><div class="sr-brand">' + p.brand + '</div>' +
+        '<div class="sr-name">' + p.name + '</div>' +
+        '<div class="sr-price">' + fmt(p.price) + " brutto</div></div>" +
+        '<label class="switch" title="' + (available ? "Dostępny — kliknij, by wyłączyć" : "Brak na stanie — kliknij, by włączyć") + '">' +
+        '<input type="checkbox" data-stock="' + p.id + '"' + (available ? " checked" : "") + ">" +
+        '<span class="track"></span><span class="thumb"></span></label></div>';
+    }).join("");
+    document.getElementById("cntStock").textContent = P.length - out;
+  }
+  document.getElementById("stockList").addEventListener("change", function (e) {
+    var t = e.target.closest("[data-stock]");
+    if (!t) return;
+    window.abbaStock.set(t.dataset.stock, t.checked);
+    renderStock();
+    toast(t.checked ? "Produkt dostępny w sklepie" : "Produkt oznaczony: brak na stanie");
+  });
+
+  function renderAll() { renderDash(); renderKanban(); renderStock(); }
+  renderAll();
+
+  /* odśwież „x temu” co minutę */
+  setInterval(renderKanban, 60000);
+})();
+</script>
+</body>
+</html>

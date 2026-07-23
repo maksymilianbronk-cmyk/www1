@@ -297,6 +297,20 @@ const SITES = [
     },
   },
   {
+    slug: "abba1",
+    title: "ABBA1 — kasy fiskalne online, Warszawa",
+    desc: "Redesign abba1.pl (lead: kamola@abba1.pl): eko-zielony wielostronicowy serwis firmy fiskalnej z Pragi Północ w estetyce paragonu (perforacje, font mono, hero z drukarką drukującą paragon). 8 podstron — Start, Sklep (symulacja: 20 realnych produktów Novitus/Posnet/Elzab/Dotykačka, filtry, koszyk-paragon z localStorage, lot produktu do koszyka, 3-krokowy checkout mailto z numerem zamówienia), Serwis, Szkolenia, Dotykačka z interaktywnym demo ekranu POS (nabijanie rachunku), Galeria z lightboxem (blur, miniatury, klawiatura, gesty), O firmie (oś czasu 2006–2026, dane KRS), Kontakt z rysowaną mapką SVG Pragi. Do tego PANEL SKLEPU (panel.html): pulpit z KPI i wykresem sprzedaży 7 dni, realizacja zamówień w kanbanie (Nowe→W realizacji→Wysłane→Zakończone, drag&drop + przycisk, szczegóły jako paragon ze stepperem, notatki, druk, anulowanie, szukajka), magazyn z przełącznikami dostępności sterującymi sklepem (brak na stanie blokuje zakup), dane demo + reset — zamówienia ze sklepu wpadają do panelu automatycznie (wspólny localStorage, katalog w products.js). Pływająca zawieszka „Weź w leasing teraz” z kalkulatorem rat, autorskie logo SVG (paragon+listek), ikony SVG, marquee marek, liczniki, parallax, reveal, fullscreen hamburger. Pełny audyt Playwright: 8 stron × 4 viewporty + E2E koszyka i panelu. Prawdziwe dane: al. Tysiąclecia 151, tel. 22 619 40 80, 600 323 994, biuro@abba1.pl, NIP 113-259-98-56, KRS 0000252651.",
+    icon: "🧾",
+    tag: "landing",
+    status: "klient-w-trakcie",
+    preview: true,
+    meta: {
+      colors: ["#f4f8f1", "#0a2b1c", "#0d5c3f", "#7fc548", "#eab63f"],
+      fonts: ["Unbounded", "Manrope", "Space Mono"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash", "localStorage"],
+    },
+  },
+  {
     slug: "kawa-sielatycki",
     title: "Sielatycki Coffee — kawa z gospodarstwa",
     desc: "Czarno-złoty wielostronicowy serwis sprzedażowy dla gospodarstwa rolnego Kamila Sielatyckiego (sprzedaż kawy): lekka strona główna (hero z ziarnami, marquee, zajawki) + 5 podstron — Gospodarstwo (o nas, proces 4 kroków, galeria), Oferta (ziarnista/mielona/hurt, opinie), Ciekawostki (10 faktów), Parzenie (4 metody + Arabica vs Robusta), Kontakt (formularz mailto). Ziarno kawy SVG toczące się z lewej do prawej w rytm scrollowania, animacje reveal, typografia Space Grotesk + Inter, wyłącznie autorskie ikony SVG (zero emoji), fullscreen hamburger menu clip-path z hamburgerem widocznym nad overlayem, kaskada zapasowych zdjęć Unsplash. Prawdziwe dane: tel. +48 666 843 861, kamilsielatycki@gmail.com.",
