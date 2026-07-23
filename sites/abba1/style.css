@@ -607,6 +607,12 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.14; font-weight: 8
 .add-btn svg { width: 20px; height: 20px; }
 .add-btn.added { background: var(--lime); color: var(--forest); animation: bump 0.4s; }
 
+.product-card.oos .product-visual svg { filter: grayscale(1); opacity: 0.45; }
+.product-card.oos .product-price { opacity: 0.55; }
+.product-tag.tag-oos { background: var(--red); color: #fff; }
+.add-btn[disabled] { background: #c6cfc0; cursor: not-allowed; }
+.add-btn[disabled]:hover { background: #c6cfc0; transform: none; }
+
 /* kulka lecąca do koszyka */
 .fly-dot {
   position: fixed; z-index: 1600; width: 16px; height: 16px; border-radius: 50%;
@@ -906,6 +912,15 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.14; font-weight: 8
   .pos-screen { grid-template-columns: 1fr; }
   .pos-bill { border-left: none; border-top: 1px dashed #c6cfc0; }
   .form-grid .f-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .contact-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) {
+  .hero-title { font-size: clamp(1.55rem, 9.4vw, 2.2rem); }
 }
 @media (max-width: 560px) {
   .gallery-grid { grid-template-columns: 1fr; }

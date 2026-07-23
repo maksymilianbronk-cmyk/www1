@@ -5,6 +5,22 @@
   var docEl = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var CART_KEY = "abba1-cart-v1";
+  var ORDERS_KEY = "abba1-orders-v1";
+
+  /* rejestr zamówień — wspólny ze sklepowym panelem (panel.html) */
+  function readOrders() {
+    try { return JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; } catch (e) { return []; }
+  }
+  function saveOrder(order) {
+    var all = readOrders();
+    all.unshift(order);
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(all));
+  }
+  function nextOrderId() {
+    var seq = parseInt(localStorage.getItem("abba1-order-seq") || "1041", 10) + 1;
+    localStorage.setItem("abba1-order-seq", String(seq));
+    return "A1-" + seq;
+  }
 
   /* ---------- kaskada zapasowych zdjęć ---------- */
   var PLACEHOLDER =
@@ -329,18 +345,29 @@
       "</div>" +
       '<button class="btn btn-pine" style="justify-content:center;width:100%" id="sendOrder">Wyślij zamówienie ✓</button>';
     document.getElementById("sendOrder").addEventListener("click", function () {
+      var orderId = nextOrderId();
+      saveOrder({
+        id: orderId,
+        ts: Date.now(),
+        customer: { name: who.name, phone: who.phone, mail: who.mail, nip: who.nip || "" },
+        items: items,
+        total: total,
+        status: "nowe",
+        note: "",
+        history: [{ status: "nowe", ts: Date.now() }],
+      });
       var body =
-        "Dzień dobry,\n\nskładam zamówienie ze strony (demo):\n\n" +
+        "Dzień dobry,\n\nskładam zamówienie " + orderId + " ze strony (demo):\n\n" +
         items.map(function (it) { return "• " + it.qty + " × " + it.name + " — " + fmt(it.price * it.qty); }).join("\n") +
         "\n\nRAZEM: " + fmt(total) +
         "\n\nDane:\n" + who.name + "\ntel. " + who.phone + "\n" + who.mail + (who.nip ? "\nNIP: " + who.nip : "") + "\n";
-      var href = "mailto:biuro@abba1.pl?subject=" + encodeURIComponent("Zamówienie ze strony — " + who.name) + "&body=" + encodeURIComponent(body);
-      checkoutStep3();
+      var href = "mailto:biuro@abba1.pl?subject=" + encodeURIComponent("Zamówienie " + orderId + " — " + who.name) + "&body=" + encodeURIComponent(body);
+      checkoutStep3(orderId);
       window.location.href = href;
     });
   }
 
-  function checkoutStep3() {
+  function checkoutStep3(orderId) {
     saveCart([]);
     renderCart();
     checkoutBody.innerHTML =
@@ -348,7 +375,8 @@
       '<div class="order-ok">' +
       '<div class="ok-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>' +
       "<h3>Zamówienie przyjęte!</h3>" +
-      '<p class="modal-sub">Otwieramy Twój program pocztowy z gotową wiadomością.<br>Oddzwonimy w godzinach pracy: pn–pt 9:00–17:00.</p>' +
+      (orderId ? '<p style="font-family:var(--font-mono);font-size:1.05rem;color:var(--pine);font-weight:700;margin-bottom:8px">nr ' + orderId + "</p>" : "") +
+      '<p class="modal-sub">Otwieramy Twój program pocztowy z gotową wiadomością.<br>Status znajdziesz w <a href="panel.html" style="color:var(--pine);font-weight:700">panelu sklepu (demo)</a>. Oddzwonimy: pn–pt 9:00–17:00.</p>' +
       '<button class="btn btn-pine" style="justify-content:center" data-close-checkout>Zamknij</button>' +
       "</div>";
   }

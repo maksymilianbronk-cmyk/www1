@@ -165,6 +165,7 @@
           <li><a href="galeria.html">Galeria</a></li>
           <li><a href="o-firmie.html">O firmie</a></li>
           <li><a href="kontakt.html">Kontakt</a></li>
+          <li><a href="panel.html" style="opacity:0.7">Panel sklepu (demo)</a></li>
         </ul>
       </div>
       <div>
@@ -199,8 +200,9 @@
   </div>
 </footer>
 
+<script src="products.js"></script>
 <script>
-/* ===== katalog produktów (symulacja — ceny orientacyjne brutto) ===== */
+/* ===== render sklepu (katalog wspólny z panelem: products.js) ===== */
 (function () {
   "use strict";
 
@@ -217,28 +219,8 @@
     bonowa: '<svg viewBox="0 0 140 120" fill="none" stroke="#0d5c3f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="28" y="44" width="84" height="52" rx="10" fill="#fff"/><rect x="40" y="56" width="60" height="10" rx="5" fill="#0a2b1c" stroke="none"/><path d="M48 44V26h44v18" stroke="#9aa694"/><path d="M54 32h32M54 38h20" stroke="#c6cfc0" stroke-width="2.4"/><circle cx="46" cy="82" r="4" fill="#eab63f" stroke="none"/><path d="M58 82h30" stroke="#7fc548"/><path d="M104 20l6-6M110 26l8-8M104 8l4-4" stroke="#eab63f" stroke-width="2.6"/></svg>'
   };
 
-  var PRODUCTS = [
-    { id: "novitus-next", brand: "Novitus", name: "NOVITUS NEXT ONLINE", cat: "kasa", art: "kasa", tag: "bestseller", price: 2899, desc: "Dotykowa kasa online z Androidem — flagowiec do handlu i usług." },
-    { id: "novitus-one", brand: "Novitus", name: "NOVITUS ONE ONLINE", cat: "kasa", art: "kasa", price: 1699, desc: "Kompaktowa kasa online z szybkim drukiem i Wi-Fi." },
-    { id: "posnet-ergo", brand: "Posnet", name: "POSNET ERGO ONLINE", cat: "kasa", art: "kasa", price: 1549, desc: "Niezawodna kasa dla małego sklepu i punktu usług." },
-    { id: "posnet-fawag", brand: "Posnet", name: "POSNET FAWAG LITE ONLINE", cat: "kasa", art: "mobilna", price: 1299, desc: "Lekka kasa mobilna — handel obwoźny i gastronomia na wynos." },
-    { id: "elzab-k10", brand: "Elzab", name: "ELZAB K10 ONLINE", cat: "kasa", art: "mobilna", tag: "promo", price: 1399, desc: "Poręczna kasa z baterią na cały dzień pracy." },
-    { id: "novitus-bono", brand: "Novitus", name: "NOVITUS BONO ONLINE", cat: "drukarka", art: "drukarka", price: 3065.16, desc: "Popularna drukarka fiskalna online do POS — szybka i cicha." },
-    { id: "novitus-deon", brand: "Novitus", name: "NOVITUS DEON ONLINE", cat: "drukarka", art: "mobilna", price: 2599, desc: "Mobilna drukarka fiskalna online z akumulatorem." },
-    { id: "posnet-trio", brand: "Posnet", name: "POSNET TRIO ONLINE", cat: "drukarka", art: "drukarka", price: 2999, desc: "Drukarka fiskalna online z wyświetlaczem klienta." },
-    { id: "posnet-temo", brand: "Posnet", name: "POSNET TEMO ONLINE", cat: "drukarka", art: "mobilna", price: 2889.27, desc: "Kieszonkowa drukarka online do pracy w terenie." },
-    { id: "elzab-mera", brand: "Elzab", name: "ELZAB MERA ONLINE BT/WIFI", cat: "drukarka", art: "drukarka", price: 3800.7, desc: "Wydajna drukarka online z obcinaczem — duży sklep i gastronomia." },
-    { id: "elzab-zeta", brand: "Elzab", name: "ELZAB ZETA ONLINE", cat: "drukarka", art: "drukarka", price: 3199, desc: "Nowoczesna, kompaktowa drukarka fiskalna online." },
-    { id: "pax-a920", brand: "PAX", name: "Terminal płatniczy PAX A920 Pro", cat: "terminal", art: "terminal", tag: "0 zł*", price: 899, desc: "Karta, BLIK, zbliżeniowo. *Możliwe 0 zł w programie Polska Bezgotówkowa." },
-    { id: "pospay", brand: "Posnet", name: "POSPAY ONLINE", cat: "kasoterminal", art: "kasoterminal", tag: "2w1", price: 3499, desc: "Kasa online i terminal płatniczy w jednym urządzeniu." },
-    { id: "dot-latwo", brand: "Dotykačka", name: "Zestaw Dotykačka ŁATWO", cat: "dotykacka", art: "tablet", price: 2499, desc: "Tablet POS 10″ z licencją — start dla małej gastronomii." },
-    { id: "dot-uniwersalna", brand: "Dotykačka", name: "Zestaw Dotykačka UNIWERSALNA", cat: "dotykacka", art: "tablet", tag: "bestseller", price: 4299, desc: "Terminal dotykowy 14″ + drukarka bonów — restauracja i kawiarnia." },
-    { id: "dot-kompletna", brand: "Dotykačka", name: "Zestaw Dotykačka KOMPLETNA + szuflada", cat: "dotykacka", art: "tablet", price: 5999, desc: "Terminal 14″, drukarka fiskalna i szuflada — komplet na klucz." },
-    { id: "szuflada", brand: "Akcesoria", name: "Szuflada kasowa", cat: "akcesoria", art: "szuflada", price: 249, desc: "Solidna szuflada z wkładem na bilon i banknoty." },
-    { id: "czytnik-2d", brand: "Akcesoria", name: "Czytnik kodów 2D", cat: "akcesoria", art: "czytnik", price: 349, desc: "Szybki skaner kodów 1D/2D — paragony bez kolejek." },
-    { id: "drukarka-kuchenna", brand: "Akcesoria", name: "Drukarka kuchenna (bonowa)", cat: "akcesoria", art: "bonowa", price: 899, desc: "Bony na kuchnię i bar — głośny sygnał, odporna na tłuszcz." },
-    { id: "rolki-eko", brand: "Akcesoria", name: "Rolki termiczne EKO 57 mm × 10", cat: "akcesoria", art: "rolki", tag: "eko", price: 29, desc: "Papier bez BPA, z certyfikowanych źródeł. Zielony wybór." }
-  ];
+  var PRODUCTS = window.ABBA1_PRODUCTS;
+  var STOCK = window.abbaStock.read();
 
   function fmt(n) {
     return n.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " zł";
@@ -246,10 +228,13 @@
 
   var grid = document.getElementById("productsGrid");
   grid.innerHTML = PRODUCTS.map(function (p, i) {
+    var oos = STOCK[p.id] === false;
     return (
-      '<article class="product-card reveal" data-cat="' + p.cat + '" data-delay="' + (i % 3) + '">' +
+      '<article class="product-card reveal' + (oos ? " oos" : "") + '" data-cat="' + p.cat + '" data-delay="' + (i % 3) + '">' +
       '<div class="product-visual">' +
-      (p.tag ? '<span class="product-tag' + (p.tag === "promo" || p.tag === "0 zł*" ? " tag-promo" : "") + '">' + p.tag + "</span>" : "") +
+      (oos
+        ? '<span class="product-tag tag-oos">brak na stanie</span>'
+        : (p.tag ? '<span class="product-tag' + (p.tag === "promo" || p.tag === "0 zł*" ? " tag-promo" : "") + '">' + p.tag + "</span>" : "")) +
       ART[p.art] +
       "</div>" +
       '<div class="product-body">' +
@@ -258,8 +243,11 @@
       '<p class="product-desc">' + p.desc + "</p>" +
       '<div class="product-foot">' +
       '<div class="product-price"><span class="gross">' + fmt(p.price) + '</span><span class="net">' + fmt(p.price / 1.23) + " netto</span></div>" +
-      '<button class="add-btn" data-add="' + p.id + '" aria-label="Dodaj do koszyka: ' + p.name + '">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>' +
+      (oos
+        ? '<button class="add-btn" disabled aria-label="Produkt niedostępny" title="Chwilowo niedostępny — zapytaj o termin">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg>'
+        : '<button class="add-btn" data-add="' + p.id + '" aria-label="Dodaj do koszyka: ' + p.name + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>') +
       "</button></div></div></article>"
     );
   }).join("");
