@@ -77,7 +77,7 @@ body { background: #eef3ea; }
 .kpi .k-sub { font-size: 0.76rem; color: var(--ink-soft); margin-top: 3px; }
 
 .dash-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 16px; }
-.dash-card { background: #fff; border-radius: 18px; padding: 24px; box-shadow: 0 2px 14px rgba(10,43,28,0.07); }
+.dash-card { background: #fff; border-radius: 18px; padding: 24px; box-shadow: 0 2px 14px rgba(10,43,28,0.07); min-width: 0; }
 .dash-card h3 { font-size: 1.02rem; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: baseline; }
 .dash-card h3 small { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-soft); font-weight: 400; }
 
@@ -102,7 +102,7 @@ body { background: #eef3ea; }
 }
 .mini-row:hover { background: var(--mint); transform: translateX(3px); }
 .mini-row .mr-id { font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; color: var(--pine); }
-.mini-row .mr-name { flex: 1; font-weight: 700; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-row .mr-name { flex: 1; min-width: 0; font-weight: 700; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mini-row .mr-sum { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; }
 
 .top-prod { display: flex; flex-direction: column; gap: 12px; }
