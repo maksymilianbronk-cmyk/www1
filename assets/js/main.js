@@ -33,13 +33,29 @@ const IMPORTED = (() => {
 
 const ALL_SITES = [...SITES, ...IMPORTED];
 
+/* ── IKONY SVG (stroke, dziedziczą kolor) ── */
+const svgi = (paths, vb = '0 0 24 24') =>
+  `<svg class="ico" viewBox="${vb}" fill="none" aria-hidden="true">${paths}</svg>`;
+
+const ICONS = {
+  sparkles: svgi('<path d="M12 4l1.8 4.5L18 10l-4.2 1.5L12 16l-1.8-4.5L6 10l4.2-1.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M18.5 15.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>'),
+  store:    svgi('<path d="M4 9.5L5.5 4h13L20 9.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 9.5a2.6 2.6 0 0 0 5.3 0 2.65 2.65 0 0 0 5.4 0 2.6 2.6 0 0 0 5.3 0" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 12v8h13v-8M9.5 20v-5h5v5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>'),
+  wrench:   svgi('<path d="M14.5 6.5a4.5 4.5 0 0 1 5.7-4.3l-3 3 .3 2.8 2.8.3 3-3a4.5 4.5 0 0 1-6 5.4L8.6 19.4a2 2 0 0 1-2.9-2.9l8.9-8.7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" transform="scale(.86) translate(1.6 1.8)"/>'),
+  book:     svgi('<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20" stroke="currentColor" stroke-width="1.7"/><path d="M8.5 7.5h7M8.5 11h4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'),
+  box:      svgi('<path d="M12 3l8 4v10l-8 4-8-4V7z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M4 7l8 4 8-4M12 11v10" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>'),
+  puzzle:   svgi('<path d="M9 4h4v3a2 2 0 1 0 4 0h3v4h-3a2 2 0 1 0 0 4h3v4h-4v-3a2 2 0 1 0-4 0v3H8v-3a2 2 0 1 1 0-4H4v-4h4a2 2 0 1 1 1-3.7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>'),
+  target:   svgi('<circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>'),
+  globe:    svgi('<circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 12h17M12 3.5c-5.5 5-5.5 12 0 17 5.5-5 5.5-12 0-17z" stroke="currentColor" stroke-width="1.7"/>'),
+  search:   svgi('<circle cx="10.5" cy="10.5" r="6" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'),
+};
+
 /* ── KATEGORIE ── */
 const CATS = [
-  { id: 'all',       label: 'Wszystkie',             icon: '✨', match: () => true },
-  { id: 'firmy',     label: 'Strony dla firm',       icon: '🏪', tags: ['landing', 'hotel', 'klinika'] },
-  { id: 'narzedzia', label: 'Narzędzia',             icon: '🛠️', tags: ['narzędzie', 'crm'] },
-  { id: 'katalogi',  label: 'Katalogi i przewodniki', icon: '📚', tags: ['katalog', 'przewodnik'] },
-  { id: 'import',    label: 'Zaimportowane',         icon: '📦', match: s => s._imported },
+  { id: 'all',       label: 'Wszystkie',              icon: ICONS.sparkles, match: () => true },
+  { id: 'firmy',     label: 'Strony dla firm',        icon: ICONS.store,    tags: ['landing', 'hotel', 'klinika'] },
+  { id: 'narzedzia', label: 'Narzędzia',              icon: ICONS.wrench,   tags: ['narzędzie', 'crm'] },
+  { id: 'katalogi',  label: 'Katalogi i przewodniki', icon: ICONS.book,     tags: ['katalog', 'przewodnik'] },
+  { id: 'import',    label: 'Zaimportowane',          icon: ICONS.box,      match: s => s._imported },
 ];
 
 function siteCat(site) {
@@ -84,7 +100,7 @@ function catCount(id) {
 function buildCatBar() {
   const cats = [...CATS];
   if (ALL_SITES.some(s => siteCat(s) === 'inne')) {
-    cats.push({ id: 'inne', label: 'Inne', icon: '🧩' });
+    cats.push({ id: 'inne', label: 'Inne', icon: ICONS.puzzle });
   }
   catBar.innerHTML = cats
     .filter(c => catCount(c.id) > 0)
@@ -112,7 +128,7 @@ function statusCount(id) {
 }
 
 function buildStatusBar() {
-  const items = [{ id: 'all', label: 'Wszystkie statusy', icon: '🎯' }, ...STATUSES];
+  const items = [{ id: 'all', label: 'Wszystkie statusy', icon: ICONS.target }, ...STATUSES];
   statusBar.innerHTML = items
     .filter(s => statusCount(s.id) > 0)
     .map(s => `
@@ -153,8 +169,8 @@ function buildCard(site) {
       <a class="card-link" href="${href}"${linkExtra} aria-label="${site.title}">
         <div class="card-preview">
           ${site.preview
-            ? `<iframe src="${iframeSrc}" loading="lazy" title="${site.title}" tabindex="-1"></iframe>`
-            : `<span class="card-icon">${site.icon || '🌐'}</span>`}
+            ? `<span class="preview-slot" data-src="${iframeSrc}" data-title="${site.title}"><span class="preview-shimmer"></span></span>`
+            : `<span class="card-icon">${ICONS.globe}</span>`}
           <span class="card-open-hint">Otwórz stronę →</span>
         </div>
         <div class="card-body">
@@ -216,13 +232,45 @@ function render() {
   if (!list.length) {
     gallery.innerHTML = `
       <div class="empty">
-        <h2>Nic nie znaleziono 🔍</h2>
+        <span class="empty-ico">${ICONS.search}</span>
+        <h2>Nic nie znaleziono</h2>
         <p>Zmień kategorię albo wpisz inną frazę.</p>
       </div>`;
     return;
   }
   gallery.innerHTML = list.map(buildCard).join('');
-  requestAnimationFrame(setupDescToggles);
+  requestAnimationFrame(() => { setupDescToggles(); setupLazyPreviews(); });
+}
+
+/* ── LENIWE PODGLĄDY: iframe wstawiany dopiero, gdy karta jest blisko ekranu ── */
+const previewIO = 'IntersectionObserver' in window
+  ? new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        mountPreview(en.target);
+        previewIO.unobserve(en.target);
+      });
+    }, { rootMargin: '400px 0px' })
+  : null;
+
+function mountPreview(slot) {
+  if (slot.dataset.mounted) return;
+  slot.dataset.mounted = '1';
+  const f = document.createElement('iframe');
+  f.src = slot.dataset.src;
+  f.title = slot.dataset.title || '';
+  f.loading = 'lazy';
+  f.tabIndex = -1;
+  f.setAttribute('scrolling', 'no');
+  f.addEventListener('load', () => slot.classList.add('loaded'), { once: true });
+  slot.appendChild(f);
+}
+
+function setupLazyPreviews() {
+  gallery.querySelectorAll('.preview-slot:not([data-mounted])').forEach(slot => {
+    if (previewIO) previewIO.observe(slot);
+    else mountPreview(slot);
+  });
 }
 
 /* ── „ROZWIŃ" DLA DŁUGICH OPISÓW ── */
@@ -322,7 +370,7 @@ function openModal(site) {
 
   mBody.innerHTML = `
     <div class="mi-head">
-      <span class="mi-icon">${site.icon || '🌐'}</span>
+      <span class="mi-icon">${ICONS.globe}</span>
       <div>
         <span class="mi-tag">${site.tag || ''}${site._imported ? ' · zaimportowana' : ''}</span>
         <h2 class="mi-title">${site.title}</h2>
