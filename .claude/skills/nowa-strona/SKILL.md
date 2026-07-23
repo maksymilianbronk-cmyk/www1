@@ -29,7 +29,6 @@ Gdy użytkownik wyda polecenie typu „nowa strona", „dodaj stronę", „stwó
    - Samodzielny dokument HTML (własny `<style>`, opcjonalnie `<script>`).
    - Spójny z ciemnym motywem kolekcji (tło `#0f0f13`, tekst `#e8e8f0`,
      akcent `#6c63ff`), responsywny, `lang="pl"`.
-   - Na dole link powrotny: `<a href="../../">← wróć do kolekcji</a>`.
    - Wypełnij treścią pasującą do tematu — nie zostawiaj pustego „lorem ipsum",
      chyba że użytkownik prosi o czysty szablon.
 
