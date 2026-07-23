@@ -50,7 +50,31 @@ function siteCat(site) {
   return 'inne';
 }
 
-const state = { cat: 'all', q: '' };
+/* ── STATUSY CRM ── */
+const STATUSES = [
+  { id: 'prywatna',        label: 'Prywatna',        icon: '🔒', color: '#8a8aa5' },
+  { id: 'ab-w-budowie',    label: 'A/B w budowie',   icon: '🧪', color: '#b78bff' },
+  { id: 'klient-w-trakcie', label: 'Klient · w trakcie', icon: '🛠️', color: '#f2b01e' },
+  { id: 'klient-wygrana',  label: 'Klient · wygrana', icon: '🏆', color: '#3ecf72' },
+  { id: 'klient-przegrana', label: 'Klient · przegrana', icon: '💤', color: '#ff5c6c' },
+];
+
+const statusOverrides = (() => {
+  try { return JSON.parse(localStorage.getItem('www1_status_v1') || '{}'); }
+  catch { return {}; }
+})();
+
+function siteStatus(site) {
+  const id = statusOverrides[site.slug] || site.status || 'prywatna';
+  return STATUSES.find(s => s.id === id) || STATUSES[0];
+}
+
+function setSiteStatus(slug, statusId) {
+  statusOverrides[slug] = statusId;
+  try { localStorage.setItem('www1_status_v1', JSON.stringify(statusOverrides)); } catch {}
+}
+
+const state = { cat: 'all', q: '', status: 'all' };
 
 function catCount(id) {
   if (id === 'all') return ALL_SITES.length;
@@ -79,6 +103,35 @@ catBar.addEventListener('click', e => {
   render();
 });
 
+/* ── PASEK STATUSÓW ── */
+const statusBar = document.getElementById('status-bar');
+
+function statusCount(id) {
+  if (id === 'all') return ALL_SITES.length;
+  return ALL_SITES.filter(s => siteStatus(s).id === id).length;
+}
+
+function buildStatusBar() {
+  const items = [{ id: 'all', label: 'Wszystkie statusy', icon: '🎯' }, ...STATUSES];
+  statusBar.innerHTML = items
+    .filter(s => statusCount(s.id) > 0)
+    .map(s => `
+      <button class="status-chip${state.status === s.id ? ' active' : ''}" data-status="${s.id}"
+              ${s.color ? `style="--sc:${s.color}"` : ''}>
+        ${s.color ? '<span class="st-dot"></span>' : `<span class="cat-ico">${s.icon}</span>`}
+        ${s.label}
+        <span class="cat-count">${statusCount(s.id)}</span>
+      </button>`).join('');
+}
+
+statusBar.addEventListener('click', e => {
+  const chip = e.target.closest('.status-chip');
+  if (!chip) return;
+  state.status = chip.dataset.status;
+  buildStatusBar();
+  render();
+});
+
 let searchT;
 searchI.addEventListener('input', () => {
   clearTimeout(searchT);
@@ -90,8 +143,13 @@ function buildCard(site) {
   const href = site._blobUrl ? site._blobUrl : `sites/${site.slug}/`;
   const linkExtra = site._blobUrl ? ' target="_blank" rel="noopener"' : '';
   const iframeSrc = site._blobUrl ? site._blobUrl : `sites/${site.slug}/`;
+  const st = siteStatus(site);
   return `
     <div class="card" data-slug="${site.slug}">
+      <button class="status-badge" data-slug="${site.slug}" style="--sc:${st.color}"
+              title="Zmień status" aria-label="Status: ${st.label} — kliknij, aby zmienić">
+        <span class="st-dot"></span>${st.label} <span class="st-caret">▾</span>
+      </button>
       <a class="card-link" href="${href}"${linkExtra} aria-label="${site.title}">
         <div class="card-preview">
           ${site.preview
@@ -135,8 +193,9 @@ function buildCard(site) {
 function visibleSites() {
   return ALL_SITES.filter(s => {
     if (state.cat !== 'all' && siteCat(s) !== state.cat) return false;
+    if (state.status !== 'all' && siteStatus(s).id !== state.status) return false;
     if (state.q) {
-      const hay = `${s.title} ${s.desc} ${s.tag}`.toLowerCase();
+      const hay = `${s.title} ${s.desc} ${s.tag} ${siteStatus(s).label}`.toLowerCase();
       if (!hay.includes(state.q)) return false;
     }
     return true;
@@ -186,7 +245,56 @@ gallery.addEventListener('click', e => {
   btn.textContent = open ? 'Zwiń ▴' : 'Rozwiń ▾';
 });
 
+/* ── MENU ZMIANY STATUSU (jak w CRM) ── */
+const statusMenu = document.createElement('div');
+statusMenu.className = 'status-menu';
+statusMenu.hidden = true;
+document.body.appendChild(statusMenu);
+let statusMenuSlug = null;
+
+function openStatusMenu(badge, slug) {
+  statusMenuSlug = slug;
+  const site = ALL_SITES.find(s => s.slug === slug);
+  const current = siteStatus(site).id;
+  statusMenu.innerHTML = STATUSES.map(s => `
+    <button class="status-menu-item${s.id === current ? ' current' : ''}" data-status="${s.id}" style="--sc:${s.color}">
+      <span class="st-dot"></span>${s.label}
+      ${s.id === current ? '<span class="st-check">✓</span>' : ''}
+    </button>`).join('');
+  const r = badge.getBoundingClientRect();
+  statusMenu.hidden = false;
+  const mw = statusMenu.offsetWidth;
+  statusMenu.style.left = Math.min(r.left, window.innerWidth - mw - 12) + 'px';
+  statusMenu.style.top = (r.bottom + 6 + window.scrollY) + 'px';
+}
+
+function closeStatusMenu() { statusMenu.hidden = true; statusMenuSlug = null; }
+
+statusMenu.addEventListener('click', e => {
+  const item = e.target.closest('.status-menu-item');
+  if (!item || !statusMenuSlug) return;
+  setSiteStatus(statusMenuSlug, item.dataset.status);
+  closeStatusMenu();
+  buildStatusBar();
+  render();
+});
+
+gallery.addEventListener('click', e => {
+  const badge = e.target.closest('.status-badge');
+  if (!badge) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (!statusMenu.hidden && statusMenuSlug === badge.dataset.slug) { closeStatusMenu(); return; }
+  openStatusMenu(badge, badge.dataset.slug);
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.status-menu') && !e.target.closest('.status-badge')) closeStatusMenu();
+});
+window.addEventListener('scroll', closeStatusMenu, { passive: true });
+
 buildCatBar();
+buildStatusBar();
 render();
 
 /* ── INFO BUTTON CLICK ── */
@@ -254,7 +362,7 @@ function closeModal() { modal.classList.remove('open'); }
 mClose.addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeZipModal(); }
+  if (e.key === 'Escape') { closeModal(); closeZipModal(); closeStatusMenu(); }
 });
 
 /* ── ZIP: HASŁO ── */
