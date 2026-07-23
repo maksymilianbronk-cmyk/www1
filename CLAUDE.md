@@ -44,6 +44,11 @@ www1/
   (jakość/cena), promptowanie, generator `scripts/gen.py` (klucz z env
   `ONEMIN_API_KEY`, nigdy w repo), tabela modeli i kosztów w
   `references/modele.md`. Użyj przy „wygeneruj zdjęcie/grafikę AI".
+- **`grafika-agy`** (`.claude/skills/grafika-agy/`) — generuje realne pliki
+  graficzne przez `agy` (Google Antigravity CLI, narzędzie `generate_image`).
+  Działa TYLKO lokalnie (agy zainstalowany + OAuth Google), nie w sesji zdalnej.
+  Zawiera wywołanie, pułapkę katalogu scratch, optymalizację webp (`magick`) i
+  zasady promptowania. Użyj przy „wygeneruj obraz przez agy/antigravity".
 - **`allegro-aukcje`** (`.claude/skills/allegro-aukcje/`) — wyszukuje aukcje
   danego sprzedawcy Allegro (fan-out wyszukiwań web + walidacja slugów,
   fallback na wyszukiwanie w profilu) i generuje karty produktów skryptem
