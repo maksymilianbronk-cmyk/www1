@@ -5,12 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kolekcja stron www</title>
   <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236c63ff'/%3E%3Cpath d='M14 40l10-16 8 12 6-8 12 12' stroke='%23fff' stroke-width='5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 </head>
 <body>
   <header class="site-header">
     <h1>Kolekcja stron www</h1>
     <p class="subtitle">Zbiór różnych projektów i eksperymentów webowych</p>
   </header>
+
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M11.5 11.5L15 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <input type="search" id="search" placeholder="Szukaj strony…" aria-label="Szukaj strony">
+      </div>
+      <nav class="cat-bar" id="cat-bar" aria-label="Kategorie stron"></nav>
+    </div>
+  </div>
 
   <main class="gallery" id="gallery">
     <!-- Karty stron są generowane przez JS z listy w sites.js -->
@@ -29,6 +43,32 @@
         </svg>
       </button>
       <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ZIP: MODAL HASŁA -->
+  <div class="info-modal" id="zip-modal" role="dialog" aria-modal="true" aria-label="Pobieranie ZIP — podaj hasło">
+    <div class="info-modal-card zip-card">
+      <div class="zip-lock" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+          <rect x="4.5" y="10" width="15" height="10.5" rx="2.5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="1.8"/>
+          <circle cx="12" cy="15.2" r="1.6" fill="currentColor"/>
+        </svg>
+      </div>
+      <h2 class="zip-title">Pobieranie strony w ZIP</h2>
+      <p class="zip-sub">Ta operacja wymaga hasła. Podaj je, aby pobrać paczkę ze stroną.</p>
+      <input type="password" id="zip-pass" class="zip-input" placeholder="Hasło" autocomplete="off" aria-label="Hasło do pobrania">
+      <p class="zip-err" id="zip-err" hidden>Nieprawidłowe hasło — spróbuj ponownie.</p>
+      <div class="zip-actions">
+        <button class="zip-btn-cancel" id="zip-cancel">Anuluj</button>
+        <button class="zip-btn-ok" id="zip-ok">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <path d="M6.5 1v8M3.5 6l3 3 3-3M1.5 10.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Pobierz ZIP
+        </button>
+      </div>
     </div>
   </div>
 
