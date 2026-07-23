@@ -58,3 +58,39 @@ Gdy użytkownik wyda polecenie typu „nowa strona", „dodaj stronę", „stwó
 - Nie zmieniaj logiki strony głównej (`index.html`, `main.js`) — jedynym punktem
   rejestracji jest `assets/js/sites.js`.
 - Trzymaj się konwencji opisanej w `CLAUDE.md`.
+
+## Zasady menu mobilnego (hamburger) — wymagania klienta
+
+Przy każdej stronie z hamburgerem i pełnoekranowym menu mobilnym:
+
+1. **Hamburger musi pozostać widoczny po otwarciu menu** (zamienia się w „X"
+   do zamknięcia). Uwaga na pułapkę z-index: jeśli hamburger siedzi w
+   `position: fixed` headerze z własnym z-index, header tworzy stacking context
+   i overlay menu (wyższy z-index) przykryje hamburger mimo wyższego z-index na
+   samym przycisku. Rozwiązanie: przy otwartym menu podbij z-index CAŁEGO
+   headera powyżej overlaya, np.:
+   ```css
+   body.menu-locked .site-header { z-index: 1200; } /* menu ma np. 1100 */
+   body.menu-locked .site-header.scrolled { background: transparent; box-shadow: none; }
+   ```
+2. **Teksty linków w menu nie mogą na siebie nachodzić** na małych ekranach:
+   - font-size linków przez `clamp()` (np. `clamp(1.5rem, 6.5vw, 2.6rem)`),
+     `line-height` ≥ 1.15, `white-space: nowrap`;
+   - kontener menu: `overflow-y: auto; overscroll-behavior: contain` +
+     `margin-top: auto` na nav i stopce zamiast `justify-content: center`,
+     żeby przy niskich ekranach lista scrollowała się zamiast nachodzić;
+   - `padding-top` menu większy niż wysokość headera (logo i X nie nachodzą
+     na pierwszy link).
+3. Po otwarciu blokuj scroll strony (`body.menu-locked { overflow: hidden; }`),
+   zamykaj menu po kliknięciu linku i po `Escape`, ustawiaj `aria-expanded`.
+4. Zweryfikuj w headless Chromium na wąskich viewportach (390 px i 320 px):
+   otwórz menu i sprawdź, że hamburger jest w viewporcie i klikalny
+   (`document.elementFromPoint` w środku przycisku trafia w przycisk),
+   a bounding boxy linków się nie przecinają.
+
+## Zasady treści wielostronicowej
+
+Preferencja klienta: **mało treści na stronie głównej**. Strona główna =
+hero + krótkie zajawki sekcji z linkami. Pełne treści (o nas, oferta,
+galeria, opinie, kontakt/formularz, artykuły) rozłóż na podstrony we
+wspólnym folderze strony (`sites/<slug>/*.html`) ze wspólną nawigacją.

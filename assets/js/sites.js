@@ -15,6 +15,32 @@
  */
 const SITES = [
   {
+    slug: "podroze-mapy",
+    title: "Trasa — mapy podróżnicze",
+    desc: "Podróżnicza aplikacja mapowa inspirowana Locus Pro / OsmAnd / Geoportalem: 104 warstw map do przełączania (OSM, topo/outdoor, satelity Esri/Google/NASA/Sentinel, Geoportal WMTS+WMS z ortofotomapą i działkami, mapy krajowe CH/AT/NO/FR/ES/DE, mapy sztabowe „Genshtab”, nakładki szlaków Waymarked, kolei, morza i pogody). Profile map (zapisywane zestawy bazowa+nakładki), tryb porównywania dwóch map z przeciąganym uchwytem, kategoria ostatnio używanych, manager warstw z filtrem, ulubionymi i testem dostępności ⚡. Nakładka Wikimapia w dwóch wariantach (https przez wsrv.nl + bezpośrednia, hash subdomen i0–i15 jak w SAS.Planet) z profilami Google+Wikimapia. Menedżer POI: 9 kategorii, kolorowe piny SVG, notatki, long-press na mapie, lista sortowana odległością, undo usuwania, eksport/import GPX i GeoJSON, foldery punktów z licznikami oraz chmura GitHub — konta użytkowników i baza plików POI w repo (gałąź poi-db, auto-sync przez Contents API, publiczne przeglądanie bazy). Dodawanie własnych map WMS/XYZ z poziomu aplikacji, mapy historyczne (WIG, Messtischblätter, sztabówki ZSRR 25k/50k/100k, USGS, NLS), szybki przełącznik cieniowania ISOK 1m (WMS w EPSG:4326 — usługi NMT nie znają 3857), wizualizacja BDOT10k (ArcGIS REST, potwierdzona), reset widoku warstw, import/eksport KML i KMZ (własny czytnik ZIP), bufor kafelków offline z panelem zawartości per serwer i pobieraniem obszaru, zdalny katalog aktualizacji map (catalog/extra.json na gałęzi poi-db) oraz konta login+hasło na tokenie aplikacji. Cały interfejs na autorskim sprite 40+ ikon SVG (styl stroke, zero emoji). GPS ze śledzeniem, pomiar, wyszukiwarka Nominatim, klucze API per dostawca. Wersja mobilna po audycie: dolny pasek akcji, cele dotykowe 44px+, safe-area, haptyka. PWA gotowe pod aplikację Android; katalog warstw to inżynieria wsteczna pakietów onlinemapsources.xml, AnyGIS i melda.ru (ANALIZA.md).",
+    icon: "🧭",
+    tag: "narzędzie",
+    preview: true,
+    meta: {
+      colors: ["#181a1f", "#20232a", "#ff7a1a", "#2f8cff", "#e8eaf0"],
+      fonts: ["Segoe UI / system-ui"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Leaflet", "WMTS/WMS", "PWA", "localStorage"],
+    },
+  },
+  {
+    slug: "drzewo-bronk",
+    title: "Drzewo genealogiczne rodziny von Bronk",
+    desc: "Interaktywne, edytowalne drzewo genealogiczne rodziny von Bronk (Niepoczołowski) w stylu MyHeritage, odtworzone z 11 fotografii papierowego wydruku: od Michała Piotra von Bronk (ur. 1721) do dziś, 10 pokoleń i 368 osób na jednej planszy SVG. Karty z awatarami, panel szczegółów osoby z relacjami, edycja / dodawanie małżonków i dzieci / usuwanie z autozapisem w przeglądarce, eksport i import JSON, wyszukiwarka, zoom i podświetlanie linii krwi.",
+    icon: "🦌",
+    tag: "genealogia",
+    preview: true,
+    meta: {
+      colors: ["#f3efe4", "#16223c", "#8c6a2f", "#b3541e", "#ffffff"],
+      fonts: ["Segoe UI / system-ui"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS"],
+    },
+  },
+  {
     slug: "powerfit",
     title: "POWERFIT Gym & Fitness",
     desc: "Wielostronicowy serwis siłowni POWERFIT Brusy: prawdziwe logo klubu i 13 zdjęć trenerki Iwony Dulskiej (galeria, sekcje, tła), kolorystyka wyprowadzona z logo (czerń, stal, czerwień). 6 podstron, rezerwacja online w stylu Booksy z kropkami dostępności, prawdziwe profile social media, fotograficzne tła z parallaxą.",
@@ -233,6 +259,32 @@ const SITES = [
       colors: ["#0f0f13", "#2f6fd0", "#f0b429", "#c22e3a", "#2e8b57"],
       fonts: ["Segoe UI / system-ui"],
       tech: ["HTML", "CSS"],
+    },
+  },
+  {
+    slug: "fuh-wieczorek",
+    title: "F.U.H. Wieczorek — Skup i sprzedaż elektroniki, Łódź",
+    desc: "Wielostronicowy serwis firmy F.U.H. Wieczorek (Łódź, Radomsko, Częstochowa): skup elektroniki na sztuki i na kilogramy, sklep i serwis komputerowy, RTV i meble. Jasny motyw w zielono-niebieskiej palecie wg briefu, zdjęcia z Unsplash (elektronika, serwis, magazyn), autorskie logo i ikony SVG, animowany marquee kategorii, liczniki zaufania z Allegro (Super Sprzedawca, 99,7%, 375+ ocen, 15 lat), mapy Google przy lokalizacjach, 5 podstron — Start, Skup, Sklep i serwis, O firmie, Kontakt z formularzem wyceny (mailto). Prawdziwe dane firmy: NIP, REGON, adresy 3 punktów, tel. +48 537 347 875.",
+    icon: "♻️",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#f4f9f7", "#eef7f2", "#0e9f6e", "#1d6fe0", "#f5b731"],
+      fonts: ["Space Grotesk", "Inter"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts"],
+    },
+  },
+  {
+    slug: "kawa-sielatycki",
+    title: "Sielatycki Coffee — kawa z gospodarstwa",
+    desc: "Czarno-złoty wielostronicowy serwis sprzedażowy dla gospodarstwa rolnego Kamila Sielatyckiego (sprzedaż kawy): lekka strona główna (hero z ziarnami, marquee, zajawki) + 5 podstron — Gospodarstwo (o nas, proces 4 kroków, galeria), Oferta (ziarnista/mielona/hurt, opinie), Ciekawostki (10 faktów), Parzenie (4 metody + Arabica vs Robusta), Kontakt (formularz mailto). Ziarno kawy SVG toczące się z lewej do prawej w rytm scrollowania, animacje reveal, typografia Space Grotesk + Inter, wyłącznie autorskie ikony SVG (zero emoji), fullscreen hamburger menu clip-path z hamburgerem widocznym nad overlayem, kaskada zapasowych zdjęć Unsplash. Prawdziwe dane: tel. +48 666 843 861, kamilsielatycki@gmail.com.",
+    icon: "☕",
+    tag: "landing",
+    preview: true,
+    meta: {
+      colors: ["#0a0806", "#120e09", "#c9a24b", "#e3c47c", "#f3ecdd"],
+      fonts: ["Space Grotesk", "Inter"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash"],
     },
   },
 ];

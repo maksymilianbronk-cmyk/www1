@@ -1,0 +1,39 @@
+# Kolekcja stron www
+
+Zbiór samodzielnych stron i aplikacji webowych. Strona główna repo (`index.html`)
+to galeria/katalog wszystkich projektów, a każdy projekt mieszka w osobnym
+folderze `sites/<nazwa>/`.
+
+## 🌍 Strona publiczna (GitHub Pages)
+
+Kolekcja jest opublikowana publicznie — wdrożenie uruchamia się automatycznie
+po każdym pushu na gałąź domyślną (workflow `.github/workflows/pages.yml`):
+
+| Co | Link |
+|---|---|
+| **Galeria kolekcji** | **https://maksymilianbronk-cmyk.github.io/www1/** |
+| **Aplikacja Trasa — mapy podróżnicze** 🧭 | **https://maksymilianbronk-cmyk.github.io/www1/sites/podroze-mapy/** |
+
+Adres działa przez https, więc aplikacja Trasa ma pełne PWA: GPS, service
+worker i instalację na telefonie („Dodaj do ekranu głównego").
+
+- [Analiza źródeł map (ANALIZA.md)](sites/podroze-mapy/ANALIZA.md)
+- [Kod aplikacji Trasa](sites/podroze-mapy/)
+
+## 🔗 Podgląd gałęzi roboczej (bez wdrożenia)
+
+Najnowszy stan gałęzi `claude/travel-maps-app-goud9f` przed publikacją:
+
+- [Aplikacja Trasa (githack)](https://raw.githack.com/maksymilianbronk-cmyk/www1/claude/travel-maps-app-goud9f/sites/podroze-mapy/index.html)
+- [Galeria (githack)](https://raw.githack.com/maksymilianbronk-cmyk/www1/claude/travel-maps-app-goud9f/index.html)
+
+## Struktura repo
+
+```
+www1/
+├── index.html          # galeria/katalog kolekcji
+├── assets/js/sites.js  # lista stron (edytuj tu!)
+└── sites/<slug>/       # każda strona w osobnym folderze
+```
+
+Szczegóły dodawania nowych stron: [CLAUDE.md](CLAUDE.md).

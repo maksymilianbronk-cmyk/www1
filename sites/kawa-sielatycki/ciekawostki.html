@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciekawostki o kawie — Sielatycki Coffee</title>
+<meta name="description" content="10 najciekawszych faktów o kawie: od tańczących kóz Kaldiego po 800 związków aromatycznych. Sielatycki Coffee — kawa prosto z gospodarstwa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="%230a0806"/><ellipse cx="32" cy="32" rx="13" ry="19" fill="none" stroke="%23c9a24b" stroke-width="3"/><path d="M32 13 C 39 23, 25 41, 32 51" fill="none" stroke="%23c9a24b" stroke-width="3"/></svg>'>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-bean" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="32" rx="14" ry="21" fill="none" stroke="currentColor" stroke-width="3.4"/>
+      <path d="M32 11 C 40 22, 24 42, 32 53" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-bean-fill" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="32" rx="14" ry="21" fill="currentColor"/>
+      <path d="M32 11 C 40 22, 24 42, 32 53" fill="none" stroke="#0a0806" stroke-width="3.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-arrow-back" viewBox="0 0 24 24">
+      <path d="M20 12H5M11 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="scroll-progress"></div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="index.html" aria-label="Sielatycki Coffee — start">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="30" fill="none" stroke="#c9a24b" stroke-width="1.4"/>
+        <circle cx="32" cy="32" r="25.5" fill="none" stroke="#c9a24b" stroke-width="0.6" opacity="0.5"/>
+        <g style="color:#e3c47c"><use href="#i-bean" transform="translate(15 14) scale(0.55)"/></g>
+      </svg>
+      <span class="logo-text">
+        <span class="logo-name">Sielatycki</span>
+        <span class="logo-sub">Coffee · Gospodarstwo</span>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="Nawigacja główna">
+      <a href="index.html">Start</a>
+      <a href="gospodarstwo.html">Gospodarstwo</a>
+      <a href="oferta.html">Oferta</a>
+      <a href="ciekawostki.html" class="active">Ciekawostki</a>
+      <a href="parzenie.html">Parzenie</a>
+      <a href="kontakt.html" class="nav-cta">Zamów kawę</a>
+    </nav>
+    <button class="hamburger" aria-label="Otwórz menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu">
+  <nav aria-label="Menu mobilne">
+    <a href="index.html"><span class="idx">01</span>Start</a>
+    <a href="gospodarstwo.html"><span class="idx">02</span>Gospodarstwo</a>
+    <a href="oferta.html"><span class="idx">03</span>Oferta</a>
+    <a href="ciekawostki.html"><span class="idx">04</span>Ciekawostki</a>
+    <a href="parzenie.html"><span class="idx">05</span>Parzenie</a>
+    <a href="kontakt.html"><span class="idx">06</span>Zamów kawę</a>
+  </nav>
+  <div class="mobile-menu-foot">
+    <a href="tel:+48666843861">+48 666 843 861</a>
+    <a href="mailto:kamilsielatycki@gmail.com">kamilsielatycki@gmail.com</a>
+    <span>Gospodarstwo rolne · Kamil Sielatycki</span>
+  </div>
+</div>
+
+<main>
+
+  <section class="subhero">
+    <div class="hero-bg">
+      <img
+        src="https://images.unsplash.com/photo-1521302080334-4bebac2763a6?auto=format&fit=crop&w=1920&q=85"
+        data-fallback="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1920&q=85|https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1920&q=85"
+        alt="Worek pełen ziaren kawy" fetchpriority="high">
+    </div>
+    <div class="container">
+      <span class="hero-eyebrow reveal visible">Świat kawy · część 1</span>
+      <h1 class="reveal visible d1">Ciekawostki, które zmienią Twoje <em>poranne espresso</em></h1>
+      <p class="hero-lead reveal visible d2">
+        Dziesięć faktów, którymi błyśniesz przy każdej filiżance — od tańczących kóz
+        z Etiopii po zakazy picia kawy pod karą śmierci.
+      </p>
+    </div>
+  </section>
+
+  <div class="bean-lane" aria-hidden="true">
+    <span class="lane-label">Im dalej scrollujesz · tym dalej toczy się ziarno</span>
+    <div class="bean-traveller">
+      <span class="trail"></span>
+      <svg width="66" height="66" style="color:#c9a24b"><use href="#i-bean-fill"/></svg>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head center reveal">
+        <span class="eyebrow"><svg style="color:#c9a24b"><use href="#i-bean"/></svg>10 faktów</span>
+        <h2>Czy wiesz, <em>że…</em></h2>
+      </div>
+      <div class="fact-list">
+        <article class="fact-row reveal">
+          <div class="fact-no">01</div>
+          <div>
+            <h3>Kawę odkryły… kozy</h3>
+            <p>Według legendy z IX wieku etiopski pasterz Kaldi zauważył, że jego kozy po zjedzeniu czerwonych owoców z pewnego krzewu zaczynały „tańczyć” i nie spały w nocy. Tak świat poznał kawowiec — a region Kaffa dał kawie nazwę.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">02</div>
+          <div>
+            <h3>Ziarno kawy to tak naprawdę pestka</h3>
+            <p>Kawa rośnie jako owoc przypominający wiśnię. To, co palimy i mielimy, jest pestką tego owocu. W każdej „wiśni” siedzą zwykle dwie pestki — a wyjątek, pojedyncza okrągła pestka, nazywany jest peaberry i ceniony przez smakoszy.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">03</div>
+          <div>
+            <h3>2,25 miliarda filiżanek dziennie</h3>
+            <p>Tyle kawy wypija ludzkość każdego dnia — około 26 tysięcy filiżanek na sekundę. Kawa jest jednym z najczęściej sprzedawanych surowców rolnych świata, a z jej uprawy żyje ponad 125 milionów ludzi.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">04</div>
+          <div>
+            <h3>Ponad 800 związków aromatycznych</h3>
+            <p>Palona kawa zawiera ponad 800 związków lotnych odpowiadających za aromat — ponad dwa razy więcej niż wino. Dlatego w kawie można wyczuć nuty czekolady, owoców, orzechów, karmelu, a nawet jaśminu.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">05</div>
+          <div>
+            <h3>Świeżość liczy się w dniach, nie latach</h3>
+            <p>Kawa najlepiej smakuje od kilku dni do około 4–6 tygodni po wypaleniu. Ziarno z supermarketu bywa palone wiele miesięcy przed zakupem — dlatego kawa prosto od palarni czy gospodarstwa smakuje zupełnie inaczej.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">06</div>
+          <div>
+            <h3>Za kawę groziła kara śmierci</h3>
+            <p>W XVII-wiecznym Imperium Osmańskim sułtan Murad IV zakazał picia kawy pod karą śmierci — kawiarnie uważano za wylęgarnie spisków. Kawa przetrwała, sułtani nie.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">07</div>
+          <div>
+            <h3>Beethoven liczył ziarna</h3>
+            <p>Kompozytor podobno parzył kawę zawsze z dokładnie 60 ziaren na filiżankę. Współczesna kawiarnia speciality robi to samo — tylko z wagą z dokładnością do 0,1 grama.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">08</div>
+          <div>
+            <h3>Espresso ma mniej kofeiny niż przelew</h3>
+            <p>Mała czarna z ekspresu ciśnieniowego zawiera ok. 60–80 mg kofeiny, a duży kubek kawy przelewowej — nawet 150–200 mg. Espresso jest bardziej skoncentrowane, ale pijemy go po prostu mniej.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">09</div>
+          <div>
+            <h3>Finowie piją najwięcej na świecie</h3>
+            <p>Statystyczny Fin wypija około 12 kg kawy rocznie — najwięcej na świecie. W Finlandii przerwa kawowa („kahvitauko”) jest wpisana w prawo pracy.</p>
+          </div>
+        </article>
+        <article class="fact-row reveal">
+          <div class="fact-no">10</div>
+          <div>
+            <h3>Pierwsza kamerka internetowa pilnowała… dzbanka kawy</h3>
+            <p>W 1991 roku naukowcy z Uniwersytetu Cambridge skierowali kamerę na ekspres w korytarzu, żeby nie chodzić do pustego dzbanka. Tak powstała pierwsza kamera internetowa w historii.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="bean-lane" aria-hidden="true">
+    <span class="lane-label">Od legendy o Kaldim · do Twojej filiżanki</span>
+    <div class="bean-traveller">
+      <span class="trail"></span>
+      <svg width="66" height="66" style="color:#e3c47c"><use href="#i-bean-fill"/></svg>
+    </div>
+  </div>
+
+  <section class="cta-band">
+    <div class="container reveal">
+      <h2>Teoria za nami. <em>Czas na degustację.</em></h2>
+      <p>Najlepszą ciekawostką o kawie jest jej smak, kiedy jest naprawdę świeża. Zamów partię z najbliższego wypału.</p>
+      <div class="facts-cta">
+        <a class="btn btn-gold" href="oferta.html">Zobacz ofertę <svg><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost" href="parzenie.html">Jak parzyć kawę</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <a class="logo" href="index.html" aria-label="Sielatycki Coffee">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="30" fill="none" stroke="#c9a24b" stroke-width="1.4"/>
+          <g style="color:#e3c47c"><use href="#i-bean" transform="translate(15 14) scale(0.55)"/></g>
+        </svg>
+        <span class="logo-text">
+          <span class="logo-name">Sielatycki</span>
+          <span class="logo-sub">Coffee · Gospodarstwo</span>
+        </span>
+      </a>
+      <nav class="footer-nav" aria-label="Nawigacja stopki">
+        <a href="gospodarstwo.html">Gospodarstwo</a>
+        <a href="oferta.html">Oferta</a>
+        <a href="ciekawostki.html">Ciekawostki</a>
+        <a href="parzenie.html">Parzenie</a>
+        <a href="kontakt.html">Kontakt</a>
+      </nav>
+      <p class="footer-note">© 2026 Gospodarstwo rolne Kamil Sielatycki.<br>Strona demonstracyjna. Zdjęcia: Unsplash.</p>
+    </div>
+    <a class="back-collection" href="../../"><svg><use href="#i-arrow-back"/></svg> wróć do kolekcji</a>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>

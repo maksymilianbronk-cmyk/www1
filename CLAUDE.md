@@ -36,6 +36,24 @@ www1/
 }
 ```
 
+## Skille pomocnicze
+
+- **`nowa-strona`** — dodaje nową stronę do kolekcji (opis wyżej).
+- **`allegro-aukcje`** (`.claude/skills/allegro-aukcje/`) — wyszukuje aukcje
+  danego sprzedawcy Allegro (fan-out wyszukiwań web + walidacja slugów,
+  fallback na wyszukiwanie w profilu) i generuje karty produktów skryptem
+  `gen_prod_cards.py`. Użyj przy prośbach typu „podlinkuj aukcje z Allegro".
+- **`zrodla-map`** (`.claude/skills/zrodla-map/`) — wyszukiwanie, weryfikacja
+  i dodawanie źródeł map (XYZ/WMS/WMTS/ArcGIS REST) do aplikacji Trasa
+  (`sites/podroze-mapy`), z rejestrem znanych endpointów i pułapek układów
+  współrzędnych (`references/zrodla.md`). Użyj przy „dodaj mapę", „napraw
+  warstwę", „sprawdź czy mapa działa".
+- **`trasa-app`** (`.claude/skills/trasa-app/`) — playbook rozwoju aplikacji
+  Trasa: architektura modułów, chmura POI na gałęzi `poi-db` (konta, token
+  właściciela, panel administratora), checklista zmian (liczniki, SW, testy
+  Playwright), wdrożenie na Pages i wyniesione lekcje. Użyj przy każdej pracy
+  nad `sites/podroze-mapy`.
+
 ## Zasady
 
 - Każda strona jest **w pełni samodzielna** — własny HTML/CSS/JS.
