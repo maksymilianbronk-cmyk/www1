@@ -52,15 +52,24 @@ cp "$SC/cover1.webp" "<projekt>/uploads/blog-nazwa.webp"
 Gdy `timeout` ubije CLI, plik i tak bywa już zapisany — **sprawdź scratch przed ponowieniem**
 (`ls -la "$SC"/*.webp`), żeby nie generować drugi raz tego samego.
 
-## 4. Optymalizacja (obowiązkowa — surowe pliki ważą ~1 MB)
+## 4. Optymalizacja + przeniesienie (obowiązkowa — surowe pliki ważą ~1 MB)
 
+Użyj helpera `scripts/to-webp.sh` — konwertuje do webp i od razu kładzie plik
+w docelowym miejscu projektu (tworzy katalogi, wypisuje oszczędność):
+
+```bash
+to-webp.sh "$SC/cover1.webp" sites/<slug>/img/hero.webp        # domyślnie max 1600px, q82
+to-webp.sh render.png sites/<slug>/img/tlo.webp 1920 80        # własny rozmiar/jakość
+```
+
+Pod spodem (gdy wolisz ręcznie):
 ```bash
 magick in.webp -resize "1600x1600>" -quality 82 -define webp:method=6 out.webp
 ```
 
-Realny efekt: 965 KB → 65 KB, 1016 KB → 86 KB przy zachowaniu jakości.
+Realny efekt (zmierzone): 150 KB → 17 KB (−89%), 622 KB → 108 KB (−83%).
 **Uwaga:** na Windows `convert` to systemowy konwerter dysków (`C:\Windows\system32\convert.exe`) —
-ImageMagick wołaj wyłącznie jako `magick`.
+ImageMagick wołaj wyłącznie jako `magick`. Helper sam wybiera `magick`/`convert`/`cwebp`.
 
 ## 5. Jak pisać opis obrazu
 
