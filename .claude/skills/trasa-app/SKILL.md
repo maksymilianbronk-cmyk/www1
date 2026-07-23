@@ -58,6 +58,16 @@ description: >
   (klasyfikator uprawnień blokuje — i słusznie); token obsługuje wyłącznie
   przeglądarka właściciela przez panel admina.
 
+### Udostępnianie POI linkiem (bez chmury)
+
+- `#share=<0|1><base64url>` — JSON `{g: folder|null, p: [[name,lat,lng,cat,
+  note,color]…]}`; prefiks `1` = gzip (CompressionStream), `0` = plain.
+- Nadawanie: `sharePoiLink(pois, label)` — przycisk share w popupie POI
+  i chip „udostępnij link" w akcjach folderu; navigator.share gdy jest,
+  inaczej schowek. Odbiór: `handleShareHash()` czyta `initialHash`
+  (zapisany PRZED pierwszym writeHash!) → `showSharedPois` (warstwa
+  tymczasowa + fitBounds + toast z akcją „Zapisz" → `importShared`).
+
 ## 3. Procedura każdej zmiany (checklista)
 
 1. Edycje w sites/podroze-mapy (+ ewentualnie assets/js/sites.js opis karty).

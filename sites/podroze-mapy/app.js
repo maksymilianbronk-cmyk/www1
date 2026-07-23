@@ -296,7 +296,9 @@ const map = L.map("map", {
 L.control.zoom({ position: "bottomright" }).addTo(map);
 L.control.scale({ metric: true, imperial: false, position: "bottomleft" }).addTo(map);
 
-/* hash: #z/lat/lng/baseId */
+/* hash: #z/lat/lng/baseId (oraz #share=… — link udostępniania POI,
+   odczytywany później; zapamiętaj oryginalny hash zanim writeHash go nadpisze) */
+const initialHash = location.hash;
 (function readHash() {
   const m = location.hash.match(/^#(\d+(?:\.\d+)?)\/(-?[\d.]+)\/(-?[\d.]+)(?:\/([\w-]+))?/);
   if (!m) return;
@@ -322,7 +324,15 @@ const actions = {
   search: () => toggleSearch(),
   locate: () => toggleLocate(),
   measure: () => toggleMeasure(),
-  "poi-add": () => setPoiAddMode(!poiAddMode),
+  "poi-add": () => {
+    /* mobile (ekran dotykowy): dodaj punkt od razu tam, gdzie celuje
+       krzyżyk na środku kadru — bez trybu klikania w mapę */
+    if (matchMedia("(pointer: coarse)").matches && !poiAddMode) {
+      openPoiEditor(null, map.getCenter());
+      return;
+    }
+    setPoiAddMode(!poiAddMode);
+  },
   "poi-panel": () => openPoiPanel(),
   gpx: () => openModal("gpx-modal"),
   keys: () => openKeysModal(),
@@ -1304,6 +1314,7 @@ function openPoiPopup(mk, p) {
     <div class="poi-popup-btns">
       <button data-a="edit">${ic("edit")} Edytuj</button>
       <button data-a="nav">${ic("nav")} Nawiguj</button>
+      <button data-a="share" title="Udostępnij publiczny link do punktu">${ic("share")}</button>
       <button data-a="copy" title="Kopiuj współrzędne">${ic("copy")}</button>
       <button data-a="del" class="danger" title="Usuń">${ic("trash")}</button>
     </div>`;
@@ -1313,6 +1324,7 @@ function openPoiPopup(mk, p) {
     if (a === "edit") { map.closePopup(); openPoiEditor(p); }
     else if (a === "nav") window.open(
       `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`, "_blank");
+    else if (a === "share") sharePoiLink([p], null);
     else if (a === "copy") {
       navigator.clipboard?.writeText(`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`);
       toast("Skopiowano współrzędne.");
@@ -1338,6 +1350,115 @@ function deletePoi(id) {
       toast("Przywrócono punkt.");
     },
   });
+}
+
+/* ── Udostępnianie POI publicznym linkiem ──
+   Punkty są zakodowane w samym linku (#share=…): JSON → gzip (gdy przeglądarka
+   ma CompressionStream) → base64url. Działa bez chmury i bez konta — każdy,
+   kto otworzy link, zobaczy punkty i może je zapisać u siebie. */
+
+function b64uEnc(bytes) {
+  let s = "";
+  for (let i = 0; i < bytes.length; i += 0x8000)
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64uDec(s) {
+  return Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")),
+    c => c.charCodeAt(0));
+}
+async function packShare(obj) {
+  const raw = new TextEncoder().encode(JSON.stringify(obj));
+  if (typeof CompressionStream === "function") {
+    const buf = new Uint8Array(await new Response(new Blob([raw]).stream()
+      .pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+    return "1" + b64uEnc(buf);
+  }
+  return "0" + b64uEnc(raw);
+}
+async function unpackShare(s) {
+  let bytes = b64uDec(s.slice(1));
+  if (s[0] === "1") {
+    bytes = new Uint8Array(await new Response(new Blob([bytes]).stream()
+      .pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+async function sharePoiLink(pois, folderLabel) {
+  if (!pois.length) { toast("Ten folder nie ma jeszcze punktów."); return; }
+  const payload = {
+    g: folderLabel || null,
+    p: pois.map(p => [p.name, +p.lat.toFixed(6), +p.lng.toFixed(6),
+      p.cat || "", p.note || "", p.color || ""]),
+  };
+  const url = location.origin + location.pathname + "#share=" + await packShare(payload);
+  const what = folderLabel ? `folder „${folderLabel}" (${pois.length} pkt)`
+    : `punkt „${pois[0].name}"`;
+  const doCopy = async () => {
+    try { await navigator.clipboard.writeText(url); toast(`Link do: ${what} — skopiowany.`); }
+    catch { prompt("Skopiuj link udostępniania:", url); }
+  };
+  /* na urządzeniach z natywnym udostępnianiem — systemowe okno,
+     z kopiowaniem jako opcją w toaście */
+  if (navigator.share) {
+    toast(`Link do: ${what} — gotowy.`, 9000, { label: "Kopiuj", fn: doCopy });
+    try { await navigator.share({ title: "Trasa — " + what, url }); return; }
+    catch { /* anulowane — zostaje toast z kopiowaniem */ }
+  } else await doCopy();
+}
+
+/* odbiór udostępnionego linku */
+let sharedLayer = null;
+function clearShared() {
+  if (sharedLayer) { map.removeLayer(sharedLayer); sharedLayer = null; }
+}
+function importShared(pts, label) {
+  const group = label || "Udostępnione";
+  if (group !== DEFAULT_GROUP && !state.groups.includes(group)) {
+    state.groups.push(group);
+    LS.set("poiGroups", state.groups);
+  }
+  pts.forEach(p => state.pois.push({
+    id: "p" + Date.now() + "_" + Math.floor(Math.random() * 1e4) + "_" + state.pois.length,
+    lat: p.lat, lng: p.lng, name: p.name, note: p.note,
+    cat: p.cat, color: p.color || undefined, group, ts: Date.now(),
+  }));
+  savePois(); renderPois();
+  markDirty(group);
+  clearShared();
+  toast(`Zapisano ${pts.length} pkt do folderu „${group}".`);
+}
+function showSharedPois(pts, label) {
+  clearShared();
+  sharedLayer = L.layerGroup().addTo(map);
+  pts.forEach(p => {
+    const mk = L.marker([p.lat, p.lng], { icon: poiIcon(p), title: p.name, opacity: 0.92 });
+    mk.bindPopup(`<div class="poi-popup"><strong>${esc(p.name)}</strong>` +
+      (p.note ? `<p>${esc(p.note)}</p>` : "") +
+      `<small>${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</small></div>`, { maxWidth: 260 });
+    mk.addTo(sharedLayer);
+  });
+  map.fitBounds(L.latLngBounds(pts.map(p => [p.lat, p.lng])).pad(0.25), { maxZoom: 15 });
+  const what = label ? `folder „${label}" (${pts.length} pkt)`
+    : (pts.length === 1 ? `punkt „${pts[0].name}"` : `${pts.length} punktów`);
+  toast(`Otrzymano ${what}. Zapisać u siebie?`, 15000,
+    { label: "Zapisz", fn: () => importShared(pts, label) });
+}
+async function handleShareHash() {
+  const m = initialHash.match(/[#&]share=([01][A-Za-z0-9_-]+)/);
+  if (!m) return;
+  try {
+    const d = await unpackShare(m[1]);
+    const pts = (d.p || []).map(a => ({
+      name: String(a[0] || "Punkt").slice(0, 120), lat: +a[1], lng: +a[2],
+      cat: a[3] || "inne", note: String(a[4] || "").slice(0, 500), color: a[5] || "",
+    })).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lng) &&
+      Math.abs(p.lat) <= 90 && Math.abs(p.lng) <= 180);
+    if (pts.length) showSharedPois(pts, d.g ? String(d.g).slice(0, 60) : null);
+  } catch {
+    toast("Nie udało się odczytać udostępnionego linku (uszkodzony lub ucięty).", 8000);
+  }
 }
 
 /* tryb dodawania: przycisk 📌 albo long-press na mapie */
@@ -1561,6 +1682,15 @@ function renderPoiFolders() {
   const act = document.getElementById("poi-folder-actions");
   act.innerHTML = "";
   if (poiPanelGroup) {
+    const share = document.createElement("button");
+    share.className = "chip";
+    share.innerHTML = `${ic("share", "ic-xs")} udostępnij link`;
+    share.title = "Publiczny link z punktami tego folderu — punkty są w samym linku";
+    share.addEventListener("click", () => sharePoiLink(
+      state.pois.filter(p => (p.group || DEFAULT_GROUP) === poiPanelGroup),
+      poiPanelGroup));
+    act.appendChild(share);
+
     const ren = document.createElement("button");
     ren.className = "chip";
     ren.innerHTML = `${ic("edit", "ic-xs")} zmień nazwę`;
@@ -2728,6 +2858,7 @@ buildList();
 renderQuickToggles();
 fetchRemoteCatalog();
 fetchCloudConfig();
+handleShareHash();
 
 /* PWA — rejestracja service workera (offline-shell + bufor kafelków) */
 if ("serviceWorker" in navigator &&
