@@ -162,10 +162,6 @@ function buildCard(site) {
   const st = siteStatus(site);
   return `
     <div class="card" data-slug="${site.slug}">
-      <button class="status-badge" data-slug="${site.slug}" style="--sc:${st.color}"
-              title="Zmień status" aria-label="Status: ${st.label} — kliknij, aby zmienić">
-        <span class="st-dot"></span>${st.label} <span class="st-caret">▾</span>
-      </button>
       <a class="card-link" href="${href}"${linkExtra} aria-label="${site.title}">
         <div class="card-preview">
           ${site.preview
@@ -177,7 +173,13 @@ function buildCard(site) {
           <div class="card-title">${site.title}</div>
           <div class="card-desc">${site.desc || ''}</div>
           <button class="desc-toggle" type="button" hidden>Rozwiń ▾</button>
-          ${site.tag ? `<span class="card-tag">${site.tag}${site._imported ? ' · import' : ''}</span>` : ''}
+          <div class="card-meta">
+            ${site.tag ? `<span class="card-tag">${site.tag}${site._imported ? ' · import' : ''}</span>` : ''}
+            <button class="status-badge" data-slug="${site.slug}" style="--sc:${st.color}"
+                    title="Zmień status" aria-label="Status: ${st.label} — kliknij, aby zmienić">
+              <span class="st-dot"></span>${st.label} <span class="st-caret">▾</span>
+            </button>
+          </div>
         </div>
       </a>
       <div class="card-actions">

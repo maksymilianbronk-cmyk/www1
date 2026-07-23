@@ -252,37 +252,46 @@ body {
   box-shadow: 0 0 8px color-mix(in srgb, var(--sc, var(--accent)) 70%, transparent);
 }
 
-/* Badge statusu na karcie */
-.status-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 11;
-  display: inline-flex;
+/* Badge statusu na dole karty, obok etykiety kategorii */
+.card-meta {
+  display: flex;
   align-items: center;
   gap: 7px;
-  padding: 5px 11px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.card-meta .card-tag { margin-top: 0; }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--sc, var(--accent)) 55%, var(--border));
-  background: rgba(15, 15, 19, .82);
-  backdrop-filter: blur(6px);
-  color: #fff;
+  border: 1px solid color-mix(in srgb, var(--sc, var(--accent)) 45%, var(--border));
+  background: color-mix(in srgb, var(--sc, var(--accent)) 10%, transparent);
+  color: var(--text-dim);
   font: inherit;
-  font-size: .72rem;
+  font-size: .68rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform .15s, box-shadow .2s, border-color .2s;
+  transition: border-color .2s, color .2s, background .2s;
 }
+
+.status-badge .st-dot { width: 7px; height: 7px; }
 
 .status-badge:hover {
-  transform: translateY(-1px);
   border-color: var(--sc, var(--accent));
-  box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--sc, var(--accent)) 70%, transparent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--sc, var(--accent)) 18%, transparent);
 }
 
-.status-badge .st-caret { opacity: .6; font-size: .65rem; }
+.status-badge .st-caret { opacity: .55; font-size: .6rem; }
 
 /* Menu wyboru statusu */
+.status-menu[hidden] { display: none; }
+
 .status-menu {
   position: absolute;
   z-index: 200;
