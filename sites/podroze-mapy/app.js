@@ -729,6 +729,7 @@ map.on("resize", updateCompareClip);
 /* ───────────────────────── Manager warstw (sidebar) ───────────────────────── */
 
 const sidebar = document.getElementById("sidebar");
+const quickbar = document.getElementById("quickbar");
 const layerList = document.getElementById("layer-list");
 
 const PSEUDO_CATS = [
@@ -958,16 +959,38 @@ function testCategory(items, sec) {
 
 /* ───────────────────────── Sidebar / topbar ───────────────────────── */
 
-function openSidebar() { sidebar.classList.add("open"); }
+/* na wąskich ekranach oba panele by się nakładały — otwarcie jednego chowa drugi */
+const panelsOverlap = () => window.innerWidth < 1000;
+function openSidebar() {
+  sidebar.classList.add("open");
+  if (panelsOverlap()) quickbar.classList.remove("open");
+}
 function closeSidebar() { sidebar.classList.remove("open"); }
-document.getElementById("btn-menu").addEventListener("click", () =>
-  sidebar.classList.toggle("open"));
+function toggleSidebar() {
+  if (sidebar.classList.contains("open")) closeSidebar();
+  else openSidebar();
+}
+document.getElementById("btn-menu").addEventListener("click", toggleSidebar);
 document.getElementById("sb-tab").addEventListener("click", () => {
   buzz();
-  sidebar.classList.toggle("open");
+  toggleSidebar();
 });
 document.getElementById("active-map-name").addEventListener("click", openSidebar);
 document.getElementById("sb-close").addEventListener("click", closeSidebar);
+
+/* lewy panel szybkiego dostępu — chowany, stan zapamiętywany */
+function toggleQuickbar(force) {
+  const open = quickbar.classList.toggle("open", force);
+  if (open && panelsOverlap()) closeSidebar();
+  LS.set("quickbarOpen", open);
+}
+document.getElementById("qb-tab").addEventListener("click", () => {
+  buzz();
+  toggleQuickbar();
+});
+document.getElementById("qb-close").addEventListener("click", () => toggleQuickbar(false));
+/* na starcie: przywróć stan (domyślnie otwarty na szerokich ekranach) */
+if (LS.get("quickbarOpen", window.innerWidth >= 1000)) quickbar.classList.add("open");
 document.getElementById("layer-filter").addEventListener("input", e =>
   buildList(e.target.value));
 
@@ -2671,7 +2694,8 @@ updateCenterCoords();
 document.addEventListener("keydown", e => {
   if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
   const k = e.key.toLowerCase();
-  if (k === "m") sidebar.classList.toggle("open");
+  if (k === "m") toggleSidebar();
+  else if (k === "q") toggleQuickbar();
   else if (k === "s") actions.search();
   else if (k === "l") actions.locate();
   else if (k === "p") actions.measure();
@@ -2681,6 +2705,7 @@ document.addEventListener("keydown", e => {
   else if (k === ".") cycleBase(1);
   else if (k === "escape") {
     closeSidebar();
+    quickbar.classList.remove("open");
     document.querySelectorAll(".modal").forEach(m => m.classList.add("hidden"));
     if (poiAddMode) setPoiAddMode(false);
     if (compare.selecting) { compare.selecting = false; document.getElementById("btn-compare").classList.remove("on"); }

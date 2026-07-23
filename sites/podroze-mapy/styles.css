@@ -134,6 +134,38 @@ html, body {
 .search-results li:hover { background: var(--bg3); }
 .sr-info { color: var(--fg2); cursor: default; }
 
+/* ── Szybki dostęp — lewy panel chowany ── */
+.quickbar {
+  position: fixed; top: var(--topbar-h);
+  bottom: calc(var(--status-h) + var(--bottombar-h) + var(--safe-b));
+  left: 0;
+  width: 300px; max-width: 88vw;
+  background: var(--bg2); border-right: 1px solid var(--line);
+  transform: translateX(-102%);
+  transition: transform 0.22s ease;
+  z-index: 1100;
+  display: flex; flex-direction: column;
+}
+.quickbar.open { transform: translateX(0); }
+.qb-body { padding: 8px 10px; overflow-y: auto; }
+.qb-body .sb-presets-label { margin-top: 10px; }
+
+/* uchwyt na lewej krawędzi */
+.qb-tab {
+  position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+  width: 26px; height: 74px;
+  background: var(--bg2); border: 1px solid var(--line); border-left: 0;
+  border-radius: 0 10px 10px 0;
+  color: var(--accent); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1105;
+  transition: left 0.22s ease;
+  box-shadow: 4px 0 14px rgba(0, 0, 0, 0.35);
+}
+.qb-tab .ic { width: 17px; height: 17px; }
+#quickbar.open + .qb-tab { left: min(300px, 88vw); }
+#quickbar.open + .qb-tab .ic { transform: rotate(180deg); }
+
 /* ── Sidebar / manager warstw ── */
 .sidebar {
   position: fixed; top: var(--topbar-h);
@@ -598,6 +630,8 @@ select.poi-filter { appearance: auto; }
   .statusbar { font-size: 11px; gap: 10px; }
   .sidebar { width: 88vw; }
   #sidebar.open + .sb-tab { right: 88vw; }
+  .quickbar { width: 84vw; }
+  #quickbar.open + .qb-tab { left: 84vw; }
   .leaflet-control-zoom { display: none; } /* pinch-zoom wystarcza */
   .modal { padding: 8px; align-items: flex-end; }
   .modal-box { border-radius: 16px 16px 0 0; max-height: 80vh; }

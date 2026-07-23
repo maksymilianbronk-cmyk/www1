@@ -12,9 +12,14 @@ description: >
 
 ## 1. Architektura (sites/podroze-mapy)
 
-- `index.html` — sprite 45+ ikon SVG (symbol/use, stroke), topbar, sidebar
-  (szybki dostęp → profile → filtr → kategorie), bottombar mobilny, modale
-  (keys, gpx, poi-modal, poi-panel+chmura, wms-modal, offline-modal, name-modal).
+- `index.html` — sprite 45+ ikon SVG (symbol/use, stroke), topbar, DWA panele
+  boczne z uchwytami na krawędziach: `#quickbar` po LEWEJ (szybki dostęp:
+  nakładki/mapy solo + profile map; stan open w LS `quickbarOpen`, domyślnie
+  otwarty ≥1000 px) i `#sidebar` po PRAWEJ (pełna kolekcja warstw: filtr →
+  kategorie). Na wąskich ekranach (<1000 px) otwarcie jednego panelu chowa
+  drugi (toggleSidebar/toggleQuickbar — nie przełączać klas bezpośrednio).
+  Poza tym bottombar mobilny i modale (keys, gpx, poi-modal, poi-panel+chmura,
+  wms-modal, offline-modal, name-modal).
 - `layers.js` — katalog MAP_SOURCES (typy: xyz, wms [crs4326], esri [REST
   export], wm [wikimapia hash], combo [mapa zespolona]) + CATEGORY_ORDER
   + KEY_PROVIDERS. Licznik warstw wypisany też w index.html (meta+placeholder)

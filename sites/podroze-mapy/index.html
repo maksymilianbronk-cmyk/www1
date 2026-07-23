@@ -92,6 +92,22 @@
     <ul id="search-results" class="search-results"></ul>
   </div>
 
+  <!-- Szybki dostęp (lewy panel, chowany) -->
+  <aside id="quickbar" class="quickbar">
+    <div class="sb-head">
+      <strong>Szybki dostęp</strong>
+      <button id="qb-close" class="tb-btn" title="Zamknij"><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="qb-body">
+      <div id="quick-toggles" class="preset-chips"></div>
+      <div class="sb-presets-label">Profile map</div>
+      <div id="preset-chips" class="preset-chips"></div>
+    </div>
+  </aside>
+  <button id="qb-tab" class="qb-tab" title="Pokaż / schowaj szybki dostęp">
+    <svg class="ic"><use href="#i-chev-r"/></svg>
+  </button>
+
   <!-- Panel warstw (sidebar) -->
   <aside id="sidebar" class="sidebar">
     <div class="sb-head">
@@ -103,12 +119,6 @@
       <button id="btn-compare" class="tb-btn" title="Tryb porównywania dwóch map"><svg class="ic"><use href="#i-compare"/></svg></button>
       <button class="tb-btn act sb-keys" data-action="keys" title="Klucze API"><svg class="ic"><use href="#i-key"/></svg></button>
       <button id="sb-close" class="tb-btn" title="Zamknij"><svg class="ic"><use href="#i-x"/></svg></button>
-    </div>
-    <div class="sb-presets">
-      <div class="sb-presets-label">Szybki dostęp</div>
-      <div id="quick-toggles" class="preset-chips"></div>
-      <div class="sb-presets-label">Profile map</div>
-      <div id="preset-chips" class="preset-chips"></div>
     </div>
     <div class="sb-filter">
       <input id="layer-filter" type="text" placeholder="Filtruj 104 warstw… (topo, orto, szlaki…)" />
