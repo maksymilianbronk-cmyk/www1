@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skrzydła Furii 1939 — polska gra lotnicza</title>
+<meta name="description" content="Skrzydła Furii 1939 — arcade'owa gra lotnicza w stylu Wings of Fury. Pilotuj polskie samoloty kampanii wrześniowej: PWS-26, PZL P.7a, P.11c, Karaś i Łoś. Karabiny, bomby, torpedy, lądowanie na lotniskowcu.">
+<meta name="theme-color" content="#0d1117">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Oswald:wght@300;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <!-- ======================= MENU GŁÓWNE ======================= -->
+  <section class="screen show" id="screen-menu">
+    <div class="menu-bg"></div>
+    <div class="menu-inner">
+      <h1 class="title">
+        <span class="t1">SKRZYDŁA</span>
+        <span class="t2">FURII</span>
+        <span class="t3">1939</span>
+      </h1>
+      <p class="tagline">Kampania wrześniowa · od dwupłatowca PWS-26 do bombowca PZL.37 Łoś</p>
+      <nav class="menu-nav">
+        <button class="btn big" data-act="campaign">▸ KAMPANIA</button>
+        <button class="btn" data-act="missions">MISJE</button>
+        <button class="btn" data-act="controls">STEROWANIE</button>
+        <button class="btn" data-act="hangar">HANGAR</button>
+        <button class="btn" data-act="options">OPCJE</button>
+      </nav>
+      <p class="hint">Gra pełnoekranowa · klawiatura · dźwięk włącza się po pierwszym kliknięciu</p>
+    </div>
+  </section>
+
+  <!-- ======================= WYBÓR MISJI ======================= -->
+  <section class="screen" id="screen-missions">
+    <div class="panel wide">
+      <header class="panel-head">
+        <h2>DZIENNIK OPERACYJNY</h2>
+        <button class="btn small" data-act="back">‹ POWRÓT</button>
+      </header>
+      <div class="mission-grid" id="mission-grid"></div>
+      <footer class="panel-foot">
+        <span id="career-line">—</span>
+        <button class="btn small ghost" data-act="reset-progress">Skasuj postęp</button>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ======================= ODPRAWA ======================= -->
+  <section class="screen" id="screen-brief">
+    <div class="panel">
+      <div class="stamp">TAJNE</div>
+      <header class="panel-head">
+        <h2 id="brief-title">MISJA</h2>
+        <span class="date" id="brief-date"></span>
+      </header>
+      <div class="brief-body">
+        <div class="brief-col">
+          <h3>SYTUACJA</h3>
+          <p id="brief-text"></p>
+          <h3>ZADANIA</h3>
+          <ul id="brief-objectives"></ul>
+        </div>
+        <div class="brief-col">
+          <h3>TWOJA MASZYNA</h3>
+          <div class="plane-card">
+            <canvas id="brief-plane" width="420" height="150"></canvas>
+            <div id="plane-name" class="plane-name"></div>
+            <div id="plane-stats" class="plane-stats"></div>
+          </div>
+          <div class="brief-controls" id="brief-controls"></div>
+        </div>
+      </div>
+      <footer class="panel-foot">
+        <button class="btn small" data-act="back">‹ POWRÓT</button>
+        <button class="btn big" data-act="launch">START ▸</button>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ======================= STEROWANIE ======================= -->
+  <section class="screen" id="screen-controls">
+    <div class="panel">
+      <header class="panel-head"><h2>STEROWANIE</h2><button class="btn small" data-act="back">‹ POWRÓT</button></header>
+      <div class="controls-grid">
+        <div class="key-row"><kbd>◀</kbd><kbd>▶</kbd><div><b>Ster wysokości</b><span>Obrót maszyny. Pełna pętla pozwala zawrócić — tak jak w prawdziwym myśliwcu.</span></div></div>
+        <div class="key-row"><kbd>▲</kbd><div><b>Gaz</b><span>Zwiększa obroty silnika. Bez prędkości nie ma siły nośnej.</span></div></div>
+        <div class="key-row"><kbd>▼</kbd><div><b>Hamowanie</b><span>Zmniejsza gaz, wypuszcza klapy. Na ziemi hamuje koła.</span></div></div>
+        <div class="key-row"><kbd>SPACJA</kbd><div><b>Karabiny maszynowe</b><span>Ogień ciągły. Uwaga na przegrzanie luf i zapas amunicji.</span></div></div>
+        <div class="key-row"><kbd>CTRL</kbd><div><b>Bomby / torpedy</b><span>Zrzut uzbrojenia podwieszanego. Torpedę zrzucaj nisko nad wodą.</span></div></div>
+        <div class="key-row"><kbd>SHIFT</kbd><div><b>Ostry skręt</b><span>Ciasny wiraż kosztem prędkości.</span></div></div>
+        <div class="key-row"><kbd>L</kbd><div><b>Podwozie</b><span>Wypuszczenie/schowanie podwozia (wypuszcza się też samo nisko nad lotniskiem).</span></div></div>
+        <div class="key-row"><kbd>P</kbd> <kbd>ESC</kbd><div><b>Pauza</b><span>Zatrzymuje misję.</span></div></div>
+        <div class="key-row"><kbd>M</kbd><div><b>Dźwięk</b><span>Włącz / wycisz.</span></div></div>
+        <div class="key-row"><kbd>R</kbd><div><b>Restart misji</b><span>Przytrzymaj 1 s.</span></div></div>
+      </div>
+      <div class="tip-box">
+        <b>Lądowanie:</b> zejdź nad pas startowy lub pokład lotniskowca, wypuść podwozie, wyrównaj maszynę (prawie poziomo),
+        zmniejsz gaz i przyziem z prędkością poniżej 130 km/h. Po zatrzymaniu obsługa naziemna uzupełni amunicję,
+        bomby i paliwo oraz połata przestrzeliny.
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= HANGAR ======================= -->
+  <section class="screen" id="screen-hangar">
+    <div class="panel wide">
+      <header class="panel-head"><h2>HANGAR — POLSKIE LOTNICTWO 1939</h2><button class="btn small" data-act="back">‹ POWRÓT</button></header>
+      <div class="hangar-grid" id="hangar-grid"></div>
+    </div>
+  </section>
+
+  <!-- ======================= OPCJE ======================= -->
+  <section class="screen" id="screen-options">
+    <div class="panel">
+      <header class="panel-head"><h2>OPCJE</h2><button class="btn small" data-act="back">‹ POWRÓT</button></header>
+      <div class="opt-list">
+        <label class="opt"><span>Dźwięk</span><input type="checkbox" id="opt-sound" checked></label>
+        <label class="opt"><span>Głośność</span><input type="range" id="opt-volume" min="0" max="100" value="70"></label>
+        <label class="opt"><span>Jakość efektów</span>
+          <select id="opt-quality">
+            <option value="high">Wysoka (dużo cząsteczek)</option>
+            <option value="med">Średnia</option>
+            <option value="low">Niska (słabszy sprzęt)</option>
+          </select>
+        </label>
+        <label class="opt"><span>Trzęsienie ekranu</span><input type="checkbox" id="opt-shake" checked></label>
+        <label class="opt"><span>Drastyczność (ślady po trafieniach piechoty)</span><input type="checkbox" id="opt-gore" checked></label>
+        <label class="opt"><span>Poziom trudności</span>
+          <select id="opt-difficulty">
+            <option value="easy">Kadet — mniej ognia plot.</option>
+            <option value="normal" selected>Pilot — historyczny</option>
+            <option value="hard">As — bez taryfy ulgowej</option>
+          </select>
+        </label>
+        <label class="opt"><span>Pokazuj wskaźniki celów</span><input type="checkbox" id="opt-markers" checked></label>
+        <label class="opt"><span>Celownik bombowy (przewidywany punkt upadku)</span><input type="checkbox" id="opt-bombsight" checked></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= PAUZA ======================= -->
+  <section class="screen" id="screen-pause">
+    <div class="panel narrow">
+      <header class="panel-head"><h2>PAUZA</h2></header>
+      <div class="pause-objs" id="pause-objs"></div>
+      <footer class="panel-foot col">
+        <button class="btn big" data-act="resume">WRÓĆ DO LOTU</button>
+        <button class="btn" data-act="restart">POWTÓRZ MISJĘ</button>
+        <button class="btn ghost" data-act="abort">PRZERWIJ MISJĘ</button>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ======================= PODSUMOWANIE ======================= -->
+  <section class="screen" id="screen-debrief">
+    <div class="panel">
+      <header class="panel-head"><h2 id="debrief-title">RAPORT</h2></header>
+      <div class="debrief-body">
+        <div class="medal" id="debrief-medal"></div>
+        <table class="score-table" id="score-table"></table>
+        <p class="debrief-text" id="debrief-text"></p>
+      </div>
+      <footer class="panel-foot">
+        <button class="btn" data-act="retry">POWTÓRZ</button>
+        <button class="btn big" data-act="next">DALEJ ▸</button>
+      </footer>
+    </div>
+  </section>
+
+  <div id="toast"></div>
+  <button id="fs-btn" title="Pełny ekran">⛶</button>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/world.js"></script>
+<script src="js/art.js"></script>
+<script src="js/units.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/planes.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
