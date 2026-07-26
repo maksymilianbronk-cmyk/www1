@@ -154,6 +154,15 @@ Helpery, które warto mieć od razu: `slot()` (kadr na zdjęcie z zapasowym wzor
 `ba()` (suwak przed/po), `gal()` (kafelek z lightboxem), `faq()` + `faq_ld()`,
 `crumbs()` + `crumb_ld()`, `hero_page()`, `medart()`, `ecg()`.
 
+`build.py` to biblioteka — same moduły `pages*.py` zapisują pliki, więc
+przebudowa to `for f in pages1.py pages2.py pages3.py; do python3 $f; done`.
+Samo `python3 build.py` kończy się sukcesem i **nie generuje niczego** —
+łatwo uwierzyć, że poprawka weszła, kiedy nie weszła.
+
+**Nie wstawiaj stylów inline z `clamp()`/`calc()`.** Zrób klasę w CSS. Styl
+inline nikt nigdy nie przegląda, a jedna literówka w wyrażeniu wywala całą
+deklarację po cichu (patrz niżej).
+
 ## 7. SEO — pełna lista kontrolna
 
 - `title` ≤ 62 znaki, `description` 140–160 znaków, **unikalne na każdej podstronie**
@@ -224,12 +233,37 @@ Podgląd gałęzi roboczej bez wdrożenia:
   zamiast podstawiać przypadkowe stocki. Zapasowy wzór SVG w kadrze sprawia,
   że brak zdjęcia nie wygląda na błąd.
 
+## 11. Ciche awarie CSS
+
+Trzy błędy, które **nie dają żadnego komunikatu** — strona po prostu wygląda
+źle, a Ty widzisz to dopiero na zrzucie od klienta:
+
+1. **Nieprawidłowa matematyka w `clamp()`/`calc()`.** W CSS `+` i `-` muszą
+   mieć spację po obu stronach. `clamp(1.2rem,1rem+1vw,1.8rem)` jest nieważne
+   → cała deklaracja `padding` znika → tekst przykleja się do krawędzi karty.
+   `*` i `/` spacji nie wymagają, co dodatkowo usypia czujność.
+2. **Kolizja specyficzności przy pozycjonowaniu** — patrz sekcja 5, pułapka 1.
+3. **Animacja nadpisująca własność sterowaną z JS** — patrz sekcja 5, pułapka 2.
+
+Na pierwszy z nich jest test: `scripts/css-nieważne.js` przepuszcza **każdą**
+deklarację (z arkuszy i ze stylów inline) przez CSSOM i zgłasza te, których
+przeglądarka nie przyjęła. Uruchamiaj po każdej zmianie stylów — trwa kilka
+sekund i wyłapuje literówki, których nie widać w kodzie.
+
+Zasada nadrzędna: **jeśli błąd skaluje się z czymś, czego nie mierzysz, nie
+zobaczysz go.** Dlatego audyt chodzi po czterech szerokościach, a
+`scripts/szerokie-ekrany.js` porównuje wysokość dokumentu i każdej sekcji
+przy 1440 i 7600 px. Sekcja wysoka od treści to nie błąd — błędem jest sekcja,
+która **rośnie razem z szerokością okna**.
+
 ## Pliki pomocnicze
 
 - `references/ikony.md` — pełny zestaw 50 ikon dwutonowych do skopiowania
 - `references/animacje.md` — gotowe bloki CSS/JS wszystkich efektów
 - `references/grafika.md` — generatory scen SVG (heksagony, fale, warstwy skóry)
-- `scripts/audyt.js` — audyt Playwright: N stron × 3 viewporty
+- `scripts/audyt.js` — audyt Playwright: N stron × 4 viewporty (z 2560 px)
+- `scripts/css-nieważne.js` — wykrywa deklaracje odrzucone przez przeglądarkę
+- `scripts/szerokie-ekrany.js` — układ rosnący z szerokością okna
 - `scripts/kontrast.py` — kalkulator WCAG dla palety
 - `scripts/miniatury_og.py` — generator miniatur Open Graph 1200×630
 - `scripts/przygotuj_zdjecia.py` — kadrowanie, rozcinanie kolaży „przed/po",
