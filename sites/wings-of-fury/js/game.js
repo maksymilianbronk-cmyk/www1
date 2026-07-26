@@ -708,7 +708,8 @@ function drawPlanePreview(cv, key, scale) {
   c.fillStyle = g; c.fillRect(0, 0, w, h);
   c.save();
   c.translate(w / 2, h / 2 + 6);
-  const s = scale || Math.min(w / 118, h / 52);
+  const L = (PLANES[key] && PLANES[key].lenM ? PLANES[key].lenM : 8) * 9;
+  const s = scale || Math.min(w / (L * 1.2), h / 46);
   c.scale(s, s);
   Art.plane(c, key, { gear: 1, prop: 0.6 });
   c.restore();
@@ -732,7 +733,7 @@ function buildHangar() {
         .map(b => `<div class="bar"><span>${b[0]}</span><i><s style="width:${Math.round(b[1] * 100)}%"></s></i></div>`).join('')}
       </div>`;
     grid.appendChild(el);
-    drawPlanePreview(el.querySelector('canvas'), key, 2.1);
+    drawPlanePreview(el.querySelector('canvas'), key, 1.9);
   }
 }
 

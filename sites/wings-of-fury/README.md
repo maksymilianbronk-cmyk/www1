@@ -16,6 +16,7 @@ rysowana ścieżkami canvas, dźwięk syntezowany przez WebAudio.
 | CTRL (lub Z) | zrzut bomby albo torpedy |
 | SHIFT | ostry wiraż (kosztem prędkości) |
 | L | podwozie |
+| ← → (postój) | zawracanie maszyny na kołach o 180° — start w przeciwną stronę |
 | P / ESC | pauza · M — dźwięk · R (przytrzymaj) — restart misji |
 
 ## Pliki
@@ -61,6 +62,16 @@ płaskie przyziemienie poza lotniskiem to **przymusowe lądowanie w polu** —
 maszyna zostaje uszkodzona, ale pilot żyje i może startować dalej (uzbrojenie
 uzupełnia tylko obsługa naziemna na prawdziwym lotnisku). Na pokładzie
 lotniskowca hak chwyta liny hamujące.
+
+## Sylwetki maszyn
+
+Rysunki boczne odwzorowują proporcje z monografii (Militaria 615 „1939"): skala
+**9 px = 1 m**, więc Łoś (12,92 m) jest w grze realnie dłuższy od P.11c (7,55 m),
+a He 111 (16,4 m) góruje nad wszystkim. Malowanie zgodne z 1939 r. — polskie khaki
+z błękitem od spodu i szachownicami, niemiecki splinter z krzyżami. Widoczne są
+cechy rozpoznawcze: mewie skrzydło P.7a/P.11c, długa oszklona kabina i owiewki
+podwozia Karasia, przeszklony nos i podwójne usterzenie Łosia, odwrócona mewa
+i „spodenki" Ju 87, w pełni oszklony nos He 111.
 
 ## Misje
 

@@ -22,6 +22,7 @@ const HUD = {
     this.messages(ctx, W, H, G, s);
     this.killFeed(ctx, W, H, G, s);
     this.landingCue(ctx, W, H, G, P, s);
+    this.taxiCue(ctx, W, H, G, P, s);
 
     ctx.restore();
   },
@@ -376,6 +377,19 @@ const HUD = {
       ctx.fillStyle = `rgba(216,178,74,${a})`;
       ctx.fillText(f.text, W - 16 * s, 24 * s + i * 17 * s);
     });
+    ctx.textAlign = 'left';
+  },
+
+  /* --- podpowiedź przy kołowaniu --- */
+  taxiCue(ctx, W, H, G, P, s) {
+    if (!P.alive || !P.onGround || Math.abs(P.vx) > 45) return;
+    const txt = P.turning ? 'ZAWRACANIE…' : '← →  zawróć maszynę    ↑  gaz do startu';
+    ctx.font = this.F(12.5 * s);
+    ctx.textAlign = 'center';
+    const w = ctx.measureText(txt).width + 26 * s;
+    this.panel(ctx, W / 2 - w / 2, H * 0.72, w, 24 * s, 0.5);
+    ctx.fillStyle = P.turning ? '#d8b24a' : '#cfcabb';
+    ctx.fillText(txt, W / 2, H * 0.72 + 12 * s);
     ctx.textAlign = 'left';
   },
 
