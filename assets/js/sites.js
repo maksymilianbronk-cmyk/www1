@@ -17,6 +17,20 @@
  */
 const SITES = [
   {
+    slug: "dormed-busko",
+    title: "Dormed Medical SPA — Busko-Zdrój",
+    desc: "Redesign dormedbusko.pl (lead: hotelarstwo + rehabilitacja + medycyna estetyczna, Busko-Zdrój) — Klinika Zdrowia i Urody dr n. med. Doroty Sagan. Wielostronicowy serwis premium w oryginalnej kolorystyce marki: głębokie bordo #6E1533 przeplatane szampańskim złotem #C9A15B i jasną kością słoniową/piaskiem, typografia Cormorant Garamond + Manrope. 10 podstron — Start, Ośrodek (pokoje, udogodnienia, galeria, okolica), Rehabilitacja i balneologia (fizykoterapia, kąpiele siarczkowe/borowinowe/kolagenowe, masaże), Medycyna estetyczna, Kosmetologia i podologia, Masaże orientalne, Pakiety pobytowe, Cennik z wyszukiwarką zabiegów, O klinice, Kontakt (formularz mailto + mapa Google). Autorski sprite ~45 ikon SVG (styl stroke, zero emoji), logo SVG odtworzone w kolorach marki z automatyczną wersją białą na ciemnych tłach (filter), sloty na oryginalne zdjęcia z eleganckim wzorem SVG jako fallback (topo/rings/waves/botanic), animacje reveal + stagger na IntersectionObserver, parallax, liczniki, pasek postępu przewijania, fullscreen menu mobilne, mobilny pasek akcji (Zadzwoń/Rezerwuj/Dojazd). SEO: unikalne title/description, canonical, Open Graph + Twitter Card, JSON-LD (MedicalClinic + HealthAndBeautyBusiness + LodgingBusiness, FAQPage, BreadcrumbList, MedicalTherapy, ContactPage, AggregateRating 8,3/106), sitemap.xml, robots.txt. Audyt Playwright 10 stron × 3 viewporty (1440/820/390), cele dotykowe 44px+, safe-area, prefers-reduced-motion. Prawdziwe dane: ul. Jana Rokosza 5, 28-100 Busko-Zdrój, tel. 41 378 23 18, 600 454 635, 604 596 473, 606 430 365, dormedbusko@gmail.com, FB /dormedbusko, IG @dormed_medical_spa.",
+    icon: "🌿",
+    tag: "landing",
+    status: "klient-w-trakcie",
+    preview: true,
+    meta: {
+      colors: ["#6E1533", "#3E0A1E", "#C9A15B", "#F4EAE3", "#FFFCFA"],
+      fonts: ["Cormorant Garamond", "Manrope"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "JSON-LD", "Playwright"],
+    },
+  },
+  {
     slug: "podroze-mapy",
     title: "Trasa — mapy podróżnicze",
     desc: "Podróżnicza aplikacja mapowa inspirowana Locus Pro / OsmAnd / Geoportalem: 104 warstw map do przełączania (OSM, topo/outdoor, satelity Esri/Google/NASA/Sentinel, Geoportal WMTS+WMS z ortofotomapą i działkami, mapy krajowe CH/AT/NO/FR/ES/DE, mapy sztabowe „Genshtab”, nakładki szlaków Waymarked, kolei, morza i pogody). Profile map (zapisywane zestawy bazowa+nakładki), tryb porównywania dwóch map z przeciąganym uchwytem, kategoria ostatnio używanych, manager warstw z filtrem, ulubionymi i testem dostępności ⚡. Nakładka Wikimapia w dwóch wariantach (https przez wsrv.nl + bezpośrednia, hash subdomen i0–i15 jak w SAS.Planet) z profilami Google+Wikimapia. Menedżer POI: 9 kategorii, kolorowe piny SVG, notatki, long-press na mapie, lista sortowana odległością, undo usuwania, eksport/import GPX i GeoJSON, foldery punktów z licznikami oraz chmura GitHub — konta użytkowników i baza plików POI w repo (gałąź poi-db, auto-sync przez Contents API, publiczne przeglądanie bazy). Dodawanie własnych map WMS/XYZ z poziomu aplikacji, mapy historyczne (WIG, Messtischblätter, sztabówki ZSRR 25k/50k/100k, USGS, NLS), szybki przełącznik cieniowania ISOK 1m (WMS w EPSG:4326 — usługi NMT nie znają 3857), wizualizacja BDOT10k (ArcGIS REST, potwierdzona), reset widoku warstw, import/eksport KML i KMZ (własny czytnik ZIP), bufor kafelków offline z panelem zawartości per serwer i pobieraniem obszaru, zdalny katalog aktualizacji map (catalog/extra.json na gałęzi poi-db) oraz konta login+hasło na tokenie aplikacji. Cały interfejs na autorskim sprite 40+ ikon SVG (styl stroke, zero emoji). GPS ze śledzeniem, pomiar, wyszukiwarka Nominatim, klucze API per dostawca. Wersja mobilna po audycie: dolny pasek akcji, cele dotykowe 44px+, safe-area, haptyka. PWA gotowe pod aplikację Android; katalog warstw to inżynieria wsteczna pakietów onlinemapsources.xml, AnyGIS i melda.ru (ANALIZA.md).",

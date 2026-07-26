@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 92" role="img" aria-label="DORMED Medical SPA">
+  <title>DORMED Medical SPA</title>
+  <g>
+    <circle cx="46" cy="46" r="40" fill="none" stroke="#C9A15B" stroke-width="1.4"/>
+    <circle cx="46" cy="46" r="34" fill="none" stroke="#C9A15B" stroke-width=".7" opacity=".6"/>
+    <path d="M46 18c7.6 8.6 11.5 15.3 11.5 21.9 0 6.8-3.9 12.6-11.5 18.3-7.6-5.7-11.5-11.5-11.5-18.3C34.5 33.3 38.4 26.6 46 18Z" fill="#6E1533"/>
+    <path d="M46 30.5c3.1 3.9 4.6 6.9 4.6 9.7 0 2.9-1.5 5.4-4.6 8-3.1-2.6-4.6-5.1-4.6-8 0-2.8 1.5-5.8 4.6-9.7Z" fill="#C9A15B"/>
+    <path d="M27 65c5.6 4.3 11.8 6.4 19 6.4S59.4 69.3 65 65" fill="none" stroke="#6E1533" stroke-width="2.9" stroke-linecap="round"/>
+  </g>
+  <g fill="#6E1533" font-family="'Cormorant Garamond','Times New Roman',Georgia,serif">
+    <text x="104" y="49" font-size="36" font-weight="700" letter-spacing="6.5">DORMED</text>
+  </g>
+  <g fill="#9A7534" font-family="'Manrope','Segoe UI',system-ui,sans-serif">
+    <text x="106" y="68" font-size="11" font-weight="700" letter-spacing="6.2">MEDICAL SPA</text>
+  </g>
+  <line x1="104" y1="57" x2="286" y2="57" stroke="#C9A15B" stroke-width=".9" opacity=".8"/>
+</svg>
