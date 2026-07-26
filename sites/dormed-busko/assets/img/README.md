@@ -30,6 +30,17 @@ z gabinetów Dormed Medical SPA) albo zostały z nich wygenerowane.
 | `masaz-plecy.jpg` | masaż leczniczy kręgosłupa | galeria Rehabilitacji |
 | `masaz-orientalny.jpg` | kadr z plakatu „Relax" | nagłówek Masaży orientalnych |
 | `plakat-relax.jpg` | plakat masażu marokańskiego | Masaże orientalne (lightbox) |
+| `dr-dorota-sagan.jpg` | portret założycielki z podpisem | sekcja O klinice |
+| `plakat-pq-age.jpg` | plakat PQ Age Evolution | Kosmetologia (lightbox) |
+| `kriolipoliza-cooltech.jpg` | aplikator CoolTech w trakcie zabiegu | Kosmetologia — sylwetka |
+| `lipolaser.jpg` | laserowe modelowanie sylwetki | Kosmetologia — sylwetka |
+| `pokoj-2os.jpg`, `pokoj-twin.jpg` | pokój dwuosobowy | Ośrodek, galeria, kafelek |
+| `pokoj-1os.jpg` | pokój z biurkiem i czajnikiem | galeria Ośrodka |
+| `lazienka.jpg`, `lazienka-2.jpg` | łazienka z kabiną i ręcznikami | Ośrodek, galeria |
+| `prysznic.jpg` | kabina prysznicowa | galeria Ośrodka |
+| `wanna-chromoterapia.jpg` | wanna z chromoterapią | Ośrodek (sekcja łazienek), galeria |
+| `loze-dormed.jpg` | pościel z haftowanym logo kliniki | Ośrodek, galeria |
+| `budynek-dormed-2.jpg` | budynek, drugie ujęcie | galeria Ośrodka |
 
 ## Metamorfozy „przed / po"
 
@@ -42,6 +53,8 @@ interaktywny suwak porównawczy na podstronie *Medycyna estetyczna*:
 | `ba-usta2-przed.jpg` / `ba-usta2-po.jpg` | zmarszczki wokół ust, czerwień wargowa |
 | `ba-oko-przed.jpg` / `ba-oko-po.jpg` | okolica oczu |
 | `ba-zmarszczki-przed.jpg` / `ba-zmarszczki-po.jpg` | policzek i szyja |
+| `ba-policzek-przed.jpg` / `ba-policzek-po.jpg` | policzek i kurze łapki |
+| `ba-sylwetka-przed.jpg` / `ba-sylwetka-po.jpg` | modelowanie sylwetki |
 
 > **Ważne:** zdjęcia pacjentów publikujemy przy adnotacji o zgodzie i indywidualnym
 > charakterze efektu. Przed publikacją produkcyjną upewnij się, że klient dysponuje
@@ -54,12 +67,11 @@ więc **nic nie wygląda na zepsute**. Wystarczy wrzucić plik o podanej nazwie,
 
 | Plik | Co warto sfotografować |
 |---|---|
-| `pokoj-1.jpg`, `pokoj-2.jpg` | pokój 1- i 2-osobowy |
 | `recepcja.jpg` | recepcja i strefa wypoczynku |
 | `taras.jpg` | taras |
 | `jadalnia.jpg` | jadalnia / bufet śniadaniowy |
-| `dr-dorota-sagan.jpg` | portret dr n. med. Doroty Sagan (pionowy) |
 | `busko-park.jpg` | Nowy Park Zdrojowy lub tężnia |
+| `fryzjer.jpg` | stanowisko fryzjerskie |
 
 ## Wskazówki techniczne
 
