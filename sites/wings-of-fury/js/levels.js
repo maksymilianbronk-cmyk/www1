@@ -80,6 +80,7 @@ const MISSIONS = [
     ],
     waves: [
       { t: 4, fn: G => { G.toast('Wieża: Sztukasy nad lotniskiem! Start natychmiast!'); Audio2.alarm(); } },
+      { t: 14, fn: G => { G.spawnFriendly('p7a', { x: 1400, y: 700, dir: 1 }); G.toast('Skrzydłowy w powietrzu — trzymaj się blisko'); } },
       { t: 8, fn: G => { for (let i = 0; i < 2; i++) G.spawnEnemy('stuka', { x: 5200 + i * 420, y: 1250, dir: -1, ai: 'stuka', targetX: 1600 }); } },
       { t: 34, fn: G => { for (let i = 0; i < 2; i++) G.spawnEnemy('stuka', { x: 5600 + i * 400, y: 1350, dir: -1, ai: 'stuka', targetX: 2400 }); } },
       { t: 58, fn: G => { G.spawnEnemy('bf109', { x: 6200, y: 1500, dir: -1, ai: 'fighter' }); G.toast('Uwaga — myśliwce eskorty!'); } },
@@ -251,7 +252,9 @@ const MISSIONS = [
     waves: [
       { t: 5, fn: G => { G.toast('Dowództwo: wyprawa bombowa na kursie 270. Start!'); Audio2.alarm(); } },
       { t: 20, fn: G => { for (let i = 0; i < 2; i++) G.spawnEnemy('he111', { x: 10800 + i * 500, y: 1800, dir: -1, ai: 'bomber', targetX: 3900 + i * 300, alt: 1800 }); } },
+      { t: 30, fn: G => { G.spawnFriendly('p11c', { x: 2600, y: 1100, dir: 1 }); G.toast('Klucz por. Skalskiego dołącza do walki'); } },
       { t: 55, fn: G => { G.spawnEnemy('bf109', { x: 10600, y: 2000, dir: -1, ai: 'fighter' }); } },
+      { t: 95, fn: G => { G.spawnFriendly('p11c', { x: 2400, y: 1300, dir: 1 }); } },
       { t: 80, fn: G => { for (let i = 0; i < 2; i++) G.spawnEnemy('he111', { x: 11000 + i * 460, y: 1900, dir: -1, ai: 'bomber', targetX: 4200 + i * 260, alt: 1900 }); } },
       { t: 110, fn: G => { G.spawnEnemy('bf109', { x: 11200, y: 2100, dir: -1, ai: 'fighter' }); } },
       { t: 150, fn: G => { G.spawnEnemy('he111', { x: 11200, y: 1750, dir: -1, ai: 'bomber', targetX: 4000, alt: 1750 }); } },
@@ -355,6 +358,7 @@ const MISSIONS = [
     waves: [
       { t: 70, fn: G => { G.spawnEnemy('bf109', { x: 12600, y: 1500, dir: -1, ai: 'fighter' }); G.warn('Myśliwce!'); } },
       { t: 150, fn: G => { G.spawnEnemy('bf109', { x: 300, y: 1500, dir: 1, ai: 'fighter' }); } },
+      { t: 165, fn: G => { G.spawnFriendly('p11c', { x: 2000, y: 1200, dir: 1 }); G.toast('Osłona myśliwska nad przeprawą'); } },
       { t: 210, fn: G => { G.spawnEnemy('bf110', { x: 12800, y: 1700, dir: -1, ai: 'fighter' }); } },
       { t: 280, fn: G => { G.spawnEnemy('stuka', { x: 12400, y: 1400, dir: -1, ai: 'stuka', targetX: 1400 }); G.warn('Sztukasy lecą na nasze lotnisko!'); } },
       { t: 330, fn: G => { G.spawnEnemy('bf109', { x: 12900, y: 1600, dir: -1, ai: 'fighter' }); } },

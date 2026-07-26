@@ -72,6 +72,18 @@ class Unit {
     return px > b.x0 - pad && px < b.x1 + pad && py > b.y0 - pad && py < b.y1 + pad;
   }
 
+  /** Samolot, do którego ta jednostka strzela (nasze działa biją w Niemców). */
+  targetPlane(G) {
+    if (this.team !== 'pol') return G.player && G.player.alive ? G.player : null;
+    let best = null, bd = Infinity;
+    for (const p of G.planes) {
+      if (!p.alive || p.team === 'pol') continue;
+      const d = dist2(this.x, this.y, p.x, p.y);
+      if (d < bd) { bd = d; best = p; }
+    }
+    return best;
+  }
+
   /* ------------------------ logika ------------------------ */
   update(dt, G) {
     this.animT += dt;
@@ -79,7 +91,7 @@ class Unit {
 
     if (this.dead) { this.updateDead(dt, G); return; }
 
-    const P = G.player;
+    const P = this.targetPlane(G);
     // ustaw na terenie
     if (!this.ship && this.type !== 'balloon') this.y = G.world.groundAt(this.x);
 
@@ -108,6 +120,15 @@ class Unit {
   }
 
   updateInfantry(dt, G, P) {
+    if (!P) {
+      this.state = 'walk';
+      this.x += this.dir * this.speed * dt;
+      if (this.patrol) {
+        if (this.x < this.patrol[0]) { this.x = this.patrol[0]; this.dir = 1; }
+        if (this.x > this.patrol[1]) { this.x = this.patrol[1]; this.dir = -1; }
+      }
+      return;
+    }
     const dToP = Math.abs(P.x - this.x);
     const lowPass = P.y - G.world.groundAt(P.x) < 500 && dToP < 700;
     if (lowPass && !this.panic) { this.panic = true; this.state = 'run'; this.dir = sign(this.x - P.x) || 1; this.speed = rnd(74, 52); }
@@ -122,7 +143,7 @@ class Unit {
       const a = Math.atan2(P.y + P.vy * 0.25 - (this.y + 16), P.x + P.vx * 0.25 - this.x);
       G.spawnBullet({
         x: this.x + Math.cos(a) * 10, y: this.y + 16 + Math.sin(a) * 10,
-        vx: Math.cos(a) * 900, vy: Math.sin(a) * 900, dmg: 2.2 * diffMul().dmg, team: 'ger', kind: 'rifle', life: 1.4,
+        vx: Math.cos(a) * 900, vy: Math.sin(a) * 900, dmg: 2.2 * diffMul().dmg, team: this.team, kind: 'rifle', life: 1.4,
       });
       Particles.spark(this.x + Math.cos(a) * 12, this.y + 16 + Math.sin(a) * 12, 2, { dir: a, spread: 0.3, spd: 90 });
       setTimeout(() => { if (!this.dead) this.state = this.panic ? 'run' : 'walk'; }, 340);
@@ -139,6 +160,7 @@ class Unit {
 
   updateTank(dt, G, P) {
     this.updateVehicle(dt, G, 26);
+    if (!P) { this.gunAngle = approach(this.gunAngle, 0.5, dt); return; }
     // wieża śledzi samolot i strzela rzadko
     const dx = P.x - this.x, dy = P.y - (this.y + 20);
     const range = 900;
@@ -152,7 +174,7 @@ class Unit {
         const a = Math.atan2(dy, dx);
         G.spawnBullet({
           x: this.x + Math.cos(a) * 24, y: this.y + 20 + Math.sin(a) * 24,
-          vx: Math.cos(a) * 1250, vy: Math.sin(a) * 1250, dmg: 7 * diffMul().dmg, team: 'ger', kind: 'mg', life: 1.6,
+          vx: Math.cos(a) * 1250, vy: Math.sin(a) * 1250, dmg: 7 * diffMul().dmg, team: this.team, kind: 'mg', life: 1.6,
         });
         Particles.flash(this.x + Math.cos(a) * 26, this.y + 20 + Math.sin(a) * 26, 9, 0.08);
         Audio2.gun(0.4);
@@ -174,6 +196,7 @@ class Unit {
 
   updateFlak(dt, G, P) {
     const D = diffMul();
+    if (!P) { this.gunAngle = approach(this.gunAngle, 1.1, dt * 0.6); this.burst = 0; return; }
     const dx = P.x - this.x, dy = P.y - (this.y + 14);
     const d = Math.hypot(dx, dy);
     const range = this.type === 'flak88' ? 2400 : 1500;
@@ -196,12 +219,13 @@ class Unit {
         const spread = (this.type === 'flak88' ? 0.055 : 0.035) / D.aa;
         const aa = a + rnd(spread, -spread);
         if (this.type === 'flak88') {
+          this._flakTarget = P;
           G.spawnFlakShell(this.x, this.y + 16, aa, d, this);
         } else {
           G.spawnBullet({
             x: this.x + Math.cos(aa) * 20, y: this.y + 16 + Math.sin(aa) * 20,
             vx: Math.cos(aa) * shellV, vy: Math.sin(aa) * shellV,
-            dmg: 5.5 * D.dmg, team: 'ger', kind: 'flak', life: 2.2, tracer: true,
+            dmg: 5.5 * D.dmg, team: this.team, kind: 'flak', life: 2.2, tracer: true,
           });
         }
         Particles.flash(this.x + Math.cos(aa) * 22, this.y + 16 + Math.sin(aa) * 22, this.type === 'flak88' ? 16 : 9, 0.07);
@@ -216,6 +240,7 @@ class Unit {
   }
 
   updateBunker(dt, G, P) {
+    if (!P) return;
     const dx = P.x - this.x, dy = P.y - (this.y + 16);
     const d = Math.hypot(dx, dy);
     if (!P.alive || d > 1000) return;
@@ -230,7 +255,7 @@ class Unit {
           if (this.dead || !G.running) return;
           G.spawnBullet({
             x: this.x + Math.cos(aa) * 18, y: this.y + 16 + Math.sin(aa) * 18,
-            vx: Math.cos(aa) * 1100, vy: Math.sin(aa) * 1100, dmg: 3.4 * diffMul().dmg, team: 'ger', kind: 'mg', life: 1.6, tracer: true,
+            vx: Math.cos(aa) * 1100, vy: Math.sin(aa) * 1100, dmg: 3.4 * diffMul().dmg, team: this.team, kind: 'mg', life: 1.6, tracer: true,
           });
         }, i * 70);
       }
@@ -239,12 +264,8 @@ class Unit {
 
   updateShip(dt, G, P) {
     this.y = Math.sin(this.animT * 0.6) * 2;
-    if (this.speed) {
-      this.x += this.dir * this.speed * dt;
-      if (this.x < 300 || this.x > G.world.width - 300) this.dir *= -1;
-      if (chance(dt * 8)) Particles.wake(this.x - this.dir * this.len / 2, 2);
-      if (chance(dt * 3)) Particles.smoke(this.x + this.dir * this.len * 0.05, 48, { col: '#4a463f', dens: 0.5, sizeMul: 1.4 });
-    }
+    if (!P) { this.updateShipMove(dt, G); return; }
+    this.updateShipMove(dt, G);
     // artyleria plot. okrętu
     const dx = P.x - this.x, dy = P.y - this.y;
     const d = Math.hypot(dx, dy);
@@ -264,12 +285,20 @@ class Unit {
           const ox = rnd(this.len * 0.35, -this.len * 0.35);
           G.spawnBullet({
             x: this.x + ox, y: this.y + 26, vx: Math.cos(aa) * shellV, vy: Math.sin(aa) * shellV,
-            dmg: 5 * diffMul().dmg, team: 'ger', kind: 'flak', life: 2.2, tracer: true,
+            dmg: 5 * diffMul().dmg, team: this.team, kind: 'flak', life: 2.2, tracer: true,
           });
           Particles.flash(this.x + ox, this.y + 28, 10, 0.06);
         }, i * 110);
       }
     }
+  }
+
+  updateShipMove(dt, G) {
+    if (!this.speed) return;
+    this.x += this.dir * this.speed * dt;
+    if (this.x < 300 || this.x > G.world.width - 300) this.dir *= -1;
+    if (chance(dt * 8)) Particles.wake(this.x - this.dir * this.len / 2, 2);
+    if (chance(dt * 3)) Particles.smoke(this.x + this.dir * this.len * 0.05, 48, { col: '#4a463f', dens: 0.5, sizeMul: 1.4 });
   }
 
   updateCarrier(dt, G) {
@@ -464,7 +493,7 @@ class Wreck {
     if (!this.onScreen) return;
     this.smokeT -= dt;
     if (this.smokeT <= 0) {
-      this.smokeT = rnd(0.55, 0.28) / Math.max(0.4, intensity);
+      this.smokeT = rnd(0.36, 0.18) / Math.max(0.4, intensity);
       Particles.smoke(this.x + rnd(this.w * 0.2, -this.w * 0.2), this.y + 8 + rnd(8), {
         col: this.t > 40 ? '#3d3a34' : '#2a2723', sizeMul: 0.7 + intensity * 0.5,
         dens: 0.8, alpha: 0.38, lifeMul: 1.15,
@@ -490,6 +519,77 @@ class Wreck {
       ctx.beginPath(); ctx.moveTo(55, -10); ctx.lineTo(24, 22); ctx.lineTo(14, 20); ctx.lineTo(48, -2); ctx.closePath(); ctx.fill();
     } else {
       Art.wreck(ctx, this);
+    }
+    ctx.restore();
+  }
+}
+
+/* =========================================================================
+   SPADOCHRONIARZ — pilot, który wyskoczył z płonącej maszyny
+   ========================================================================= */
+class Parachute {
+  constructor(x, y, team, world) {
+    this.x = x; this.y = y; this.team = team;
+    this.vx = rnd(30, -30); this.vy = 60;
+    this.open = 0; this.t = 0; this.landed = false; this.remove = false;
+    this.swing = rnd(TAU);
+    this.wind = world ? world.wind : 0;
+  }
+  update(dt, G) {
+    this.t += dt;
+    if (this.landed) {
+      // po wylądowaniu odchodzi w bok i znika za horyzontem zdarzeń misji
+      this.x += sign(this.vx || 1) * 26 * dt;
+      this.y = G.world.groundAt(this.x);
+      if (this.t > 40) this.remove = true;
+      return;
+    }
+    this.open = Math.min(1, this.open + dt * 1.6);
+    this.swing += dt * 1.6;
+    const drag = 0.4 + this.open * 5.2;
+    this.vy += (-GRAV + drag * 42) * dt;
+    this.vy = clamp(this.vy, -220, 90);
+    if (this.open > 0.5) this.vy = approach(this.vy, -34, dt * 90);
+    this.vx = approach(this.vx, this.wind * 1.4, dt * 12);
+    this.x += (this.vx + Math.sin(this.swing) * 12 * this.open) * dt;
+    this.y += this.vy * dt;
+    const g = G.world.surfaceAt(this.x);
+    if (this.y <= g + 8) {
+      this.y = g; this.landed = true; this.t = 0;
+      if (G.world.isWater(this.x)) { Particles.water(this.x, 0, 10, { spd: 120 }); this.remove = true; }
+    }
+  }
+  draw(ctx, W, H, G) {
+    if (this.x < G.viewX0 - 80 || this.x > G.viewX1 + 80) return;
+    const z = Cam.zoom;
+    ctx.save();
+    ctx.translate(Cam.sx(this.x, W), Cam.sy(this.y, H));
+    ctx.scale(z, z);
+    if (!this.landed) {
+      const sw = Math.sin(this.swing) * 0.16 * this.open;
+      ctx.rotate(sw);
+      const r = 16 * this.open;
+      if (this.open > 0.05) {
+        ctx.fillStyle = this.team === 'pol' ? '#e6e2d4' : '#d9d4c4';
+        ctx.beginPath(); ctx.arc(0, -30, r, Math.PI, TAU); ctx.fill();
+        ctx.fillStyle = 'rgba(0,0,0,.12)';
+        ctx.beginPath(); ctx.arc(0, -30, r, Math.PI * 1.5, TAU); ctx.fill();
+        ctx.strokeStyle = 'rgba(230,226,212,.75)'; ctx.lineWidth = 0.7;
+        for (const dx of [-r * 0.85, -r * 0.3, r * 0.3, r * 0.85]) {
+          ctx.beginPath(); ctx.moveTo(dx, -30); ctx.lineTo(0, -10); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = '#4a4f3a';
+      ctx.fillRect(-2.4, -10, 4.8, 8);
+      ctx.fillStyle = '#3c4130';
+      ctx.beginPath(); ctx.arc(0, -11.5, 2.6, 0, TAU); ctx.fill();
+      ctx.strokeStyle = '#3c4130'; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, -2); ctx.lineTo(-2.6 + Math.sin(this.swing) * 1.6, 4);
+      ctx.moveTo(0, -2); ctx.lineTo(2.6 - Math.sin(this.swing) * 1.6, 4);
+      ctx.stroke();
+    } else {
+      Art.soldier(ctx, { dir: sign(this.vx) || 1, animT: this.t, state: 'run', color: '#4a4f3a', helmet: '#3c4130' });
     }
     ctx.restore();
   }

@@ -7,7 +7,7 @@ class Bullet {
   constructor(o) {
     Object.assign(this, {
       x: 0, y: 0, vx: 0, vy: 0, life: 1.6, dmg: 4, team: 'pol', kind: 'mg',
-      tracer: true, dead: false, px: o.x, py: o.y, grav: 0,
+      tracer: true, dead: false, px: o.x, py: o.y, grav: 0, owner: null,
     }, o);
     if (this.kind === 'rifle') this.grav = 45;
     if (this.kind === 'flak') this.grav = 80;
@@ -38,7 +38,7 @@ class Bullet {
     if (this.team === 'pol') {
       for (const u of G.units) {
         if (u.dead || u.remove) continue;
-        if (u.type === 'carrier') continue;
+        if (u.type === 'carrier' || u.team === this.team) continue;
         if (u.contains(this.x, this.y, 2)) {
           const killed = u.hit(this.dmg, this.x, this.y, G, 'guns');
           G.stats.hits++;
@@ -49,7 +49,7 @@ class Bullet {
       for (const p of G.planes) {
         if (p === G.player || !p.alive || p.team === 'pol') continue;
         if (dist2(this.x, this.y, p.x, p.y) < p.hitR * p.hitR) {
-          p.hit(this.dmg, this.x, this.y, G, G.player);
+          p.hit(this.dmg, this.x, this.y, G, this.owner);
           G.stats.hits++;
           Particles.spark(this.x, this.y, 4, { spd: 200, col: '#ffd7a0' });
           Audio2.hitMetal();
@@ -57,6 +57,10 @@ class Bullet {
         }
       }
     } else {
+      for (const u of G.units) {
+        if (u.dead || u.remove || u.team === this.team || u.type === 'carrier') continue;
+        if (u.contains(this.x, this.y, 2)) { u.hit(this.dmg, this.x, this.y, G, 'guns'); this.dead = true; return; }
+      }
       const p = G.player;
       if (p.alive && dist2(this.x, this.y, p.x, p.y) < p.hitR * p.hitR) {
         p.hit(this.dmg, this.x, this.y, G, null);
@@ -98,6 +102,8 @@ class Bullet {
 class FlakShell {
   constructor(x, y, a, fuseDist, owner) {
     this.x = x; this.y = y;
+    this.team = owner ? owner.team : 'ger';
+    this.target = owner ? owner._flakTarget : null;
     const v = 1500;
     this.vx = Math.cos(a) * v; this.vy = Math.sin(a) * v;
     this.dist = 0; this.fuse = fuseDist * rnd(1.12, 0.86);
@@ -121,13 +127,13 @@ class FlakShell {
     Particles.flash(x, y, 26, 0.1);
     Particles.spark(x, y, 16, { spd: 420, col: '#ffdf9a' });
     Audio2.flak();
-    const P = G.player;
-    if (P.alive) {
-      const d = dist(x, y, P.x, P.y);
+    // odłamki rażą każdy samolot przeciwnej strony w promieniu wybuchu
+    for (const p of G.planes) {
+      if (!p.alive || p.team === this.team) continue;
+      const d = dist(x, y, p.x, p.y);
       if (d < 150) {
-        const dmg = (1 - d / 150) * 26 * diffMul().dmg;
-        P.hit(dmg, x, y, G, null);
-        Cam.kick(0.4);
+        p.hit((1 - d / 150) * 26 * diffMul().dmg, x, y, G, null);
+        if (p.isPlayer) Cam.kick(0.4);
       }
     }
   }

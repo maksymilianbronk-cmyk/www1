@@ -260,8 +260,11 @@ const HUD = {
       const rw = G.homeRunway;
       if (rw) list.push({ x: (rw.x0 + rw.x1) / 2, y: rw.y, col: '#7fc16a', home: true });
     }
+    // pokazujemy tylko kilka najbliższych wskaźników, żeby nie zaśmiecać krawędzi
+    list.sort((a, b) => dist2(a.x, a.y, P.x, P.y) - dist2(b.x, b.y, P.x, P.y));
+    const shown = list.slice(0, 7);
     const m = 26;
-    for (const t of list) {
+    for (const t of shown) {
       const sx = Cam.sx(t.x, W), sy = Cam.sy(t.y, H);
       if (sx > m && sx < W - m && sy > m && sy < H - m) continue;
       const cx = W / 2, cy = H / 2;
@@ -272,9 +275,10 @@ const HUD = {
       const mx = cx + Math.cos(a) * r, my = cy + Math.sin(a) * r;
       ctx.save();
       ctx.translate(mx, my); ctx.rotate(a);
-      ctx.globalAlpha = 0.72;
+      const far = clamp(1 - dist(t.x, t.y, P.x, P.y) / 4000, 0.28, 0.8);
+      ctx.globalAlpha = far;
       ctx.fillStyle = t.col;
-      ctx.beginPath(); ctx.moveTo(9, 0); ctx.lineTo(-6, -5.5); ctx.lineTo(-6, 5.5); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(8, 0); ctx.lineTo(-5, -4.6); ctx.lineTo(-5, 4.6); ctx.closePath(); ctx.fill();
       ctx.restore();
     }
     ctx.globalAlpha = 1;

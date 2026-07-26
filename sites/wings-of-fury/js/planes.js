@@ -433,6 +433,7 @@ class Plane {
         x: bx, y: by,
         vx: Math.cos(aa) * mv + this.vx * 0.5, vy: Math.sin(aa) * mv + this.vy * 0.5,
         dmg: S.gunDmg * (this.team === 'pol' ? 1 : diffMul().dmg), team: this.team, kind: 'mg', life: 1.1,
+        owner: this,
       });
       Particles.flash(bx, by, 7, 0.05);
     }
@@ -511,6 +512,10 @@ class Plane {
     if (!this.alive) return;
     this.alive = false;
     this.hp = 0;
+    // pilot czasem zdąży wyskoczyć
+    if (!this.isPlayer && this.y - G.world.groundAt(this.x) > 260 && chance(0.55)) {
+      G.addParachute(this.x, this.y, this.team);
+    }
     this.deathT = 0;
     this.spin = rnd(3.4, -3.4);
     Particles.explosion(this.x, this.y, this.isPlayer ? 2.4 : 2, { debrisCol: '#3a3730' });
@@ -615,10 +620,17 @@ class Plane {
   /** Podąża za celem z wyprzedzeniem i strzela. */
   aiFighter(dt, G, P, D) {
     const ai = this.ai;
-    let target = P.alive ? P : null;
-    // czasem atakuj polskiego skrzydłowego
-    if (!target) {
-      target = G.planes.find(q => q.team === 'pol' && q.alive) || null;
+    let target = null;
+    if (this.team === 'ger') {
+      target = P && P.alive ? P : (G.planes.find(q => q.team === 'pol' && q.alive) || null);
+    } else {
+      // nasz skrzydłowy szuka najbliższego Niemca
+      let bd = Infinity;
+      for (const q of G.planes) {
+        if (!q.alive || q.team === this.team) continue;
+        const d = dist2(this.x, this.y, q.x, q.y);
+        if (d < bd) { bd = d; target = q; }
+      }
     }
     if (!target) { this.aiPatrol(dt, G); return; }
 

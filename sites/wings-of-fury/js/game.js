@@ -24,7 +24,7 @@ const G = {
   state: 'menu',            // menu | play | paused | debrief
   running: false,
   world: null, mission: null, player: null,
-  units: [], planes: [], bullets: [], ordnance: [], shells: [], wrecks: [],
+  units: [], planes: [], bullets: [], ordnance: [], shells: [], wrecks: [], parachutes: [],
   objState: {}, objectiveTags: new Set(),
   missionT: 0, waveIdx: 0, score: 0, lives: 3,
   stats: { shots: 0, hits: 0, kills: 0, ground: 0, bombsDropped: 0, planesLost: 0 },
@@ -42,7 +42,7 @@ const G = {
     this.attract = false;
     this.world = new World(Object.assign({ wind: rnd(16, -16) }, m.world));
     this.units = []; this.planes = []; this.bullets = []; this.ordnance = [];
-    this.shells = []; this.wrecks = []; this.feed = [];
+    this.shells = []; this.wrecks = []; this.parachutes = []; this.feed = [];
     Particles.clear();
     this.score = 0; this.missionT = 0; this.waveIdx = 0; this.lives = 3;
     this.stats = { shots: 0, hits: 0, kills: 0, ground: 0, bombsDropped: 0, planesLost: 0 };
@@ -82,20 +82,35 @@ const G = {
     setTimeout(() => { if (this.state === 'play') this.toast('Gaz: strzałka ↑   ·   Ster: ← →'); }, 3200);
   },
 
-  /* ---------------- tło menu ---------------- */
+  /* ---------------- tło menu: pościg nad polami o świcie ---------------- */
   startAttract() {
     try {
       this.attract = true;
       this.state = 'menu';
-      this.world = new World({ seed: 24, width: 6000, baseHeight: 250, relief: 80, treeDensity: 0.6, time: 'dusk', ceiling: 2600 });
-      this.units = []; this.planes = []; this.bullets = []; this.ordnance = []; this.shells = []; this.wrecks = [];
+      this.world = new World({
+        seed: 24, width: 7000, baseHeight: 260, relief: 95, treeDensity: 0.7,
+        time: chance(0.5) ? 'dawn' : 'day', ceiling: 2600,
+      });
+      this.units = []; this.planes = []; this.bullets = []; this.ordnance = [];
+      this.shells = []; this.wrecks = []; this.parachutes = [];
       Particles.clear();
-      const p = new Plane('p11c', { x: 1000, y: 900, vx: 300, vy: 0, ai: 'fighter' });
-      p.team = 'pol'; p.aiKind = null; p.ai = { state: 'cruise', t: 0, fireT: 0, evadeT: 0, targetAlt: 900 };
-      p.aiKind = 'patrolOnly';
-      this.planes.push(p);
-      this.attractPlane = p;
-      Cam.set(p.x, p.y + 60);
+      // wieś i płonący wrak w tle
+      for (let i = 0; i < 4; i++) this.addUnit({ type: 'house', x: 2400 + i * 130, team: 'pol' });
+      this.addWreck({ x: 3200, y: this.world.groundAt(3200), kind: 'tank', w: 40, h: 24, fire: 1 });
+      this.addWreck({ x: 3460, y: this.world.groundAt(3460), kind: 'plane', w: 44, h: 18, fire: 1.2 });
+
+      const mk = (key, x, y, team) => {
+        const p = new Plane(key, { x, y, vx: PLANES[key].vMax * 0.72, vy: 0, ai: 'fighter' });
+        p.team = team; p.invuln = 1e9; p.ai.targetAlt = y;
+        p.gearDown = false; p.gearT = 0;
+        p.throttle = 0.85; p.rpm = 0.85;
+        this.planes.push(p);
+        return p;
+      };
+      this.attractPlane = mk('p11c', 1200, 760, 'pol');
+      this.attractPrey = mk('stuka', 1560, 720, 'ger');
+      Cam.zoom = 1.15; Cam.targetZoom = 1.15;
+      this.attractT = 0;
       this.running = true;
     } catch (e) { this.attract = false; }
   },
@@ -111,6 +126,7 @@ const G = {
     this.units.push(u);
     return u;
   },
+  addParachute(x, y, team) { if (this.parachutes.length < 14) this.parachutes.push(new Parachute(x, y, team, this.world)); },
   addWreck(o) { this.wrecks.push(new Wreck(o, this.world)); if (this.wrecks.length > 160) this.wrecks.shift(); },
 
   groundLevelFor(x) {
@@ -133,6 +149,17 @@ const G = {
   spawnBullet(o) { if (this.bullets.length < 900) this.bullets.push(new Bullet(o)); },
   spawnOrdnance(o) { this.ordnance.push(o); },
   spawnFlakShell(x, y, a, d, owner) { if (this.shells.length < 120) this.shells.push(new FlakShell(x, y, a, d, owner)); },
+  /** Skrzydłowy — polska maszyna sterowana przez komputer. */
+  spawnFriendly(key, o = {}) {
+    const p = new Plane(key, Object.assign({ team: 'pol', ai: 'fighter' }, o));
+    p.team = 'pol';
+    p.a = o.dir === -1 ? Math.PI : 0;
+    p.vx = (o.dir === -1 ? -1 : 1) * PLANES[key].vMax * 0.7;
+    p.y = o.y || 900;
+    p.throttle = 0.9; p.rpm = 0.9;
+    this.planes.push(p);
+    return p;
+  },
   spawnEnemy(key, o = {}) {
     const p = new Plane(key, Object.assign({ team: 'ger' }, o));
     if (o.dir === -1) { p.a = Math.PI; p.vx = -PLANES[key].vMax * 0.7; }
@@ -193,7 +220,8 @@ const G = {
       return;
     }
     if (p.team === 'ger') {
-      const pts = Math.round((p.S.hp * 3 + 120) * diffMul().score);
+      const mine = !by || by.isPlayer;          // zestrzelenia skrzydłowych też liczą się do misji
+      const pts = Math.round((p.S.hp * 3 + 120) * diffMul().score * (mine ? 1 : 0.4));
       this.score += pts;
       this.stats.kills++;
       this.killed[p.key] = (this.killed[p.key] || 0) + 1;
@@ -320,19 +348,46 @@ const G = {
     Particles.update(dt, W);
 
     if (this.attract) {
-      const p = this.attractPlane;
-      if (p) {
-        p.aiPatrol(dt, this);
+      this.attractT = (this.attractT || 0) + dt;
+      const chaser = this.attractPlane, prey = this.attractPrey;
+      for (const p of this.planes) {
+        if (!p || !p.alive) continue;
+        // ścigany ucieka wężykiem, ścigający siedzi mu na ogonie
+        if (p === prey) {
+          const wob = Math.sin(this.attractT * 0.7) * 0.22;
+          p.ai.targetAlt = 780 + Math.sin(this.attractT * 0.5) * 190;
+          p.aiPatrol(dt, this);
+          p.a += wob * dt;
+        } else if (p === chaser && prey && prey.alive) {
+          // ścigający celuje w punkt za ogonem ściganego, żeby nie wchodzić w kadłub
+          const tx2 = prey.x - Math.cos(prey.a) * 230;
+          const ty2 = prey.y - Math.sin(prey.a) * 230;
+          const lead = Math.atan2(ty2 - p.y, tx2 - p.x);
+          const gap = dist(p.x, p.y, prey.x, prey.y);
+          p.aiSteer(dt, lead, gap < 260 ? 0.55 : 0.95);
+          if (chance(dt * 0.7)) { p.ammo = 999; p.gunT = 0; for (let i = 0; i < 3; i++) setTimeout(() => { p.gunT = 0; p.fireGuns(this); }, i * 90); }
+        }
         p.updateFlight(dt, this);
         p.prop += dt * 90;
         const c = Math.cos(p.a);
         if (c < -0.06) p.flip = true; else if (c > 0.06) p.flip = false;
-        if (p.x < 400) { p.x = 400; p.vx = Math.abs(p.vx); }
-        if (p.x > W.width - 400) { p.x = W.width - 400; p.vx = -Math.abs(p.vx); }
-        if (p.y < 500) { p.y = 500; p.vy = Math.abs(p.vy); }
-        Cam.follow(p, dt, VW, VH);
+        if (p.x < 500) { p.x = 500; p.vx = Math.abs(p.vx); }
+        if (p.x > W.width - 500) { p.x = W.width - 500; p.vx = -Math.abs(p.vx); }
+        if (p.y < 480) { p.y = 480; p.vy = Math.abs(p.vy); }
+        if (p.y > 1300) { p.y = 1300; p.vy = -Math.abs(p.vy) * 0.4; }
       }
+      for (const b of this.bullets) b.update(dt, this);
+      this.bullets = this.bullets.filter(b => !b.dead);
+      for (const u of this.units) u.update(dt, this);
       for (const w of this.wrecks) w.update(dt, this);
+      // kamera trzyma maszyny w prawej dolnej części kadru, z dala od menu
+      if (chaser) {
+        const tx = (chaser.x + (prey ? prey.x : chaser.x)) / 2;
+        const ty = (chaser.y + (prey ? prey.y : chaser.y)) / 2;
+        Cam.x = lerp(Cam.x, tx - VW * 0.15, 1 - Math.pow(0.02, dt));
+        Cam.y = lerp(Cam.y, ty + VH * 0.06, 1 - Math.pow(0.02, dt));
+        Cam.zoom = lerp(Cam.zoom, 1.15, 1 - Math.pow(0.05, dt));
+      }
       return;
     }
 
@@ -358,12 +413,14 @@ const G = {
     for (const b of this.bullets) b.update(dt, this);
     for (const s of this.shells) s.update(dt, this);
     for (const o of this.ordnance) o.update(dt, this);
+    for (const s of this.parachutes) s.update(dt, this);
 
     // sprzątanie
     this.bullets = this.bullets.filter(b => !b.dead);
     this.shells = this.shells.filter(s => !s.dead);
     this.ordnance = this.ordnance.filter(o => !o.dead);
     this.units = this.units.filter(u => !u.remove);
+    this.parachutes = this.parachutes.filter(s => !s.remove);
     this.planes = this.planes.filter(p => !p.remove);
 
     // kolizje samolot–ziemia dla SI oraz zderzenia z jednostkami
@@ -470,6 +527,7 @@ const G = {
     for (const w of this.wrecks) w.draw(ctx, VW, VH, this);
     for (const u of this.units) if (!u.ship) u.draw(ctx, VW, VH, this);
     for (const u of this.units) if (u.ship) u.draw(ctx, VW, VH, this);
+    for (const s of this.parachutes) s.draw(ctx, VW, VH, this);
     for (const o of this.ordnance) o.draw(ctx, VW, VH);
     for (const p of this.planes) if (!p.isPlayer) p.draw(ctx, VW, VH, this);
     if (this.player) this.player.draw(ctx, VW, VH, this);
@@ -485,9 +543,10 @@ const G = {
   },
 
   drawAttractOverlay() {
+    // przyciemniamy głównie górę i dół — środek ma pozostać czytelny pod menu
     const g = ctx.createLinearGradient(0, 0, 0, VH);
-    g.addColorStop(0, 'rgba(8,10,13,.30)'); g.addColorStop(0.55, 'rgba(8,10,13,.42)');
-    g.addColorStop(1, 'rgba(8,10,13,.66)');
+    g.addColorStop(0, 'rgba(8,10,13,.42)'); g.addColorStop(0.5, 'rgba(8,10,13,.18)');
+    g.addColorStop(1, 'rgba(8,10,13,.5)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
   },
 
@@ -499,7 +558,7 @@ const G = {
     Audio2.stopEngine();
     const m = this.mission;
     const acc = this.stats.shots ? Math.round(this.stats.hits / this.stats.shots * 100) : 0;
-    const timeBonus = this.successFlag ? Math.max(0, Math.round((900 - this.missionT) * 2)) : 0;
+    const timeBonus = this.successFlag ? Math.max(0, Math.round((600 - this.missionT) * 1.2)) : 0;
     const accBonus = this.successFlag ? acc * 12 : 0;
     const livesBonus = this.successFlag ? this.lives * 400 : 0;
     const total = Math.max(0, this.score + timeBonus + accBonus + livesBonus);
@@ -522,8 +581,10 @@ const G = {
     }
 
     document.getElementById('debrief-title').textContent = this.successFlag ? 'MISJA WYKONANA' : 'MISJA NIEUDANA';
-    document.getElementById('debrief-medal').textContent = this.successFlag ? ['', '🥉', '🥈', '🥇'][medal] : '💥';
+    document.getElementById('debrief-medal').innerHTML = medalSvg(this.successFlag ? medal : 0);
+    const mt = Math.round(this.missionT);
     const rows = [
+      ['Czas lotu', `${String((mt / 60) | 0).padStart(2, '0')}:${String(mt % 60).padStart(2, '0')}`],
       ['Cele misji', this.mission.objectives.filter(o => this.objState[o.id].done).length + '/' + this.mission.objectives.length],
       ['Zestrzelone samoloty', this.stats.kills],
       ['Zniszczone cele naziemne', this.stats.ground],
@@ -588,7 +649,7 @@ function buildMissionGrid() {
       <h3>${m.title}</h3>
       <p>${m.place} — ${PLANES[m.plane].name}</p>
       <div class="m-meta">
-        <span class="medal-chip">${['—', '🥉', '🥈', '🥇'][medal]}</span>
+        <span class="medal-chip">${medal ? medalSvg(medal).replace('width="86" height="86"', 'width="26" height="26"') : '—'}</span>
         <span>${best ? best + ' pkt' : 'brak wyniku'}</span>
       </div>
       ${unlocked ? '' : '<div class="lock">🔒</div>'}`;
@@ -598,6 +659,14 @@ function buildMissionGrid() {
   const d = Save.data;
   document.getElementById('career-line').textContent =
     `Misje: ${Object.keys(d.medals || {}).length}/${MISSIONS.length} · Zestrzelenia: ${d.kills || 0} · Punkty kariery: ${d.totalScore || 0}`;
+}
+
+/** Polska odmiana rzeczownika po liczbie: plural(2,'karabin','karabiny','karabinów'). */
+function plural(n, one, few, many) {
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a === 1) return `${n} ${one}`;
+  if (b >= 2 && b <= 4 && (a < 12 || a > 14)) return `${n} ${few}`;
+  return `${n} ${many}`;
 }
 
 /* ---------- odprawa ---------- */
@@ -612,10 +681,14 @@ function openBrief(i) {
   document.getElementById('brief-objectives').innerHTML =
     m.objectives.map(o => `<li>${o.text}</li>`).join('');
   document.getElementById('plane-name').textContent = S.full;
+  const arm = [plural(S.guns, 'karabin maszynowy', 'karabiny maszynowe', 'karabinów maszynowych')];
+  if (S.bombs) arm.push(plural(S.bombs, 'bomba', 'bomby', 'bomb'));
+  if (S.torps) arm.push(plural(S.torps, 'torpeda', 'torpedy', 'torped'));
   document.getElementById('plane-stats').innerHTML =
     `<b>Rola:</b> ${S.role} (${S.year})<br>` +
     `<b>Prędkość maks.:</b> ${S.vMax} km/h<br>` +
-    `<b>Uzbrojenie:</b> ${S.guns} km${S.bombs ? ` · ${S.bombs} bomb` : ''}${S.torps ? ` · ${S.torps} torpedy` : ''}<br>` +
+    `<b>Prędkość przeciągnięcia:</b> ${S.vStall} km/h<br>` +
+    `<b>Uzbrojenie:</b> ${arm.join(' · ')}<br>` +
     `<b>Wytrzymałość:</b> ${S.hp}<br>${S.desc}`;
   document.getElementById('brief-controls').innerHTML =
     '<kbd>←</kbd><kbd>→</kbd> ster · <kbd>↑</kbd> gaz · <kbd>↓</kbd> hamowanie<br>' +
@@ -633,7 +706,7 @@ function drawPlanePreview(cv, key, scale) {
   c.fillStyle = g; c.fillRect(0, 0, w, h);
   c.save();
   c.translate(w / 2, h / 2 + 6);
-  const s = scale || Math.min(w / 130, h / 60);
+  const s = scale || Math.min(w / 118, h / 52);
   c.scale(s, s);
   Art.plane(c, key, { gear: 1, prop: 0.6 });
   c.restore();
@@ -679,6 +752,25 @@ function bindOptions() {
   q('opt-gore').addEventListener('change', e => { Settings.gore = e.target.checked; save(); });
   q('opt-difficulty').addEventListener('change', e => { Settings.difficulty = e.target.value; save(); });
   q('opt-markers').addEventListener('change', e => { Settings.markers = e.target.checked; save(); });
+}
+
+/** Krzyż / medal w podsumowaniu misji (SVG zamiast emoji). */
+function medalSvg(level) {
+  if (!level) return `<svg viewBox="0 0 64 64" width="76" height="76" aria-hidden="true">
+      <circle cx="32" cy="32" r="22" fill="none" stroke="#7a2a22" stroke-width="4"/>
+      <path d="M20 20 L44 44 M44 20 L20 44" stroke="#c0392b" stroke-width="6" stroke-linecap="round"/></svg>`;
+  const col = ['', '#b07a4a', '#c3c7cc', '#d8b24a'][level];
+  const dark = ['', '#7d5330', '#8b9096', '#9a7a24'][level];
+  return `<svg viewBox="0 0 64 64" width="86" height="86" aria-hidden="true">
+    <path d="M22 4 h20 l-4 14 h-12 z" fill="#3b5aa0"/>
+    <path d="M26 4 h4 v14 h-4 z M34 4 h4 v14 h-4 z" fill="#1d2b4a" opacity=".5"/>
+    <g transform="translate(32,38)">
+      <path d="M-6 -20 h12 l-2 12 h10 l2 -2 v12 l-2 -2 h-10 l2 12 h-12 l2 -12 h-10 l-2 2 v-12 l2 2 h10 z"
+            fill="${col}" stroke="${dark}" stroke-width="1.5" stroke-linejoin="round"/>
+      <circle r="5.5" fill="${dark}" opacity=".65"/>
+      <circle r="3.4" fill="${col}"/>
+    </g>
+  </svg>`;
 }
 
 /* ---------- obsługa przycisków ---------- */
@@ -782,12 +874,21 @@ function frame(now) {
   Input.endFrame();
 }
 
+/* ---------------- podpowiedź dla urządzeń dotykowych ---------------- */
+function touchHint() {
+  const touch = matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (!touch) return;
+  const hint = document.querySelector('#screen-menu .hint');
+  if (hint) hint.textContent = 'Gra wymaga klawiatury — podłącz ją albo zagraj na komputerze';
+}
+
 /* ---------------- start ---------------- */
 Save.load();
 Input.init();
 resize();
 bindOptions();
 buildMissionGrid();
+touchHint();
 G.startAttract();
 G.state = 'menu';
 showScreen('screen-menu');
