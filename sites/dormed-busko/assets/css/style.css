@@ -444,6 +444,12 @@ body.nav-open .mobile-nav a.mnav__link { animation: mnavIn .45s var(--ease) forw
   display: flex; flex-direction: column;
 }
 .card:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px var(--bordo-300), var(--sh-sm); }
+/* Karta ze zdjęciem na całą szerokość: obraz bez marginesu, treść z paddingiem
+   takim jak w zwykłej karcie. Wcześniej stał tu styl inline z clamp(1.2rem,
+   1rem+1vw, 1.8rem) — w CSS "+" musi mieć spacje po obu stronach, inaczej
+   cała deklaracja jest nieważna i treść przykleja się do krawędzi karty. */
+.card--flush { padding: 0; overflow: hidden; }
+.card--flush > .card__pad { padding: clamp(1.4rem, 1.1rem + .9vw, 2rem); }
 .bg-cream .card, .bg-sand .card, .bg-bordo .card { background: var(--paper); }
 .card__icon {
   width: 48px; height: 48px; border-radius: 14px;
