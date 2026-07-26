@@ -13,6 +13,7 @@ po każdym pushu na gałąź domyślną (workflow `.github/workflows/pages.yml`)
 |---|---|
 | **Galeria kolekcji** | **https://maksymilianbronk-cmyk.github.io/www1/** |
 | **Aplikacja Trasa — mapy podróżnicze** 🧭 | **https://maksymilianbronk-cmyk.github.io/www1/sites/podroze-mapy/** |
+| **Dormed Medical SPA — Busko-Zdrój** 🌿 | **https://maksymilianbronk-cmyk.github.io/www1/sites/dormed-busko/** |
 
 Adres działa przez https, więc aplikacja Trasa ma pełne PWA: GPS, service
 worker i instalację na telefonie („Dodaj do ekranu głównego").
