@@ -1060,8 +1060,10 @@ svg .i-line {
 /* ============================================================
    32. GRAFIKA MEDYCZNA — autorskie sceny SVG
    ============================================================ */
-.medart { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.medart svg { width: 100%; height: 100%; }
+.medart { position: absolute !important; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+/* svg też absolutnie — bez tego przy szerokim oknie dobiera wysokość
+   z proporcji viewBox (1140:500) i wypycha sekcję w dół */
+.medart svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 .medart .ln { fill: none; stroke: var(--bordo); stroke-width: 1; opacity: .1; }
 .medart .ln-soft { fill: none; stroke: var(--bordo); stroke-width: .8; opacity: .06; }
 .medart .dot { fill: var(--gold); opacity: .3; }
@@ -1113,7 +1115,10 @@ svg .i-line {
     radial-gradient(34% 40% at 78% 72%, rgba(201,161,91,.10), transparent 66%);
   animation: aurora 22s var(--ease-soft) infinite alternate;
 }
-.bg-bordo > *, .bg-dark > * { position: relative; z-index: 2; }
+/* Treść nad tłem — ale scena .medart musi zostać poza układem (absolute),
+   inaczej rośnie proporcjonalnie do szerokości okna i rozpycha sekcję
+   na kilka tysięcy pikseli pustej przestrzeni na szerokich ekranach. */
+.bg-bordo > *:not(.medart), .bg-dark > *:not(.medart) { position: relative; z-index: 2; }
 @keyframes aurora {
   0%   { transform: translate3d(0,0,0) scale(1); }
   50%  { transform: translate3d(2%, -2%, 0) scale(1.06); }

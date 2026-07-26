@@ -6,6 +6,7 @@ const BASE = 'http://127.0.0.1:8123';
 const PAGES = ['index.html','osrodek.html','rehabilitacja.html','medycyna-estetyczna.html',
   'kosmetologia.html','masaze-orientalne.html','pakiety.html','cennik.html','o-nas.html','kontakt.html'];
 const VIEWPORTS = [
+  { name: 'ultra',   width: 2560, height: 1080, isMobile: false },
   { name: 'desktop', width: 1440, height: 900, isMobile: false },
   { name: 'tablet',  width: 820,  height: 1180, isMobile: true },
   { name: 'mobile',  width: 390,  height: 844, isMobile: true },

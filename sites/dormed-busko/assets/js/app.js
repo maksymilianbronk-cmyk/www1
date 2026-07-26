@@ -214,15 +214,27 @@
       range.value = pct;
       range.setAttribute('aria-valuenow', Math.round(pct));
     }
-    range.addEventListener('input', function () { set(parseFloat(range.value)); });
+    // Animacja podpowiedzi steruje --pos, więc dopóki trwa, nadpisuje każdą
+    // pozycję ustawioną przez użytkownika — suwak wygląda na zepsuty.
+    // Pierwsze dotknięcie natychmiast ją przerywa.
+    var touched = false;
+    function stopPeek() { touched = true; ba.classList.remove('is-peek'); }
+
+    range.addEventListener('input', function () { stopPeek(); set(parseFloat(range.value)); });
 
     function fromPointer(e) {
       var r = ba.getBoundingClientRect();
       set(((e.clientX - r.left) / r.width) * 100);
     }
+    // Pozycję liczymy sami, nie z natywnego range: jego uchwyt ma 52 px
+    // szerokości, więc wartość mapuje się na tor pomniejszony o uchwyt
+    // i linia podziału rozjeżdża się z kursorem przy krawędziach.
     ba.addEventListener('pointerdown', function (e) {
-      if (e.target === range) return;
-      ba.setPointerCapture(e.pointerId); fromPointer(e);
+      stopPeek();
+      ba.setPointerCapture(e.pointerId);
+      fromPointer(e);
+      e.preventDefault();                       // nie uruchamiaj natywnego przeciągania
+      if (document.activeElement !== range) range.focus({ preventScroll: true });
     });
     ba.addEventListener('pointermove', function (e) {
       if (e.buttons === 1 && ba.hasPointerCapture && ba.hasPointerCapture(e.pointerId)) fromPointer(e);
@@ -235,6 +247,7 @@
       var peek = new IntersectionObserver(function (en) {
         en.forEach(function (x) {
           if (!x.isIntersecting) return;
+          if (touched) { peek.unobserve(ba); return; }
           ba.classList.add('is-peek');
           setTimeout(function () { ba.classList.remove('is-peek'); }, 2700);
           peek.unobserve(ba);

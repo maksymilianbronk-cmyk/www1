@@ -27,7 +27,9 @@ kolejnego klienta bez wymyślania wszystkiego od nowa.
    (powiększ kadr i odczytaj — patrz `scripts/przygotuj_zdjecia.py`).
 3. **Zbuduj generator, nie pliki HTML** — 10 podstron pisanych ręcznie to 10
    miejsc na rozjazd nagłówka i stopki. Patrz sekcja 6.
-4. **Audytuj po każdej większej zmianie** — `scripts/audyt.js`.
+4. **Audytuj po każdej większej zmianie** — `scripts/audyt.js`. Cztery
+   viewporty, w tym **2560 px**: błędy układu, które skalują się z szerokością
+   okna, na 1440 px w ogóle nie widać.
 5. **Publikuj i sprawdź wdrożenie** — sekcja 9.
 
 ## 2. System kolorów: jasna baza, marka jako akcent
@@ -119,6 +121,22 @@ więc `stroke-dasharray: 100` działa bez mierzenia w JS.
 
 Grafika tła: generuj ją w Pythonie jako SVG (`references/grafika.md`). Zero
 problemów licencyjnych, ostra na każdym ekranie, kilka kB.
+
+**Dwie pułapki, które kosztowały mnie wpadkę u klienta:**
+
+1. **Scena tła wypchnięta do układu.** Reguła w rodzaju
+   `.bg-brand > * { position: relative; z-index: 2 }` (żeby treść była nad tłem)
+   ma tę samą specyficzność co `.medart { position: absolute }` i — jeśli stoi
+   niżej w pliku — **wygrywa**. Scena wraca do przepływu, dobiera wysokość
+   z proporcji `viewBox` i przy szerokim oknie rozpycha sekcję na tysiące
+   pikseli pustki. Pisz `> *:not(.medart)` i daj `position: absolute` również
+   na samym `<svg>`. Objaw: strona rośnie razem z szerokością okna — dlatego
+   audyt mierzy `document.body.scrollHeight` na 1440 i 7600 px.
+2. **Animacja podpowiedzi blokuje sterowanie.** Jeśli hint (np. `baPeek`)
+   animuje tę samą własność, którą ustawia użytkownik (`--pos`), to przez
+   cały czas trwania animacji CSS nadpisuje każde ustawienie z JS — suwak
+   wygląda na całkowicie zepsuty. **Pierwsze dotknięcie musi zdejmować klasę
+   animacji**, a obserwator nie może jej ponownie założyć.
 
 ## 6. Generator zamiast plików
 

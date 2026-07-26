@@ -199,6 +199,34 @@ Obsługa: `pointerdown` + `setPointerCapture` na kontenerze, `input` na
 `is-peek` przy pierwszym wejściu w kadr — użytkownik musi wiedzieć,
 że da się chwycić.
 
+**Dwie rzeczy, bez których suwak jest zepsuty:**
+
+```js
+var touched = false;
+function stopPeek() { touched = true; ba.classList.remove('is-peek'); }
+
+// 1. Animacja podpowiedzi steruje --pos, więc dopóki trwa, nadpisuje KAŻDĄ
+//    pozycję ustawioną przez użytkownika. Pierwsze dotknięcie ją przerywa.
+// 2. Pozycję liczymy sami, nie z natywnego range: jego uchwyt ma 52 px,
+//    więc wartość mapuje się na tor pomniejszony o uchwyt i linia podziału
+//    rozjeżdża się z kursorem przy krawędziach.
+ba.addEventListener('pointerdown', function (e) {
+  stopPeek();
+  ba.setPointerCapture(e.pointerId);
+  fromPointer(e);
+  e.preventDefault();                       // bez natywnego przeciągania
+  if (document.activeElement !== range) range.focus({ preventScroll: true });
+});
+range.addEventListener('input', function () { stopPeek(); set(parseFloat(range.value)); });
+// obserwator podpowiedzi:
+if (touched) { peek.unobserve(ba); return; }
+```
+
+Test regresyjny: przeciągnij **250 ms po wejściu suwaka w kadr** (czyli
+w trakcie podpowiedzi) i sprawdź, czy `--pos` odpowiada pozycji kursora.
+Przeciągnięcie po zakończeniu animacji działa nawet w zepsutej wersji —
+dlatego ten błąd łatwo przeoczyć.
+
 ## 8. Ikony dwutonowe — ożywienie
 
 ```css
