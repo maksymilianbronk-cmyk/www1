@@ -556,8 +556,8 @@ function drawParticles(ctx, W, H) {
         break;
       }
       case 'ring': {
-        ctx.globalAlpha = clamp(t, 0, 1) * 0.8;
-        ctx.strokeStyle = p.col; ctx.lineWidth = Math.max(1, 3 * t * z);
+        ctx.globalAlpha = clamp(t * t, 0, 1) * 0.42;
+        ctx.strokeStyle = p.col; ctx.lineWidth = Math.max(0.8, 2.2 * t * t * z);
         ctx.beginPath(); ctx.arc(sx, sy, s, 0, TAU); ctx.stroke();
         break;
       }

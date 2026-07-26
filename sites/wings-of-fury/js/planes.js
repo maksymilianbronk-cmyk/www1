@@ -354,6 +354,32 @@ class Plane {
       return;
     }
 
+    // przymusowe lądowanie w polu: spokojne, płaskie przyziemienie poza lotniskiem
+    // kończy się połamanym podwoziem, a nie kraterem
+    if (!canLand && !rw && !water) {
+      const gentle = Math.abs(this.pitch - slope) < 0.3 && vs > -110 &&
+        this.speed < this.S.vLand * 1.25 && Math.abs(slope) < 0.22;
+      if (gentle) {
+        this.y = gy + 8;
+        this.vy = 0;
+        this.vx *= this.gearT > 0.85 ? 0.86 : 0.6;
+        this.onGround = true;
+        this.landed = false;
+        this.pitch = slope;
+        this.hp -= this.maxHp * (this.gearT > 0.85 ? 0.12 : 0.3);
+        Particles.dirt(this.x, gy, 16, { spd: 220 });
+        if (this.gearT <= 0.85) Particles.spark(this.x, gy + 4, 10, { spd: 220, col: '#ffd08a' });
+        Cam.kick(0.5);
+        Audio2.boom(0.5);
+        if (this.isPlayer) {
+          G.warn('PRZYMUSOWE LĄDOWANIE');
+          G.toast('Maszyna w polu — startuj dalej albo wracaj na lotnisko');
+        }
+        if (this.hp <= 0) this.crash(G, false);
+        return;
+      }
+    }
+
     if (canLand) {
       this.y = gy + 8;
       this.vy = 0;
@@ -384,7 +410,8 @@ class Plane {
     const v = Math.abs(this.vx);
     // na pokładzie lotniskowca hak chwyta liny hamujące — maszyna staje w kilkadziesiąt metrów
     const arrest = (rw && rw.deck && this.landed && v > 12) ? 900 : 0;
-    const roll = 26 + this.brakes * 520 + arrest;
+    const rough = rw ? 0 : 90;                 // pole nie jest utwardzonym pasem
+    const roll = 26 + rough + this.brakes * 520 + arrest;
     if (arrest && chance(0.4)) Particles.dirt(this.x - sign(this.vx) * 14, gy, 2, { spd: 90, col: '#b9b3a2' });
     const aero = S.cd0 * v * v * 1.25;
     this.vx += (S.thrust * this.rpm * Math.cos(this.a) - sign(this.vx) * (roll + aero)) * dt;

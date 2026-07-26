@@ -56,7 +56,11 @@ natarcia powyżej 0,27 rad.
 
 Lądowanie sprawdza cztery warunki (podwozie, prędkość < `vStall·1,45`, pochylenie
 < 0,34 rad, opadanie > −130 m/s) i działa w obie strony lotu; zbyt szybkie, ale
-poprawne podejście kończy się odbiciem od pasa, a nie katastrofą.
+poprawne podejście kończy się odbiciem od pasa, a nie katastrofą. Spokojne,
+płaskie przyziemienie poza lotniskiem to **przymusowe lądowanie w polu** —
+maszyna zostaje uszkodzona, ale pilot żyje i może startować dalej (uzbrojenie
+uzupełnia tylko obsługa naziemna na prawdziwym lotnisku). Na pokładzie
+lotniskowca hak chwyta liny hamujące.
 
 ## Misje
 
@@ -66,7 +70,8 @@ poprawne podejście kończy się odbiciem od pasa, a nie katastrofą.
 4. **Most na Warcie** — Sieradz, PZL.23 Karaś
 5. **Gniazdo os** — polowe lotnisko Luftwaffe, Karaś
 6. **Niebo nad Warszawą** — Okęcie, P.11c (He 111 + eskorta, obrona miasta)
-7. **Wilcze stado** — Zatoka Gdańska, PZL.37 Łoś (torpedy, lądowanie na pokładzie)
+7. **Wilcze stado** — Zatoka Gdańska, PZL.37 Łoś (torpedy; lądowanie na pokładzie
+   lotniskowca albo na polowym lotnisku na wyspie)
 8. **Ostatni lot** — przyczółek nad Bugiem, Łoś
 
 Postęp kampanii, medale i ustawienia zapisują się w `localStorage`
