@@ -45,7 +45,7 @@ const SAVE_KEY = 'wof1939.save.v1';
 
 const Settings = {
   sound: true, volume: 0.7, quality: 'high', shake: true, gore: true,
-  difficulty: 'normal', markers: true,
+  difficulty: 'normal', markers: true, bombsight: true,
 };
 
 const Save = {

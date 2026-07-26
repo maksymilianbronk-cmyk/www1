@@ -746,6 +746,7 @@ function bindOptions() {
   q('opt-gore').checked = Settings.gore;
   q('opt-difficulty').value = Settings.difficulty;
   q('opt-markers').checked = Settings.markers;
+  q('opt-bombsight').checked = Settings.bombsight;
   const save = () => { Save.store(); Audio2.setVolume(); };
   q('opt-sound').addEventListener('change', e => { Settings.sound = e.target.checked; if (Settings.sound) Audio2.unlock(); save(); });
   q('opt-volume').addEventListener('input', e => { Settings.volume = e.target.value / 100; save(); });
@@ -754,6 +755,7 @@ function bindOptions() {
   q('opt-gore').addEventListener('change', e => { Settings.gore = e.target.checked; save(); });
   q('opt-difficulty').addEventListener('change', e => { Settings.difficulty = e.target.value; save(); });
   q('opt-markers').addEventListener('change', e => { Settings.markers = e.target.checked; save(); });
+  q('opt-bombsight').addEventListener('change', e => { Settings.bombsight = e.target.checked; save(); });
 }
 
 /** Krzyż / medal w podsumowaniu misji (SVG zamiast emoji). */

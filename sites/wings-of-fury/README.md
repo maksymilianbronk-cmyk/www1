@@ -86,6 +86,16 @@ Wybuchy wypalają też roślinność (`World.blastScenery`).
 
 ## Testy
 
+W katalogu `test/` leży test dymny (`smoke.mjs`), który przechodzi całą ścieżkę:
+menu → odprawa → start z pasa → lot → ogień z karabinów → bombardowanie z lejem
+i wrakiem → lądowanie → obsługa naziemna → atak nurkowy na kolumnę → wczytanie
+wszystkich ośmiu misji → pomiar płynności → ekrany menu.
+
+```bash
+npx http-server -p 8099 .          # z katalogu repozytorium
+node sites/wings-of-fury/test/smoke.mjs
+```
+
 Gra była rozwijana w pętli z testami Playwright (headless Chromium): start i
 lądowanie na klawiaturze, przelot całej kampanii do ekranu raportu, zachowanie SI
 (pościg, bombardowanie z wyprzedzeniem balistycznym, nurkowanie Ju 87), ogień

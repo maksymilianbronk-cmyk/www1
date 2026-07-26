@@ -17,6 +17,7 @@ const HUD = {
     this.instruments(ctx, W, H, G, P, s);
     this.weapons(ctx, W, H, G, P, s);
     this.radar(ctx, W, H, G, s);
+    this.bombsight(ctx, W, H, G, P);
     this.markers(ctx, W, H, G, P);
     this.messages(ctx, W, H, G, s);
     this.killFeed(ctx, W, H, G, s);
@@ -241,6 +242,68 @@ const HUD = {
     ctx.beginPath();
     ctx.moveTo(px, y + 6 * s); ctx.lineTo(px - 4 * s, y + 14 * s); ctx.lineTo(px + 4 * s, y + 14 * s);
     ctx.closePath(); ctx.fill();
+  },
+
+  /* --- celownik bombowy: przewidywany tor i punkt upadku --- */
+  bombsight(ctx, W, H, G, P) {
+    if (!Settings.bombsight || !P.alive || P.onGround) return;
+    const torp = P.torps > 0 && P.S.torps > 0 && (G.world.isWater(P.x) || P.bombs <= 0);
+    if (P.bombs <= 0 && !torp) return;
+
+    // ta sama całkowanie co w Ordnance.update
+    const c = Math.cos(P.a), sn = Math.sin(P.a);
+    let x = P.x + c * 2 - sn * -10, y = P.y + sn * 2 + c * -10;
+    let vx = P.vx, vy = P.vy - 30;
+    const dt = 1 / 30, drag = 0.06;
+    const pts = [];
+    let hit = null;
+    for (let i = 0; i < 240; i++) {
+      vy -= 380 * dt;
+      const v = Math.hypot(vx, vy);
+      const k = drag * dt * v / 200;
+      vx -= vx * k; vy -= vy * k;
+      x += vx * dt; y += vy * dt;
+      if (i % 3 === 0) pts.push(x, y);
+      const surf = G.world.surfaceAt(x);
+      if (y <= surf) { hit = { x, y: surf }; break; }
+      if (x < 0 || x > G.world.width) break;
+    }
+    if (!hit) return;
+
+    const z = Cam.zoom;
+    ctx.save();
+    ctx.setLineDash([3, 6]);
+    ctx.strokeStyle = 'rgba(232,227,212,.30)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i += 2) {
+      const sx = Cam.sx(pts[i], W), sy = Cam.sy(pts[i + 1], H);
+      if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // celownik w miejscu upadku
+    const hx = Cam.sx(hit.x, W), hy = Cam.sy(hit.y, H);
+    // czy pod krzyżykiem jest cel?
+    let onTarget = false;
+    for (const u of G.units) {
+      if (u.dead || u.remove || u.team === 'pol') continue;
+      const b = u.bounds();
+      if (hit.x > b.x0 - 24 && hit.x < b.x1 + 24) { onTarget = true; break; }
+    }
+    const col = onTarget ? '#7fc16a' : 'rgba(232,227,212,.6)';
+    ctx.strokeStyle = col;
+    ctx.lineWidth = onTarget ? 2 : 1.2;
+    const r = 9 * clamp(z, 0.7, 1.3);
+    ctx.beginPath(); ctx.arc(hx, hy, r, 0, TAU); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hx - r * 1.7, hy); ctx.lineTo(hx - r * 0.5, hy);
+    ctx.moveTo(hx + r * 0.5, hy); ctx.lineTo(hx + r * 1.7, hy);
+    ctx.moveTo(hx, hy - r * 1.7); ctx.lineTo(hx, hy - r * 0.5);
+    ctx.moveTo(hx, hy + r * 0.5); ctx.lineTo(hx, hy + r * 1.7);
+    ctx.stroke();
+    ctx.restore();
   },
 
   /* --- strzałki do celów poza ekranem --- */
