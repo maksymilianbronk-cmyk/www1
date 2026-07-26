@@ -269,7 +269,7 @@ const MISSIONS = [
     plane: 'los', medalPar: [5200, 7800, 10500],
     brief: 'Niemieckie transportowce dowożą zaopatrzenie dla wojsk oblegających Hel, osłania je niszczyciel. ' +
       'Łoś zabiera dwie torpedy i osiem bomb. Torpedę zrzucaj nisko nad wodą, w linii prostej. ' +
-      'Po ataku wyląduj na pokładzie okrętu-bazy.',
+      'Po ataku siadaj na pokładzie okrętu-bazy albo na polowym lotnisku na wyspie — jak wolisz.',
     world: {
       seed: 707, width: 12000, baseHeight: 230, relief: 40, treeDensity: 0.35, time: 'day', ceiling: 3000,
       sea: true, seaSpans: [[3000, 11400, 420]], islands: [{ x: 9000, w: 1500, h: 150 }],
@@ -284,24 +284,26 @@ const MISSIONS = [
       // lotniskowiec-baza (na kotwicy)
       const carrier = U(G, 'carrier', 4300, { team: 'pol', tag: 'own', len: 340, dir: 1 });
       carrier.y = 0;
-      const deck = W.addRunway(4300 - 150, 4300 + 150, 30, { name: 'pokład', deck: true, carrier });
+      const deck = W.addRunway(4300 - 168, 4300 + 168, 30, { name: 'pokład', deck: true, carrier });
       G.carrier = carrier; G.deck = deck;
 
       // konwój
       U(G, 'transport', 7200, { tag: 'ships', speed: 26, dir: 1, patrol: [6200, 10200] });
       U(G, 'transport', 8000, { tag: 'ships', speed: 24, dir: 1, patrol: [6200, 10200] });
       U(G, 'destroyer', 6600, { tag: 'escort', speed: 34, dir: 1, patrol: [5600, 10600] });
-      // wyspa z baterią
-      U(G, 'flak88', 8800, { tag: 'shore' });
-      U(G, 'flak', 9200, { tag: 'shore' });
-      U(G, 'bunker', 9500, { tag: 'shore' });
-      squad(G, 9000, 6);
+      // wyspa: zdobyte lotnisko polowe (można na nim lądować) i bateria nadbrzeżna
+      W.addRunway(8560, 9240, 140, { name: 'lotnisko na wyspie', island: true });
+      U(G, 'hangar', 8460, { team: 'pol', tag: 'own' });
+      U(G, 'flak88', 9700, { tag: 'shore' });
+      U(G, 'flak', 9950, { tag: 'shore' });
+      U(G, 'bunker', 10150, { tag: 'shore' });
+      squad(G, 9800, 6);
       G.playerStart = { x: 850, y: 230, grounded: true };
     },
     objectives: [
       { id: 'ships', text: 'Zatop 2 transportowce (najlepiej torpedami)', type: 'destroyTag', tag: 'ships', count: 2 },
       { id: 'escort', text: 'Zatop niszczyciel osłony', type: 'destroyTag', tag: 'escort', count: 1 },
-      { id: 'land', text: 'Wyląduj na pokładzie lotniskowca', type: 'land', deck: true },
+      { id: 'land', text: 'Wyląduj na pokładzie lotniskowca albo na lotnisku na wyspie', type: 'land', deckOrIsland: true },
     ],
     waves: [
       { t: 90, fn: G => { G.spawnEnemy('bf109', { x: 11600, y: 1400, dir: -1, ai: 'fighter' }); G.warn('Myśliwce znad morza!'); } },

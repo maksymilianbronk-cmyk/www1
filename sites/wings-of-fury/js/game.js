@@ -249,7 +249,9 @@ const G = {
     // powrót liczy się tylko wtedy, gdy maszyna faktycznie była w powietrzu
     if (allDone && landObj && this.tookOff && !this.objState[landObj.id].done) {
       const rw = this.player.groundRw;
-      if (!landObj.deck || (rw && rw.deck)) {
+      const placeOk = landObj.deckOrIsland ? !!(rw && (rw.deck || rw.island))
+        : landObj.deck ? !!(rw && rw.deck) : true;
+      if (placeOk) {
         this.objState[landObj.id].done = true;
         this.checkObjectives();
         return;
@@ -437,7 +439,7 @@ const G = {
       for (let j = i + 1; j < this.planes.length; j++) {
         const b = this.planes[j];
         if (!b.alive || b.onGround || a.team === b.team) continue;
-        const rr = (a.hitR + b.hitR) * 0.45;
+        const rr = (a.hitR + b.hitR) * 0.28;   // w widoku z boku maszyny mijają się w innej płaszczyźnie
         if (dist2(a.x, a.y, b.x, b.y) < rr * rr) {
           Particles.explosion((a.x + b.x) / 2, (a.y + b.y) / 2, 2.2);
           a.hit(a.maxHp * 1.2, a.x, a.y, this, b);

@@ -156,6 +156,9 @@ class Plane {
     const S = this.S;
     this.prop += (0.4 + this.rpm * 3) * dt * 34;
     this.wobble += dt;
+    // odstępy między strzałami i zrzutami
+    if (this.gunT > 0) this.gunT = Math.max(0, this.gunT - dt);
+    if (this.bombT > 0) this.bombT = Math.max(0, this.bombT - dt);
     if (this.invuln > 0) this.invuln -= dt;
 
     // teren pod maszyną (uwzględnia pokład lotniskowca)
@@ -379,7 +382,10 @@ class Plane {
 
     // toczenie: ciąg minus tarcie kół i opór powietrza
     const v = Math.abs(this.vx);
-    const roll = 26 + this.brakes * 520;
+    // na pokładzie lotniskowca hak chwyta liny hamujące — maszyna staje w kilkadziesiąt metrów
+    const arrest = (rw && rw.deck && this.landed && v > 12) ? 900 : 0;
+    const roll = 26 + this.brakes * 520 + arrest;
+    if (arrest && chance(0.4)) Particles.dirt(this.x - sign(this.vx) * 14, gy, 2, { spd: 90, col: '#b9b3a2' });
     const aero = S.cd0 * v * v * 1.25;
     this.vx += (S.thrust * this.rpm * Math.cos(this.a) - sign(this.vx) * (roll + aero)) * dt;
     if (Math.abs(this.vx) < 3 && this.rpm < 0.15) this.vx = 0;
@@ -503,7 +509,7 @@ class Plane {
     }
     if (this.fire > 0) {
       this.hp -= dt * 2.6;
-      if (chance(dt * 40)) Particles.fire(this.x + rnd(14, -14), this.y + rnd(8, -8), { vx: this.vx * 0.2, vy: this.vy * 0.2, sizeMul: 0.9 });
+      if (chance(dt * 20)) Particles.fire(this.x + rnd(14, -14), this.y + rnd(8, -8), { vx: this.vx * 0.2, vy: this.vy * 0.2, sizeMul: 0.85 });
       if (this.hp <= 0) this.destroy(G, this.lastHitBy);
     }
   }
@@ -532,7 +538,7 @@ class Plane {
     this.x += this.vx * dt; this.y += this.vy * dt;
     this.a += this.spin * dt;
     this.prop += dt * 6;
-    if (chance(dt * 40)) Particles.fire(this.x + rnd(12, -12), this.y + rnd(10, -10), { sizeMul: 1.3 });
+    if (chance(dt * 24)) Particles.fire(this.x + rnd(12, -12), this.y + rnd(10, -10), { sizeMul: 1.1 });
     if (chance(dt * 30)) Particles.smoke(this.x, this.y, { col: '#1c1a17', sizeMul: 1.6, dens: 1 });
     if (chance(dt * 12)) Particles.debris(this.x, this.y, 1, { spd: 60 });
 
@@ -641,7 +647,10 @@ class Plane {
     let wantA = Math.atan2(lead.y - this.y, lead.x - this.x);
 
     ai.evadeT -= dt;
-    if (d < 160 && ai.evadeT < -1.2) { ai.evadeT = rnd(2.4, 1.2); ai.evadeDir = chance(0.5) ? 1 : -1; }
+    // rozejście się przy locie czołowym — inaczej obie maszyny lecą na taran
+    const headOn = Math.abs(wrapAngle(Math.atan2(target.vy, target.vx) - this.a)) > 2.1;
+    if (headOn && d < 420 && ai.evadeT < 0) { ai.evadeT = rnd(1.6, 0.9); ai.evadeDir = this.y > target.y ? 1 : -1; }
+    if (d < 190 && ai.evadeT < -1.2) { ai.evadeT = rnd(2.4, 1.2); ai.evadeDir = chance(0.5) ? 1 : -1; }
     if (ai.evadeT > 0) {
       wantA = this.a + ai.evadeDir * 1.2;
       this.aiSteer(dt, wantA, 1);
@@ -662,10 +671,9 @@ class Plane {
     const aimErr = Math.abs(wrapAngle(wantA - this.a));
     ai.fireT -= dt;
     if (d < 720 && aimErr < 0.1 && ai.fireT <= 0) {
-      this.gunT -= dt;
-      if (this.gunT <= 0) this.fireGuns(G);
+      this.fireGuns(G);
       if (chance(dt * 1.2)) ai.fireT = rnd(1.4, 0.4) / D.enemy;
-    } else this.gunT = Math.max(0, this.gunT - dt);
+    }
   }
 
   aiPatrol(dt, G) {

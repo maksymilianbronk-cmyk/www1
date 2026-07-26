@@ -81,16 +81,20 @@ class Bullet {
     const z = Cam.zoom;
     const sx = Cam.sx(this.x, W), sy = Cam.sy(this.y, H);
     if (sx < -40 || sx > W + 40 || sy < -40 || sy > H + 40) return;
-    const psx = Cam.sx(this.px, W), psy = Cam.sy(this.py, H);
+    // wydłużamy smugę względem realnego kroku, żeby czytała się jako pocisk w locie
+    const tailX = this.x - this.vx * 0.026, tailY = this.y - this.vy * 0.026;
+    const psx = Cam.sx(Math.abs(tailX - this.px) > 4 ? tailX : this.px, W);
+    const psy = Cam.sy(Math.abs(tailY - this.py) > 4 ? tailY : this.py, H);
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.strokeStyle = this.team === 'pol' ? 'rgba(255,238,170,.95)' : 'rgba(255,150,90,.95)';
-    ctx.lineWidth = Math.max(1, (this.kind === 'flak' ? 2.4 : 1.6) * z);
     ctx.lineCap = 'round';
+    // poświata (addytywnie) + twardy rdzeń pocisku smugowego
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = this.team === 'pol' ? 'rgba(255,176,60,.5)' : 'rgba(255,110,50,.5)';
+    ctx.lineWidth = Math.max(1.5, (this.kind === 'flak' ? 5 : 3.4) * z);
     ctx.beginPath(); ctx.moveTo(psx, psy); ctx.lineTo(sx, sy); ctx.stroke();
-    ctx.globalAlpha = 0.5;
-    ctx.strokeStyle = this.team === 'pol' ? 'rgba(255,255,220,.5)' : 'rgba(255,90,40,.5)';
-    ctx.lineWidth = Math.max(1, 3.6 * z);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = this.team === 'pol' ? '#ffd257' : '#ff9c5a';
+    ctx.lineWidth = Math.max(1, (this.kind === 'flak' ? 2 : 1.3) * z);
     ctx.beginPath(); ctx.moveTo(psx, psy); ctx.lineTo(sx, sy); ctx.stroke();
     ctx.restore();
   }

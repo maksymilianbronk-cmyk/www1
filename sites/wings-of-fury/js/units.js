@@ -39,6 +39,8 @@ class Unit {
       animT: rnd(10), state: 'idle', gunAngle: 0.9, fireT: rnd(3, 0.5), burst: 0, burstT: 0,
       tag: o.tag || o.type, vx: 0, speed: o.speed ?? 0, hitFlash: 0, scale: o.scale || 1,
       ship: o.ship || null, len: o.len || 180, sink: 0, big: o.big || false,
+      // nasza obrona plot. jest wsparciem, nie zastępstwem dla pilota
+      skill: (o.team || 'ger') === 'pol' ? 0.4 : 1,
       color: o.color, alt: o.alt || 0, patrol: o.patrol || null, id: Unit.nextId++,
     });
     if (o.type === 'transport' || o.type === 'destroyer' || o.type === 'carrier') {
@@ -199,7 +201,7 @@ class Unit {
     if (!P) { this.gunAngle = approach(this.gunAngle, 1.1, dt * 0.6); this.burst = 0; return; }
     const dx = P.x - this.x, dy = P.y - (this.y + 14);
     const d = Math.hypot(dx, dy);
-    const range = this.type === 'flak88' ? 2400 : 1500;
+    const range = (this.type === 'flak88' ? 2400 : 1500) * (this.skill < 1 ? 0.7 : 1);
     if (!P.alive || d > range) { this.gunAngle = approach(this.gunAngle, 1.1, dt * 0.6); this.burst = 0; return; }
 
     // wyprzedzenie toru lotu
@@ -216,7 +218,7 @@ class Unit {
       if (this.burstT <= 0) {
         this.burst--;
         this.burstT = this.type === 'flak88' ? 0.9 : 0.09;
-        const spread = (this.type === 'flak88' ? 0.055 : 0.035) / D.aa;
+        const spread = (this.type === 'flak88' ? 0.055 : 0.035) / (D.aa * this.skill);
         const aa = a + rnd(spread, -spread);
         if (this.type === 'flak88') {
           this._flakTarget = P;
@@ -225,7 +227,7 @@ class Unit {
           G.spawnBullet({
             x: this.x + Math.cos(aa) * 20, y: this.y + 16 + Math.sin(aa) * 20,
             vx: Math.cos(aa) * shellV, vy: Math.sin(aa) * shellV,
-            dmg: 5.5 * D.dmg, team: this.team, kind: 'flak', life: 2.2, tracer: true,
+            dmg: 5.5 * D.dmg * this.skill, team: this.team, kind: 'flak', life: 2.2, tracer: true,
           });
         }
         Particles.flash(this.x + Math.cos(aa) * 22, this.y + 16 + Math.sin(aa) * 22, this.type === 'flak88' ? 16 : 9, 0.07);
@@ -235,7 +237,7 @@ class Unit {
     } else if (this.fireT <= 0) {
       this.burst = this.type === 'flak88' ? 1 : rndi(5, 9);
       this.burstT = 0;
-      this.fireT = (this.type === 'flak88' ? rnd(3.4, 2) : rnd(2.4, 1.1)) / D.aa;
+      this.fireT = (this.type === 'flak88' ? rnd(3.4, 2) : rnd(2.4, 1.1)) / (D.aa * this.skill);
     }
   }
 

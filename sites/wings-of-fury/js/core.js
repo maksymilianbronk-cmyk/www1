@@ -428,7 +428,7 @@ const Particles = {
     const p = clamp(power, 0.35, 4);
     this.flash(x, y, 26 * p, 0.13);
     this.ring(x, y, 8 * p, 90 * p, 0.42, 'rgba(255,210,140,.55)');
-    if (p > 1.2) this.ring(x, y, 4 * p, 150 * p, 0.7, 'rgba(255,255,255,.14)');
+    if (p > 1.9) this.ring(x, y, 4 * p, 120 * p, 0.5, 'rgba(255,255,255,.10)');
     const n = Math.round(16 * p * qScale());
     for (let i = 0; i < n; i++) {
       const a = rnd(TAU), s = rnd(240 * p, 40);
@@ -521,12 +521,12 @@ function drawParticles(ctx, W, H) {
     const s = Math.max(0.4, p.size * z);
     switch (p.type) {
       case 'fire': {
-        const a = clamp(t * t * 0.9, 0, 1);
-        if (a < 0.02) break;
+        const a = clamp(t * t * t * 1.05, 0, 1);
+        if (a < 0.04) break;
         const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, s);
         g.addColorStop(0, rgba('#fff2c8', a));
-        g.addColorStop(0.35, rgba(p.col, a * 0.85));
-        g.addColorStop(0.7, rgba(p.col, a * 0.3));
+        g.addColorStop(0.28, rgba(p.col, a * 0.8));
+        g.addColorStop(0.62, rgba(p.col, a * 0.18));
         g.addColorStop(1, rgba(p.col, 0));
         ctx.globalAlpha = 1;
         ctx.fillStyle = g;
