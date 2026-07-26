@@ -1,56 +1,69 @@
-# Zdjęcia i logo — pliki do podmiany
+# Materiały graficzne Dormed Medical SPA
 
-Strona jest gotowa na oryginalne materiały Dormed Medical SPA. Dopóki pliku nie ma,
-w jego miejscu wyświetla się elegancki wzór graficzny (SVG) — **nic się nie „psuje"**.
-Po wgraniu pliku o właściwej nazwie zdjęcie pojawia się automatycznie.
+Wszystkie pliki w tym folderze pochodzą **od klienta** (oryginalne logo i zdjęcia
+z gabinetów Dormed Medical SPA) albo zostały z nich wygenerowane.
 
-## Logo — **`logo.svg`**
+## Logo i ikony
 
-W repozytorium leży `logo.svg` — sygnet odtworzony w kolorach marki
-(bordo `#6E1533` + złoto `#C9A15B`). **Aby wstawić oryginalne logo Dormed,
-wystarczy nadpisać ten jeden plik** (`logo.svg` lub `logo.png` — wtedy zmień
-rozszerzenie w plikach HTML: szukaj `assets/img/logo.svg`).
+| Plik | Zastosowanie |
+|---|---|
+| `logo.png` | oryginalne logo Dormed (przezroczyste tło) — nagłówek i stopka |
+| `logo@3x.png` | wersja dla ekranów Retina (`srcset`) |
+| `favicon.png` | ikona karty przeglądarki (64 px, logo na bordowym tle) |
+| `apple-touch-icon.png` | ikona na ekranie głównym iOS (180 px) |
+| `icon-512.png` | duża ikona (PWA / katalogi) |
+| `og.jpg` | miniatura do social media, 1200×630 (kadr z budynku) |
 
-Wymagania: przezroczyste tło, proporcje poziome ok. 3:1, wysokość min. 120 px.
-Na ciemnych tłach (nagłówek na zdjęciu, stopka) logo jest automatycznie
-wyświetlane w wersji białej — nie trzeba przygotowywać osobnego pliku.
+## Zdjęcia obiektu i zabiegów
 
-## Zdjęcia (format .jpg, proporcje jak w opisie)
-
-| Plik | Gdzie | Zalecane |
+| Plik | Co przedstawia | Gdzie użyte |
 |---|---|---|
-| `hero-dormed.jpg` | nagłówek strony głównej | 2000×1200, poziome |
-| `og.jpg` | miniatura do social media (Open Graph) | 1200×630 |
-| `osrodek-recepcja.jpg` | strona główna — sekcja „Uzdrowisko" | 1200×950 |
-| `pokoj-1.jpg`, `pokoj-2.jpg` | pokoje | 1200×900 |
-| `pakiet-pobyt.jpg` | kafelek „Pobyty i turnusy" | 900×1200 |
-| `tezania-busko.jpg` | kafelek „Okolica" | 900×1200 |
-| `osrodek-hero.jpg` | nagłówek podstrony Ośrodek | 2000×1000 |
-| `galeria-1.jpg` … `galeria-6.jpg` | galeria ośrodka | 1200×900 |
-| `busko-park.jpg` | Park Zdrojowy | 1200×950 |
-| `rehabilitacja-hero.jpg` | nagłówek Rehabilitacja | 2000×1000 |
-| `balneologia.jpg` | sekcja balneologii | 1200×750 |
-| `medycyna-estetyczna-hero.jpg` | nagłówek Medycyna estetyczna | 2000×1000 |
-| `medycyna-estetyczna-1.jpg` | konsultacja (pionowe) | 900×1140 |
-| `medycyna-estetyczna-2.jpg` | zabieg | 1200×750 |
-| `kosmetologia-hero.jpg` | nagłówek Kosmetologia | 2000×1000 |
-| `kosmetologia-cialo.jpg` | zabiegi na ciało | 1200×950 |
-| `podologia.jpg` | gabinet podologiczny | 1200×750 |
-| `masaze-hero.jpg` | nagłówek Masaże | 2000×1000 |
-| `masaze-1.jpg` | rytuał (pionowe) | 900×1140 |
-| `masaze-2.jpg` | strefa relaksu | 1200×750 |
-| `pakiety-hero.jpg` | nagłówek Pakiety | 2000×1000 |
-| `pakiety-dodatki.jpg` | zabiegi dodatkowe | 1200×750 |
-| `cennik-hero.jpg` | nagłówek Cennik | 2000×1000 |
-| `o-nas-hero.jpg` | nagłówek O nas | 2000×1000 |
-| `dr-dorota-sagan.jpg` | portret (pionowe) | 900×1140 |
-| `busko-uzdrowisko.jpg` | Busko-Zdrój | 1200×750 |
-| `kontakt-hero.jpg` | nagłówek Kontakt | 2000×1000 |
+| `budynek-dormed.jpg` | budynek kliniki z bannerem, ul. Rokosza 5 | nagłówki Ośrodek / O nas / Kontakt, kafelki, galerie |
+| `gabinet-masazu.jpg` | gabinet masażu podczas zabiegu | nagłówek strony głównej, Masaże, Pakiety |
+| `kapiel-balneologia.jpg` | kąpiel lecznicza przy świecach | Rehabilitacja (balneologia), Pakiety, galerie |
+| `laser-wysokoenergetyczny.jpg` | laser wysokoenergetyczny | Rehabilitacja, Kosmetologia (laser), kafelek |
+| `pst-urzadzenie.jpg` | urządzenie PST (osteoporoza, artroza) | Rehabilitacja, galerie |
+| `plakat-pst.jpg` | plakat „PST — redukcja bólu" | Rehabilitacja (lightbox) |
+| `presoterapia.jpg` | presoterapia BOA — drenaż limfatyczny | Kosmetologia (ciało), Cennik, galerie |
+| `detoks-stop.jpg` | detoks i pielęgnacja stóp | Podologia, galerie |
+| `masaz-kark.jpg` | masaż karku i obręczy barkowej | nagłówek Rehabilitacji, Masaże |
+| `masaz-plecy.jpg` | masaż leczniczy kręgosłupa | galeria Rehabilitacji |
+| `masaz-orientalny.jpg` | kadr z plakatu „Relax" | nagłówek Masaży orientalnych |
+| `plakat-relax.jpg` | plakat masażu marokańskiego | Masaże orientalne (lightbox) |
 
-## Wskazówki
+## Metamorfozy „przed / po"
 
-* Zdjęcia zapisz w formacie **JPG, jakość ~80%**, szerokość maks. 2000 px —
-  to wystarczy do ekranów Retina i utrzymuje szybkie ładowanie.
-* Jeśli masz pliki `.webp`, po prostu zmień rozszerzenia w plikach HTML
-  (wyszukaj `assets/img/` i podmień).
-* Do miniatury `og.jpg` najlepiej nadaje się kadr z logo lub wnętrzem kliniki.
+Kolaże przysłane przez klienta zostały **rozcięte na osobne pliki**, żeby działał
+interaktywny suwak porównawczy na podstronie *Medycyna estetyczna*:
+
+| Para plików | Zabieg |
+|---|---|
+| `ba-usta-przed.jpg` / `ba-usta-po.jpg` | modelowanie i nawilżenie ust |
+| `ba-usta2-przed.jpg` / `ba-usta2-po.jpg` | zmarszczki wokół ust, czerwień wargowa |
+| `ba-oko-przed.jpg` / `ba-oko-po.jpg` | okolica oczu |
+| `ba-zmarszczki-przed.jpg` / `ba-zmarszczki-po.jpg` | policzek i szyja |
+
+> **Ważne:** zdjęcia pacjentów publikujemy przy adnotacji o zgodzie i indywidualnym
+> charakterze efektu. Przed publikacją produkcyjną upewnij się, że klient dysponuje
+> pisemnymi zgodami na wykorzystanie wizerunku.
+
+## Czego jeszcze brakuje (opcjonalnie)
+
+Poniższych kadrów klient nie przesłał — w ich miejscu wyświetla się elegancki wzór SVG,
+więc **nic nie wygląda na zepsute**. Wystarczy wrzucić plik o podanej nazwie, żeby się pojawił:
+
+| Plik | Co warto sfotografować |
+|---|---|
+| `pokoj-1.jpg`, `pokoj-2.jpg` | pokój 1- i 2-osobowy |
+| `recepcja.jpg` | recepcja i strefa wypoczynku |
+| `taras.jpg` | taras |
+| `jadalnia.jpg` | jadalnia / bufet śniadaniowy |
+| `dr-dorota-sagan.jpg` | portret dr n. med. Doroty Sagan (pionowy) |
+| `busko-park.jpg` | Nowy Park Zdrojowy lub tężnia |
+
+## Wskazówki techniczne
+
+* Zdjęcia zapisuj jako **JPG, jakość ~84%**, szerokość maks. 1800 px.
+* Pliki `.webp` też zadziałają — zmień wtedy rozszerzenie w plikach HTML
+  (wyszukaj `assets/img/`).
+* Logo: przezroczyste tło, proporcje poziome, wysokość min. 240 px.

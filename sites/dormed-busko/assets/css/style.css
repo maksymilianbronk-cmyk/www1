@@ -239,27 +239,33 @@ section { position: relative; }
   gap: 1rem; width: min(100% - 1.6rem, 1400px); min-width: 0;
 }
 
-/* logo — podmienialny plik assets/img/logo.svg */
-.brand { display: flex; align-items: center; flex: none; min-height: 44px; }
+/* logo — oryginalny plik assets/img/logo.png */
+.brand { display: flex; align-items: center; gap: .45rem; flex: none; min-height: 44px; }
 .brand__img {
-  height: 46px; width: auto; max-width: min(46vw, 230px); object-fit: contain;
+  height: 54px; width: auto; max-width: min(38vw, 190px); object-fit: contain;
   transition: height .45s var(--ease-soft), filter .4s var(--ease-soft);
+  filter: drop-shadow(0 1px 2px rgba(44,7,21,.22));
 }
-.header.is-stuck .brand__img { height: 38px; }
-/* na ciemnym tle logo w wersji białej — działa dla dowolnego pliku klienta */
-.header--light:not(.is-stuck) .brand__img,
-.footer .brand__img,
-.mobile-nav .brand__img { filter: brightness(0) invert(1); }
-.footer .brand__img { height: 52px; }
+.header.is-stuck .brand__img { height: 42px; }
+.header--light:not(.is-stuck) .brand__img { filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+.brand__txt { display: flex; flex-direction: column; line-height: 1; padding-bottom: 2px; }
+.brand__sub {
+  font-size: .75rem; font-weight: 800; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold-700); white-space: nowrap;
+}
+.header--light:not(.is-stuck) .brand__sub { color: var(--gold-300); }
+.footer .brand__img { height: 68px; }
+.footer .brand__sub { color: var(--gold-500); }
+@media (max-width: 520px) { .brand__txt { display: none; } .brand__img { height: 46px; } }
 
-.nav { display: flex; align-items: center; gap: .2rem; }
+.nav { display: flex; align-items: center; gap: 0; min-width: 0; }
 .nav__link {
-  position: relative; padding: .65rem .78rem; border-radius: var(--r-sm);
-  font-size: .87rem; font-weight: 600; color: var(--ink-70);
+  position: relative; padding: .65rem .58rem; border-radius: var(--r-sm);
+  font-size: .85rem; font-weight: 600; color: var(--ink-70);
   white-space: nowrap; transition: color .25s;
 }
 .nav__link::after {
-  content: ""; position: absolute; left: .78rem; right: .78rem; bottom: .42rem; height: 1.5px;
+  content: ""; position: absolute; left: .58rem; right: .58rem; bottom: .42rem; height: 1.5px;
   background: var(--gold-500); transform: scaleX(0); transform-origin: left;
   transition: transform .4s var(--ease);
 }
@@ -269,7 +275,7 @@ section { position: relative; }
 .header--light:not(.is-stuck) .nav__link:hover,
 .header--light:not(.is-stuck) .nav__link[aria-current="page"] { color: #fff; }
 
-.header__cta { display: flex; align-items: center; gap: .55rem; flex: none; }
+.header__cta { display: flex; align-items: center; gap: .45rem; flex: none; }
 .header__phone {
   display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
   font-weight: 700; font-size: .9rem; color: var(--bordo-700);
@@ -349,7 +355,8 @@ body.nav-open .mobile-nav a.mnav__link { animation: mnavIn .5s var(--ease) forwa
 .hero__veil {
   position: absolute; inset: 0; z-index: 1;
   background:
-    linear-gradient(180deg, rgba(44,7,21,.62) 0%, rgba(44,7,21,.25) 38%, rgba(44,7,21,.86) 100%),
+    linear-gradient(105deg, rgba(44,7,21,.9) 0%, rgba(44,7,21,.62) 46%, rgba(44,7,21,.34) 100%),
+    linear-gradient(180deg, rgba(44,7,21,.5) 0%, rgba(44,7,21,.2) 38%, rgba(44,7,21,.88) 100%),
     radial-gradient(1100px 620px at 78% 18%, rgba(201,161,91,.2), transparent 62%);
 }
 .hero__inner { position: relative; z-index: 3; width: 100%; }
@@ -900,7 +907,7 @@ body.nav-open .mobile-nav a.mnav__link { animation: mnavIn .5s var(--ease) forwa
 @media (max-width: 1180px) {
   .deco-ring { display: none; }
 }
-@media (max-width: 1120px) {
+@media (max-width: 1200px) {
   .nav { display: none; }
   .burger { display: flex; }
   .header__phone span { display: none; }
@@ -945,3 +952,169 @@ body.nav-open .mobile-nav a.mnav__link { animation: mnavIn .5s var(--ease) forwa
   body { color: #000; background: #fff; }
   [data-reveal], .stagger > * { opacity: 1 !important; transform: none !important; }
 }
+
+/* ============================================================
+   27. Metamorfozy — suwak PRZED / PO
+   ============================================================ */
+.ba {
+  position: relative; overflow: hidden;
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-md);
+  background: var(--sand);
+  touch-action: pan-y;
+  cursor: ew-resize;
+  isolation: isolate;
+  --pos: 50%;
+  aspect-ratio: var(--ba-ratio, 3 / 2);
+}
+.ba__img {
+  display: block; width: 100%; height: 100%;
+  object-fit: cover; object-position: var(--ba-pos, center);
+}
+.ba__after {
+  position: absolute; inset: 0;
+  clip-path: inset(0 0 0 var(--pos));
+  will-change: clip-path;
+}
+.ba__after img { width: 100%; height: 100%; object-fit: cover; object-position: var(--ba-pos, center); }
+.ba__line {
+  position: absolute; top: 0; bottom: 0; left: var(--pos);
+  width: 2px; margin-left: -1px; z-index: 3;
+  background: linear-gradient(180deg, rgba(255,255,255,.5), #fff 20%, #fff 80%, rgba(255,255,255,.5));
+  box-shadow: 0 0 14px rgba(44,7,21,.5);
+  pointer-events: none;
+}
+.ba__grip {
+  position: absolute; top: 50%; left: var(--pos); z-index: 4;
+  transform: translate(-50%, -50%);
+  width: 52px; height: 52px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255,252,250,.94);
+  box-shadow: 0 8px 26px -8px rgba(44,7,21,.7), inset 0 0 0 1px rgba(154,117,52,.4);
+  color: var(--bordo-700);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+  pointer-events: none;
+}
+.ba:hover .ba__grip { transform: translate(-50%, -50%) scale(1.08); }
+.ba__grip svg { width: 24px; height: 24px; }
+.ba__tag {
+  position: absolute; top: .9rem; z-index: 5;
+  padding: .35rem .8rem; border-radius: var(--r-pill);
+  font-size: var(--fs-micro); font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+.ba__tag--before { left: .9rem; background: rgba(44,7,21,.62); color: rgba(255,255,255,.92); }
+.ba__tag--after  { right: .9rem; background: rgba(201,161,91,.92); color: var(--bordo-950); }
+.ba__range {
+  position: absolute; inset: 0; z-index: 6;
+  width: 100%; height: 100%; margin: 0; padding: 0;
+  opacity: 0; cursor: ew-resize;
+  -webkit-appearance: none; appearance: none; background: transparent;
+}
+.ba__range::-webkit-slider-thumb { -webkit-appearance: none; width: 56px; height: 100%; }
+.ba__range::-moz-range-thumb { width: 56px; height: 100%; border: 0; background: transparent; }
+.ba__range:focus-visible + .ba__line { box-shadow: 0 0 0 3px var(--gold-500); }
+.ba__caption {
+  margin-top: .9rem; font-size: var(--fs-small); color: var(--ink-50); text-align: center;
+}
+.bg-bordo .ba__caption { color: rgba(255,255,255,.62); }
+.ba-hint {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: var(--fs-small); color: var(--ink-50);
+}
+.ba-hint svg { width: 17px; height: 17px; color: var(--gold-600); }
+/* delikatne „mrugnięcie" suwaka przy pierwszym pokazaniu */
+@keyframes baPeek {
+  0%, 100% { --pos: 50%; }
+  35%      { --pos: 34%; }
+  70%      { --pos: 62%; }
+}
+@property --pos { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+.ba.is-peek { animation: baPeek 2.6s var(--ease) 1; }
+
+/* ============================================================
+   28. Lightbox galerii
+   ============================================================ */
+.lightbox {
+  position: fixed; inset: 0; z-index: 200;
+  display: grid; place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background: rgba(28,5,14,.94);
+  backdrop-filter: blur(10px);
+  opacity: 0; visibility: hidden;
+  transition: opacity .35s var(--ease), visibility .35s;
+}
+.lightbox.is-open { opacity: 1; visibility: visible; }
+.lightbox img {
+  max-width: min(100%, 1200px); max-height: 82vh; width: auto;
+  border-radius: var(--r-md); box-shadow: var(--sh-lg);
+  transform: scale(.96); transition: transform .4s var(--ease);
+}
+.lightbox.is-open img { transform: none; }
+.lightbox__cap {
+  margin-top: 1rem; text-align: center; color: rgba(255,255,255,.75);
+  font-size: var(--fs-small); letter-spacing: .04em;
+}
+.lightbox__btn {
+  position: absolute; z-index: 2;
+  width: 52px; height: 52px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255,255,255,.1); color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.22);
+  transition: background .3s, transform .3s var(--ease);
+}
+.lightbox__btn:hover { background: var(--gold-500); color: var(--bordo-950); transform: scale(1.06); }
+.lightbox__btn svg { width: 22px; height: 22px; }
+.lightbox__close { top: 1rem; right: 1rem; }
+.lightbox__prev { left: clamp(.5rem, 2vw, 2rem); top: 50%; margin-top: -26px; }
+.lightbox__next { right: clamp(.5rem, 2vw, 2rem); top: 50%; margin-top: -26px; }
+.lightbox__prev svg { transform: rotate(180deg); }
+@media (max-width: 640px) {
+  .lightbox__prev { left: .5rem; } .lightbox__next { right: .5rem; }
+  .lightbox img { max-height: 68vh; }
+}
+
+/* powiększalne kafelki galerii */
+.gallery a { cursor: zoom-in; }
+.gallery a::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgba(44,7,21,.55));
+  opacity: 0; transition: opacity .4s var(--ease);
+}
+.gallery a:hover::after, .gallery a:focus-visible::after { opacity: 1; }
+.gallery figcaption {
+  position: absolute; left: .8rem; right: .8rem; bottom: .7rem; z-index: 2;
+  color: #fff; font-size: var(--fs-small); font-weight: 600;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .4s var(--ease), transform .4s var(--ease);
+}
+.gallery a:hover figcaption, .gallery a:focus-visible figcaption { opacity: 1; transform: none; }
+
+/* ============================================================
+   29. Pasek przewijanych plakatów / dodatkowe drobiazgi
+   ============================================================ */
+.poster {
+  border-radius: var(--r-md); overflow: hidden;
+  box-shadow: var(--sh-sm);
+  transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.poster:hover { transform: translateY(-6px) rotate(-.6deg); box-shadow: var(--sh-md); }
+
+.photo-strip { display: grid; gap: var(--gap); grid-template-columns: repeat(4, 1fr); }
+.photo-strip figure { margin: 0; }
+.photo-strip .img-slot {
+  border-radius: var(--r-md); aspect-ratio: 1;
+  box-shadow: var(--sh-xs);
+}
+.photo-strip figcaption {
+  margin-top: .65rem; font-size: var(--fs-small); font-weight: 600; color: var(--ink-70);
+}
+.photo-strip figcaption small { display: block; font-weight: 400; color: var(--ink-50); font-size: .8rem; }
+.bg-bordo .photo-strip figcaption { color: #fff; }
+.bg-bordo .photo-strip figcaption small { color: rgba(255,255,255,.62); }
+@media (max-width: 900px) { .photo-strip { grid-template-columns: repeat(2, 1fr); } }
+
+/* subtelny efekt „ken burns" na zdjęciach w kadrach */
+.frame img { transition: transform 1.4s var(--ease); }
+.frame:hover img { transform: scale(1.05); }

@@ -203,7 +203,104 @@
     });
   }
 
-  /* ---------- 11. Płynne przewijanie do kotwic ---------- */
+  /* ---------- 11. Metamorfozy: suwak PRZED / PO ---------- */
+  $$('.ba').forEach(function (ba) {
+    var range = $('.ba__range', ba);
+    if (!range) return;
+
+    function set(pct) {
+      pct = Math.max(0, Math.min(100, pct));
+      ba.style.setProperty('--pos', pct + '%');
+      range.value = pct;
+      range.setAttribute('aria-valuenow', Math.round(pct));
+    }
+    range.addEventListener('input', function () { set(parseFloat(range.value)); });
+
+    function fromPointer(e) {
+      var r = ba.getBoundingClientRect();
+      set(((e.clientX - r.left) / r.width) * 100);
+    }
+    ba.addEventListener('pointerdown', function (e) {
+      if (e.target === range) return;
+      ba.setPointerCapture(e.pointerId); fromPointer(e);
+    });
+    ba.addEventListener('pointermove', function (e) {
+      if (e.buttons === 1 && ba.hasPointerCapture && ba.hasPointerCapture(e.pointerId)) fromPointer(e);
+    });
+
+    set(parseFloat(range.value || 50));
+
+    // jednorazowa podpowiedź, że suwak da się przeciągnąć
+    if (!reduced && 'IntersectionObserver' in window) {
+      var peek = new IntersectionObserver(function (en) {
+        en.forEach(function (x) {
+          if (!x.isIntersecting) return;
+          ba.classList.add('is-peek');
+          setTimeout(function () { ba.classList.remove('is-peek'); }, 2700);
+          peek.unobserve(ba);
+        });
+      }, { threshold: 0.45 });
+      peek.observe(ba);
+    }
+  });
+
+  /* ---------- 12. Lightbox galerii ---------- */
+  var zoomables = $$('[data-zoom]');
+  if (zoomables.length) {
+    var box = document.createElement('div');
+    box.className = 'lightbox';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', 'Powiększone zdjęcie');
+    box.innerHTML =
+      '<button class="lightbox__btn lightbox__close" type="button" aria-label="Zamknij">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">' +
+        '<path d="M6 6l12 12M18 6 6 18"/></svg></button>' +
+      '<button class="lightbox__btn lightbox__prev" type="button" aria-label="Poprzednie">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M4 12h15m-6-6 6 6-6 6"/></svg></button>' +
+      '<button class="lightbox__btn lightbox__next" type="button" aria-label="Następne">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M4 12h15m-6-6 6 6-6 6"/></svg></button>' +
+      '<figure style="margin:0"><img alt="Powiększone zdjęcie"><figcaption class="lightbox__cap"></figcaption></figure>';
+    document.body.appendChild(box);
+
+    var lbImg = $('img', box), lbCap = $('.lightbox__cap', box), idx = 0, opener = null;
+
+    function show(i) {
+      idx = (i + zoomables.length) % zoomables.length;
+      var src = zoomables[idx].getAttribute('data-zoom');
+      var cap = zoomables[idx].getAttribute('data-caption') || '';
+      lbImg.src = src; lbImg.alt = cap; lbCap.textContent = cap;
+    }
+    function open(i, from) {
+      opener = from || null;
+      show(i);
+      box.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      $('.lightbox__close', box).focus();
+    }
+    function close() {
+      box.classList.remove('is-open');
+      document.body.style.overflow = '';
+      if (opener) opener.focus();
+    }
+    zoomables.forEach(function (el, i) {
+      el.addEventListener('click', function (e) { e.preventDefault(); open(i, el); });
+    });
+    $('.lightbox__close', box).addEventListener('click', close);
+    $('.lightbox__prev', box).addEventListener('click', function () { show(idx - 1); });
+    $('.lightbox__next', box).addEventListener('click', function () { show(idx + 1); });
+    box.addEventListener('click', function (e) { if (e.target === box) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (!box.classList.contains('is-open')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') show(idx + 1);
+      if (e.key === 'ArrowLeft') show(idx - 1);
+    });
+  }
+
+  /* ---------- 13. Płynne przewijanie do kotwic ---------- */
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href^="#"]');
     if (!a) return;
