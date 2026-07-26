@@ -7,22 +7,36 @@
 const Art = {
 
   /* ---------------- elementy wspólne ---------------- */
-  propDisc(ctx, x, r, spin, col = 'rgba(220,225,230,.28)') {
+  /* Malowanie z 1939 r.: polskie khaki i błękit spodu, niemiecki splinter. */
+  POL: { top: '#6f6c4a', topL: '#7d7a55', topD: '#585640', bot: '#9db0bb' },
+  GER: { top: '#4e5947', topL: '#5c6853', topD: '#3b4435', bot: '#9fb4c2' },
+
+  propDisc(ctx, x, r, spin, col = 'rgba(214,220,226,.9)', cy = 0) {
     ctx.save();
-    ctx.translate(x, 0);
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = col;
-    ctx.beginPath(); ctx.ellipse(0, 0, 3.2, r, 0, 0, TAU); ctx.fill();
-    ctx.globalAlpha = 0.85;
-    ctx.strokeStyle = '#2b2b2b'; ctx.lineWidth = 1.5;
+    ctx.translate(x, cy);
+    // rozmyty krąg pracującego śmigła
+    const g = ctx.createLinearGradient(-r * 0.34, 0, r * 0.34, 0);
+    g.addColorStop(0, 'rgba(206,214,222,0)');
+    g.addColorStop(0.35, 'rgba(214,220,226,.26)');
+    g.addColorStop(0.6, 'rgba(226,232,238,.34)');
+    g.addColorStop(1, 'rgba(206,214,222,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.ellipse(0, 0, r * 0.34, r, 0, 0, TAU); ctx.fill();
+    // dwie łopaty jako smugi — długość zmienia się z fazą obrotu
+    ctx.strokeStyle = 'rgba(46,48,44,.42)';
+    ctx.lineCap = 'round';
     for (let i = 0; i < 2; i++) {
       const a = spin + i * Math.PI;
+      const len = Math.sin(a) * r;
+      ctx.lineWidth = 1 + Math.abs(Math.cos(a)) * 1.4;
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.lineTo(Math.cos(a) * 1.5, Math.sin(a) * r);
+      ctx.quadraticCurveTo(Math.cos(a) * 2.4, len * 0.55, Math.cos(a) * 1.2, len);
       ctx.stroke();
     }
-    ctx.globalAlpha = 1;
+    // kołpak
+    ctx.fillStyle = '#31352c';
+    ctx.beginPath(); ctx.ellipse(-1, 0, 2, 3, 0, 0, TAU); ctx.fill();
     ctx.restore();
   },
 
@@ -77,377 +91,599 @@ const Art = {
     f.call(this, ctx, o);
   },
 
-  /* --- PWS-26: dwupłatowiec szkolny --- */
+  /* --------------------------------------------------------------------
+     Sylwetki odwzorowane z rysunków bocznych (Militaria 615 „1939"):
+     proporcje wg rzeczywistych długości, skala 9 px = 1 m,
+     malowanie polskie: khaki na górze, błękit od spodu.
+     Płat rysujemy jako cięciwę przy kadłubie (jak na rysunku bocznym),
+     a nie jako pas na całą długość maszyny.
+     -------------------------------------------------------------------- */
+
+  /** Biało-czerwony pas na sterze kierunku. */
+  rudderFlash(ctx, x0, y0, x1, y1, w) {
+    ctx.save();
+    ctx.fillStyle = '#f4f1e8';
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.lineTo(x1 + w, y1); ctx.lineTo(x0 + w, y0); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#d21f26';
+    ctx.beginPath(); ctx.moveTo(x0 + w, y0); ctx.lineTo(x1 + w, y1); ctx.lineTo(x1 + w * 2, y1); ctx.lineTo(x0 + w * 2, y0); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  },
+
+  /** Owiewka („spodenka") stałego podwozia. */
+  spat(ctx, x, y, h, s = 1) {
+    ctx.fillStyle = Art.POL.topD;
+    ctx.beginPath();
+    ctx.moveTo(x - 3 * s, y);
+    ctx.quadraticCurveTo(x - 4.6 * s, y + h * 0.6, x - 3.4 * s, y + h);
+    ctx.lineTo(x + 3.4 * s, y + h);
+    ctx.quadraticCurveTo(x + 4.6 * s, y + h * 0.6, x + 3 * s, y);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#17171a';
+    ctx.beginPath(); ctx.arc(x, y + h + 1.2 * s, 4.2 * s, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#3d3d40';
+    ctx.beginPath(); ctx.arc(x, y + h + 1.2 * s, 1.7 * s, 0, TAU); ctx.fill();
+  },
+
+  /** Dalszy płat w perspektywie — jak na rysunkach bocznych z Militarii:
+      od nasady biegnie w tył i w dół, spod kadłuba wystaje wyraźna końcówka. */
+  farWing(ctx, rootLE, rootTE, y, tipX, tipY, chordTip, col, colEdge) {
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.moveTo(rootLE, y);
+    ctx.lineTo(tipX, tipY);
+    ctx.quadraticCurveTo(tipX - 4.5, tipY + chordTip * 0.55, tipX + 3, tipY + chordTip);
+    ctx.lineTo(rootTE, y + chordTip * 0.55);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = colEdge || 'rgba(0,0,0,.18)';
+    ctx.beginPath();
+    ctx.moveTo(rootLE, y); ctx.lineTo(tipX, tipY);
+    ctx.lineTo(tipX + 1.6, tipY + 1.4); ctx.lineTo(rootLE, y + 1.4);
+    ctx.closePath(); ctx.fill();
+  },
+
+  /** Gwiazdowy silnik w pierścieniu Townenda / NACA. */
+  radial(ctx, x, r) {
+    ctx.fillStyle = '#31352c';
+    ctx.beginPath(); ctx.ellipse(x, 0, r * 0.42, r, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#565b4c'; ctx.lineWidth = 1;
+    for (let i = -2; i <= 2; i++) {
+      ctx.beginPath(); ctx.moveTo(x - r * 0.34, i * r * 0.36); ctx.lineTo(x + r * 0.34, i * r * 0.36); ctx.stroke();
+    }
+    ctx.fillStyle = '#22251e';
+    ctx.beginPath(); ctx.ellipse(x + r * 0.36, 0, r * 0.16, r * 0.92, 0, 0, TAU); ctx.fill();
+  },
+
+  /* --- PWS-26: dwupłatowiec szkolny (dł. 7,36 m) --- */
   p_pws26(ctx, o) {
-    const gear = o.gear ?? 1;
-    // dolny płat
-    ctx.fillStyle = '#7d8a5c';
-    ctx.beginPath(); ctx.ellipse(-1, 4, 21, 3, 0, 0, TAU); ctx.fill();
-    // rozpórki
-    ctx.strokeStyle = '#5d6448'; ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.moveTo(-12, 2); ctx.lineTo(-14, -11); ctx.moveTo(8, 2); ctx.lineTo(10, -11);
-    ctx.moveTo(-12, 2); ctx.lineTo(10, -11); ctx.stroke();
+    const gear = o.gear ?? 1, P = Art.POL;
+    // dolny płat (dalszy, widoczny spod kadłuba)
+    Art.farWing(ctx, 10, -6, 3.6, -24, 6.4, 4.2, '#5b5939');
     // kadłub
-    ctx.fillStyle = '#8b976a';
+    ctx.fillStyle = P.top;
     ctx.beginPath();
-    ctx.moveTo(30, 0); ctx.quadraticCurveTo(24, -6, 8, -6.5);
-    ctx.lineTo(-22, -4.5); ctx.lineTo(-31, -2); ctx.lineTo(-31, 2.5);
-    ctx.lineTo(-20, 4.5); ctx.quadraticCurveTo(6, 6.5, 26, 4); ctx.closePath(); ctx.fill();
-    // statecznik pionowy
-    ctx.fillStyle = '#7d8a5c';
-    ctx.beginPath(); ctx.moveTo(-24, -4); ctx.lineTo(-33, -16); ctx.lineTo(-31, -3.5); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#d21f26';
-    ctx.beginPath(); ctx.moveTo(-29, -8); ctx.lineTo(-33, -16); ctx.lineTo(-31.5, -6); ctx.closePath(); ctx.fill();
-    // statecznik poziomy
-    ctx.fillStyle = '#7d8a5c';
-    ctx.beginPath(); ctx.ellipse(-27, 0, 9, 2, 0, 0, TAU); ctx.fill();
-    // górny płat
-    ctx.fillStyle = '#96a374';
-    ctx.beginPath(); ctx.ellipse(-2, -12, 25, 3.2, 0, 0, TAU); ctx.fill();
-    // kabiny
-    this.canopy(ctx, 0, -6, 9, 4, 'rgba(40,50,45,.85)');
-    this.canopy(ctx, -10, -5, 8, 4, 'rgba(40,50,45,.85)');
-    // silnik + śmigło
-    ctx.fillStyle = '#43483a';
-    ctx.beginPath(); ctx.ellipse(26, 0, 5, 6, 0, 0, TAU); ctx.fill();
-    this.propDisc(ctx, 31, 15, o.prop || 0);
-    // podwozie stałe
-    if (gear > 0.02) { this.wheel(ctx, 4, 4, 4, 9 * gear); this.wheel(ctx, -3, 4, 4, 9 * gear); this.wheel(ctx, -29, 2, 2, 4 * gear); }
-    this.checker(ctx, -6, -13, 7);
-    this.checker(ctx, -20, -4, 5);
+    ctx.moveTo(25, -1); ctx.quadraticCurveTo(22, -7, 8, -8);
+    ctx.lineTo(-20, -6); ctx.lineTo(-33, -2.6); ctx.lineTo(-33, 1.4);
+    ctx.lineTo(-19, 4.4); ctx.quadraticCurveTo(6, 6.6, 23, 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.bot;
+    ctx.beginPath();
+    ctx.moveTo(23, 4); ctx.quadraticCurveTo(6, 6.6, -19, 4.4); ctx.lineTo(-19, 3.3);
+    ctx.quadraticCurveTo(6, 5.5, 23, 3); ctx.closePath(); ctx.fill();
+    // usterzenie
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-23, -5.4); ctx.quadraticCurveTo(-29, -14.6, -34.6, -13.6);
+    ctx.quadraticCurveTo(-33.6, -7, -33, -2.6); ctx.closePath(); ctx.fill();
+    Art.rudderFlash(ctx, -33.2, -3, -34.5, -13, 2.1);
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-24, -1.4); ctx.lineTo(-38, -3); ctx.lineTo(-38, -0.4); ctx.lineTo(-24, 1); ctx.closePath(); ctx.fill();
+    // odkryte kabiny
+    ctx.fillStyle = '#23271e';
+    ctx.beginPath(); ctx.ellipse(2, -7.6, 3.4, 2, 0, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-8, -6.8, 3.2, 1.9, 0, 0, TAU); ctx.fill();
+    // rozpórki międzypłatowe i baldachim
+    ctx.strokeStyle = '#4e4c38'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-12, 3.6); ctx.lineTo(-14, -12.4);
+    ctx.moveTo(9, 3.2); ctx.lineTo(8, -12.6);
+    ctx.moveTo(-4, -7.6); ctx.lineTo(-6, -12.6);
+    ctx.moveTo(4, -7.6); ctx.lineTo(4, -12.6);
+    ctx.moveTo(-12, 3.6); ctx.lineTo(8, -12.6);
+    ctx.stroke();
+    // górny płat: bliższy pas + dalszy panel w perspektywie
+    ctx.fillStyle = '#5b5939';
+    ctx.beginPath();
+    ctx.moveTo(12, -13.6); ctx.lineTo(-22, -11.2); ctx.quadraticCurveTo(-27, -10.6, -21, -8.4);
+    ctx.lineTo(11, -10.2); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.topL;
+    ctx.beginPath();
+    ctx.moveTo(13, -14.4); ctx.lineTo(-15, -14.4); ctx.lineTo(-16.5, -11.6); ctx.lineTo(12, -11.6); ctx.closePath(); ctx.fill();
+    // silnik rzędowy w owiewce + śmigło
+    ctx.fillStyle = '#3a3d31';
+    ctx.beginPath(); ctx.moveTo(25, -1); ctx.quadraticCurveTo(28, -5, 25, -6); ctx.lineTo(25, 3.6);
+    ctx.quadraticCurveTo(28, 3, 25, -1); ctx.closePath(); ctx.fill();
+    Art.propDisc(ctx, 28, 15, o.prop || 0);
+    if (gear > 0.02) {
+      ctx.strokeStyle = '#3a3a36'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(2, 4 + 8 * gear); ctx.moveTo(9, 4); ctx.lineTo(3.4, 4 + 8 * gear); ctx.stroke();
+      ctx.fillStyle = '#17171a';
+      ctx.beginPath(); ctx.arc(2.6, 4 + 9 * gear, 3.6, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#3d3d40'; ctx.beginPath(); ctx.arc(2.6, 4 + 9 * gear, 1.4, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#2c2c28';
+      ctx.beginPath(); ctx.arc(-32, 2.6, 1.8, 0, TAU); ctx.fill();
+    }
+    Art.checker(ctx, -8, -13.2, 5.6);
+    Art.checker(ctx, -26, -4.4, 5);
   },
 
-  /* --- PZL P.7a: myśliwiec o skrzydle mewim --- */
+  /* --- PZL P.7a: myśliwiec o skrzydle mewim (dł. 7,15 m) --- */
   p_p7a(ctx, o) {
-    const gear = o.gear ?? 1;
-    ctx.fillStyle = '#8d9a6f';
-    // skrzydło mewie
+    const gear = o.gear ?? 1, P = Art.POL;
+    // skrzydło mewie: od góry kadłuba stromo w dół, potem cienka cięciwa
+    ctx.fillStyle = P.topD;
     ctx.beginPath();
-    ctx.moveTo(-4, -8); ctx.lineTo(-24, -11); ctx.lineTo(-26, -8); ctx.lineTo(-6, -4);
-    ctx.lineTo(-4, -4); ctx.lineTo(16, -8); ctx.lineTo(20, -11); ctx.lineTo(2, -9); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#7a8760';
-    ctx.beginPath(); ctx.moveTo(-2, -7.5); ctx.lineTo(-3, -12); ctx.lineTo(3, -12); ctx.lineTo(4, -7.5); ctx.closePath(); ctx.fill();
+    ctx.moveTo(11, -9.4); ctx.lineTo(-8, -9.4); ctx.lineTo(-11, -6.6); ctx.lineTo(9, -6.6); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.topL;
+    ctx.beginPath();
+    ctx.moveTo(9, -8.2); ctx.lineTo(-2, -8.6); ctx.lineTo(-3.6, -6.2); ctx.lineTo(8, -6.2); ctx.closePath(); ctx.fill();
     // kadłub
-    ctx.fillStyle = '#96a374';
+    ctx.fillStyle = P.top;
     ctx.beginPath();
-    ctx.moveTo(30, -0.5); ctx.quadraticCurveTo(26, -6, 12, -7);
-    ctx.lineTo(-20, -4.5); ctx.lineTo(-32, -2); ctx.lineTo(-32, 2); ctx.lineTo(-18, 4.5);
-    ctx.quadraticCurveTo(8, 6.5, 27, 4); ctx.closePath(); ctx.fill();
-    // ogon
-    ctx.fillStyle = '#7a8760';
-    ctx.beginPath(); ctx.moveTo(-24, -4); ctx.lineTo(-34, -15); ctx.lineTo(-31, -3.5); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-28, 0.5, 9.5, 2, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#d21f26';
-    ctx.beginPath(); ctx.moveTo(-30, -9); ctx.lineTo(-34, -15); ctx.lineTo(-32, -5); ctx.closePath(); ctx.fill();
-    // odkryta kabina + zagłówek
-    ctx.fillStyle = '#2c3327';
-    ctx.beginPath(); ctx.ellipse(0, -6.5, 4, 2.4, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#7a8760';
-    ctx.beginPath(); ctx.moveTo(-4, -6.6); ctx.lineTo(-9, -6.2); ctx.lineTo(-9, -3.6); ctx.lineTo(-4, -4); ctx.closePath(); ctx.fill();
+    ctx.moveTo(26, -0.6); ctx.quadraticCurveTo(24, -6.4, 12, -7.4);
+    ctx.lineTo(-18, -5.6); ctx.lineTo(-31, -2.6); ctx.lineTo(-31, 1.4);
+    ctx.lineTo(-17, 4.2); ctx.quadraticCurveTo(6, 6.2, 24, 3.6); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.bot;
+    ctx.beginPath();
+    ctx.moveTo(24, 3.6); ctx.quadraticCurveTo(6, 6.2, -17, 4.2); ctx.lineTo(-17, 2.6);
+    ctx.quadraticCurveTo(6, 4.2, 24, 2); ctx.closePath(); ctx.fill();
+    // zagłówek pilota i odkryta kabina
+    ctx.fillStyle = '#23271e';
+    ctx.beginPath(); ctx.ellipse(0, -7, 3.6, 2, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-3.6, -7.2); ctx.quadraticCurveTo(-9, -7.4, -10, -4.6); ctx.lineTo(-3.6, -5); ctx.closePath(); ctx.fill();
+    // statecznik pionowy i poziomy
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-21, -5); ctx.quadraticCurveTo(-28, -15.4, -33, -14.4);
+    ctx.lineTo(-31, -2.6); ctx.closePath(); ctx.fill();
+    Art.rudderFlash(ctx, -31.4, -3, -33.2, -13.8, 2.2);
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-22, -1.2); ctx.lineTo(-36, -2.8); ctx.lineTo(-36, -0.2); ctx.lineTo(-22, 1.2); ctx.closePath(); ctx.fill();
     // silnik gwiazdowy
-    ctx.fillStyle = '#3d4236';
-    ctx.beginPath(); ctx.ellipse(27, 0, 4.4, 6.4, 0, 0, TAU); ctx.fill();
-    ctx.strokeStyle = '#5b6150'; ctx.lineWidth = 1;
-    for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(24, i * 2.2); ctx.lineTo(29, i * 2.2); ctx.stroke(); }
-    this.propDisc(ctx, 31, 16, o.prop || 0);
-    // podwozie stałe z owiewkami
+    Art.radial(ctx, 25, 6.6);
+    Art.propDisc(ctx, 29, 15.5, o.prop || 0);
     if (gear > 0.02) {
-      ctx.fillStyle = '#6c7458';
-      ctx.beginPath(); ctx.moveTo(2, 3); ctx.lineTo(6, 11 * gear); ctx.lineTo(-1, 11 * gear); ctx.lineTo(-3, 3); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#191919';
-      ctx.beginPath(); ctx.arc(2.5, 11.5 * gear, 3.6, 0, TAU); ctx.fill();
-      this.wheel(ctx, -30, 2, 1.8, 3.4 * gear);
+      ctx.strokeStyle = '#3a3a36'; ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(-2, 4); ctx.lineTo(3, 3 + 7 * gear); ctx.moveTo(8, 3.4); ctx.lineTo(4, 3 + 7 * gear); ctx.stroke();
+      Art.spat(ctx, 3.4, 2.6, 6.4 * gear, 0.86);
+      ctx.fillStyle = '#2c2c28';
+      ctx.beginPath(); ctx.arc(-30, 2.6, 1.8, 0, TAU); ctx.fill();
     }
-    this.checker(ctx, -14, -9, 6);
-    this.checker(ctx, -22, -3.5, 5);
+    Art.checker(ctx, -13, -8.6, 5.6);
+    Art.checker(ctx, -24, -3.6, 5);
   },
 
-  /* --- PZL P.11c: podstawowy myśliwiec września --- */
+  /* --- PZL P.11c: myśliwiec września (dł. 7,55 m, wys. 2,85 m) --- */
   p_p11c(ctx, o) {
-    const gear = o.gear ?? 1;
-    ctx.fillStyle = '#8d9a6f';
+    const gear = o.gear ?? 1, P = Art.POL;
+    // płat mewi: krótki, stromy odcinek przy kadłubie + długa cienka cięciwa
+    // dalszy płat — cieńszy i ciemniejszy, widoczny zza kadłuba
+    ctx.fillStyle = '#4c4a36';
     ctx.beginPath();
-    ctx.moveTo(-5, -8.5); ctx.lineTo(-27, -12); ctx.lineTo(-29, -8.5); ctx.lineTo(-7, -4.2);
-    ctx.lineTo(-4, -4.2); ctx.lineTo(18, -9); ctx.lineTo(23, -12); ctx.lineTo(2, -9.5); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#79865f';
-    ctx.beginPath(); ctx.moveTo(-2, -8); ctx.lineTo(-3.5, -13); ctx.lineTo(3.5, -13); ctx.lineTo(5, -8); ctx.closePath(); ctx.fill();
+    ctx.moveTo(15, -11.6); ctx.lineTo(-11, -11.6); ctx.lineTo(-15, -8.4); ctx.lineTo(12, -8.4); ctx.closePath(); ctx.fill();
+    // bliższy płat
+    ctx.fillStyle = P.topD;
+    ctx.beginPath();
+    ctx.moveTo(14, -10.2); ctx.lineTo(-10, -10.2); ctx.lineTo(-14, -6.6); ctx.lineTo(11, -6.6); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.topL;
+    ctx.beginPath();
+    ctx.moveTo(12.5, -9.4); ctx.lineTo(-6, -9.6); ctx.lineTo(-8.6, -7); ctx.lineTo(10.6, -7); ctx.closePath(); ctx.fill();
+    // charakterystyczne załamanie „mewy" tuż przy kadłubie
+    ctx.fillStyle = P.top;
+    ctx.beginPath();
+    ctx.moveTo(-1.4, -10); ctx.lineTo(4.4, -10.2); ctx.lineTo(6.4, -6.2); ctx.lineTo(-3.6, -6); ctx.closePath(); ctx.fill();
     // kadłub
-    ctx.fillStyle = '#9aa878';
+    ctx.fillStyle = P.top;
     ctx.beginPath();
-    ctx.moveTo(33, -0.5); ctx.quadraticCurveTo(28, -6.4, 13, -7.4);
-    ctx.lineTo(-21, -5); ctx.lineTo(-34, -2); ctx.lineTo(-34, 2.2); ctx.lineTo(-19, 5);
-    ctx.quadraticCurveTo(9, 7, 29, 4.2); ctx.closePath(); ctx.fill();
-    // pas cieniowania
-    ctx.fillStyle = 'rgba(0,0,0,.12)';
-    ctx.beginPath(); ctx.moveTo(29, 4.2); ctx.lineTo(-19, 5); ctx.lineTo(-19, 2.6); ctx.lineTo(29, 2); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#79865f';
-    ctx.beginPath(); ctx.moveTo(-25, -4.4); ctx.lineTo(-37, -16); ctx.lineTo(-33, -3.6); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-30, 0.6, 10, 2.2, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#d21f26';
-    ctx.beginPath(); ctx.moveTo(-32.5, -9); ctx.lineTo(-37, -16); ctx.lineTo(-34, -5); ctx.closePath(); ctx.fill();
-    // kabina
-    ctx.fillStyle = '#26301f';
-    ctx.beginPath(); ctx.ellipse(1, -7, 4.6, 2.6, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#79865f';
-    ctx.beginPath(); ctx.moveTo(-3.5, -7.2); ctx.lineTo(-10, -6.6); ctx.lineTo(-10, -4); ctx.lineTo(-3.5, -4.4); ctx.closePath(); ctx.fill();
-    // silnik
-    ctx.fillStyle = '#3d4236';
-    ctx.beginPath(); ctx.ellipse(29, 0, 4.6, 6.6, 0, 0, TAU); ctx.fill();
-    ctx.strokeStyle = '#5b6150'; ctx.lineWidth = 1;
-    for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(26, i * 2.3); ctx.lineTo(31, i * 2.3); ctx.stroke(); }
+    ctx.moveTo(30, -0.6); ctx.quadraticCurveTo(27, -6.6, 14, -7.8);
+    ctx.lineTo(-20, -6); ctx.lineTo(-35, -2.8); ctx.lineTo(-35, 1.6);
+    ctx.lineTo(-19, 4.6); ctx.quadraticCurveTo(8, 6.8, 27, 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.bot;
+    ctx.beginPath();
+    ctx.moveTo(27, 4); ctx.quadraticCurveTo(8, 6.8, -19, 4.6); ctx.lineTo(-19, 3.6);
+    ctx.quadraticCurveTo(8, 5.6, 27, 3); ctx.closePath(); ctx.fill();
+    // wiatrochron i zagłówek
+    ctx.fillStyle = 'rgba(150,200,220,.55)';
+    ctx.beginPath(); ctx.moveTo(3.6, -8); ctx.lineTo(1, -11); ctx.lineTo(-1.4, -10.8); ctx.lineTo(-1.4, -8); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#23271e';
+    ctx.beginPath(); ctx.ellipse(-3.4, -7.6, 3.2, 1.9, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-6.6, -7.8); ctx.quadraticCurveTo(-12, -8, -13.4, -5); ctx.lineTo(-6.6, -5.4); ctx.closePath(); ctx.fill();
+    // usterzenie z zaokrąglonym sterem
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-24, -5.2); ctx.quadraticCurveTo(-31.5, -15.6, -37, -14.4);
+    ctx.quadraticCurveTo(-36.2, -8, -35, -2.8); ctx.closePath(); ctx.fill();
+    Art.rudderFlash(ctx, -35.2, -3.4, -36.9, -13.6, 2.1);
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-24, -1.2); ctx.lineTo(-39.5, -3.2); ctx.lineTo(-39.5, -0.2); ctx.lineTo(-24, 1.4); ctx.closePath(); ctx.fill();
+    // silnik Mercury w wąskiej osłonie
+    Art.radial(ctx, 28, 7);
     // karabiny w kadłubie
-    ctx.strokeStyle = '#33372e'; ctx.lineWidth = 1.3;
-    ctx.beginPath(); ctx.moveTo(20, -4.5); ctx.lineTo(31, -4.2); ctx.moveTo(20, 3); ctx.lineTo(31, 2.8); ctx.stroke();
-    this.propDisc(ctx, 34, 17, o.prop || 0);
+    ctx.strokeStyle = '#2f322a'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(18, -5); ctx.lineTo(30, -4.6); ctx.moveTo(18, 2.6); ctx.lineTo(30, 2.4); ctx.stroke();
+    Art.propDisc(ctx, 32, 16.5, o.prop || 0);
     if (gear > 0.02) {
-      ctx.fillStyle = '#6c7458';
-      ctx.beginPath(); ctx.moveTo(3, 3.4); ctx.lineTo(7, 12 * gear); ctx.lineTo(-1, 12 * gear); ctx.lineTo(-4, 3.4); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#191919';
-      ctx.beginPath(); ctx.arc(3, 12.4 * gear, 3.8, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#3a3a3a';
-      ctx.beginPath(); ctx.arc(3, 12.4 * gear, 1.5, 0, TAU); ctx.fill();
-      this.wheel(ctx, -32, 2, 1.8, 3.4 * gear);
+      ctx.strokeStyle = '#3a3a36'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(-3, 4.4); ctx.lineTo(4, 3.4 + 7 * gear); ctx.moveTo(10, 3.6); ctx.lineTo(5.4, 3.4 + 7 * gear); ctx.stroke();
+      Art.spat(ctx, 4.6, 3, 7 * gear, 0.92);
+      ctx.fillStyle = '#2c2c28';
+      ctx.beginPath(); ctx.arc(-34, 2.8, 1.9, 0, TAU); ctx.fill();
     }
-    this.checker(ctx, -16, -10, 6.5);
-    this.checker(ctx, -24, -3.8, 5.5);
+    Art.checker(ctx, -15, -9.6, 6);
+    Art.checker(ctx, -27, -4, 5.4);
   },
 
-  /* --- PZL.23 Karaś: lekki bombowiec --- */
+  /* --- PZL.23 Karaś: lekki bombowiec (dł. 9,68 m, wys. 3,3 m) --- */
   p_karas(ctx, o) {
-    const gear = o.gear ?? 1;
-    // skrzydło
-    ctx.fillStyle = '#7f8c60';
-    ctx.beginPath(); ctx.moveTo(-6, 1); ctx.lineTo(-30, -2); ctx.lineTo(-32, 2); ctx.lineTo(-6, 5);
-    ctx.lineTo(14, 5); ctx.lineTo(26, 1); ctx.lineTo(24, -2); ctx.closePath(); ctx.fill();
+    const gear = o.gear ?? 1, P = Art.POL;
+    // dalszy płat w perspektywie — wychodzi spod kadłuba w tył
+    Art.farWing(ctx, 16, -8, 3, -34, 6.6, 5, '#5b5939');
     // kadłub
-    ctx.fillStyle = '#93a06f';
+    ctx.fillStyle = P.top;
     ctx.beginPath();
-    ctx.moveTo(38, 0); ctx.quadraticCurveTo(33, -7, 18, -8.5);
-    ctx.lineTo(-8, -9); ctx.lineTo(-26, -5); ctx.lineTo(-40, -2.5); ctx.lineTo(-40, 2.5);
-    ctx.lineTo(-24, 5); ctx.quadraticCurveTo(8, 8, 34, 4.6); ctx.closePath(); ctx.fill();
-    // długa oszklona kabina
-    this.canopy(ctx, 6, -8.6, 26, 6);
-    ctx.fillStyle = 'rgba(30,40,45,.5)';
-    ctx.fillRect(-2, -11.5, 1.2, 3);
-    ctx.fillRect(8, -12, 1.2, 3.4);
-    // gondola strzelca dolnego
-    ctx.fillStyle = '#7f8c60';
-    ctx.beginPath(); ctx.moveTo(-6, 5); ctx.lineTo(-16, 5); ctx.lineTo(-14, 10); ctx.lineTo(-7, 10); ctx.closePath(); ctx.fill();
-    // ogon
-    ctx.fillStyle = '#7f8c60';
-    ctx.beginPath(); ctx.moveTo(-30, -4.5); ctx.lineTo(-44, -18); ctx.lineTo(-39, -3); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-36, 0.4, 12, 2.4, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#d21f26';
-    ctx.beginPath(); ctx.moveTo(-38.5, -10); ctx.lineTo(-44, -18); ctx.lineTo(-40, -5); ctx.closePath(); ctx.fill();
-    // silnik
-    ctx.fillStyle = '#3d4236';
-    ctx.beginPath(); ctx.ellipse(34, 0, 5.4, 7.4, 0, 0, TAU); ctx.fill();
-    this.propDisc(ctx, 39, 19, o.prop || 0);
+    ctx.moveTo(38, 0); ctx.quadraticCurveTo(35, -8, 20, -9.6);
+    ctx.lineTo(-10, -8.6); ctx.lineTo(-30, -5.4); ctx.lineTo(-47, -2.4); ctx.lineTo(-47, 2.2);
+    ctx.lineTo(-28, 5); ctx.quadraticCurveTo(6, 8, 35, 4.8); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.bot;
+    ctx.beginPath();
+    ctx.moveTo(35, 4.8); ctx.quadraticCurveTo(6, 8, -28, 5); ctx.lineTo(-28, 3.9);
+    ctx.quadraticCurveTo(6, 6.8, 35, 3.4); ctx.closePath(); ctx.fill();
+    // długa oszklona kabina (pilot + obserwator)
+    ctx.fillStyle = 'rgba(152,204,224,.6)';
+    ctx.beginPath();
+    ctx.moveTo(24, -9.6); ctx.lineTo(19, -14.6); ctx.lineTo(-6, -14.6);
+    ctx.lineTo(-13, -8.4); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(28,40,46,.75)'; ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(19, -14.5); ctx.lineTo(19, -9.6);
+    ctx.moveTo(11, -14.6); ctx.lineTo(11, -9.3);
+    ctx.moveTo(3, -14.6); ctx.lineTo(3, -9);
+    ctx.moveTo(-6, -14.5); ctx.lineTo(-6, -8.7);
+    ctx.stroke();
+    // gondola dolnego strzelca
+    ctx.fillStyle = P.bot;
+    ctx.beginPath();
+    ctx.moveTo(-4, 5.6); ctx.lineTo(-19, 5.2); ctx.quadraticCurveTo(-17, 11.4, -8, 11); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#2f322a'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(-14, 8.6); ctx.lineTo(-24, 11.4); ctx.stroke();
+    // karabin strzelca górnego
+    ctx.beginPath(); ctx.moveTo(-6, -9.4); ctx.lineTo(-17, -13.4); ctx.stroke();
+    // usterzenie
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-32, -6.4); ctx.quadraticCurveTo(-42, -21, -50.5, -19.4);
+    ctx.quadraticCurveTo(-49, -10, -47, -2.4); ctx.closePath(); ctx.fill();
+    Art.rudderFlash(ctx, -47.4, -3, -50.4, -18.6, 3);
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-33, -1.6); ctx.lineTo(-53, -4); ctx.lineTo(-53, -0.2); ctx.lineTo(-33, 1.8); ctx.closePath(); ctx.fill();
+    // silnik gwiazdowy Pegaz
+    Art.radial(ctx, 35, 8.4);
+    Art.propDisc(ctx, 39.5, 20, o.prop || 0);
+    // stałe podwozie w owiewkach
     if (gear > 0.02) {
-      ctx.fillStyle = '#6c7458';
-      ctx.beginPath(); ctx.moveTo(9, 4); ctx.lineTo(13, 13 * gear); ctx.lineTo(4, 13 * gear); ctx.lineTo(2, 4); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = '#191919'; ctx.beginPath(); ctx.arc(8.5, 13.4 * gear, 4, 0, TAU); ctx.fill();
-      this.wheel(ctx, -38, 2, 1.9, 3.6 * gear);
+      ctx.strokeStyle = '#3a3a36'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(2, 5.2); ctx.lineTo(9, 4 + 9 * gear); ctx.moveTo(18, 4.4); ctx.lineTo(13, 4 + 9 * gear); ctx.stroke();
+      Art.spat(ctx, 15.5, 3.6, 8.6 * gear, 0.95);      // owiewka dalszego koła
+      Art.spat(ctx, 9.5, 3.6, 9 * gear, 1.08);
+      ctx.fillStyle = '#2c2c28';
+      ctx.beginPath(); ctx.arc(-45, 3.2, 2.1, 0, TAU); ctx.fill();
     }
-    this.checker(ctx, -20, -6, 7);
-    this.checker(ctx, -26, 1, 6);
+    Art.checker(ctx, -22, -7.2, 7);
+    Art.checker(ctx, -36, -3.4, 6);
   },
 
-  /* --- PZL.37 Łoś: dwusilnikowy bombowiec --- */
+  /* --- PZL.37 Łoś: bombowiec średni (dł. 12,92 m, wys. 4,25 m) --- */
   p_los(ctx, o) {
-    const gear = o.gear ?? 0;
-    // skrzydło
-    ctx.fillStyle = '#75835a';
-    ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(-36, -3); ctx.lineTo(-38, 3); ctx.lineTo(-8, 7);
-    ctx.lineTo(20, 7); ctx.lineTo(34, 1); ctx.lineTo(31, -3); ctx.closePath(); ctx.fill();
-    // gondole silnikowe
-    for (const gx of [10]) {
-      ctx.fillStyle = '#7f8d61';
-      ctx.beginPath(); ctx.ellipse(gx + 8, 1.5, 16, 5.4, 0, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#3d4236';
-      ctx.beginPath(); ctx.ellipse(gx + 22, 1.5, 4.4, 5.6, 0, 0, TAU); ctx.fill();
-      this.propDisc(ctx, gx + 26, 17, (o.prop || 0) + 1.2);
-      if (gear > 0.02) { this.wheel(ctx, gx + 10, 5, 3.6, 11 * gear); }
+    const gear = o.gear ?? 0, P = Art.POL;
+    // dalszy płat w perspektywie
+    Art.farWing(ctx, 24, -14, 4, -46, 8.4, 6.2, '#5b5939');
+    // gondola silnikowa wystająca spod płata
+    ctx.fillStyle = P.topL;
+    ctx.beginPath();
+    ctx.moveTo(31, 4); ctx.quadraticCurveTo(29, -2.6, 19, -3.2);
+    ctx.lineTo(-4, -0.6); ctx.quadraticCurveTo(-8, 5, -2, 9.6);
+    ctx.lineTo(20, 10); ctx.quadraticCurveTo(30, 9.4, 31, 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,.14)';
+    ctx.beginPath(); ctx.moveTo(-2, 9.6); ctx.lineTo(20, 10); ctx.quadraticCurveTo(27, 9.6, 30, 6.4);
+    ctx.lineTo(-1, 6.2); ctx.closePath(); ctx.fill();
+    Art.radial(ctx, 28, 8.2);
+    if (gear > 0.02) {
+      ctx.fillStyle = '#2b2e27';
+      ctx.fillRect(11, 9, 5, 8 * gear);
+      ctx.fillStyle = '#17171a';
+      ctx.beginPath(); ctx.arc(13.5, 9 + 9 * gear, 4.6, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(17.5, 9 + 9 * gear, 3.8, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#3d3d40';
+      ctx.beginPath(); ctx.arc(13.5, 9 + 9 * gear, 1.8, 0, TAU); ctx.fill();
     }
     // kadłub
-    ctx.fillStyle = '#8b996b';
+    ctx.fillStyle = P.top;
     ctx.beginPath();
-    ctx.moveTo(44, 1); ctx.quadraticCurveTo(40, -6, 26, -8);
-    ctx.lineTo(0, -9.5); ctx.lineTo(-30, -6); ctx.lineTo(-48, -3); ctx.lineTo(-48, 3);
-    ctx.lineTo(-28, 6); ctx.quadraticCurveTo(10, 9, 40, 5.4); ctx.closePath(); ctx.fill();
-    // przeszklony nos
-    ctx.fillStyle = 'rgba(150,205,225,.62)';
-    ctx.beginPath(); ctx.moveTo(44, 1); ctx.quadraticCurveTo(40, -6, 28, -7.6); ctx.lineTo(28, 4.6);
-    ctx.quadraticCurveTo(40, 5, 44, 1); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = 'rgba(30,45,55,.6)'; ctx.lineWidth = 0.7;
-    ctx.beginPath(); ctx.moveTo(33, -7); ctx.lineTo(33, 5); ctx.moveTo(38, -5.6); ctx.lineTo(38, 5.2); ctx.stroke();
-    this.canopy(ctx, 16, -9, 18, 5.5);
+    ctx.moveTo(51, 1.2); ctx.quadraticCurveTo(48, -6.6, 34, -8.6);
+    ctx.lineTo(0, -10); ctx.lineTo(-34, -6.6); ctx.lineTo(-60, -3); ctx.lineTo(-60, 2.6);
+    ctx.lineTo(-32, 5.6); ctx.quadraticCurveTo(10, 8.4, 46, 5.2); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = P.bot;
+    ctx.beginPath();
+    ctx.moveTo(46, 5.2); ctx.quadraticCurveTo(10, 8.4, -32, 5.6); ctx.lineTo(-32, 4.3);
+    ctx.quadraticCurveTo(10, 7.1, 46, 3.7); ctx.closePath(); ctx.fill();
+    // oszklony nos bombardiera
+    ctx.fillStyle = 'rgba(152,204,224,.62)';
+    ctx.beginPath();
+    ctx.moveTo(51, 1.2); ctx.quadraticCurveTo(48, -6.6, 36, -8.4);
+    ctx.lineTo(36, 5.6); ctx.quadraticCurveTo(47, 5.2, 51, 1.2); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(28,40,46,.7)'; ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(41, -7.8); ctx.lineTo(41, 5.4); ctx.moveTo(46, -6); ctx.lineTo(46, 5.2);
+    ctx.moveTo(36, -8.4); ctx.lineTo(51, 1.2); ctx.stroke();
+    // kabina pilotów
+    ctx.fillStyle = 'rgba(152,204,224,.62)';
+    ctx.beginPath();
+    ctx.moveTo(30, -8.8); ctx.lineTo(26, -13.4); ctx.lineTo(12, -13.2); ctx.lineTo(9, -9.6); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(28,40,46,.7)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(20, -13.3); ctx.lineTo(20, -9.2); ctx.stroke();
     // wieżyczka grzbietowa
-    ctx.fillStyle = '#5f6a4c';
-    ctx.beginPath(); ctx.arc(-12, -9, 4.2, Math.PI, TAU); ctx.fill();
-    ctx.strokeStyle = '#33372e'; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(-12, -11); ctx.lineTo(-24, -15); ctx.stroke();
-    // podwójne usterzenie
-    ctx.fillStyle = '#75835a';
-    ctx.beginPath(); ctx.ellipse(-44, 0.4, 13, 2.6, 0, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-40, -2); ctx.lineTo(-48, -14); ctx.lineTo(-52, -13); ctx.lineTo(-50, -1); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-40, 2); ctx.lineTo(-48, 12); ctx.lineTo(-52, 11); ctx.lineTo(-50, 1); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#d21f26';
-    ctx.beginPath(); ctx.moveTo(-46, -9); ctx.lineTo(-48, -14); ctx.lineTo(-51.5, -13); ctx.lineTo(-49.6, -8); ctx.closePath(); ctx.fill();
-    this.checker(ctx, -24, -7.4, 8);
-    this.checker(ctx, -30, 3, 7);
+    ctx.fillStyle = '#4f5540';
+    ctx.beginPath(); ctx.arc(-14, -9.6, 5, Math.PI, TAU); ctx.fill();
+    ctx.strokeStyle = '#2f322a'; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(-14, -12); ctx.lineTo(-28, -16.4); ctx.stroke();
+    // stanowisko dolne
+    ctx.fillStyle = P.bot;
+    ctx.beginPath(); ctx.moveTo(-12, 6.2); ctx.lineTo(-26, 5.6); ctx.quadraticCurveTo(-24, 10.6, -14, 10.4); ctx.closePath(); ctx.fill();
+    // podwójne usterzenie pionowe na tapered stateczniku
+    ctx.fillStyle = P.topD;
+    ctx.beginPath(); ctx.moveTo(-40, -2.4); ctx.lineTo(-64, -4.6); ctx.lineTo(-64, -0.4); ctx.lineTo(-40, 1.8); ctx.closePath(); ctx.fill();
+    // dwa stateczniki pionowe na końcach statecznika poziomego —
+    // w rzucie bocznym dalszy jest nieco przesunięty i ciemniejszy
+    for (const far of [true, false]) {
+      const dx = far ? 3.4 : 0;
+      ctx.fillStyle = far ? '#43412e' : P.topD;
+      ctx.beginPath();
+      ctx.moveTo(-49 + dx, -3);
+      ctx.quadraticCurveTo(-53 + dx, -16.6, -60.5 + dx, -15.6);
+      ctx.quadraticCurveTo(-62.5 + dx, -8, -62.5 + dx, -2.6);
+      ctx.closePath(); ctx.fill();
+      if (!far) Art.rudderFlash(ctx, -60.4, -3, -61.4, -14.6, 2.4);
+    }
+    Art.checker(ctx, -30, -8, 8);
+    Art.checker(ctx, -42, -1.2, 6.6);
+    Art.propDisc(ctx, 34, 16, (o.prop || 0) + 1.2, undefined, 3.4);
   },
 
-  /* --- Messerschmitt Bf 109 E --- */
+  /* --- Messerschmitt Bf 109 E (dł. 8,64 m) --- */
   p_bf109(ctx, o) {
-    const gear = o.gear ?? 0;
-    ctx.fillStyle = '#5d6a52';
-    ctx.beginPath(); ctx.moveTo(-4, -1); ctx.lineTo(-24, -4); ctx.lineTo(-26, 1); ctx.lineTo(-4, 4.5);
-    ctx.lineTo(12, 4.5); ctx.lineTo(24, 0); ctx.lineTo(21, -3.5); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#6f7b60';
+    const gear = o.gear ?? 0, G = Art.GER;
+    Art.farWing(ctx, 13, -11, 3.2, -29, 6.8, 4.8, '#414a38');
+    ctx.fillStyle = G.top;
     ctx.beginPath();
-    ctx.moveTo(34, 0); ctx.quadraticCurveTo(31, -5.4, 20, -6.6);
-    ctx.lineTo(-6, -7); ctx.lineTo(-24, -4.4); ctx.lineTo(-35, -2); ctx.lineTo(-35, 2);
-    ctx.lineTo(-22, 4.6); ctx.quadraticCurveTo(6, 6.6, 30, 3.6); ctx.closePath(); ctx.fill();
-    // żółty nos (oznaczenie taktyczne)
+    ctx.moveTo(34, 0); ctx.quadraticCurveTo(32, -6.2, 22, -7.4);
+    ctx.lineTo(-6, -7.8); ctx.lineTo(-26, -5); ctx.lineTo(-40, -2.4); ctx.lineTo(-40, 1.8);
+    ctx.lineTo(-24, 4.6); ctx.quadraticCurveTo(6, 7, 30, 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = G.bot;
+    ctx.beginPath();
+    ctx.moveTo(30, 4); ctx.quadraticCurveTo(6, 7, -24, 4.6); ctx.lineTo(-24, 2.8);
+    ctx.quadraticCurveTo(6, 5, 30, 2.2); ctx.closePath(); ctx.fill();
+    // żółty nos i kołpak
     ctx.fillStyle = '#e0b02a';
-    ctx.beginPath(); ctx.moveTo(34, 0); ctx.quadraticCurveTo(31, -5.4, 25, -6.2); ctx.lineTo(25, 4.6);
-    ctx.quadraticCurveTo(31, 3.8, 34, 0); ctx.closePath(); ctx.fill();
-    this.canopy(ctx, 3, -7, 14, 5, 'rgba(160,200,220,.7)');
-    ctx.fillStyle = '#5d6a52';
-    ctx.beginPath(); ctx.moveTo(-4, -7); ctx.lineTo(-14, -6); ctx.lineTo(-14, -3.4); ctx.lineTo(-4, -4); ctx.closePath(); ctx.fill();
-    // ogon
-    ctx.fillStyle = '#5d6a52';
-    ctx.beginPath(); ctx.moveTo(-26, -4); ctx.lineTo(-37, -14); ctx.lineTo(-33, -3.2); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-31, -1, 9, 2, 0, 0, TAU); ctx.fill();
-    ctx.strokeStyle = '#3a4034'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(-30, -8); ctx.lineTo(-36, -12); ctx.stroke();
-    this.propDisc(ctx, 35, 15, o.prop || 0);
-    if (gear > 0.02) { this.wheel(ctx, 12, 4, 3.4, 10 * gear); }
-    this.balken(ctx, -14, -5.4, 7);
-    this.balken(ctx, -20, 2, 6);
+    ctx.beginPath(); ctx.moveTo(34, 0); ctx.quadraticCurveTo(32, -6.2, 26, -7); ctx.lineTo(26, 4.4);
+    ctx.quadraticCurveTo(32, 3.6, 34, 0); ctx.closePath(); ctx.fill();
+    // kabina
+    ctx.fillStyle = 'rgba(160,205,225,.6)';
+    ctx.beginPath(); ctx.moveTo(11, -7.8); ctx.lineTo(7, -12); ctx.lineTo(-4, -11.8); ctx.lineTo(-6, -7.8); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(28,40,46,.75)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(1, -11.9); ctx.lineTo(1, -7.8); ctx.stroke();
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.moveTo(-6, -8); ctx.quadraticCurveTo(-13, -8, -15, -4.6); ctx.lineTo(-6, -5); ctx.closePath(); ctx.fill();
+    // usterzenie z podpórką
+    ctx.fillStyle = G.topD;
+    ctx.beginPath();
+    ctx.moveTo(-27, -5.4); ctx.quadraticCurveTo(-36, -15.6, -43.5, -14.4);
+    ctx.quadraticCurveTo(-42, -8, -40, -2.4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.moveTo(-30, -3.4); ctx.lineTo(-47, -6.6); ctx.lineTo(-47, -3.4); ctx.lineTo(-30, -0.4); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#33382e'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-44, -5.6); ctx.lineTo(-42.6, -12.4); ctx.stroke();
+    Art.propDisc(ctx, 36, 16, o.prop || 0);
+    if (gear > 0.02) {
+      ctx.strokeStyle = '#33332f'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(14, 4); ctx.lineTo(10, 4 + 9 * gear); ctx.stroke();
+      ctx.fillStyle = '#17171a';
+      ctx.beginPath(); ctx.arc(10, 5 + 9 * gear, 4, 0, TAU); ctx.fill();
+    }
+    Art.balken(ctx, -17, -5.4, 7.5);
+    Art.balken(ctx, -27, 1.6, 6.4);
   },
 
-  /* --- Junkers Ju 87 Stuka --- */
+  /* --- Junkers Ju 87 B „Stuka" (dł. 11,1 m) --- */
   p_stuka(ctx, o) {
-    // odwrócone skrzydło mewie
-    ctx.fillStyle = '#4f5a4a';
+    const G = Art.GER;
+    // odwrócone skrzydło mewie: od kadłuba w dół, potem cięciwa
+    // odwrócone skrzydło mewie: od kadłuba w dół, potem dalszy płat w tył
+    Art.farWing(ctx, 8, -10, 6.4, -34, 8.6, 5.4, '#414a38');
+    ctx.fillStyle = G.topD;
     ctx.beginPath();
-    ctx.moveTo(-2, 0); ctx.lineTo(-12, 5); ctx.lineTo(-30, 3); ctx.lineTo(-31, 7); ctx.lineTo(-10, 9);
-    ctx.lineTo(6, 9); ctx.lineTo(22, 4); ctx.lineTo(24, 0); ctx.lineTo(8, 4); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#63705b';
+    ctx.moveTo(12, 1); ctx.lineTo(4, 6.6); ctx.lineTo(-8, 6.6); ctx.lineTo(-10, 2.4);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = G.top;
     ctx.beginPath();
-    ctx.moveTo(36, 1); ctx.quadraticCurveTo(33, -6, 20, -7.5);
-    ctx.lineTo(-8, -8); ctx.lineTo(-28, -4.5); ctx.lineTo(-40, -2); ctx.lineTo(-40, 3);
-    ctx.lineTo(-26, 5.5); ctx.quadraticCurveTo(6, 8, 32, 4.6); ctx.closePath(); ctx.fill();
-    // długa oszklona kabina dwumiejscowa
-    this.canopy(ctx, 6, -8, 24, 6, 'rgba(150,195,215,.6)');
-    ctx.strokeStyle = 'rgba(25,35,40,.75)'; ctx.lineWidth = 0.8;
-    ctx.beginPath(); ctx.moveTo(0, -11); ctx.lineTo(0, -8); ctx.moveTo(10, -11.4); ctx.lineTo(10, -8); ctx.stroke();
-    // karabin tylny
-    ctx.strokeStyle = '#2c2f28'; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(-8, -8.5); ctx.lineTo(-20, -12); ctx.stroke();
-    // ogon
-    ctx.fillStyle = '#4f5a4a';
-    ctx.beginPath(); ctx.moveTo(-30, -4); ctx.lineTo(-42, -16); ctx.lineTo(-38, -3); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-35, 0, 12, 2.4, 0, 0, TAU); ctx.fill();
-    ctx.strokeStyle = '#3a4034'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(-34, -8); ctx.lineTo(-40, -13); ctx.stroke();
-    // stałe podwozie z owiewkami ("spodenki")
-    ctx.fillStyle = '#4a5245';
-    ctx.beginPath(); ctx.moveTo(4, 7); ctx.lineTo(9, 15); ctx.lineTo(1, 15); ctx.lineTo(-2, 7); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#191919'; ctx.beginPath(); ctx.arc(4.5, 15.5, 3.6, 0, TAU); ctx.fill();
-    // silnik rzędowy + śmigło
-    ctx.fillStyle = '#3a3f36';
-    ctx.beginPath(); ctx.ellipse(33, 1, 4.6, 6, 0, 0, TAU); ctx.fill();
-    this.propDisc(ctx, 37, 16, o.prop || 0);
-    this.balken(ctx, -18, -5, 7);
-    this.balken(ctx, -24, 3, 6);
+    ctx.moveTo(42, 1); ctx.quadraticCurveTo(39, -7, 24, -8.6);
+    ctx.lineTo(-8, -8.8); ctx.lineTo(-30, -5.6); ctx.lineTo(-52, -2.6); ctx.lineTo(-52, 2.4);
+    ctx.lineTo(-28, 5.4); ctx.quadraticCurveTo(8, 8, 38, 5); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = G.bot;
+    ctx.beginPath();
+    ctx.moveTo(38, 5); ctx.quadraticCurveTo(8, 8, -28, 5.4); ctx.lineTo(-28, 3.4);
+    ctx.quadraticCurveTo(8, 6, 38, 2.8); ctx.closePath(); ctx.fill();
+    // długa, kanciasta kabina dwumiejscowa
+    ctx.fillStyle = 'rgba(150,198,220,.58)';
+    ctx.beginPath();
+    ctx.moveTo(24, -8.6); ctx.lineTo(20, -14.4); ctx.lineTo(-6, -14.2); ctx.lineTo(-9, -8.8); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(25,35,42,.8)'; ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    ctx.moveTo(12, -14.3); ctx.lineTo(12, -9); ctx.moveTo(4, -14.3); ctx.lineTo(4, -8.9);
+    ctx.moveTo(-2, -14.2); ctx.lineTo(-2, -8.8); ctx.stroke();
+    ctx.strokeStyle = '#2c2f28'; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(-8, -9.4); ctx.lineTo(-22, -13.6); ctx.stroke();
+    // usterzenie z zastrzałami
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.moveTo(-34, -5.6); ctx.lineTo(-52, -19.4); ctx.lineTo(-56, -16.4); ctx.lineTo(-52, -2.6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-36, -2); ctx.lineTo(-58, -5.2); ctx.lineTo(-58, -1.8); ctx.lineTo(-36, 1.4); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#33382e'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-53, -4.4); ctx.lineTo(-55, -15); ctx.stroke();
+    // stałe podwozie w „spodenkach"
+    // charakterystyczne „spodenki" stałego podwozia
+    for (const [gx, sc] of [[12, 0.9], [5, 1.05]]) {
+      ctx.fillStyle = sc > 1 ? '#414a38' : '#37402f';
+      ctx.beginPath();
+      ctx.moveTo(gx - 4.6 * sc, 6.6); ctx.quadraticCurveTo(gx - 6.6 * sc, 13, gx - 4 * sc, 17.4);
+      ctx.lineTo(gx + 4 * sc, 17.4); ctx.quadraticCurveTo(gx + 6.6 * sc, 13, gx + 4.6 * sc, 6.6);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#17171a';
+      ctx.beginPath(); ctx.arc(gx, 18.4, 4.4 * sc, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#3d3d40';
+      ctx.beginPath(); ctx.arc(gx, 18.4, 1.7 * sc, 0, TAU); ctx.fill();
+    }
+    // silnik rzędowy + syrena
+    ctx.fillStyle = '#31352c';
+    ctx.beginPath(); ctx.ellipse(39, 1, 4.6, 6.4, 0, 0, TAU); ctx.fill();
+    Art.propDisc(ctx, 43, 17.5, o.prop || 0);
+    Art.balken(ctx, -22, -6, 8);
+    Art.balken(ctx, -34, 2.4, 7);
   },
 
-  /* --- Heinkel He 111 --- */
+  /* --- Heinkel He 111 P (dł. 16,4 m) --- */
   p_he111(ctx, o) {
-    ctx.fillStyle = '#4b5750';
-    ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(-44, -3); ctx.lineTo(-46, 4); ctx.lineTo(-12, 8);
-    ctx.lineTo(24, 8); ctx.lineTo(42, 2); ctx.lineTo(38, -3); ctx.closePath(); ctx.fill();
-    for (const gx of [8]) {
-      ctx.fillStyle = '#5b6960';
-      ctx.beginPath(); ctx.ellipse(gx + 10, 2, 19, 6, 0, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#33382f';
-      ctx.beginPath(); ctx.ellipse(gx + 27, 2, 4.6, 6, 0, 0, TAU); ctx.fill();
-      this.propDisc(ctx, gx + 31, 19, (o.prop || 0) + 0.8);
-    }
-    ctx.fillStyle = '#657266';
+    const G = Art.GER;
+    Art.farWing(ctx, 30, -16, 3.6, -56, 9, 7, '#414a38');
+    // gondola silnikowa
+    ctx.fillStyle = G.top;
     ctx.beginPath();
-    ctx.moveTo(52, 2); ctx.quadraticCurveTo(48, -6, 32, -8);
-    ctx.lineTo(0, -9); ctx.lineTo(-34, -5); ctx.lineTo(-56, -2); ctx.lineTo(-56, 4);
-    ctx.lineTo(-32, 7); ctx.quadraticCurveTo(12, 10, 48, 6); ctx.closePath(); ctx.fill();
-    // charakterystyczny przeszklony nos
-    ctx.fillStyle = 'rgba(150,205,225,.6)';
-    ctx.beginPath(); ctx.moveTo(52, 2); ctx.quadraticCurveTo(48, -6, 34, -7.6); ctx.lineTo(34, 5.6);
-    ctx.quadraticCurveTo(48, 6, 52, 2); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = 'rgba(30,45,55,.55)'; ctx.lineWidth = 0.7;
-    ctx.beginPath(); ctx.moveTo(40, -7); ctx.lineTo(40, 6); ctx.moveTo(46, -5); ctx.lineTo(46, 6); ctx.stroke();
+    ctx.moveTo(40, 3); ctx.quadraticCurveTo(38, -4, 26, -4.6);
+    ctx.lineTo(-4, -2); ctx.lineTo(-4, 6.4); ctx.lineTo(28, 8.4);
+    ctx.quadraticCurveTo(39, 8, 40, 3); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#2f342b';
+    ctx.beginPath(); ctx.ellipse(37, 3, 4.6, 6.6, 0, 0, TAU); ctx.fill();
+    // kadłub
+    ctx.fillStyle = G.top;
+    ctx.beginPath();
+    ctx.moveTo(64, 1.6); ctx.quadraticCurveTo(62, -7.4, 46, -9.6);
+    ctx.lineTo(4, -11); ctx.lineTo(-40, -7.2); ctx.lineTo(-76, -3.2); ctx.lineTo(-76, 3);
+    ctx.lineTo(-38, 6.2); ctx.quadraticCurveTo(14, 9.4, 58, 6); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = G.bot;
+    ctx.beginPath();
+    ctx.moveTo(58, 6); ctx.quadraticCurveTo(14, 9.4, -38, 6.2); ctx.lineTo(-38, 3.8);
+    ctx.quadraticCurveTo(14, 7, 58, 3.4); ctx.closePath(); ctx.fill();
+    // charakterystyczny, w pełni oszklony nos
+    ctx.fillStyle = 'rgba(152,204,224,.6)';
+    ctx.beginPath();
+    ctx.moveTo(64, 1.6); ctx.quadraticCurveTo(62, -7.4, 46, -9.4);
+    ctx.lineTo(40, -9); ctx.lineTo(40, 6); ctx.quadraticCurveTo(57, 6, 64, 1.6); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(28,40,46,.65)'; ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(46, -9.4); ctx.lineTo(46, 6); ctx.moveTo(53, -8); ctx.lineTo(53, 6);
+    ctx.moveTo(58, -5); ctx.lineTo(58, 6); ctx.stroke();
     // wieżyczka górna i gondola dolna
-    ctx.fillStyle = '#4b5750';
-    ctx.beginPath(); ctx.arc(-6, -9, 4.4, Math.PI, TAU); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(2, 8); ctx.lineTo(-10, 8); ctx.lineTo(-8, 13); ctx.lineTo(2, 13); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#4b5750';
-    ctx.beginPath(); ctx.moveTo(-40, -3); ctx.lineTo(-56, -16); ctx.lineTo(-52, -2.4); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-48, 1, 14, 2.6, 0, 0, TAU); ctx.fill();
-    this.balken(ctx, -26, -6, 9);
-    this.balken(ctx, -34, 4, 8);
-  },
-
-  /* --- Bf 110 — ciężki myśliwiec --- */
-  p_bf110(ctx, o) {
-    ctx.fillStyle = '#4d5a4c';
-    ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(-36, -3); ctx.lineTo(-38, 3); ctx.lineTo(-8, 7);
-    ctx.lineTo(20, 7); ctx.lineTo(34, 1); ctx.lineTo(31, -3); ctx.closePath(); ctx.fill();
-    for (const gx of [8]) {
-      ctx.fillStyle = '#5d6b5b';
-      ctx.beginPath(); ctx.ellipse(gx + 8, 1.5, 15, 5, 0, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#33382f';
-      ctx.beginPath(); ctx.ellipse(gx + 21, 1.5, 4, 5.2, 0, 0, TAU); ctx.fill();
-      this.propDisc(ctx, gx + 25, 16, (o.prop || 0) + 0.6);
-    }
-    ctx.fillStyle = '#68765f';
-    ctx.beginPath();
-    ctx.moveTo(40, 0); ctx.quadraticCurveTo(36, -6, 24, -7.4);
-    ctx.lineTo(-2, -8); ctx.lineTo(-28, -5); ctx.lineTo(-44, -2); ctx.lineTo(-44, 2.6);
-    ctx.lineTo(-26, 5.4); ctx.quadraticCurveTo(8, 8, 36, 4.6); ctx.closePath(); ctx.fill();
-    this.canopy(ctx, 10, -8, 26, 5.4, 'rgba(150,200,220,.65)');
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.arc(-6, -10.8, 5.4, Math.PI, TAU); ctx.fill();
+    ctx.fillStyle = G.bot;
+    ctx.beginPath(); ctx.moveTo(4, 7); ctx.lineTo(-18, 6.6); ctx.quadraticCurveTo(-16, 13.6, 2, 13); ctx.closePath(); ctx.fill();
     ctx.strokeStyle = '#2c2f28'; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(-6, -8.5); ctx.lineTo(-18, -12); ctx.stroke();
-    ctx.fillStyle = '#4d5a4c';
-    ctx.beginPath(); ctx.ellipse(-40, 0.4, 12, 2.4, 0, 0, TAU); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-36, -2); ctx.lineTo(-44, -13); ctx.lineTo(-48, -12); ctx.lineTo(-46, -1); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-36, 2); ctx.lineTo(-44, 11); ctx.lineTo(-48, 10); ctx.lineTo(-46, 1); ctx.closePath(); ctx.fill();
-    this.balken(ctx, -20, -6, 8);
-    this.balken(ctx, -28, 3, 7);
+    ctx.beginPath(); ctx.moveTo(-14, 10.4); ctx.lineTo(-26, 13.4); ctx.stroke();
+    // usterzenie
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.moveTo(-52, -6); ctx.quadraticCurveTo(-66, -22, -78, -19.6);
+    ctx.quadraticCurveTo(-77, -10, -76, -3.2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-54, -2.2); ctx.lineTo(-82, -5.4); ctx.lineTo(-82, -1.4); ctx.lineTo(-54, 1.8); ctx.closePath(); ctx.fill();
+    Art.balken(ctx, -34, -8, 10);
+    Art.balken(ctx, -50, 2.4, 8.6);
+    Art.propDisc(ctx, 46, 17, (o.prop || 0) + 0.8, undefined, 3);
   },
 
-  /* --- Henschel Hs 126 — samolot rozpoznawczy --- */
-  p_hs126(ctx, o) {
-    ctx.fillStyle = '#5b6a4e';
-    ctx.beginPath(); ctx.ellipse(0, -10, 26, 3.2, 0, 0, TAU); ctx.fill();
-    ctx.strokeStyle = '#4a5540'; ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(-8, -8); ctx.lineTo(-6, -2); ctx.moveTo(8, -8); ctx.lineTo(6, -2); ctx.stroke();
-    ctx.fillStyle = '#6b7a5c';
+  /* --- Messerschmitt Bf 110 C (dł. 12,1 m) --- */
+  p_bf110(ctx, o) {
+    const G = Art.GER;
+    Art.farWing(ctx, 22, -12, 3, -42, 7.4, 5.6, '#414a38');
+    ctx.fillStyle = G.top;
     ctx.beginPath();
-    ctx.moveTo(32, 0); ctx.quadraticCurveTo(28, -6, 14, -7);
-    ctx.lineTo(-16, -5); ctx.lineTo(-34, -2); ctx.lineTo(-34, 2.4); ctx.lineTo(-16, 5);
-    ctx.quadraticCurveTo(6, 7, 28, 4); ctx.closePath(); ctx.fill();
-    this.canopy(ctx, 0, -6, 16, 4.6, 'rgba(40,55,50,.8)');
-    ctx.fillStyle = '#5b6a4e';
-    ctx.beginPath(); ctx.moveTo(-26, -3.6); ctx.lineTo(-36, -14); ctx.lineTo(-33, -3); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-30, 0.6, 10, 2.2, 0, 0, TAU); ctx.fill();
-    ctx.fillStyle = '#3d4236';
-    ctx.beginPath(); ctx.ellipse(28, 0, 4.6, 6.4, 0, 0, TAU); ctx.fill();
-    this.propDisc(ctx, 32, 16, o.prop || 0);
-    this.wheel(ctx, 4, 4, 4, 11);
-    this.balken(ctx, -16, -4, 7);
+    ctx.moveTo(30, 2.4); ctx.quadraticCurveTo(28, -3.6, 17, -4.2);
+    ctx.lineTo(-8, -1.8); ctx.lineTo(-8, 5.4); ctx.lineTo(19, 7);
+    ctx.quadraticCurveTo(29, 6.8, 30, 2.4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#2f342b';
+    ctx.beginPath(); ctx.ellipse(27, 2.4, 4.2, 5.8, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = G.top;
+    ctx.beginPath();
+    ctx.moveTo(48, 0.6); ctx.quadraticCurveTo(45, -6.4, 32, -7.6);
+    ctx.lineTo(-2, -8.4); ctx.lineTo(-30, -5.4); ctx.lineTo(-56, -2.6); ctx.lineTo(-56, 2.2);
+    ctx.lineTo(-28, 5.2); ctx.quadraticCurveTo(12, 7.8, 44, 4.6); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = G.bot;
+    ctx.beginPath();
+    ctx.moveTo(44, 4.6); ctx.quadraticCurveTo(12, 7.8, -28, 5.2); ctx.lineTo(-28, 3.2);
+    ctx.quadraticCurveTo(12, 5.6, 44, 2.6); ctx.closePath(); ctx.fill();
+    // długa oszklona kabina
+    ctx.fillStyle = 'rgba(152,204,224,.6)';
+    ctx.beginPath();
+    ctx.moveTo(30, -7.6); ctx.lineTo(26, -12.8); ctx.lineTo(-2, -12.4); ctx.lineTo(-5, -8.4); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(28,40,46,.7)'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(16, -12.7); ctx.lineTo(16, -8.2); ctx.moveTo(6, -12.6); ctx.lineTo(6, -8.4); ctx.stroke();
+    ctx.strokeStyle = '#2c2f28'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(-4, -8.8); ctx.lineTo(-18, -12.4); ctx.stroke();
+    // podwójne usterzenie
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.moveTo(-38, -2.2); ctx.lineTo(-60, -4.4); ctx.lineTo(-60, -0.4); ctx.lineTo(-38, 1.8); ctx.closePath(); ctx.fill();
+    for (const far of [true, false]) {
+      const dx = far ? 3 : 0;
+      ctx.fillStyle = far ? '#2f3629' : G.topD;
+      ctx.beginPath();
+      ctx.moveTo(-47 + dx, -2.8);
+      ctx.quadraticCurveTo(-51 + dx, -14.6, -57.5 + dx, -13.8);
+      ctx.quadraticCurveTo(-59 + dx, -7, -59 + dx, -2.2);
+      ctx.closePath(); ctx.fill();
+    }
+    Art.balken(ctx, -24, -6.4, 8.6);
+    Art.balken(ctx, -38, 2.6, 7.4);
+    Art.propDisc(ctx, 32, 15.5, (o.prop || 0) + 0.6, undefined, 2.4);
+  },
+
+  /* --- Henschel Hs 126 (dł. 10,85 m) --- */
+  p_hs126(ctx, o) {
+    const G = Art.GER;
+    // górnopłat na zastrzałach
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.moveTo(20, -14.4); ctx.lineTo(-16, -14.4); ctx.lineTo(-19, -11); ctx.lineTo(17, -11); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#3d4436'; ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.moveTo(-10, -11.4); ctx.lineTo(-4, -3); ctx.moveTo(12, -11.4); ctx.lineTo(6, -3);
+    ctx.moveTo(2, -11.2); ctx.lineTo(2, -7.6); ctx.stroke();
+    ctx.fillStyle = G.top;
+    ctx.beginPath();
+    ctx.moveTo(36, 0); ctx.quadraticCurveTo(33, -6.4, 18, -7.6);
+    ctx.lineTo(-14, -6); ctx.lineTo(-42, -2.6); ctx.lineTo(-42, 2); ctx.lineTo(-14, 5);
+    ctx.quadraticCurveTo(8, 7, 32, 4); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = G.bot;
+    ctx.beginPath();
+    ctx.moveTo(32, 4); ctx.quadraticCurveTo(8, 7, -14, 5); ctx.lineTo(-14, 3);
+    ctx.quadraticCurveTo(8, 5, 32, 2.2); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(150,198,220,.55)';
+    ctx.beginPath(); ctx.moveTo(14, -7.6); ctx.lineTo(10, -11.2); ctx.lineTo(-6, -10.8); ctx.lineTo(-8, -6.4); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#2c2f28'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(-7, -7.4); ctx.lineTo(-19, -11.4); ctx.stroke();
+    ctx.fillStyle = G.topD;
+    ctx.beginPath(); ctx.moveTo(-28, -4.6); ctx.quadraticCurveTo(-38, -17, -45, -15.6);
+    ctx.quadraticCurveTo(-43.6, -8, -42, -2.6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-30, -1.4); ctx.lineTo(-47, -3.8); ctx.lineTo(-47, -0.6); ctx.lineTo(-30, 1.6); ctx.closePath(); ctx.fill();
+    Art.radial(ctx, 33, 7.4);
+    Art.propDisc(ctx, 37, 17.5, o.prop || 0);
+    ctx.fillStyle = '#3f4738';
+    ctx.beginPath();
+    ctx.moveTo(2, 5); ctx.quadraticCurveTo(-1, 11, 0, 14.6); ctx.lineTo(9, 14.6);
+    ctx.quadraticCurveTo(11, 10, 8, 5); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#17171a';
+    ctx.beginPath(); ctx.arc(4.4, 15.2, 4, 0, TAU); ctx.fill();
+    Art.balken(ctx, -22, -4.6, 7.6);
   },
 
   /* =======================================================================

@@ -16,13 +16,15 @@ const CL_MAX = 1.62;       // maksymalny współczynnik siły nośnej (przed prz
 const PLANES = {
   pws26: {
     name: 'PWS-26', full: 'PWS-26', role: 'Samolot szkolno-treningowy', year: 1936,
+    lenM: 7.36, noseX: 28,
     thrust: 130, vStall: 118, vMax: 300, turn: 2.0, cdi: 0.0009,
     hp: 90, guns: 1, rof: 0.14, ammo: 400, gunDmg: 5.2, bombs: 0, torps: 0, fuel: 260,
-    hitR: 26, desc: 'Zwrotny dwupłatowiec szkolny. Wolny, ale wybacza błędy — na nim uczysz się latać.',
+    hitR: 28, desc: 'Zwrotny dwupłatowiec szkolny. Wolny, ale wybacza błędy — na nim uczysz się latać.',
     stats: { spd: 0.3, arm: 0.2, agi: 0.8, tuf: 0.35 },
   },
   p7a: {
     name: 'PZL P.7a', full: 'PZL P.7a', role: 'Myśliwiec', year: 1932,
+    lenM: 7.15, noseX: 29,
     thrust: 150, vStall: 138, vMax: 355, turn: 2.1, cdi: 0.0008,
     hp: 105, guns: 2, rof: 0.1, ammo: 600, gunDmg: 5.6, bombs: 0, torps: 0, fuel: 300,
     hitR: 27, desc: 'Pierwszy polski myśliwiec o konstrukcji metalowej. Skrzydło mewie daje świetną widoczność.',
@@ -30,59 +32,67 @@ const PLANES = {
   },
   p11c: {
     name: 'PZL P.11c', full: 'PZL P.11c', role: 'Myśliwiec', year: 1935,
+    lenM: 7.55, noseX: 32,
     thrust: 168, vStall: 150, vMax: 400, turn: 2.2, cdi: 0.0008,
     hp: 125, guns: 4, rof: 0.085, ammo: 800, gunDmg: 6.2, bombs: 2, bombKind: 'bomb', torps: 0, fuel: 330,
-    hitR: 28, desc: 'Podstawowy myśliwiec września. Cztery karabiny, zwrotny jak osa, ale wolniejszy od Messerschmitta.',
+    hitR: 29, desc: 'Podstawowy myśliwiec września. Cztery karabiny, zwrotny jak osa, ale wolniejszy od Messerschmitta.',
     stats: { spd: 0.5, arm: 0.62, agi: 0.9, tuf: 0.45 },
   },
   karas: {
     name: 'PZL.23 Karaś', full: 'PZL.23B Karaś', role: 'Lekki bombowiec', year: 1936,
+    lenM: 9.68, noseX: 39,
     thrust: 158, vStall: 155, vMax: 385, turn: 1.7, cdi: 0.0010,
     hp: 190, guns: 2, rof: 0.11, ammo: 700, gunDmg: 5.4, bombs: 6, bombKind: 'bomb', torps: 0, fuel: 460,
-    hitR: 34, desc: 'Lekki bombowiec liniowy. Dźwiga 700 kg bomb, ale w walce z myśliwcem jest ciężki i powolny.',
+    hitR: 37, desc: 'Lekki bombowiec liniowy. Dźwiga 700 kg bomb, ale w walce z myśliwcem jest ciężki i powolny.',
     stats: { spd: 0.46, arm: 0.55, agi: 0.45, tuf: 0.62 },
   },
   los: {
     name: 'PZL.37 Łoś', full: 'PZL.37B Łoś', role: 'Bombowiec średni', year: 1938,
+    lenM: 12.92, noseX: 51,
     thrust: 178, vStall: 170, vMax: 425, turn: 1.35, cdi: 0.0011,
     hp: 300, guns: 2, rof: 0.12, ammo: 800, gunDmg: 5.6, bombs: 8, bombKind: 'heavy', torps: 2, fuel: 620,
-    hitR: 42, desc: 'Duma polskiego lotnictwa — nowoczesny bombowiec o dużym udźwigu. Może przenosić torpedy lotnicze.',
+    hitR: 49, desc: 'Duma polskiego lotnictwa — nowoczesny bombowiec o dużym udźwigu. Może przenosić torpedy lotnicze.',
     stats: { spd: 0.62, arm: 0.85, agi: 0.3, tuf: 0.9 },
   },
   /* --- maszyny przeciwnika --- */
   bf109: {
     name: 'Bf 109 E', full: 'Messerschmitt Bf 109 E-1', role: 'Myśliwiec', year: 1938,
+    lenM: 8.64, noseX: 36,
     thrust: 198, vStall: 165, vMax: 470, turn: 2.0, cdi: 0.0008,
     hp: 130, guns: 4, rof: 0.09, ammo: 9999, gunDmg: 6.4, bombs: 0, torps: 0, fuel: 9999,
-    hitR: 28, enemy: true, desc: 'Najgroźniejszy przeciwnik. Szybszy i lepiej uzbrojony, ale mniej zwrotny w ciasnym wirażu.',
+    hitR: 33, enemy: true, desc: 'Najgroźniejszy przeciwnik. Szybszy i lepiej uzbrojony, ale mniej zwrotny w ciasnym wirażu.',
     stats: { spd: 0.85, arm: 0.8, agi: 0.7, tuf: 0.5 },
   },
   stuka: {
     name: 'Ju 87 Stuka', full: 'Junkers Ju 87 B', role: 'Bombowiec nurkujący', year: 1937,
+    lenM: 11.1, noseX: 43,
     thrust: 148, vStall: 145, vMax: 355, turn: 1.6, cdi: 0.0010,
     hp: 165, guns: 2, rof: 0.13, ammo: 9999, gunDmg: 5, bombs: 3, torps: 0, fuel: 9999,
-    hitR: 34, enemy: true, rearGun: true, desc: 'Bombowiec nurkujący z syreną. Powolny — świetny cel, jeśli dopadniesz go po zrzucie.',
+    hitR: 42, enemy: true, rearGun: true, desc: 'Bombowiec nurkujący z syreną. Powolny — świetny cel, jeśli dopadniesz go po zrzucie.',
     stats: { spd: 0.42, arm: 0.6, agi: 0.4, tuf: 0.62 },
   },
   he111: {
     name: 'He 111', full: 'Heinkel He 111 P', role: 'Bombowiec średni', year: 1937,
+    lenM: 16.4, noseX: 64,
     thrust: 162, vStall: 165, vMax: 400, turn: 1.15, cdi: 0.0012,
     hp: 380, guns: 1, rof: 0.16, ammo: 9999, gunDmg: 4.4, bombs: 10, torps: 0, fuel: 9999,
-    hitR: 48, enemy: true, rearGun: true, desc: 'Bombowiec, który równał z ziemią polskie miasta. Twardy, ale powolny i słabo uzbrojony w ogon.',
+    hitR: 62, enemy: true, rearGun: true, desc: 'Bombowiec, który równał z ziemią polskie miasta. Twardy, ale powolny i słabo uzbrojony w ogon.',
     stats: { spd: 0.6, arm: 0.75, agi: 0.2, tuf: 0.95 },
   },
   bf110: {
     name: 'Bf 110', full: 'Messerschmitt Bf 110 C', role: 'Ciężki myśliwiec', year: 1938,
+    lenM: 12.1, noseX: 48,
     thrust: 182, vStall: 170, vMax: 440, turn: 1.5, cdi: 0.0010,
     hp: 240, guns: 5, rof: 0.085, ammo: 9999, gunDmg: 6.8, bombs: 0, torps: 0, fuel: 9999,
-    hitR: 38, enemy: true, rearGun: true, desc: 'Niszczyciel — ciężko uzbrojony, ale ociężały w wirażu.',
+    hitR: 46, enemy: true, rearGun: true, desc: 'Niszczyciel — ciężko uzbrojony, ale ociężały w wirażu.',
     stats: { spd: 0.78, arm: 0.95, agi: 0.35, tuf: 0.75 },
   },
   hs126: {
     name: 'Hs 126', full: 'Henschel Hs 126', role: 'Samolot rozpoznawczy', year: 1938,
+    lenM: 10.85, noseX: 37,
     thrust: 138, vStall: 125, vMax: 330, turn: 1.7, cdi: 0.0010,
     hp: 110, guns: 1, rof: 0.16, ammo: 9999, gunDmg: 4, bombs: 0, torps: 0, fuel: 9999,
-    hitR: 30, enemy: true, rearGun: true, desc: 'Oczy niemieckiej artylerii. Zestrzelenie go ratuje życie naszych żołnierzy.',
+    hitR: 41, enemy: true, rearGun: true, desc: 'Oczy niemieckiej artylerii. Zestrzelenie go ratuje życie naszych żołnierzy.',
     stats: { spd: 0.35, arm: 0.25, agi: 0.5, tuf: 0.4 },
   },
 };
@@ -138,6 +148,8 @@ class Plane {
     this.lastHitBy = null;
     this.brakes = 0;
     this.wobble = rnd(TAU);
+    this.turning = 0;          // postęp zawracania na ziemi (0..1)
+    this.turnDir = 1;
   }
 
   get speed() { return Math.hypot(this.vx, this.vy); }
@@ -179,7 +191,8 @@ class Plane {
     const powerLoss = this.hp < this.maxHp * 0.35 ? 0.62 : this.hp < this.maxHp * 0.6 ? 0.85 : 1;
     this.rpm = approach(this.rpm, this.throttle * fuelOk * powerLoss, dt * 0.9);
 
-    if (this.onGround) this.updateGround(dt, G);
+    if (this.turning) this.updateGroundTurn(dt, G);
+    else if (this.onGround) this.updateGround(dt, G);
     else this.updateFlight(dt, G);
 
     // podwozie
@@ -247,11 +260,20 @@ class Plane {
           type: 'smoke', col: '#ffffff', alpha: 0.22, drag: 2, prio: 0.4,
         });
       }
-    } else {
-      // na ziemi ster wysokości podrywa ogon — działa tak samo w obie strony
-      const d = this.faceDir;
-      const pr = clamp(this.pitch + pitch * d * 1.2 * dt * clamp(this.speed / 110, 0.15, 1), -0.28, 0.55);
-      this.pitch = pr;
+    } else if (!this.turning) {
+      // stojąc niemal w miejscu strzałkami zawracamy maszynę na pasie,
+      // w rozbiegu te same klawisze podrywają ogon
+      if (pitch !== 0 && Math.abs(this.vx) < 45) {
+        this.turning = 0.0001;
+        this.turnDir = pitch > 0 ? 1 : -1;
+        this.vx = 0;
+        G.toast('Zawracanie…');
+        Audio2.noise(0.5, 260, 0.8, 0.12, 'lowpass');
+      } else {
+        const d = this.faceDir;
+        const pr = clamp(this.pitch + pitch * d * 1.2 * dt * clamp(this.speed / 110, 0.15, 1), -0.28, 0.55);
+        this.pitch = pr;
+      }
     }
 
     // podwozie
@@ -398,6 +420,26 @@ class Plane {
     }
   }
 
+  /** Obrót maszyny na kołach o 180° — w rzucie z boku widać, jak sylwetka
+      „chowa się" bokiem i wychodzi zwrócona w drugą stronę. */
+  updateGroundTurn(dt, G) {
+    const gl = G.groundLevelFor(this.x);
+    this.y = gl.y + 8;
+    this.vx *= 0.6; this.vy = 0;
+    this.turning += dt / 1.25;
+    // kurz spod kół i pisk hamulców
+    if (chance(dt * 26)) {
+      Particles.dirt(this.x + rnd(12, -12), gl.y, 1,
+        { spd: 55, col: (gl.rw && gl.rw.deck) ? '#9aa0a3' : '#7d6a4a' });
+    }
+    if (this.turning >= 1) {
+      this.turning = 0;
+      this.a = wrapAngle(Math.PI - this.a);       // maszyna stoi zwrócona w drugą stronę
+      this.flip = Math.cos(this.a) < 0;
+      if (this.isPlayer) G.toast(this.faceDir > 0 ? 'Nos w prawo — gaz do startu (↑)' : 'Nos w lewo — gaz do startu (↑)');
+    }
+  }
+
   updateGround(dt, G) {
     const S = this.S;
     const rw = this.groundRw || G.world.inRunway(this.x);
@@ -410,7 +452,7 @@ class Plane {
     const v = Math.abs(this.vx);
     // na pokładzie lotniskowca hak chwyta liny hamujące — maszyna staje w kilkadziesiąt metrów
     const arrest = (rw && rw.deck && this.landed && v > 12) ? 900 : 0;
-    const rough = rw ? 0 : 90;                 // pole nie jest utwardzonym pasem
+    const rough = rw ? 0 : 46;                 // pole stawia większy opór niż utwardzony pas
     const roll = 26 + rough + this.brakes * 520 + arrest;
     if (arrest && chance(0.4)) Particles.dirt(this.x - sign(this.vx) * 14, gy, 2, { spd: 90, col: '#b9b3a2' });
     const aero = S.cd0 * v * v * 1.25;
@@ -457,8 +499,9 @@ class Plane {
     const c = Math.cos(this.a), s = Math.sin(this.a);
     for (let i = 0; i < n; i++) {
       const off = (i - (n - 1) / 2) * 9 * (this.flip ? -1 : 1);
-      const bx = this.x + c * 30 - s * off;
-      const by = this.y + s * 30 + c * off;
+      const nx = S.noseX || 30;
+      const bx = this.x + c * nx - s * off;
+      const by = this.y + s * nx + c * off;
       const spread = rnd(0.016, -0.016);
       const aa = this.a + spread;
       const mv = 1500;
@@ -812,6 +855,11 @@ class Plane {
     ctx.rotate(-this.a);
     if (this.flip) ctx.scale(1, -1);
     ctx.scale(z, z);
+    if (this.turning) {
+      // sylwetka obraca się wokół osi pionowej: skala pozioma 1 → 0 → -1
+      const k = Math.cos(this.turning * Math.PI);
+      ctx.scale(Math.abs(k) < 0.14 ? 0.14 * (k < 0 ? -1 : 1) : k, 1);
+    }
     // cień pod maszyną nisko nad ziemią
     ctx.globalAlpha = 1;
     Art.plane(ctx, this.key, { gear: this.gearT, prop: this.prop, damage: 1 - this.hp / this.maxHp });
@@ -825,7 +873,8 @@ class Plane {
       ctx.globalAlpha = clamp(0.34 * (1 - agl / 420), 0, 0.34);
       ctx.fillStyle = '#000';
       ctx.beginPath();
-      ctx.ellipse(sx, gsy, 34 * z * Math.abs(Math.cos(this.a)) + 8 * z, 5 * z, 0, 0, TAU);
+      const shW = (this.S.lenM || 8) * 4.4;
+      ctx.ellipse(sx, gsy, shW * z * Math.abs(Math.cos(this.a)) + 8 * z, 5 * z, 0, 0, TAU);
       ctx.fill();
       ctx.restore();
     }
