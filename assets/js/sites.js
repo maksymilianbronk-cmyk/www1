@@ -352,4 +352,18 @@ const SITES = [
       tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash"],
     },
   },
+  {
+    slug: "kod-menedzer",
+    title: "KodBox — menedżer projektów kodu",
+    desc: "Wklejasz kod, aplikacja zapisuje go jako plik z wybranym (lub automatycznie rozpoznanym) rozszerzeniem. Praca na projektach: menedżer plików z podglądem, zmianą nazwy, duplikowaniem i wgrywaniem przez przeciąganie; edytor z numerami linii i własnym podświetlaniem składni (HTML, CSS, JS, PY, JSON, MD, SQL, SH, YAML, INI); podgląd HTML na żywo z automatycznym wstawianiem arkuszy CSS i skryptów JS z tego samego projektu. Import z Markdown: wklejasz cały eksport rozmowy (Perplexity, ChatGPT), a aplikacja wyodrębnia każdy blok kodu, rozpoznaje język i proponuje nazwy plików — z nazwy podanej w tekście, z nagłówka nad blokiem albo z języka bloku; nazwy można poprawić przed zapisem, opis zapisać jako README.md. Pobieranie pojedynczych plików i całego projektu jako ZIP (własny zapis archiwum, bez bibliotek). Udostępnianie w dwóch wariantach: samodzielny link z zaszytą i skompresowaną zawartością projektu (deflate-raw + base64url, strona odbiorcy share.html z podglądem, pobieraniem i kopiowaniem do własnych projektów) albo krótki link z tokenem obsługiwany przez backend. Dwa tryby zapisu: lokalny w przeglądarce (IndexedDB) i serwerowy — dołączony backend Node.js bez żadnych zależności (moduły wbudowane, ZIP z deflate, walidacja ścieżek i rozszerzeń, strona udostępniania), wykrywany automatycznie przez /api/ping.",
+    icon: "🗂️",
+    tag: "narzędzie",
+    status: "prywatna",
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#1a1a22", "#6c63ff", "#42d392", "#f5a623"],
+      fonts: ["system-ui", "JetBrains Mono / monospace"],
+      tech: ["HTML", "CSS", "Vanilla JS", "IndexedDB", "Node.js", "CompressionStream", "Playwright"],
+    },
+  },
 ];
