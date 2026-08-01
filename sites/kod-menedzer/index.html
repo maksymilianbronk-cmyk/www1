@@ -59,8 +59,8 @@
               <p id="projectDesc"></p>
             </div>
             <div class="toolbar">
-              <button class="btn btn-primary" id="btnNewFile">+ Wklej kod / nowy plik</button>
-              <button class="btn" id="btnMarkdown">📄 Rozbij Markdown na pliki</button>
+              <button class="btn btn-primary" id="btnNewFile">✏️ Okno kodu</button>
+              <button class="btn" id="btnMarkdown">📄 Okno pliku .md</button>
               <button class="btn" id="btnUpload">📂 Wgraj pliki</button>
               <button class="btn btn-ok" id="btnShare">🔗 Udostępnij</button>
               <button class="btn" id="btnZip">⬇️ Pobierz ZIP</button>
@@ -77,6 +77,55 @@
           </div>
         </div>
 
+        <section class="section panes">
+          <div class="pane" id="paneCode">
+            <div class="pane-head">
+              <h2><span class="pane-num">1</span> Okno kodu</h2>
+              <span class="pane-sub">wklej kod → zapisze się jako plik</span>
+            </div>
+            <textarea class="paste-area" id="inpFileContent" placeholder="Wklej tutaj kod (Ctrl+V) — HTML, CSS, JS, Python, JSON…"></textarea>
+            <div class="pane-row">
+              <input class="field" id="inpFileName" placeholder="nazwa pliku (uzupełnimy sami)" autocomplete="off">
+              <select class="field" id="selExt"></select>
+              <button class="btn btn-primary" id="btnSaveNewFile">💾 Zapisz jako plik</button>
+              <button class="btn btn-sm" id="btnClearCode">✕ Wyczyść</button>
+            </div>
+            <p class="hint" id="detectHint">Rozszerzenie rozpoznajemy automatycznie z treści kodu — możesz je nadpisać powyżej.</p>
+          </div>
+
+          <div class="pane" id="paneMd">
+            <div class="pane-head">
+              <h2><span class="pane-num">2</span> Okno pliku .md</h2>
+              <span class="pane-sub">rozbijemy go na osobne pliki z kodem</span>
+            </div>
+            <div class="drop" id="mdDrop">
+              <strong>Upuść tutaj plik .md</strong>
+              <span>albo <button class="btn btn-sm" id="btnMdPickFile">wybierz z dysku</button></span>
+            </div>
+            <textarea class="paste-area" id="inpMarkdown" placeholder="…albo wklej tutaj treść dokumentu .md (np. eksport rozmowy z Perplexity)"></textarea>
+            <div class="pane-row">
+              <button class="btn" id="btnMdAnalyze">🔍 Analizuj</button>
+              <button class="btn btn-sm" id="btnMdClear">✕ Wyczyść</button>
+            </div>
+
+            <div id="mdResult" hidden>
+              <div class="section-head" style="margin:6px 0 8px">
+                <h2>Znalezione bloki kodu (<span id="mdCount">0</span>)</h2>
+                <div class="grow"></div>
+                <button class="btn btn-sm" id="btnMdAll">Zaznacz wszystko</button>
+                <button class="btn btn-sm" id="btnMdNone">Odznacz</button>
+              </div>
+              <div id="mdList" class="md-list"></div>
+              <label class="md-extra">
+                <input type="checkbox" id="chkMdProse"> Zapisz też treść opisową jako <code>README.md</code>
+              </label>
+              <div class="pane-row" style="margin-top:10px">
+                <button class="btn btn-primary" id="btnMdSave">💾 Zapisz zaznaczone pliki</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="section">
           <div class="section-head">
             <h2>Pliki w projekcie</h2>
@@ -85,7 +134,7 @@
           </div>
           <div class="files" id="fileList"></div>
           <div class="empty-files" id="emptyFiles" hidden>
-            Brak plików. Kliknij <strong>„Wklej kod / nowy plik"</strong> albo upuść pliki w to okno.
+            Brak plików. Wklej kod w <strong>oknie kodu</strong> powyżej, wgraj plik <strong>.md</strong> albo upuść pliki w to okno.
           </div>
         </section>
 
@@ -150,63 +199,6 @@
   </div>
 </div>
 
-<!-- Modal: nowy plik / wklejanie kodu -->
-<div class="modal-back" id="modalFile" hidden>
-  <div class="modal wide">
-    <h2>Wklej kod — zapisz jako plik</h2>
-    <div class="modal-row">
-      <label class="lbl">Nazwa pliku
-        <input class="field" id="inpFileName" placeholder="index" autocomplete="off">
-      </label>
-      <label class="lbl">Rozszerzenie
-        <select class="field" id="selExt"></select>
-      </label>
-    </div>
-    <label class="lbl">Kod
-      <textarea class="paste-area" id="inpFileContent" placeholder="Wklej tutaj kod (Ctrl+V)…"></textarea>
-    </label>
-    <p class="hint" id="detectHint">Rozszerzenie zostanie rozpoznane automatycznie po wklejeniu kodu — możesz je nadpisać ręcznie.</p>
-    <div class="modal-actions">
-      <button class="btn" data-close>Anuluj</button>
-      <button class="btn btn-primary" id="btnSaveNewFile">Zapisz plik</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: import z Markdown -->
-<div class="modal-back" id="modalMarkdown" hidden>
-  <div class="modal wide">
-    <h2>📄 Markdown → osobne pliki</h2>
-    <p class="hint">Wklej cały dokument <code>.md</code> (np. eksport rozmowy z ChatGPT czy Perplexity).
-      Aplikacja wyodrębni każdy blok kodu, rozpozna język i zaproponuje nazwę pliku —
-      z nazwy podanej w tekście („<em>Backend (app.py)</em>"), z nagłówka nad blokiem albo z języka bloku.</p>
-    <div class="toolbar">
-      <button class="btn btn-sm" id="btnMdPickFile">📂 Wczytaj plik .md</button>
-      <button class="btn btn-sm" id="btnMdAnalyze">🔍 Analizuj</button>
-      <button class="btn btn-sm" id="btnMdClear">✕ Wyczyść</button>
-    </div>
-    <textarea class="paste-area" id="inpMarkdown" style="min-height:150px" placeholder="Wklej tutaj treść pliku .md…"></textarea>
-
-    <div id="mdResult" hidden>
-      <div class="section-head" style="margin-bottom:8px">
-        <h2>Znalezione bloki kodu (<span id="mdCount">0</span>)</h2>
-        <div class="grow"></div>
-        <button class="btn btn-sm" id="btnMdAll">Zaznacz wszystko</button>
-        <button class="btn btn-sm" id="btnMdNone">Odznacz</button>
-      </div>
-      <div id="mdList" class="md-list"></div>
-      <label class="md-extra">
-        <input type="checkbox" id="chkMdProse"> Zapisz też treść opisową jako <code>README.md</code>
-      </label>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn" data-close>Anuluj</button>
-      <button class="btn btn-primary" id="btnMdSave" disabled>Zapisz zaznaczone pliki</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal: udostępnianie -->
 <div class="modal-back" id="modalShare" hidden>
   <div class="modal">
@@ -250,11 +242,12 @@
     <h2>Jak to działa</h2>
     <ol style="display:grid; gap:10px; padding-left:20px; color:var(--txt-2); font-size:13.5px">
       <li><strong>Projekt</strong> to katalog plików. Utwórz go w panelu po lewej.</li>
-      <li><strong>Wklej kod</strong> — podaj nazwę pliku i wybierz rozszerzenie
-          (HTML, CSS, JS, PY, JSON, MD, SVG, SQL i kilkanaście innych).
-          Rozszerzenie jest też wykrywane automatycznie z treści kodu.</li>
-      <li><strong>Markdown → pliki</strong> — wklej cały dokument <code>.md</code> (np. eksport rozmowy
-          z Perplexity czy ChatGPT) albo upuść plik <code>.md</code> w okno. Aplikacja wyodrębni każdy
+      <li><strong>Okno kodu</strong> (nr 1 na stronie projektu) — wklej kod i kliknij
+          „Zapisz jako plik". Rozszerzenie rozpoznajemy z treści, a nazwę uzupełniamy sami
+          (index.html, styles.css, script.js…), jeśli jej nie podasz — nic nie nadpisujemy
+          bez pytania. Możesz oczywiście wpisać własną nazwę i wybrać rozszerzenie z listy.</li>
+      <li><strong>Okno pliku .md</strong> (nr 2) — upuść tam plik <code>.md</code>, wybierz go z dysku
+          albo wklej treść (np. eksport rozmowy z Perplexity czy ChatGPT). Aplikacja wyodrębni każdy
           blok kodu, rozpozna język i zaproponuje nazwę pliku (z tekstu typu „Backend (app.py)",
           z nagłówka nad blokiem albo z języka bloku). Nazwy możesz poprawić przed zapisem,
           a treść opisową zapisać jako <code>README.md</code>.</li>
