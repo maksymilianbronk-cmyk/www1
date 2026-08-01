@@ -9,8 +9,10 @@ Pliki są pogrupowane w projekty, można je edytować, podglądać, pobierać
 | Obszar | Co potrafi |
 | --- | --- |
 | Projekty | tworzenie, zmiana nazwy/opisu, usuwanie, wyszukiwarka, statystyki (pliki, rozmiar, wiek, liczba udostępnień) |
+| Okno kodu | stałe pole na stronie projektu: wklejasz kod, klikasz „Zapisz jako plik". Rozszerzenie rozpoznawane z treści, nazwa uzupełniana automatycznie do pierwszej wolnej (bez pytań o nadpisanie); własna nazwa i rozszerzenie do wyboru |
+| Okno pliku .md | drugie stałe pole: upuszczasz plik `.md`, wybierasz z dysku albo wklejasz treść — poniżej od razu lista wykrytych plików do zaznaczenia |
 | Pliki | zapis wklejonego kodu z rozszerzeniem wybranym ręcznie **albo rozpoznanym automatycznie**, zmiana nazwy, duplikowanie, usuwanie, filtr, wgrywanie plików z dysku (klik lub przeciągnięcie) |
-| Markdown → pliki | wklejasz dokument `.md` (np. eksport rozmowy z Perplexity/ChatGPT), aplikacja wyodrębnia każdy blok ```` ``` ````, rozpoznaje język i proponuje nazwę pliku; nazwy można poprawić przed zapisem, opis można zapisać jako `README.md` |
+| Markdown → pliki | aplikacja wyodrębnia każdy blok ```` ``` ````, rozpoznaje język i proponuje nazwę pliku; nazwy można poprawić przed zapisem, opis można zapisać jako `README.md` |
 | Edytor | numery linii, podświetlanie składni (HTML, CSS, JS, PY, JSON, MD, SQL, SH, YAML, INI), Tab jako wcięcie, `Ctrl+S`, wskaźnik niezapisanych zmian |
 | Podgląd | render HTML na żywo — arkusze CSS i skrypty JS z tego samego projektu są wstawiane do podglądu automatycznie; podgląd Markdown i SVG; otwarcie w nowej karcie |
 | Pobieranie | pojedynczy plik albo cały projekt jako ZIP (własny zapis archiwum, bez bibliotek) |

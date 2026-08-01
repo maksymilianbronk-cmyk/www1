@@ -1,5 +1,5 @@
 /* KodBox — logika aplikacji: projekty, menedżer plików, edytor, podgląd, udostępnianie.
-   Dwa tryby zapisu: IndexedDB w przeglądarce albo backend Flask z katalogu server/. */
+   Dwa tryby zapisu: IndexedDB w przeglądarce albo backend Node.js z katalogu server/. */
 
 (function () {
   "use strict";
@@ -494,7 +494,7 @@
       var extras = [];
       if (ext === "md" || ext === "markdown") {
         extras.push(["✂️", "Rozbij na osobne pliki z kodem", function () {
-          Store.readFile(state.project.id, f.name).then(openMarkdownModal);
+          Store.readFile(state.project.id, f.name).then(loadMarkdown);
         }]);
       }
       extras.concat([
@@ -725,39 +725,68 @@
     sel.value = "html";
   }
 
-  function openFileModal() {
+  /** Przewija do okna kodu i ustawia w nim kursor. */
+  function focusCodePane() {
+    $("paneCode").scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(function () { $("inpFileContent").focus(); }, 120);
+  }
+
+  function clearCodePane() {
     $("inpFileName").value = "";
     $("inpFileContent").value = "";
     $("selExt").value = "html";
-    $("detectHint").textContent = "Rozszerzenie zostanie rozpoznane automatycznie po wklejeniu kodu — możesz je nadpisać ręcznie.";
-    openModal("modalFile");
-    setTimeout(function () { $("inpFileContent").focus(); }, 60);
+    $("detectHint").textContent = "Rozszerzenie rozpoznajemy automatycznie z treści kodu — możesz je nadpisać powyżej.";
   }
 
   function autoDetect() {
     var code = $("inpFileContent").value;
+    if (!code.trim()) return;
     var ext = KB.detectExtension(code);
     if (!ext) return;
     var meta = KB.EXT_MAP[ext];
     $("selExt").value = ext;
     $("detectHint").textContent = "Rozpoznano: " + (meta ? meta.label : ext.toUpperCase()) +
-      " — plik zostanie zapisany z rozszerzeniem ." + ext + ". Możesz to zmienić powyżej.";
+      " — zapiszemy jako " + (($("inpFileName").value || "").trim() || freeName(ext)) +
+      ". Nazwę i rozszerzenie możesz zmienić powyżej.";
+  }
+
+  /** Pierwsza wolna nazwa dla danego rozszerzenia — bez pytań o nadpisanie. */
+  function freeName(ext) {
+    var base = defaultName(ext);
+    var stem = base.slice(0, -(ext.length + 1));
+    var taken = {};
+    (state.project ? state.project.files || [] : []).forEach(function (f) { taken[f.name.toLowerCase()] = true; });
+    var name = base;
+    var i = 2;
+    while (taken[name.toLowerCase()]) name = stem + "-" + i++ + "." + ext;
+    return name;
   }
 
   function saveNewFile() {
+    if (!state.project) { toast("Najpierw wybierz projekt.", "bad"); return; }
+
     var ext = $("selExt").value;
     var raw = ($("inpFileName").value || "").trim();
     var content = $("inpFileContent").value;
-    if (!content.trim()) { toast("Wklej najpierw jakiś kod.", "bad"); return; }
+    if (!content.trim()) {
+      toast("Okno kodu jest puste — wklej kod skrótem Ctrl+V (na telefonie: przytrzymaj pole i wybierz Wklej).", "bad");
+      $("inpFileContent").focus();
+      return;
+    }
 
-    var name = KB.safeFileName(raw || defaultName(ext));
-    if (KB.extOf(name) !== ext) name = name.replace(/\.[^.]*$/, "") + "." + ext;
-
-    var exists = (state.project.files || []).some(function (f) { return f.name === name; });
-    if (exists && !confirm("Plik " + name + " już istnieje. Nadpisać?")) return;
+    var name;
+    if (raw) {
+      name = KB.safeFileName(raw);
+      if (KB.extOf(name) !== ext) name = name.replace(/\.[^.]*$/, "") + "." + ext;
+      var exists = (state.project.files || []).some(function (f) { return f.name === name; });
+      if (exists && !confirm("Plik " + name + " już istnieje. Nadpisać?")) return;
+    } else {
+      /* bez podanej nazwy nie pytamy o nadpisanie — bierzemy pierwszą wolną */
+      name = freeName(ext);
+    }
 
     Store.writeFile(state.project.id, name, content).then(function () {
-      closeModal("modalFile");
+      clearCodePane();
       toast("Zapisano " + name, "ok");
       return reloadProject().then(function () { openFile(name); });
     }).catch(function (e) { toast(e.message, "bad"); });
@@ -778,15 +807,24 @@
 
   var mdFiles = [];
 
-  function openMarkdownModal(content) {
+  /** Wrzuca treść .md do okna nr 2 i od razu ją analizuje. */
+  function loadMarkdown(content) {
     $("inpMarkdown").value = content || "";
     $("mdResult").hidden = true;
     $("btnMdSave").disabled = true;
     $("chkMdProse").checked = false;
     mdFiles = [];
-    openModal("modalMarkdown");
+    $("paneMd").scrollIntoView({ behavior: "smooth", block: "start" });
     if (content) analyzeMarkdown();
-    else setTimeout(function () { $("inpMarkdown").focus(); }, 60);
+    else setTimeout(function () { $("inpMarkdown").focus(); }, 120);
+  }
+
+  function clearMarkdownPane() {
+    $("inpMarkdown").value = "";
+    $("mdResult").hidden = true;
+    $("btnMdSave").disabled = true;
+    $("chkMdProse").checked = false;
+    mdFiles = [];
   }
 
   function analyzeMarkdown() {
@@ -888,7 +926,7 @@
     jobs.reduce(function (chain, job) {
       return chain.then(function () { return Store.writeFile(state.project.id, job.name, job.content); });
     }, Promise.resolve()).then(function () {
-      closeModal("modalMarkdown");
+      clearMarkdownPane();
       toast("Zapisano plików: " + jobs.length, "ok");
       return reloadProject();
     }).then(function () {
@@ -914,7 +952,7 @@
             confirm('Plik "' + files[0].name + '" to Markdown z blokami kodu.\n\n' +
                     "OK — rozbij go na osobne pliki (HTML, CSS, JS…).\n" +
                     "Anuluj — zapisz jako jeden plik .md.")) {
-          openMarkdownModal(text);
+          loadMarkdown(text);
         } else {
           Store.writeFile(state.project.id, KB.safeFileName(files[0].name), text)
             .then(reloadProject)
@@ -1137,23 +1175,43 @@
       renderFiles();
     });
 
-    $("btnNewFile").addEventListener("click", openFileModal);
+    $("btnNewFile").addEventListener("click", focusCodePane);
     $("btnSaveNewFile").addEventListener("click", saveNewFile);
+    var detectTimer = null;
+    $("inpFileContent").addEventListener("input", function () {
+      clearTimeout(detectTimer);
+      detectTimer = setTimeout(autoDetect, 350);
+    });
     $("inpFileContent").addEventListener("paste", function () { setTimeout(autoDetect, 30); });
-    $("inpFileContent").addEventListener("blur", autoDetect);
 
-    $("btnMarkdown").addEventListener("click", function () { openMarkdownModal(""); });
+    $("btnMarkdown").addEventListener("click", function () { loadMarkdown(""); });
     $("btnMdAnalyze").addEventListener("click", analyzeMarkdown);
     $("btnMdSave").addEventListener("click", saveMarkdownFiles);
-    $("btnMdClear").addEventListener("click", function () {
-      $("inpMarkdown").value = "";
-      $("mdResult").hidden = true;
-      $("btnMdSave").disabled = true;
-      mdFiles = [];
-    });
+    $("btnMdClear").addEventListener("click", clearMarkdownPane);
+    $("btnClearCode").addEventListener("click", clearCodePane);
     $("btnMdAll").addEventListener("click", function () { toggleAllMd(true); });
     $("btnMdNone").addEventListener("click", function () { toggleAllMd(false); });
     $("btnMdPickFile").addEventListener("click", function () { $("mdPicker").click(); });
+
+    /* upuszczenie pliku .md prosto na okno nr 2 */
+    var mdDrop = $("mdDrop");
+    ["dragenter", "dragover"].forEach(function (type) {
+      mdDrop.addEventListener(type, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        mdDrop.classList.add("hot");
+      });
+    });
+    mdDrop.addEventListener("dragleave", function () { mdDrop.classList.remove("hot"); });
+    mdDrop.addEventListener("drop", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      mdDrop.classList.remove("hot");
+      $("dropzone").hidden = true;
+      var file = e.dataTransfer && e.dataTransfer.files[0];
+      if (!file) return;
+      file.text().then(loadMarkdown);
+    });
     $("mdPicker").addEventListener("change", function (e) {
       var file = e.target.files[0];
       if (file) file.text().then(function (text) { $("inpMarkdown").value = text; analyzeMarkdown(); });
