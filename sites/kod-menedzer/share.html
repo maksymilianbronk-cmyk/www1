@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Udostępniony projekt — KodBox</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%236c63ff'/><text y='68' x='50' font-size='54' text-anchor='middle' fill='white' font-family='monospace'>%7B%7D</text></svg>">
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { overflow: auto; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 28px 20px 60px; display: grid; gap: 18px; }
+  .head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row .grow { flex: 1; min-width: 0; }
+  .row .nm { font-family: var(--mono); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .mt { font-size: 11.5px; color: var(--txt-3); }
+  .viewer { display: none; gap: 12px; }
+  .viewer.on { display: grid; }
+  .viewer pre {
+    background: #101017; border: 1px solid var(--line); border-radius: var(--radius-s);
+    padding: 14px; overflow: auto; max-height: 60vh;
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+  }
+  .viewer iframe { width: 100%; height: 60vh; border: 1px solid var(--line); border-radius: var(--radius-s); background: #fff; }
+  .notice { color: var(--txt-2); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="head">
+    <div class="brand">
+      <div class="brand-mark">{}</div>
+      <div>KodBox<small>udostępniony projekt</small></div>
+    </div>
+    <div style="flex:1"></div>
+    <button class="btn" id="btnZip">⬇️ Pobierz ZIP</button>
+    <button class="btn btn-primary" id="btnImport">📥 Skopiuj do moich projektów</button>
+  </header>
+
+  <div>
+    <h1 id="title" style="font-size:22px; letter-spacing:-0.02em">Wczytywanie…</h1>
+    <p id="desc" style="color:var(--txt-2)"></p>
+  </div>
+
+  <div class="card" id="files"></div>
+
+  <div class="viewer" id="viewer">
+    <div class="head">
+      <strong id="viewName" style="font-family:var(--mono); font-size:13px"></strong>
+      <div style="flex:1"></div>
+      <button class="btn btn-sm" id="btnPreviewToggle" hidden>👁️ Podgląd strony</button>
+      <button class="btn btn-sm" id="btnDownloadOne">⬇️ Pobierz plik</button>
+      <button class="btn btn-sm" id="btnCopyOne">📋 Kopiuj kod</button>
+    </div>
+    <pre id="viewCode"></pre>
+    <iframe id="viewFrame" hidden sandbox="allow-scripts allow-modals allow-forms allow-popups" title="Podgląd"></iframe>
+  </div>
+
+  <p class="notice" id="notice"></p>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="lib.js"></script>
+<script src="share.js"></script>
+</body>
+</html>
