@@ -16,7 +16,8 @@ po każdym pushu na gałąź domyślną (workflow `.github/workflows/pages.yml`)
 | **Dormed Medical SPA — Busko-Zdrój** 🌿 | **https://maksymilianbronk-cmyk.github.io/www1/sites/dormed-busko/** |
 | **CLAMAX Automation — oprogramowanie maszyn i PLC** 🏭 | **https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/** |
 | **Poradnik S7-1200 CPU 1211C** 🎛️ | **https://maksymilianbronk-cmyk.github.io/www1/sites/s7-1200-poradnik/** |
-| **Skill `uslugi-plc` (ZIP do pobrania)** 📦 | **https://maksymilianbronk-cmyk.github.io/www1/pliki/skill-uslugi-plc.zip** |
+| **Skill `uslugi-plc` + podręcznik (ZIP do pobrania)** 📦 | **https://maksymilianbronk-cmyk.github.io/www1/pliki/skill-uslugi-plc.zip** |
+| **Podręcznik programowania maszyn (MD)** 📖 | **https://maksymilianbronk-cmyk.github.io/www1/docs/podrecznik-programowania-maszyn.md** |
 
 Adres działa przez https, więc aplikacja Trasa ma pełne PWA: GPS, service
 worker i instalację na telefonie („Dodaj do ekranu głównego").

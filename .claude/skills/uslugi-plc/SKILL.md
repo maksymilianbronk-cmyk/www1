@@ -60,14 +60,24 @@ Zasady niezmienne:
 - Dla maszyn pakujących trzymaj się stanów **PackML** (ISA-TR88):
   Stopped/Idle/Execute/Held/Suspended/Aborted — integratorzy linii tego oczekują.
 
-## 3. Wzorce maszyn
+## 3. Wzorce maszyn i biblioteka kodu
 
-- **Owijarka do palet** (obrotowa/ramieniowa): pełna specyfikacja I/O,
-  sekwencja, parametry i alarmy → `references/owijarka.md`.
+- **Biblioteka standardowych bloków w SCL** (FB_Naped, FB_Tryby, FB_Alarm,
+  FC_SkalujAI, szablon FB_Sekwencja z watchdogiem, FB_PackML, FC_Wyjscia,
+  konwencje nazewnictwa) → `references/biblioteka-scl.md`. **Od tych bloków
+  zaczynaj każdy nowy program** — nie pisz napędu ani alarmu od zera.
+- **Owijarka do palet** (obrotowa/ramieniowa): specyfikacja I/O, sekwencja,
+  parametry i alarmy → `references/owijarka.md`; **kompletny program
+  przykładowy w SCL** (tags, DB_Parametry, FB_Owijarka z pauzą po zerwaniu
+  folii, OB1) → `references/owijarka-program.md`.
 - **Maszyny pakujące** (flow-pack, kartoniarka, zamykarka) + paletyzer,
   przenośniki z trackingiem → `references/pakowanie.md`.
+- **Komunikacja — gotowe szablony kodu** (USS, Modbus RTU/TCP, GET/PUT,
+  TSEND_C/TRCV_C, interfejs 24 V maszyna↔linia) → `references/komunikacja-kod.md`.
 - Uniwersalne wzorce (start/stop, nawrotnik, gwiazda–trójkąt, analogi,
   sygnalizacja ISA-18) → `sites/s7-1200-poradnik/przyklady.html`.
+- Podręcznik zbiorczy (wszystko powyższe w jednym pliku dla człowieka)
+  → `docs/podrecznik-programowania-maszyn.md` w repo.
 
 ## 4. Checklista przed uruchomieniem u klienta
 
