@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pełny katalog instrukcji — S7-1200 (LAD/FBD/SCL)</title>
+<meta name="description" content="Wszystkie instrukcje wewnętrzne SIMATIC S7-1200: logika bitowa, timery IEC, liczniki, porównania, matematyka, MOVE, konwersje, sterowanie programem, logika słów, przesunięcia, data i czas, łańcuchy, przerwania, diagnostyka, PWM/PTO, HSC, PID, Motion Control i komunikacja.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-in">
+    <a class="brand" href="index.html"><span class="chip">S7-1200</span> Poradnik programisty</a>
+    <nav class="nav">
+      <a href="index.html">Start</a>
+      <a href="sprzet.html">Sprzęt</a>
+      <a href="program.html">TIA Portal</a>
+      <a href="instrukcje.html" class="active">Instrukcje</a>
+      <a href="przyklady.html">Przykłady maszyn</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Rozdział 3 · Pełny katalog instrukcji S7-1200</h1>
+  <p class="lead">
+    Kompletny przegląd instrukcji dostępnych w TIA Portal dla S7-1200 (LAD/FBD; w SCL większość ma
+    odpowiednik jako funkcja lub operator). Podział dokładnie jak w drzewku
+    <em>Instructions</em> w TIA Portal: <strong>Basic → Extended → Technology → Communication</strong>.
+  </p>
+
+  <div class="toc">
+    <b>Grupy instrukcji</b>
+    <ol>
+      <li><a href="#bit">Logika bitowa</a></li>
+      <li><a href="#timery">Timery IEC</a></li>
+      <li><a href="#liczniki">Liczniki IEC</a></li>
+      <li><a href="#porownania">Porównania</a></li>
+      <li><a href="#matematyka">Funkcje matematyczne</a></li>
+      <li><a href="#move">Przenoszenie (Move)</a></li>
+      <li><a href="#konwersje">Konwersje</a></li>
+      <li><a href="#sterowanie">Sterowanie programem</a></li>
+      <li><a href="#slowa">Operacje logiczne na słowach</a></li>
+      <li><a href="#przesuniecia">Przesunięcia i obroty</a></li>
+      <li><a href="#dataczas">Data i czas</a></li>
+      <li><a href="#stringi">Łańcuchy znaków (String)</a></li>
+      <li><a href="#przerwania">Przerwania</a></li>
+      <li><a href="#diagnostyka">Alarmy i diagnostyka</a></li>
+      <li><a href="#impulsy">Generatory impulsów PWM/PTO</a></li>
+      <li><a href="#hsc">Szybkie liczniki HSC</a></li>
+      <li><a href="#pid">Regulacja PID</a></li>
+      <li><a href="#motion">Motion Control (osie)</a></li>
+      <li><a href="#komunikacja">Komunikacja</a></li>
+      <li><a href="#pozostale">Pozostałe (receptury, logi, adresy)</a></li>
+    </ol>
+  </div>
+
+  <h2 id="bit"><span class="h-icon">3.1</span>Logika bitowa (Bit logic)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Symbol LAD</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td>Styk zwierny (NO)</td><td><code>--| |--</code></td><td>Przewodzi, gdy zmienna = 1. Szeregowo = AND, równolegle = OR.</td></tr>
+        <tr><td>Styk rozwierny (NC)</td><td><code>--|/|--</code></td><td>Przewodzi, gdy zmienna = 0 (negacja).</td></tr>
+        <tr><td>NOT</td><td><code>--|NOT|--</code></td><td>Neguje wynik operacji logicznej w linii.</td></tr>
+        <tr><td>Cewka</td><td><code>--( )--</code></td><td>Przypisuje wynik linii do zmiennej (1 gdy przepływ, 0 gdy brak).</td></tr>
+        <tr><td>Cewka negowana</td><td><code>--(/)--</code></td><td>Przypisuje negację wyniku.</td></tr>
+        <tr><td>Ustaw <code>S</code></td><td><code>--(S)--</code></td><td>Zapala bit na stałe (zatrzask); zostaje 1 nawet po zaniku warunku.</td></tr>
+        <tr><td>Kasuj <code>R</code></td><td><code>--(R)--</code></td><td>Gasi bit na stałe.</td></tr>
+        <tr><td><code>SET_BF</code> / <code>RESET_BF</code></td><td><code>--(SET_BF)--</code></td><td>Ustawia / kasuje <em>pole n kolejnych bitów</em> od podanego adresu.</td></tr>
+        <tr><td>Przerzutnik <code>SR</code></td><td>blok</td><td>Set/Reset z priorytetem <strong>Reset</strong> (R1 wygrywa przy obu = 1). Standard dla napędów: STOP silniejszy niż START.</td></tr>
+        <tr><td>Przerzutnik <code>RS</code></td><td>blok</td><td>Reset/Set z priorytetem <strong>Set</strong>.</td></tr>
+        <tr><td>Zbocze narastające <code>P</code></td><td><code>--|P|--</code></td><td>Styk przewodzi przez 1 cykl przy zmianie 0→1 (wymaga bitu pamięci zbocza).</td></tr>
+        <tr><td>Zbocze opadające <code>N</code></td><td><code>--|N|--</code></td><td>Styk przewodzi przez 1 cykl przy zmianie 1→0.</td></tr>
+        <tr><td>Cewki <code>P</code>/<code>N</code></td><td><code>--(P)--</code>, <code>--(N)--</code></td><td>Ustawiają zmienną na 1 cykl przy zboczu wyniku linii.</td></tr>
+        <tr><td><code>P_TRIG</code> / <code>N_TRIG</code></td><td>blok</td><td>Wykrycie zbocza wyniku logicznego (Q = impuls 1 cykl).</td></tr>
+        <tr><td><code>R_TRIG</code> / <code>F_TRIG</code></td><td>FB</td><td>Wykrycie zbocza sygnału jako blok funkcyjny z własną instancją (wygodne w SCL).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="timery"><span class="h-icon">3.2</span>Timery IEC</h2>
+  <p>Timery to bloki FB — każdy potrzebuje instancji (własnej lub multiinstancji). Czas typu <code>Time</code>, np. <code>T#3s</code>, <code>T#1m30s</code>, <code>T#250ms</code>.</p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Nazwa</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>TP</code></td><td>Impuls</td><td>Zbocze na IN generuje na Q impuls o stałej długości PT — niezależnie od dalszego stanu IN.</td></tr>
+        <tr><td><code>TON</code></td><td>Opóźnienie załączenia</td><td>Q = 1 dopiero, gdy IN trwa nieprzerwanie przez PT. Najczęściej używany timer (np. gwiazda–trójkąt).</td></tr>
+        <tr><td><code>TOF</code></td><td>Opóźnienie wyłączenia</td><td>Q = 1 od razu z IN; po zaniku IN trzyma jeszcze przez PT (np. wybieg wentylatora).</td></tr>
+        <tr><td><code>TONR</code></td><td>Sumujący (retentywny)</td><td>Sumuje czas załączeń IN; Q = 1 po osiągnięciu PT; kasowanie wejściem R (np. licznik motogodzin do przeglądu).</td></tr>
+        <tr><td><code>--(TP)--, --(TON)--, --(TOF)--, --(TONR)--</code></td><td>cewki timerów</td><td>Wersje cewkowe tych samych timerów do stosowania w linii LAD.</td></tr>
+        <tr><td><code>RT</code></td><td>Reset timera</td><td>Zeruje instancję timera (ET := 0).</td></tr>
+        <tr><td><code>PT</code></td><td>Load duration</td><td>Ładuje nową wartość PT do instancji timera w trakcie pracy.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Wyjścia pomocnicze każdego timera: <code>Q</code> (Bool) i <code>ET</code> (czas, który upłynął — można go pokazać na HMI).</p>
+
+  <h2 id="liczniki"><span class="h-icon">3.3</span>Liczniki IEC</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Nazwa</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>CTU</code></td><td>Licznik w górę</td><td>Zbocze na CU zwiększa CV o 1; Q = 1 gdy CV ≥ PV; R zeruje.</td></tr>
+        <tr><td><code>CTD</code></td><td>Licznik w dół</td><td>Zbocze na CD zmniejsza CV; Q = 1 gdy CV ≤ 0; LD ładuje CV := PV.</td></tr>
+        <tr><td><code>CTUD</code></td><td>Licznik dwukierunkowy</td><td>CU/CD w obu kierunkach, wyjścia QU (CV ≥ PV) i QD (CV ≤ 0).</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Typ licznika (SInt…UDInt) wybiera się przy wstawianiu. Liczniki IEC liczą zdarzenia wolniejsze niż cykl programu — szybkie impulsy (enkodery, przepływomierze) wymagają <a href="#hsc">HSC</a>.</p>
+
+  <h2 id="porownania"><span class="h-icon">3.4</span>Porównania (Comparator)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>==</code>, <code>&lt;&gt;</code>, <code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code></td><td>Styk przewodzi, gdy warunek IN1 ? IN2 jest spełniony (dla Int/DInt/Real/Time/String…).</td></tr>
+        <tr><td><code>IN_RANGE</code></td><td>Prawda, gdy MIN ≤ VAL ≤ MAX (kontrola zakresu, np. temperatura w oknie).</td></tr>
+        <tr><td><code>OUT_RANGE</code></td><td>Prawda, gdy VAL &lt; MIN lub VAL &gt; MAX (alarm poza zakresem).</td></tr>
+        <tr><td><code>OK</code> / <code>NOT_OK</code></td><td>Sprawdza, czy zmienna Real jest poprawną liczbą (nie NaN/∞) — ważne po dzieleniu i przy danych z komunikacji.</td></tr>
+        <tr><td><code>VARIANT</code>: <code>EQ_Type</code>, <code>NE_Type</code>, <code>IS_NULL</code>, <code>NOT_NULL</code>, <code>IS_ARRAY</code></td><td>Testy typu wskaźników VARIANT (programowanie generyczne w bibliotekach).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="matematyka"><span class="h-icon">3.5</span>Funkcje matematyczne (Math)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>CALCULATE</code></td><td>Jedno pole na dowolne wyrażenie, np. <code>OUT := (IN1+IN2)*IN3/2.0</code> — zastępuje łańcuszki bloków.</td></tr>
+        <tr><td><code>ADD</code>, <code>SUB</code>, <code>MUL</code>, <code>DIV</code></td><td>Dodawanie, odejmowanie, mnożenie, dzielenie (ADD/MUL rozszerzalne o kolejne wejścia).</td></tr>
+        <tr><td><code>MOD</code></td><td>Reszta z dzielenia całkowitego (np. co n-ty produkt).</td></tr>
+        <tr><td><code>NEG</code></td><td>Zmiana znaku.</td></tr>
+        <tr><td><code>INC</code> / <code>DEC</code></td><td>Zwiększ / zmniejsz zmienną o 1 (w miejscu).</td></tr>
+        <tr><td><code>ABS</code></td><td>Wartość bezwzględna.</td></tr>
+        <tr><td><code>MIN</code> / <code>MAX</code></td><td>Mniejsza / większa z wartości (do 100 wejść).</td></tr>
+        <tr><td><code>LIMIT</code></td><td>Ogranicza wartość do przedziału MIN..MAX (np. zadana z HMI zawsze 0–100 %).</td></tr>
+        <tr><td><code>SQR</code> / <code>SQRT</code></td><td>Kwadrat / pierwiastek kwadratowy (Real).</td></tr>
+        <tr><td><code>LN</code> / <code>EXP</code></td><td>Logarytm naturalny / e^x.</td></tr>
+        <tr><td><code>SIN</code>, <code>COS</code>, <code>TAN</code>, <code>ASIN</code>, <code>ACOS</code>, <code>ATAN</code></td><td>Funkcje trygonometryczne (kąty w radianach).</td></tr>
+        <tr><td><code>FRAC</code></td><td>Część ułamkowa liczby.</td></tr>
+        <tr><td><code>EXPT</code></td><td>Potęgowanie IN1^IN2.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn">
+    <span class="t">Przepełnienie i dzielenie przez zero</span>
+    Wynik poza zakresem typu lub dzielenie przez 0 ustawia ENO = 0 (a bez OB121 program jedzie dalej
+    ze złym wynikiem). Krytyczne obliczenia zabezpieczaj: sprawdzaj dzielnik <code>&lt;&gt; 0</code>,
+    a wyniki Real instrukcją <code>OK</code> i <code>LIMIT</code>.
+  </div>
+
+  <h2 id="move"><span class="h-icon">3.6</span>Przenoszenie danych (Move)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>MOVE</code></td><td>Kopiuje wartość IN do jednego lub wielu OUT (z niejawną konwersją zgodnych typów).</td></tr>
+        <tr><td><code>MOVE_BLK</code></td><td>Kopiuje COUNT elementów tablicy od IN do OUT (obszary mogą być w różnych DB).</td></tr>
+        <tr><td><code>UMOVE_BLK</code></td><td>Jak wyżej, ale „nieprzerywalnie" — kopiowanie nie zostanie przerwane przez OB przerwania (spójność danych).</td></tr>
+        <tr><td><code>FILL_BLK</code> / <code>UFILL_BLK</code></td><td>Wypełnia COUNT elementów tablicy jedną wartością (np. zerowanie receptury).</td></tr>
+        <tr><td><code>MOVE_BLK_VARIANT</code></td><td>Kopiowanie bloków przez wskaźniki VARIANT (biblioteki generyczne).</td></tr>
+        <tr><td><code>SWAP</code></td><td>Zamienia kolejność bajtów w Word/DWord (endianness — częsty ratunek przy Modbus).</td></tr>
+        <tr><td><code>SERIALIZE</code> / <code>DESERIALIZE</code></td><td>Struktura ↔ ciągły bufor bajtów (ramki komunikacyjne, receptury binarne).</td></tr>
+        <tr><td><code>SCATTER</code> / <code>GATHER</code></td><td>Word/DWord ↔ tablica bitów Bool (od FW V4.2; rozpakowanie słowa statusowego na bity).</td></tr>
+        <tr><td><code>PEEK</code> / <code>POKE</code> (SCL)</td><td>Odczyt/zapis pod adresem obliczanym w locie (tylko bloki nieoptymalizowane; ostateczność).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="konwersje"><span class="h-icon">3.7</span>Konwersje (Conversion)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>CONVERT</code> (<code>CONV</code>)</td><td>Jawna zamiana typu (Int→Real, Real→DInt, BCD16↔Int itd.). W SCL: <code>INT_TO_REAL(x)</code> itp.</td></tr>
+        <tr><td><code>ROUND</code></td><td>Real → liczba całkowita, zaokrąglenie do najbliższej (połówki do parzystej).</td></tr>
+        <tr><td><code>CEIL</code> / <code>FLOOR</code></td><td>Zaokrąglenie zawsze w górę / w dół.</td></tr>
+        <tr><td><code>TRUNC</code></td><td>Obcięcie części ułamkowej (w stronę zera).</td></tr>
+        <tr><td><code>NORM_X</code></td><td>Normalizacja: (VALUE−MIN)/(MAX−MIN) → 0.0–1.0. Krok 1 skalowania analogów.</td></tr>
+        <tr><td><code>SCALE_X</code></td><td>Skalowanie: 0.0–1.0 → MIN..MAX w jednostkach fizycznych. Krok 2 skalowania analogów.</td></tr>
+      </tbody>
+    </table>
+  </div>
+<pre><code><span class="c">// Kanoniczne skalowanie wejścia analogowego 0–10 V na 0–6 bar (SCL):</span>
+<span class="a">#Znorm</span>    := <span class="k">NORM_X</span>(MIN := <span class="s">0</span>, VALUE := <span class="a">"IW64_Cisnienie"</span>, MAX := <span class="s">27648</span>);
+<span class="a">#Cisnienie</span> := <span class="k">SCALE_X</span>(MIN := <span class="s">0.0</span>, VALUE := <span class="a">#Znorm</span>, MAX := <span class="s">6.0</span>);</code></pre>
+
+  <h2 id="sterowanie"><span class="h-icon">3.8</span>Sterowanie programem (Program control)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>JMP</code> / <code>JMPN</code></td><td>Skok do etykiety, gdy wynik linii = 1 / = 0 (tylko w przód lub w tył w obrębie bloku).</td></tr>
+        <tr><td><code>LABEL</code></td><td>Etykieta — cel skoku.</td></tr>
+        <tr><td><code>JMP_LIST</code></td><td>Skok do etykiety nr K z listy (skoki indeksowane).</td></tr>
+        <tr><td><code>SWITCH</code></td><td>Porównuje wartość z listą progów i skacze do odpowiedniej etykiety.</td></tr>
+        <tr><td><code>RET</code></td><td>Warunkowy powrót z bloku (z wartością zwrotną dla FC).</td></tr>
+        <tr><td><code>ENDIS_PW</code></td><td>Zezwala/blokuje legalność haseł CPU (ochrona dostępu z programu).</td></tr>
+        <tr><td><code>RE_TRIGR</code></td><td>Restartuje strażnika cyklu (watchdog) — przy jednorazowych długich obliczeniach.</td></tr>
+        <tr><td><code>STP</code></td><td>Przełącza CPU w STOP z programu (sytuacje krytyczne).</td></tr>
+        <tr><td><code>GET_ERROR</code> / <code>GET_ERR_ID</code></td><td>Odczyt informacji o błędzie wykonania wewnątrz bloku (lokalna obsługa błędów zamiast OB121).</td></tr>
+        <tr><td><code>RUNTIME</code></td><td>Pomiar czasu wykonania fragmentu programu (profilowanie).</td></tr>
+        <tr><td>SCL: <code>IF..ELSIF..ELSE</code>, <code>CASE..OF</code>, <code>FOR</code>, <code>WHILE</code>, <code>REPEAT</code>, <code>CONTINUE</code>, <code>EXIT</code>, <code>RETURN</code>, <code>GOTO</code></td><td>Pełne strukturalne sterowanie przepływem w języku SCL.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="slowa"><span class="h-icon">3.9</span>Operacje logiczne na słowach (Word logic)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>AND</code>, <code>OR</code>, <code>XOR</code></td><td>Operacje bitowe na Byte/Word/DWord (maskowanie, składanie statusów).</td></tr>
+        <tr><td><code>INVERT</code> (<code>INV</code>)</td><td>Negacja wszystkich bitów (dopełnienie jedynkowe).</td></tr>
+        <tr><td><code>DECO</code></td><td>Dekoder: ustawia bit nr n w słowie wyjściowym (1-z-n).</td></tr>
+        <tr><td><code>ENCO</code></td><td>Enkoder: zwraca numer najmłodszego ustawionego bitu.</td></tr>
+        <tr><td><code>SEL</code></td><td>Wybiera IN0 lub IN1 zależnie od bitu G (multiplekser 2→1).</td></tr>
+        <tr><td><code>MUX</code></td><td>Wybiera jedno z wielu wejść wg indeksu K.</td></tr>
+        <tr><td><code>DEMUX</code></td><td>Kieruje wartość IN na wyjście nr K.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="przesuniecia"><span class="h-icon">3.10</span>Przesunięcia i obroty (Shift / Rotate)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>SHL</code> / <code>SHR</code></td><td>Przesunięcie bitów w lewo / w prawo o N pozycji (zwolnione bity = 0). Klasyka śledzenia produktu na przenośniku (rejestr przesuwny).</td></tr>
+        <tr><td><code>ROL</code> / <code>ROR</code></td><td>Obrót bitów w lewo / w prawo (bity wychodzące wracają z drugiej strony) — np. „wędrujące światło".</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="dataczas"><span class="h-icon">3.11</span>Data i czas (Extended → Date &amp; time-of-day)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>T_CONV</code></td><td>Konwersje między typami czasu (Time↔DInt itd.).</td></tr>
+        <tr><td><code>T_ADD</code> / <code>T_SUB</code></td><td>Dodaje / odejmuje czas do daty lub czasu.</td></tr>
+        <tr><td><code>T_DIFF</code></td><td>Różnica dwóch dat/czasów.</td></tr>
+        <tr><td><code>T_COMBINE</code></td><td>Łączy Date + Time_of_Day → DTL.</td></tr>
+        <tr><td><code>WR_SYS_T</code> / <code>RD_SYS_T</code></td><td>Zapis / odczyt zegara systemowego CPU (UTC).</td></tr>
+        <tr><td><code>RD_LOC_T</code> / <code>WR_LOC_T</code></td><td>Czas lokalny (ze strefą i czasem letnim wg konfiguracji CPU).</td></tr>
+        <tr><td><code>SET_TIMEZONE</code></td><td>Ustawia strefę czasową z programu.</td></tr>
+        <tr><td><code>RTM</code></td><td>Obsługa liczników motogodzin CPU (start/stop/odczyt/zapis, 10 liczników).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="stringi"><span class="h-icon">3.12</span>Łańcuchy znaków (String + Char)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>S_MOVE</code></td><td>Kopiowanie łańcucha.</td></tr>
+        <tr><td><code>S_CONV</code></td><td>Konwersja liczba↔łańcuch (prosta).</td></tr>
+        <tr><td><code>STRG_VAL</code> / <code>VAL_STRG</code></td><td>Łańcuch → liczba / liczba → łańcuch z pełną kontrolą formatu (precyzja, znak).</td></tr>
+        <tr><td><code>Strg_TO_Chars</code> / <code>Chars_TO_Strg</code></td><td>String ↔ tablica znaków (bufory komunikacyjne).</td></tr>
+        <tr><td><code>ATH</code> / <code>HTA</code></td><td>ASCII ↔ zapis szesnastkowy.</td></tr>
+        <tr><td><code>MAX_LEN</code> / <code>LEN</code></td><td>Maksymalna / aktualna długość łańcucha.</td></tr>
+        <tr><td><code>CONCAT</code></td><td>Sklejanie łańcuchów.</td></tr>
+        <tr><td><code>LEFT</code>, <code>RIGHT</code>, <code>MID</code></td><td>Wycinanie fragmentów (od lewej / prawej / ze środka).</td></tr>
+        <tr><td><code>DELETE</code>, <code>INSERT</code>, <code>REPLACE</code></td><td>Usuwanie / wstawianie / zastępowanie fragmentu.</td></tr>
+        <tr><td><code>FIND</code></td><td>Szuka podłańcucha, zwraca pozycję.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="przerwania"><span class="h-icon">3.13</span>Przerwania (Interrupts)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>ATTACH</code> / <code>DETACH</code></td><td>Przypisuje / odłącza OB przerwania sprzętowego do zdarzenia (zbocze wejścia, HSC) w czasie pracy.</td></tr>
+        <tr><td><code>SET_CINT</code> / <code>QRY_CINT</code></td><td>Zmienia / odczytuje interwał przerwania cyklicznego (OB30…).</td></tr>
+        <tr><td><code>SET_TINTL</code>, <code>ACT_TINT</code>, <code>CAN_TINT</code>, <code>QRY_TINT</code></td><td>Konfiguruje, aktywuje, anuluje i odpytuje przerwanie kalendarzowe (time-of-day OB).</td></tr>
+        <tr><td><code>SRT_DINT</code> / <code>CAN_DINT</code> / <code>QRY_DINT</code></td><td>Startuje / anuluje / odpytuje przerwanie opóźnione (OB20…).</td></tr>
+        <tr><td><code>DIS_AIRT</code> / <code>EN_AIRT</code></td><td>Chwilowo wstrzymuje / przywraca obsługę przerwań (ochrona sekcji krytycznej).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="diagnostyka"><span class="h-icon">3.14</span>Alarmy i diagnostyka</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>Program_Alarm</code></td><td>Alarm procesowy ze znacznikiem czasu wysyłany do HMI (FW V4+, bloki alarmowe).</td></tr>
+        <tr><td><code>Get_AlarmState</code></td><td>Stan zgłoszonego alarmu.</td></tr>
+        <tr><td><code>GET_DIAG</code></td><td>Odczyt informacji diagnostycznej wskazanego urządzenia/modułu.</td></tr>
+        <tr><td><code>LED</code></td><td>Stan diod LED CPU/modułu (np. do zdalnego raportowania).</td></tr>
+        <tr><td><code>DeviceStates</code> / <code>ModuleStates</code></td><td>Stany urządzeń PROFINET / modułów (awaria, brak, OK) — panel diagnostyczny na HMI.</td></tr>
+        <tr><td><code>Get_IM_Data</code></td><td>Dane identyfikacyjne modułu (numer seryjny, wersja).</td></tr>
+        <tr><td><code>GetSMCinfo</code></td><td>Informacje o karcie pamięci (pojemność, zużycie).</td></tr>
+        <tr><td><code>GetChecksum</code></td><td>Suma kontrolna programu (wykrywanie zmian).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="impulsy"><span class="h-icon">3.15</span>Generatory impulsów PWM / PTO</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>CTRL_PWM</code></td><td>Włącza/wyłącza generator PWM (modulacja szerokości impulsu — płynne sterowanie grzałką przez SSR, zaworem proporcjonalnym). Częstotliwość i adres wyjścia konfiguruje się we właściwościach CPU (Pulse generators), wypełnienie zmienia się w słowie QW podanym w konfiguracji.</td></tr>
+        <tr><td><code>CTRL_PTO</code></td><td>Generator ciągu impulsów o zadanej częstotliwości (Pulse Train Output) — sterowanie krokowcami bez Motion Control (FW V4.2+).</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout danger">
+    <span class="t">Uwaga — wersja przekaźnikowa!</span>
+    W CPU 1211C AC/DC/RLY <strong>nie wolno kierować PWM/PTO na wyjścia przekaźnikowe</strong> —
+    styki mechaniczne nie nadążą i zużyją się w godziny. Impulsowanie wymaga zamontowania płytki
+    sygnałowej z wyjściami tranzystorowymi (np. SB 1222, 200 kHz).
+  </div>
+
+  <h2 id="hsc"><span class="h-icon">3.16</span>Szybkie liczniki HSC (High Speed Counter)</h2>
+  <ul>
+    <li>CPU 1211C: <strong>3 liczniki HSC</strong> na wejściach I0.0–I0.5, do 100 kHz (enkoder kwadraturowy A/B do 80 kHz).</li>
+    <li>Tryby: zliczanie jednofazowe, dwufazowe (up/down), kwadraturowe A/B (×1/×4), pomiar częstotliwości lub okresu.</li>
+    <li>Aktywacja i tryb — we właściwościach CPU (High speed counters); wartość bieżąca w <code>ID1000</code>, <code>ID1004</code>… (DInt).</li>
+  </ul>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>CTRL_HSC</code></td><td>Sterowanie licznikiem w pracy: nowa wartość bieżąca, wartość referencyjna, kierunek, zerowanie.</td></tr>
+        <tr><td><code>CTRL_HSC_EXT</code></td><td>Wersja rozszerzona (FW V4.1+): pełna kontrola przez strukturę danych, pomiary częstotliwości/okresu, bramkowanie, przechwytywanie (capture).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="pid"><span class="h-icon">3.17</span>Regulacja PID (Technology)</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>PID_Compact</code></td><td>Uniwersalny regulator PID z autotuningiem (pretuning + fine tuning), ograniczeniami, trybem ręcznym i wyjściem analogowym lub PWM. Do temperatury, ciśnienia, przepływu, poziomu.</td></tr>
+        <tr><td><code>PID_3Step</code></td><td>Regulator dla siłowników trójstawnych (zawory z silnikiem: otwórz/stój/zamknij), z autotuningiem.</td></tr>
+        <tr><td><code>PID_Temp</code></td><td>Regulator temperatury grzanie/chłodzenie z kaskadą (FW V4.1+).</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">
+    PID wywołuje się z <strong>OB przerwania cyklicznego</strong> (np. OB30 co 100 ms), nigdy z OB1 —
+    regulator potrzebuje stałego taktu próbkowania. Konfiguracja i uruchomienie (commissioning,
+    strojenie) mają własne okna w TIA Portal → Technology objects.
+  </p>
+
+  <h2 id="motion"><span class="h-icon">3.18</span>Motion Control — sterowanie osiami</h2>
+  <p>
+    S7-1200 steruje serwonapędami i silnikami krokowymi przez PTO (impuls/kierunek), wyjście
+    analogowe ±10 V lub PROFIdrive (PROFINET). Oś konfiguruje się jako obiekt technologiczny
+    <em>TO_PositioningAxis</em>. W wersji przekaźnikowej PTO wymaga płytki SB z wyjściami DC.
+  </p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>MC_Power</code></td><td>Włącza/wyłącza oś (zezwolenie napędu).</td></tr>
+        <tr><td><code>MC_Reset</code></td><td>Kasuje błędy osi.</td></tr>
+        <tr><td><code>MC_Home</code></td><td>Bazowanie (referencja) — aktywne, pasywne, bezpośrednie.</td></tr>
+        <tr><td><code>MC_Halt</code></td><td>Zatrzymanie ruchu z rampą.</td></tr>
+        <tr><td><code>MC_MoveAbsolute</code></td><td>Jazda do pozycji bezwzględnej.</td></tr>
+        <tr><td><code>MC_MoveRelative</code></td><td>Przesunięcie o zadany dystans.</td></tr>
+        <tr><td><code>MC_MoveVelocity</code></td><td>Jazda z zadaną prędkością (ciągła).</td></tr>
+        <tr><td><code>MC_MoveJog</code></td><td>Jazda ręczna (jog) przyciskami.</td></tr>
+        <tr><td><code>MC_CommandTable</code></td><td>Wykonanie sekwencji ruchów z tabeli.</td></tr>
+        <tr><td><code>MC_ChangeDynamic</code></td><td>Zmiana dynamiki (rampy) w locie.</td></tr>
+        <tr><td><code>MC_WriteParam</code> / <code>MC_ReadParam</code></td><td>Zapis/odczyt parametrów osi w ruchu.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="komunikacja"><span class="h-icon">3.19</span>Komunikacja</h2>
+  <h3>Open User Communication (Ethernet TCP / ISO-on-TCP / UDP)</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>TSEND_C</code> / <code>TRCV_C</code></td><td>„Kompaktowe" wysyłanie/odbiór z automatycznym nawiązaniem połączenia — najprostsza droga do wymiany danych PLC↔PLC lub PLC↔komputer.</td></tr>
+        <tr><td><code>TCON</code> / <code>TDISCON</code></td><td>Ręczne nawiązanie / zerwanie połączenia.</td></tr>
+        <tr><td><code>TSEND</code> / <code>TRCV</code></td><td>Wysyłanie / odbiór po istniejącym połączeniu.</td></tr>
+        <tr><td><code>TUSEND</code> / <code>TURCV</code></td><td>Wysyłanie / odbiór UDP.</td></tr>
+        <tr><td><code>T_CONFIG</code></td><td>Zmiana konfiguracji IP z programu.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Komunikacja S7 (PLC ↔ PLC / HMI)</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET</code> / <code>PUT</code></td><td>Odczyt / zapis danych w zdalnym CPU S7 (partner musi mieć zezwolenie „Permit access with PUT/GET" w konfiguracji). HMI korzysta z protokołu S7 automatycznie, bez programowania.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Modbus</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>MB_CLIENT</code></td><td>Modbus TCP klient (master) — czyta/pisze rejestry serwera (falowniki, liczniki energii, wyspy zaworowe).</td></tr>
+        <tr><td><code>MB_SERVER</code></td><td>Modbus TCP serwer — udostępnia dane S7-1200 systemom nadrzędnym (SCADA).</td></tr>
+        <tr><td><code>Modbus_Comm_Load</code></td><td>Konfiguracja portu CM 1241 (RS-485/232) pod Modbus RTU.</td></tr>
+        <tr><td><code>Modbus_Master</code> / <code>Modbus_Slave</code></td><td>Modbus RTU master / slave na porcie szeregowym.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Komunikacja szeregowa punkt-punkt (CM 1241) i USS</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>Port_Config</code>, <code>Send_Config</code>, <code>Receive_Config</code></td><td>Konfiguracja portu i ramek z programu.</td></tr>
+        <tr><td><code>Send_P2P</code> / <code>Receive_P2P</code></td><td>Wysyłanie / odbiór dowolnych ramek (wagi, skanery, drukarki).</td></tr>
+        <tr><td><code>Receive_Reset</code>, <code>Signal_Get</code>, <code>Signal_Set</code>, <code>Get_Features</code>, <code>Set_Features</code></td><td>Obsługa bufora i linii sterujących RS-232.</td></tr>
+        <tr><td><code>USS_Port_Scan</code>, <code>USS_Drive_Control</code>, <code>USS_Read_Param</code>, <code>USS_Write_Param</code></td><td>Protokół USS — sterowanie falownikami Siemens (np. SINAMICS V20, G120) po RS-485.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="pozostale"><span class="h-icon">3.20</span>Pozostałe grupy</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Instrukcja</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>RecipeExport</code> / <code>RecipeImport</code></td><td>Eksport/import receptur z DB do pliku CSV na karcie pamięci / w pamięci ładowania.</td></tr>
+        <tr><td><code>DataLogCreate</code>, <code>DataLogOpen</code>, <code>DataLogWrite</code>, <code>DataLogClose</code>, <code>DataLogNewFile</code>, <code>DataLogClear</code>, <code>DataLogDelete</code></td><td>Rejestrowanie danych procesowych do plików CSV (dostępnych też przez serwer WWW CPU).</td></tr>
+        <tr><td><code>READ_DBL</code> / <code>WRIT_DBL</code></td><td>Kopiowanie DB między pamięcią roboczą a ładowania (receptury oszczędzające pamięć retentywną).</td></tr>
+        <tr><td><code>CREATE_DB</code>, <code>DELETE_DB</code>, <code>ATTR_DB</code></td><td>Tworzenie/usuwanie/atrybuty DB w czasie pracy.</td></tr>
+        <tr><td><code>LOG2GEO</code>, <code>GEO2LOG</code>, <code>RD_ADDR</code></td><td>Konwersje adresów sprzętowych (identyfikatory HW ↔ położenie).</td></tr>
+        <tr><td><code>WWW</code></td><td>Aktywacja stron użytkownika (custom web pages) na wbudowanym serwerze WWW CPU.</td></tr>
+        <tr><td><code>PID/inne biblioteki</code></td><td>Dodatkowe biblioteki Siemens (LGF — Library of General Functions) rozszerzają katalog o setki gotowych FC/FB.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout ok">
+    <span class="t">Gdzie szukać pełnej dokumentacji</span>
+    Oficjalne źródło: „S7-1200 Programmable controller — System Manual" (Siemens Industry Online
+    Support, dokument do pobrania za darmo) oraz pomoc F1 w TIA Portal — każda instrukcja ma tam
+    opis parametrów, kodów błędów RET_VAL i przykłady. Ten katalog obejmuje wszystkie grupy
+    instrukcji dostępne dla S7-1200 FW V4.x.
+  </div>
+
+  <div class="pager">
+    <a href="program.html">← Rozdział 2: TIA Portal</a>
+    <a href="przyklady.html">Rozdział 4: Przykłady dla maszyn →</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Poradnik edukacyjny S7-1200 · <a href="index.html">spis treści</a> · <a href="../../index.html">kolekcja stron</a>
+</footer>
+
+</body>
+</html>

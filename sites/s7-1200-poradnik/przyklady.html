@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gotowe wzorce dla maszyn — S7-1200 CPU 1211C</title>
+<meta name="description" content="Sprawdzone wzorce programów S7-1200 dla typowych maszyn: start/stop z podtrzymaniem, nawrotnik, gwiazda-trójkąt, przenośnik z licznikiem, pompa i zbiornik, skalowanie analogów, sekwencja krokowa, miganie lamp.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-in">
+    <a class="brand" href="index.html"><span class="chip">S7-1200</span> Poradnik programisty</a>
+    <nav class="nav">
+      <a href="index.html">Start</a>
+      <a href="sprzet.html">Sprzęt</a>
+      <a href="program.html">TIA Portal</a>
+      <a href="instrukcje.html">Instrukcje</a>
+      <a href="przyklady.html" class="active">Przykłady maszyn</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Rozdział 4 · Gotowe wzorce dla typowych maszyn</h1>
+  <p class="lead">
+    Z tych kilku wzorców składa się 90 % programów małych maszyn. Zapis LAD jest tekstowy
+    (<code>--| |--</code> styk NO, <code>--|/|--</code> styk NC, <code>--( )--</code> cewka),
+    obok — odpowiednik SCL. Przykładowe adresy dobrano pod 6 wejść / 4 wyjścia CPU 1211C.
+  </p>
+
+  <div class="toc">
+    <b>Wzorce</b>
+    <ol>
+      <li><a href="#startstop">Start/stop z podtrzymaniem</a></li>
+      <li><a href="#nawrotnik">Nawrotnik silnika (lewo/prawo)</a></li>
+      <li><a href="#gwiazda">Rozruch gwiazda–trójkąt</a></li>
+      <li><a href="#przenosnik">Przenośnik z czujnikiem i licznikiem</a></li>
+      <li><a href="#pompa">Pompa i zbiornik (dwa poziomy)</a></li>
+      <li><a href="#analog">Sygnał analogowy + alarmy</a></li>
+      <li><a href="#miganie">Miganie lamp i sygnalizacja</a></li>
+      <li><a href="#sekwencja">Sekwencja krokowa (automat stanów)</a></li>
+      <li><a href="#checklist">Checklista uruchomienia maszyny</a></li>
+    </ol>
+  </div>
+
+  <h2 id="startstop"><span class="h-icon">4.1</span>Start/stop z podtrzymaniem — fundament wszystkiego</h2>
+  <p>Przydział I/O: <code>I0.0</code> START (NO), <code>I0.1</code> STOP (NC!), <code>I0.2</code> styk pomocniczy zabezpieczenia termicznego, <code>Q0.0</code> stycznik silnika.</p>
+<pre><code><span class="c">// Network 1 — samopodtrzymanie (uklad stycznikowy przeniesiony do PLC)</span>
+      START        STOP       TERMIK       SILNIK
+    --|  |--+-----|  |-------|  |---------(   )--
+   SILNIK   |
+    --|  |--+
+<span class="c">// STOP i TERMIK sa fizycznie NC, wiec w programie czytamy je stykiem NO:</span>
+<span class="c">// przerwanie przewodu = utrata "1" = natychmiastowe zatrzymanie (fail-safe).</span></code></pre>
+<pre><code><span class="c">// SCL — to samo:</span>
+<span class="a">"Silnik"</span> := ( <span class="a">"Start"</span> <span class="k">OR</span> <span class="a">"Silnik"</span> ) <span class="k">AND</span> <span class="a">"Stop_NC"</span> <span class="k">AND</span> <span class="a">"Termik_NC"</span>;</code></pre>
+  <p class="note">Alternatywa: przerzutnik <code>SR</code> (S=Start, R1=Stop) — priorytet Reset gwarantuje, że STOP zawsze wygrywa.</p>
+
+  <h2 id="nawrotnik"><span class="h-icon">4.2</span>Nawrotnik silnika (lewo/prawo)</h2>
+  <p><code>I0.0</code> START-P, <code>I0.3</code> START-L, <code>I0.1</code> STOP (NC), <code>Q0.0</code> stycznik P, <code>Q0.1</code> stycznik L.</p>
+<pre><code><span class="c">// Network 1 — kierunek P: blokada krzyzowa przez wyjscie L i przycisk L</span>
+     START_P      STOP      SILNIK_L    START_L     SILNIK_P
+    --|  |--+----|  |--------|/|----------|/|--------(   )--
+   SILNIK_P |
+    --|  |--+
+<span class="c">// Network 2 — kierunek L: lustrzane odbicie (blokada przez SILNIK_P i START_P)</span></code></pre>
+  <div class="callout danger">
+    <span class="t">Blokada programowa to za mało</span>
+    Styczniki kierunkowe muszą mieć także <strong>blokadę mechaniczną i elektryczną</strong>
+    (styki NC nawzajem w obwodach cewek). Zwarcie międzyfazowe przy sklejonym styku to pożar
+    rozdzielnicy. Dodaj też przerwę czasową przy zmianie kierunku (TON 0,5–1 s).
+  </div>
+
+  <h2 id="gwiazda"><span class="h-icon">4.3</span>Rozruch gwiazda–trójkąt</h2>
+  <p><code>Q0.0</code> stycznik główny, <code>Q0.1</code> stycznik gwiazdy, <code>Q0.2</code> stycznik trójkąta. Timer <code>TON</code> 5 s (czas rozruchu) + 50 ms przerwy na wygaszenie łuku.</p>
+<pre><code><span class="c">// Po starcie: glowny + gwiazda. TON odmierza rozruch.</span>
+<span class="c">// Po T#5s: gwiazda odpada, po T#50ms zalacza sie trojkat.</span>
+<span class="k">IF</span> <span class="a">#Praca</span> <span class="k">THEN</span>
+    <span class="a">#tRozruch</span>(IN := <span class="k">TRUE</span>, PT := <span class="s">T#5s</span>);
+    <span class="a">#tPrzerwa</span>(IN := <span class="a">#tRozruch.Q</span>, PT := <span class="s">T#50ms</span>);
+    <span class="a">"StycznikGlowny"</span> := <span class="k">TRUE</span>;
+    <span class="a">"StycznikGwiazda"</span> := <span class="k">NOT</span> <span class="a">#tRozruch.Q</span> <span class="k">AND NOT</span> <span class="a">"StycznikTrojkat"</span>;
+    <span class="a">"StycznikTrojkat"</span> := <span class="a">#tPrzerwa.Q</span>  <span class="k">AND NOT</span> <span class="a">"StycznikGwiazda"</span>;
+<span class="k">ELSE</span>
+    <span class="a">#tRozruch</span>(IN := <span class="k">FALSE</span>, PT := <span class="s">T#5s</span>);
+    <span class="a">#tPrzerwa</span>(IN := <span class="k">FALSE</span>, PT := <span class="s">T#50ms</span>);
+    <span class="a">"StycznikGlowny"</span>  := <span class="k">FALSE</span>;
+    <span class="a">"StycznikGwiazda"</span> := <span class="k">FALSE</span>;
+    <span class="a">"StycznikTrojkat"</span> := <span class="k">FALSE</span>;
+<span class="k">END_IF</span>;</code></pre>
+  <p class="note">Styczniki Y i Δ dodatkowo blokuj mechanicznie. Uwaga: to zajmuje 3 z 4 wyjść 1211C.</p>
+
+  <h2 id="przenosnik"><span class="h-icon">4.4</span>Przenośnik z czujnikiem i licznikiem sztuk</h2>
+  <p><code>I0.2</code> czujnik optyczny, <code>Q0.0</code> napęd taśmy. Licznik <code>CTU</code> zlicza produkty; po 24 szt. (karton pełny) taśma staje.</p>
+<pre><code><span class="c">// Network 1: start/stop tasmy jak w 4.1, dodatkowo warunek "NOT KartonPelny"</span>
+<span class="c">// Network 2: licznik sztuk</span>
+        CZUJNIK          +-------+
+    ----|P|--------------|CTU    |
+                         |    QU |---- KartonPelny
+   ResetKarton ----------|R      |
+              24 --------|PV  CV |---- AktualnaLiczba (na HMI)
+                         +-------+</code></pre>
+  <p class="note">Zbocze <code>|P|</code> przed CU jest obowiązkowe — inaczej wolny produkt przed czujnikiem policzy się raz na cykl programu. Rejestr przesuwny <code>SHL</code> taktowany enkoderem taśmy pozwala śledzić pozycję produktu (np. wyrzutnik braków 3 pozycje dalej).</p>
+
+  <h2 id="pompa"><span class="h-icon">4.5</span>Pompa i zbiornik — dwa poziomy</h2>
+  <p><code>I0.3</code> czujnik poziomu dolnego LSL, <code>I0.4</code> czujnik poziomu górnego LSH, <code>Q0.1</code> pompa napełniająca. Histereza między czujnikami eliminuje „kłapanie".</p>
+<pre><code><span class="c">// Pompa startuje, gdy poziom spadnie ponizej LSL,</span>
+<span class="c">// pracuje az do osiagniecia LSH (samopodtrzymanie miedzy poziomami):</span>
+       LSL       LSH      Awaria
+    --|/|---+----|/|-------|/|-------( POMPA )--
+   POMPA    |
+    --| |---+
+<span class="c">// Sucho-bieg: TON 10 s — jesli pompa pracuje, a LSL nadal "0", alarm.</span></code></pre>
+
+  <h2 id="analog"><span class="h-icon">4.6</span>Sygnał analogowy + alarmy (czujnik 0–10 V)</h2>
+  <p>Czujnik ciśnienia 0–6 bar na kanale <code>IW64</code>. Skalowanie + dwa progi alarmowe:</p>
+<pre><code><span class="c">// FC "Skalowanie" wywolywane w OB1:</span>
+<span class="a">#Norm</span>      := <span class="k">NORM_X</span>(MIN := <span class="s">0</span>, VALUE := <span class="s">%IW64</span>, MAX := <span class="s">27648</span>);
+<span class="a">"Cisnienie"</span> := <span class="k">SCALE_X</span>(MIN := <span class="s">0.0</span>, VALUE := <span class="a">#Norm</span>, MAX := <span class="s">6.0</span>);   <span class="c">// [bar]</span>
+
+<span class="c">// alarmy z opoznieniem 2 s (eliminacja szpilek):</span>
+<span class="a">#tHi</span>(IN := <span class="a">"Cisnienie"</span> &gt; <span class="s">5.5</span>, PT := <span class="s">T#2s</span>);
+<span class="a">"AlarmHi"</span> := <span class="a">#tHi.Q</span>;
+<span class="a">#tLo</span>(IN := <span class="a">"Cisnienie"</span> &lt; <span class="s">0.5</span>, PT := <span class="s">T#2s</span>);
+<span class="a">"AlarmLo"</span> := <span class="a">#tLo.Q</span>;
+<span class="c">// przerwanie petli pradowej / zwarcie czujnika wykryjesz progiem &lt; 0.2 V.</span></code></pre>
+
+  <h2 id="miganie"><span class="h-icon">4.7</span>Miganie lamp i sygnalizacja</h2>
+  <p>Najprościej — bity zegarowe (rozdz. 2.7): lampa alarmu = <code>Alarm AND M0.5</code> (1 Hz). Wzorzec pełnej kolumny sygnalizacyjnej:</p>
+  <ul>
+    <li><strong>Zielona ciągła</strong> — praca automatyczna: <code>Q := Praca</code>,</li>
+    <li><strong>Żółta migająca</strong> — ostrzeżenie: <code>Q := Ostrzezenie AND "Clock_1Hz"</code>,</li>
+    <li><strong>Czerwona migająca do skwitowania, potem ciągła</strong> — klasyka ISA-18: miga, dopóki obsługa nie naciśnie „Kwituj", potem świeci ciągle aż do ustąpienia przyczyny.</li>
+  </ul>
+<pre><code><span class="a">"Niekwitowany"</span> := (<span class="a">"Niekwitowany"</span> <span class="k">OR</span> <span class="a">#NoweZdarzenie</span>) <span class="k">AND NOT</span> <span class="a">"Kwituj"</span>;
+<span class="a">"LampaCzerwona"</span> := (<span class="a">"Niekwitowany"</span> <span class="k">AND</span> <span class="a">"Clock_1Hz"</span>) <span class="k">OR</span> (<span class="a">"Alarm"</span> <span class="k">AND NOT</span> <span class="a">"Niekwitowany"</span>);</code></pre>
+
+  <h2 id="sekwencja"><span class="h-icon">4.8</span>Sekwencja krokowa — automat stanów</h2>
+  <p>
+    Każdy cykl maszyny (myjka, prasa, dozownik, mieszalnik) to sekwencja kroków. S7-1200 nie ma
+    języka GRAPH, więc standardem jest zmienna kroku <code>Int</code> + <code>CASE</code> w SCL:
+  </p>
+<pre><code><span class="k">CASE</span> <span class="a">#Krok</span> <span class="k">OF</span>
+    <span class="s">0</span>:  <span class="c">// GOTOWOSC</span>
+        <span class="k">IF</span> <span class="a">"Start"</span> <span class="k">AND</span> <span class="a">"OslonaZamknieta"</span> <span class="k">THEN</span> <span class="a">#Krok</span> := <span class="s">10</span>; <span class="k">END_IF</span>;
+    <span class="s">10</span>: <span class="c">// NAPELNIANIE</span>
+        <span class="a">"ZawarNapelniania"</span> := <span class="k">TRUE</span>;
+        <span class="k">IF</span> <span class="a">"PoziomOsiagniety"</span> <span class="k">THEN</span>
+            <span class="a">"ZawarNapelniania"</span> := <span class="k">FALSE</span>;  <span class="a">#Krok</span> := <span class="s">20</span>;
+        <span class="k">END_IF</span>;
+    <span class="s">20</span>: <span class="c">// MIESZANIE 30 s</span>
+        <span class="a">"Mieszadlo"</span> := <span class="k">TRUE</span>;
+        <span class="a">#tKrok</span>(IN := <span class="k">TRUE</span>, PT := <span class="s">T#30s</span>);
+        <span class="k">IF</span> <span class="a">#tKrok.Q</span> <span class="k">THEN</span> <span class="a">"Mieszadlo"</span> := <span class="k">FALSE</span>; <span class="a">#Krok</span> := <span class="s">30</span>; <span class="k">END_IF</span>;
+    <span class="s">30</span>: <span class="c">// OPROZNIANIE</span>
+        <span class="a">"ZawarSpustu"</span> := <span class="k">TRUE</span>;
+        <span class="k">IF</span> <span class="a">"ZbiornikPusty"</span> <span class="k">THEN</span> <span class="a">"ZawarSpustu"</span> := <span class="k">FALSE</span>; <span class="a">#Krok</span> := <span class="s">0</span>; <span class="k">END_IF</span>;
+<span class="k">END_CASE</span>;
+
+<span class="c">// Timer #tKrok resetuj przy kazdej zmianie kroku; rownolegle prowadz</span>
+<span class="c">// timeout kroku (np. 2 min) -> alarm "sekwencja zawieszona".</span>
+<span class="k">IF</span> <span class="a">#Krok</span> &lt;&gt; <span class="a">#KrokPoprzedni</span> <span class="k">THEN</span>
+    <span class="a">#tKrok</span>(IN := <span class="k">FALSE</span>, PT := <span class="s">T#0s</span>);
+    <span class="a">#KrokPoprzedni</span> := <span class="a">#Krok</span>;
+<span class="k">END_IF</span>;</code></pre>
+  <ul>
+    <li>Numeruj kroki co 10 — łatwo dodać krok pośredni.</li>
+    <li>Krok 0 = stan bezpieczny; awaria lub STOP zawsze wymusza <code>#Krok := 0</code> i gasi wszystkie wyjścia sekwencji.</li>
+    <li>Zmienną kroku pokazuj na HMI — diagnostyka „dlaczego stoi" robi się natychmiastowa.</li>
+  </ul>
+
+  <h2 id="checklist"><span class="h-icon">4.9</span>Checklista uruchomienia każdej maszyny</h2>
+  <ol>
+    <li><strong>Lista I/O</strong> — spis wszystkich czujników/napędów z adresami i typem styku (NO/NC), zanim napiszesz pierwszą sieć.</li>
+    <li><strong>Obwód bezpieczeństwa sprzętowo</strong> — E-STOP przez przekaźnik bezpieczeństwa odcina styczniki; PLC tylko obserwuje jego styk pomocniczy.</li>
+    <li><strong>Test wejść</strong> — w Watch table sprawdź każde wejście fizycznie (naciśnij / zasłoń czujnik).</li>
+    <li><strong>Test wyjść bez napędów</strong> — wymuszaj wyjścia przy odłączonych obwodach mocy (bezpieczniki silnikowe wyjęte).</li>
+    <li><strong>Tryb ręczny przed automatem</strong> — najpierw jog każdego napędu z HMI/przycisków, dopiero potem sekwencja automatyczna.</li>
+    <li><strong>Symuluj awarie</strong> — wyciągnij czujnik w trakcie cyklu, otwórz osłonę, zdejmij fazę: maszyna ma stanąć bezpiecznie i zgłosić czytelny alarm.</li>
+    <li><strong>Zrób kopię projektu</strong> z datą i opisem wersji; wgraj program na kartę pamięci jako backup w szafie.</li>
+  </ol>
+
+  <div class="pager">
+    <a href="instrukcje.html">← Rozdział 3: Instrukcje</a>
+    <a href="index.html">Powrót do spisu treści →</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Poradnik edukacyjny S7-1200 · <a href="index.html">spis treści</a> · <a href="../../index.html">kolekcja stron</a>
+</footer>
+
+</body>
+</html>

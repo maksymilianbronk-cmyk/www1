@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprzęt i podłączenie — S7-1200 CPU 1211C AC/DC/RLY</title>
+<meta name="description" content="CPU 1211C AC/DC/RLY: dane techniczne, podłączenie zasilania 230 V AC, wejść 24 V DC i wyjść przekaźnikowych, adresowanie, obszary pamięci i typy danych S7-1200.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-in">
+    <a class="brand" href="index.html"><span class="chip">S7-1200</span> Poradnik programisty</a>
+    <nav class="nav">
+      <a href="index.html">Start</a>
+      <a href="sprzet.html" class="active">Sprzęt</a>
+      <a href="program.html">TIA Portal</a>
+      <a href="instrukcje.html">Instrukcje</a>
+      <a href="przyklady.html">Przykłady maszyn</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Rozdział 1 · Sprzęt i podłączenie</h1>
+
+  <div class="toc">
+    <b>W tym rozdziale</b>
+    <ol>
+      <li><a href="#oznaczenie">Co oznacza „AC/DC/RLY"</a></li>
+      <li><a href="#zasilanie">Podłączenie zasilania</a></li>
+      <li><a href="#wejscia">Wejścia cyfrowe 24 V DC</a></li>
+      <li><a href="#wyjscia">Wyjścia przekaźnikowe</a></li>
+      <li><a href="#analogowe">Wejścia analogowe 0–10 V</a></li>
+      <li><a href="#rozbudowa">Możliwości rozbudowy</a></li>
+      <li><a href="#pamiec">Obszary pamięci i adresowanie</a></li>
+      <li><a href="#typy">Typy danych</a></li>
+    </ol>
+  </div>
+
+  <h2 id="oznaczenie"><span class="h-icon">1.1</span>Co oznacza „AC/DC/RLY"</h2>
+  <p>Oznaczenie wersji CPU czyta się zawsze w kolejności <em>zasilanie / wejścia / wyjścia</em>:</p>
+  <ul>
+    <li><strong>AC</strong> — zasilanie sterownika napięciem przemiennym 120/230 V AC (bez zewnętrznego zasilacza 24 V),</li>
+    <li><strong>DC</strong> — wejścia cyfrowe na 24 V DC,</li>
+    <li><strong>RLY</strong> (relay) — wyjścia przekaźnikowe: bezpotencjałowe styki, które mogą łączyć zarówno obwody DC, jak i AC (np. cewkę stycznika 230 V AC).</li>
+  </ul>
+  <div class="callout">
+    <span class="t">Zaleta i wada przekaźników</span>
+    Styki przekaźnika są uniwersalne (do 250 V AC / 2 A) i odporne na przepięcia, ale mają
+    ograniczoną żywotność mechaniczną (ok. 10 mln cykli, elektrycznie ~100 tys. pod obciążeniem)
+    i czas przełączania ~10 ms. Do szybkiego impulsowania (PWM/PTO, serwo, krokowce) — nie nadają
+    się; potrzebna wersja DC/DC/DC albo płytka sygnałowa tranzystorowa.
+  </div>
+
+  <h2 id="zasilanie"><span class="h-icon">1.2</span>Podłączenie zasilania</h2>
+  <ol>
+    <li>Zaciski <code>L1</code> i <code>N</code> — faza i neutralny 230 V AC (dopuszczalne 85–264 V AC, 47–63 Hz). Zacisk uziemienia funkcjonalnego połącz z szyną PE.</li>
+    <li>Sterownik ma <strong>wbudowany zasilacz czujników 24 V DC</strong> (zaciski <code>L+</code> / <code>M</code>, wydajność 300 mA) — można z niego zasilić wejścia i czujniki (indukcyjne, optyczne, przyciski).</li>
+    <li>Przed CPU zamontuj wyłącznik nadprądowy (np. B6) i — dobrą praktyką — wyłącznik serwisowy.</li>
+    <li>Prowadź przewody 230 V AC oddzielnie od przewodów sygnałowych 24 V DC (osobne korytka lub odstęp min. 20 cm).</li>
+  </ol>
+
+  <h2 id="wejscia"><span class="h-icon">1.3</span>Wejścia cyfrowe 24 V DC (I0.0–I0.5)</h2>
+  <p>
+    6 wejść typu sink/source: wspólny zacisk <code>1M</code> decyduje o polaryzacji. Najczęstszy
+    układ (czujniki PNP): <code>1M</code> → do <code>M</code> (masa 24 V), a styki/czujniki podają
+    <strong>+24 V na zacisk wejścia</strong>. Stan „1" ≥ 15 V DC, stan „0" ≤ 5 V DC, pobór ~4 mA.
+  </p>
+  <ul>
+    <li>Czas reakcji filtruje się w konfiguracji CPU (domyślnie 6,4 ms; dla szybkich sygnałów/HSC zmniejsz filtr nawet do mikrosekund).</li>
+    <li>Wejścia I0.0–I0.5 mogą pracować jako <strong>szybkie liczniki (HSC)</strong> do 100 kHz oraz wyzwalać <strong>przerwania sprzętowe</strong>.</li>
+    <li>Do styków mechanicznych (przyciski, krańcówki) stosuj drgania styków ≈ filtr wejściowy ≥ 6,4 ms — eliminacja drgań „za darmo".</li>
+  </ul>
+  <div class="callout warn">
+    <span class="t">NO czy NC?</span>
+    Przycisk <strong>STOP i wszystkie łańcuchy zatrzymania podłączaj jako styki rozwierne (NC)</strong> —
+    przerwanie przewodu działa wtedy jak zatrzymanie (zasada fail-safe). START jako zwierny (NO).
+    W programie styk NC czyta się instrukcją styku <em>zwykle otwartego</em> (bo fizycznie na wejściu jest „1").
+  </div>
+
+  <h2 id="wyjscia"><span class="h-icon">1.4</span>Wyjścia przekaźnikowe (Q0.0–Q0.3)</h2>
+  <ul>
+    <li>4 bezpotencjałowe styki NO w grupach ze wspólnym zaciskiem <code>1L</code>/<code>2L</code> — każda grupa może łączyć inne napięcie (np. jedna 24 V DC, druga 230 V AC).</li>
+    <li>Obciążalność: 2 A na styk (rezystancyjnie), 30 W DC / 200 W AC; żarówki: 30 W DC / 200 W AC.</li>
+    <li>Cewki styczników i elektrozawory <strong>DC</strong> — bocznikuj diodą gaszącą (1N4007 równolegle, katoda do +). Cewki <strong>AC</strong> — warystorem lub członem RC. Wydłuża to życie styków wielokrotnie.</li>
+    <li>Silniki załączaj <strong>zawsze przez stycznik</strong> z zabezpieczeniem termicznym — nigdy bezpośrednio ze styku PLC.</li>
+  </ul>
+
+  <h2 id="analogowe"><span class="h-icon">1.5</span>Wejścia analogowe 0–10 V</h2>
+  <ul>
+    <li>2 kanały (zaciski <code>AI0</code>, <code>AI1</code> + wspólna masa), zakres 0–10 V, rozdzielczość 10 bitów.</li>
+    <li>Adresy w programie: <code>IW64</code> (kanał 0) i <code>IW66</code> (kanał 1).</li>
+    <li>Wartość surowa: <strong>0–27648</strong> odpowiada 0–10 V. Przeliczanie na jednostki fizyczne — parą instrukcji <code>NORM_X</code> + <code>SCALE_X</code> (przykład w <a href="przyklady.html#analog">rozdziale 4</a>).</li>
+    <li>Czujnik z wyjściem prądowym 4–20 mA podłączysz przez rezystor bocznikujący 500 Ω (4–20 mA → 2–10 V) albo przez płytkę sygnałową analogową.</li>
+  </ul>
+
+  <h2 id="rozbudowa"><span class="h-icon">1.6</span>Możliwości rozbudowy CPU 1211C</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Rozszerzenie</th><th>Limit dla 1211C</th><th>Przykłady</th></tr></thead>
+      <tbody>
+        <tr><td>Moduły sygnałowe (SM)</td><td><strong>0</strong> — brak możliwości!</td><td>— (to główna różnica względem 1212C/1214C)</td></tr>
+        <tr><td>Płytka sygnałowa (SB)</td><td>1 (montowana w czoło CPU)</td><td><code>SB 1222</code> 4×DQ tranzystor 200 kHz (do PTO/PWM), <code>SB 1232</code> 1×AQ (wyjście analogowe), <code>SB 1223</code> 2×DI/2×DQ, <code>SB 1231</code> 1×AI (w tym termopary/RTD)</td></tr>
+        <tr><td>Moduły komunikacyjne (CM)</td><td>do 3 (z lewej strony)</td><td><code>CM 1241</code> RS-232/RS-485 (Modbus RTU, USS), <code>CM 1243-5</code> PROFIBUS DP master, <code>CP 1243-1</code> telemetria</td></tr>
+        <tr><td>Bateria (CB)</td><td>1 × <code>BB 1297</code></td><td>podtrzymanie zegara RTC na długie wyłączenia</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="pamiec"><span class="h-icon">1.7</span>Obszary pamięci i adresowanie</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Obszar</th><th>Przykład adresu</th><th>Opis</th></tr></thead>
+      <tbody>
+        <tr><td><strong>I</strong> — wejścia (obraz procesu)</td><td><code>I0.0</code>, <code>IB0</code>, <code>IW64</code></td><td>Stan wejść zatrzaśnięty na początku cyklu. Dostęp bezpośredni do fizycznego wejścia: <code>I0.0:P</code>.</td></tr>
+        <tr><td><strong>Q</strong> — wyjścia (obraz procesu)</td><td><code>Q0.0</code>, <code>QB0</code>, <code>QW80</code></td><td>Zapisywane na fizyczne wyjścia na końcu cyklu. Natychmiastowy zapis: <code>Q0.0:P</code>.</td></tr>
+        <tr><td><strong>M</strong> — pamięć znaczników (merker)</td><td><code>M10.0</code>, <code>MB10</code>, <code>MW20</code>, <code>MD24</code></td><td>Zmienne globalne bitowe/bajtowe/słowa. Część można skonfigurować jako retentywną.</td></tr>
+        <tr><td><strong>DB</strong> — bloki danych</td><td><code>"Dane".Poziom</code>, <code>DB1.DBW0</code></td><td>Preferowane miejsce na dane (dostęp symboliczny, optymalizowany). Globalne lub instancyjne (dla FB).</td></tr>
+        <tr><td><strong>L</strong> — dane lokalne (temp)</td><td>zmienne temp bloku</td><td>Żyją tylko podczas jednego wywołania bloku — nie pamiętają wartości między cyklami!</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Rozmiary: bit (<code>M0.0</code>) → bajt <code>B</code> (8 bitów) → słowo <code>W</code>
+    (16 bitów) → podwójne słowo <code>D</code> (32 bity). Uwaga na nakładanie się adresów:
+    <code>MW20</code> zawiera bajty <code>MB20</code> i <code>MB21</code>, a <code>MD24</code> —
+    bajty 24–27. Prowadź tabelę zmiennych (PLC tags) i pracuj symbolicznie — to eliminuje kolizje.
+  </p>
+
+  <h2 id="typy"><span class="h-icon">1.8</span>Typy danych S7-1200</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Typ</th><th>Rozmiar</th><th>Zakres / format</th><th>Typowe użycie</th></tr></thead>
+      <tbody>
+        <tr><td><code>Bool</code></td><td>1 bit</td><td>FALSE / TRUE</td><td>styki, cewki, flagi</td></tr>
+        <tr><td><code>Byte</code></td><td>8 b</td><td>16#00–16#FF</td><td>maski bitowe</td></tr>
+        <tr><td><code>Word</code> / <code>DWord</code></td><td>16/32 b</td><td>wzorce bitowe hex</td><td>statusy, logika słów</td></tr>
+        <tr><td><code>SInt</code> / <code>USInt</code></td><td>8 b</td><td>−128..127 / 0..255</td><td>małe liczniki</td></tr>
+        <tr><td><code>Int</code> / <code>UInt</code></td><td>16 b</td><td>−32768..32767 / 0..65535</td><td>wartości analogowe surowe</td></tr>
+        <tr><td><code>DInt</code> / <code>UDInt</code></td><td>32 b</td><td>±2,1 mld / 0..4,29 mld</td><td>pozycje, liczniki HSC</td></tr>
+        <tr><td><code>Real</code></td><td>32 b</td><td>±3,4·10³⁸ (IEEE 754)</td><td>wartości fizyczne, PID</td></tr>
+        <tr><td><code>LReal</code></td><td>64 b</td><td>podwójna precyzja</td><td>dokładne obliczenia</td></tr>
+        <tr><td><code>Time</code></td><td>32 b</td><td><code>T#-24d..T#+24d</code>, ms</td><td>czasy timerów (<code>T#2s500ms</code>)</td></tr>
+        <tr><td><code>Date</code> / <code>Time_of_Day</code></td><td>16/32 b</td><td><code>D#2026-08-02</code> / <code>TOD#14:30:00</code></td><td>harmonogramy</td></tr>
+        <tr><td><code>DTL</code></td><td>12 B</td><td>data+czas struktura</td><td>zegar RTC (<code>RD_LOC_T</code>)</td></tr>
+        <tr><td><code>Char</code> / <code>String</code></td><td>1 B / 2+254 B</td><td>ASCII</td><td>komunikaty, komunikacja</td></tr>
+        <tr><td><code>Array[..] of T</code></td><td>—</td><td>tablica dowolnego typu</td><td>receptury, bufory</td></tr>
+        <tr><td><code>Struct</code> / typ PLC (UDT)</td><td>—</td><td>struktura pól</td><td>dane maszyny, standaryzacja</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pager">
+    <a href="index.html">← Start</a>
+    <a href="program.html">Rozdział 2: TIA Portal i struktura programu →</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Poradnik edukacyjny S7-1200 · <a href="index.html">spis treści</a> · <a href="../../index.html">kolekcja stron</a>
+</footer>
+
+</body>
+</html>

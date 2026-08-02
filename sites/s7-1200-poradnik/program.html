@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIA Portal i struktura programu — S7-1200 CPU 1211C</title>
+<meta name="description" content="TIA Portal krok po kroku dla S7-1200: pierwszy projekt, bloki OB/FB/FC/DB, cykl programu, języki LAD/FBD/SCL, bity zegarowe i systemowe, wgrywanie i diagnostyka online.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-in">
+    <a class="brand" href="index.html"><span class="chip">S7-1200</span> Poradnik programisty</a>
+    <nav class="nav">
+      <a href="index.html">Start</a>
+      <a href="sprzet.html">Sprzęt</a>
+      <a href="program.html" class="active">TIA Portal</a>
+      <a href="instrukcje.html">Instrukcje</a>
+      <a href="przyklady.html">Przykłady maszyn</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Rozdział 2 · TIA Portal i struktura programu</h1>
+
+  <div class="toc">
+    <b>W tym rozdziale</b>
+    <ol>
+      <li><a href="#srodowisko">Środowisko TIA Portal</a></li>
+      <li><a href="#pierwszy">Pierwszy projekt krok po kroku</a></li>
+      <li><a href="#cykl">Jak CPU wykonuje program (cykl)</a></li>
+      <li><a href="#bloki">Bloki: OB, FC, FB, DB</a></li>
+      <li><a href="#ob">Wszystkie typy OB w S7-1200</a></li>
+      <li><a href="#jezyki">Języki: LAD, FBD, SCL</a></li>
+      <li><a href="#bity">Bity systemowe i zegarowe</a></li>
+      <li><a href="#online">Wgrywanie, tryb online, diagnostyka</a></li>
+    </ol>
+  </div>
+
+  <h2 id="srodowisko"><span class="h-icon">2.1</span>Środowisko TIA Portal</h2>
+  <p>
+    S7-1200 programuje się wyłącznie w <strong>TIA Portal</strong> (Totally Integrated Automation).
+    Wystarczy pakiet <strong>STEP 7 Basic</strong> (dodawany często do zestawów startowych);
+    STEP 7 Professional potrzebny jest dopiero do S7-1500/300/400. Do wizualizacji HMI Basic
+    Panels służy zintegrowane WinCC Basic.
+  </p>
+  <ul>
+    <li>Komputer łączy się z CPU zwykłym kablem Ethernet (port PROFINET). Domyślnie CPU nie ma adresu IP — TIA Portal znajduje go po MAC (funkcja „Accessible devices").</li>
+    <li>Typowa konwencja adresów: CPU <code>192.168.0.1</code>, programator <code>192.168.0.241</code>, maska <code>255.255.255.0</code>.</li>
+    <li>Wersja firmware CPU (V4.x) musi zgadzać się z wersją wybraną w projekcie — sprawdzisz ją na tabliczce lub w „Online &amp; diagnostics".</li>
+  </ul>
+
+  <h2 id="pierwszy"><span class="h-icon">2.2</span>Pierwszy projekt krok po kroku</h2>
+  <ol>
+    <li><strong>Create new project</strong> → nazwa i katalog.</li>
+    <li><strong>Add new device</strong> → Controllers → SIMATIC S7-1200 → CPU 1211C AC/DC/Rly → <code>6ES7211-1BE40-0XB0</code> → właściwa wersja firmware. (Możesz też wybrać „Unspecified CPU" i użyć detekcji sprzętu.)</li>
+    <li>W <strong>Device configuration</strong> ustaw: adres IP (Properties → PROFINET interface), zachowanie po starcie (Startup → np. „Warm restart – RUN"), retentywność, bity zegarowe (patrz <a href="#bity">2.7</a>), filtry wejść.</li>
+    <li>Uzupełnij <strong>PLC tags</strong> — nadaj nazwy wejściom/wyjściom (np. <code>PrzyciskStart</code> = <code>%I0.0</code>). Od tej pory programuj wyłącznie symbolicznie.</li>
+    <li>Pisz program w <strong>Main [OB1]</strong> (i własnych blokach — patrz <a href="#bloki">2.4</a>).</li>
+    <li><strong>Compile</strong> (ikona lub <kbd>Ctrl</kbd>+<kbd>B</kbd>) → <strong>Download to device</strong> → wybierz interfejs sieciowy → Load → Start CPU.</li>
+    <li>Testuj w trybie <strong>Monitoring</strong> (okulary) — zielone linie = przepływ prądu w LAD.</li>
+  </ol>
+
+  <h2 id="cykl"><span class="h-icon">2.3</span>Jak CPU wykonuje program — cykl</h2>
+  <p>Sterownik pracuje w nieskończonej pętli (typowo co 1–20 ms):</p>
+  <ol>
+    <li><strong>Odczyt wejść</strong> fizycznych do obrazu procesu (obszar I),</li>
+    <li><strong>Wykonanie programu</strong> — OB1 od pierwszej do ostatniej sieci (network), wraz z wywołanymi blokami,</li>
+    <li><strong>Zapis obrazu wyjść</strong> (obszar Q) na wyjścia fizyczne,</li>
+    <li>komunikacja, autodiagnostyka → i od nowa.</li>
+  </ol>
+  <ul>
+    <li>Konsekwencja nr 1: <strong>stan wejścia jest stały przez cały cykl</strong> — impulsy krótsze niż cykl gubią się (dlatego szybkie sygnały liczy sprzętowy HSC).</li>
+    <li>Konsekwencja nr 2: liczy się <strong>ostatni zapis</strong> do cewki w cyklu — nie steruj tą samą cewką z dwóch miejsc (błąd „podwójnej cewki").</li>
+    <li>Strażnik cyklu (watchdog) domyślnie 150 ms — przekroczenie wywołuje OB80 lub STOP. Nigdy nie używaj pętli oczekujących w programie.</li>
+  </ul>
+
+  <h2 id="bloki"><span class="h-icon">2.4</span>Bloki programowe: OB, FC, FB, DB</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Blok</th><th>Nazwa</th><th>Do czego służy</th></tr></thead>
+      <tbody>
+        <tr><td><strong>OB</strong></td><td>Organization Block</td><td>Punkty wejścia wywoływane przez system operacyjny CPU: cykl główny (OB1), start (OB100), przerwania (czasowe, sprzętowe, błędów). Nie wywołujesz ich sam.</td></tr>
+        <tr><td><strong>FC</strong></td><td>Function (funkcja)</td><td>Podprogram <em>bez pamięci</em> — dostaje parametry IN/OUT, zwraca wynik, niczego nie pamięta między wywołaniami. Idealny na obliczenia i logikę kombinacyjną.</td></tr>
+        <tr><td><strong>FB</strong></td><td>Function Block (blok funkcyjny)</td><td>Podprogram <em>z pamięcią</em> — każde wywołanie ma własny <strong>DB instancyjny</strong> ze zmiennymi Static. Idealny na obiekty: napęd, zawór, sekwencja. Timery/liczniki IEC to też FB.</td></tr>
+        <tr><td><strong>DB</strong></td><td>Data Block</td><td>Pamięć danych: <em>globalny</em> (dostępny zewsząd, np. „Receptura") lub <em>instancyjny</em> (należy do wywołania FB).</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout ok">
+    <span class="t">Dobra architektura małego programu</span>
+    OB1 tylko <em>wywołuje</em> bloki: <code>FC_WejsciaSkalowanie</code> → <code>FB_Napęd</code>
+    (osobna instancja na każdy silnik) → <code>FC_Alarmy</code> → <code>FC_Wyjścia</code>. Dzięki temu
+    ten sam FB obsłuży 1. i 10. silnik — zmienia się tylko DB instancyjny i podpięte zmienne.
+  </div>
+  <p class="note">
+    Bloki „optymalizowane" (domyślnie) nie mają adresów bezwzględnych — dostęp tylko symboliczny,
+    za to szybszy i bezpieczniejszy. Wyłącz optymalizację tylko, gdy komunikacja wymaga stałych
+    offsetów (np. Modbus, PUT/GET).
+  </p>
+
+  <h2 id="ob"><span class="h-icon">2.5</span>Wszystkie typy OB dostępne w S7-1200</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>OB (nr)</th><th>Zdarzenie</th><th>Typowe zastosowanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>OB1</code> Program cycle</td><td>każdy cykl</td><td>program główny; można mieć kilka OB cyklu — wykonują się kolejno</td></tr>
+        <tr><td><code>OB100</code> Startup</td><td>jednorazowo przy przejściu STOP→RUN</td><td>inicjalizacja: zerowanie, wartości domyślne, wstępny odczyt</td></tr>
+        <tr><td><code>OB10x</code>… Time of day</td><td>o zadanej godzinie / dacie (harmonogram)</td><td>zadania dobowe (od FW V4: konfigurowane instrukcjami <code>SET_TINTL</code>/<code>ACT_TINT</code>)</td></tr>
+        <tr><td><code>OB20</code>… Time delay</td><td>po czasie od wywołania <code>SRT_DINT</code></td><td>opóźnione jednorazowe akcje poza cyklem</td></tr>
+        <tr><td><code>OB30</code>… Cyclic interrupt</td><td>co stały interwał (np. 100 ms)</td><td>regulacja PID, próbkowanie analogów — stały takt niezależny od cyklu</td></tr>
+        <tr><td><code>OB40</code>… Hardware interrupt</td><td>zbocze na wejściu, zdarzenie HSC</td><td>natychmiastowa reakcja (&lt;1 ms) na sygnał — przypisanie w konfiguracji lub <code>ATTACH</code></td></tr>
+        <tr><td><code>OB80</code> Time error</td><td>przekroczenie czasu cyklu</td><td>rejestracja/reakcja zamiast STOP</td></tr>
+        <tr><td><code>OB82</code> Diagnostic error</td><td>błąd diagnostyczny modułu (np. zwarcie czujnika)</td><td>alarmowanie obsługi</td></tr>
+        <tr><td><code>OB83</code> Pull/plug</td><td>wyjęcie/włożenie modułu</td><td>reakcja na zmianę sprzętu</td></tr>
+        <tr><td><code>OB86</code> Rack error</td><td>awaria urządzenia rozproszonego (PROFINET)</td><td>obsługa utraty IO device</td></tr>
+        <tr><td><code>OB121</code> Programming error</td><td>błąd wykonania (np. zły indeks tablicy)</td><td>bez tego OB błąd nie zatrzyma CPU, ale warto go logować</td></tr>
+        <tr><td><code>OB122</code> I/O access error</td><td>błąd dostępu do peryferii</td><td>obsługa braku odpowiedzi modułu</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="jezyki"><span class="h-icon">2.6</span>Języki programowania</h2>
+  <h3>LAD (Ladder) — schemat drabinkowy</h3>
+  <p>
+    Graficzny, wzorowany na schematach stycznikowych: szyna zasilająca, styki, cewki. Najlepszy do
+    logiki załącz/wyłącz i najczytelniejszy dla utrzymania ruchu. W tym poradniku przykłady
+    zapisujemy „tekstowo": <code>--| |--</code> styk NO, <code>--|/|--</code> styk NC,
+    <code>--( )--</code> cewka.
+  </p>
+  <h3>FBD — schemat bloków funkcyjnych</h3>
+  <p>Ta sama logika co LAD, ale rysowana bramkami (AND/OR/=). Kwestia preferencji — konwersja LAD↔FBD jest w TIA Portal automatyczna.</p>
+  <h3>SCL — Structured Control Language</h3>
+  <p>
+    Tekstowy język wysokiego poziomu (odmiana ST z IEC 61131-3, składnia pascalopodobna):
+    <code>IF</code>, <code>CASE</code>, <code>FOR</code>, <code>WHILE</code>, <code>REPEAT</code>,
+    wyrażenia arytmetyczne. Najlepszy do obliczeń, receptur, tablic i algorytmów. Przykład:
+  </p>
+<pre><code><span class="k">IF</span> <span class="a">#Start</span> <span class="k">AND NOT</span> <span class="a">#Awaria</span> <span class="k">THEN</span>
+    <span class="a">#Silnik</span> := <span class="k">TRUE</span>;
+<span class="k">ELSIF</span> <span class="a">#Stop</span> <span class="k">OR</span> <span class="a">#Awaria</span> <span class="k">THEN</span>
+    <span class="a">#Silnik</span> := <span class="k">FALSE</span>;
+<span class="k">END_IF</span>;
+
+<span class="c">// pętla po recepturze</span>
+<span class="k">FOR</span> <span class="a">#i</span> := <span class="s">1</span> <span class="k">TO</span> <span class="s">10</span> <span class="k">DO</span>
+    <span class="a">#Suma</span> := <span class="a">#Suma</span> + <span class="a">"Receptura".Skladnik</span>[<span class="a">#i</span>];
+<span class="k">END_FOR</span>;</code></pre>
+  <p class="note">S7-1200 nie obsługuje języków STL (AWL) ani GRAPH — te są zarezerwowane dla S7-1500/300/400. Sekwencje krokowe realizuje się w LAD/SCL wzorcem „step" (rozdział 4).</p>
+
+  <h2 id="bity"><span class="h-icon">2.7</span>Bity systemowe i zegarowe</h2>
+  <p>
+    Włącz je w konfiguracji CPU: Properties → System and clock memory (typowo <code>MB1</code>
+    systemowy, <code>MB0</code> zegarowy):
+  </p>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Bit</th><th>Nazwa</th><th>Działanie</th></tr></thead>
+      <tbody>
+        <tr><td><code>M1.0</code></td><td>FirstScan</td><td>„1" tylko w pierwszym cyklu po starcie — inicjalizacja bez OB100</td></tr>
+        <tr><td><code>M1.1</code></td><td>DiagStatusUpdate</td><td>zmiana stanu diagnostyki</td></tr>
+        <tr><td><code>M1.2</code></td><td>AlwaysTRUE</td><td>stała „1" — np. do bloków wymagających EN</td></tr>
+        <tr><td><code>M1.3</code></td><td>AlwaysFALSE</td><td>stała „0"</td></tr>
+        <tr><td><code>M0.0</code>–<code>M0.7</code></td><td>Clock memory</td><td>fale prostokątne: 10 Hz · 5 Hz · 2,5 Hz · 2 Hz · 1,25 Hz · 1 Hz · 0,625 Hz · 0,5 Hz — gotowe miganie lamp (<code>M0.5</code> = 1 Hz)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="online"><span class="h-icon">2.8</span>Wgrywanie, tryb online i diagnostyka</h2>
+  <ul>
+    <li><strong>Download</strong>: zmiany w blokach można wgrywać w RUN (bez zatrzymania maszyny), zmiany konfiguracji sprzętu wymagają STOP.</li>
+    <li><strong>Monitoring</strong> (ikona okularów): podgląd na żywo stanów w kodzie; <strong>Watch table</strong> — podgląd i wymuszanie (modify) zmiennych; <strong>Force table</strong> — trwałe wymuszanie wejść/wyjść fizycznych (ostrożnie!).</li>
+    <li><strong>Online &amp; diagnostics</strong>: bufor diagnostyczny (przyczyny STOP), stan LED, ustawianie IP i czasu, reset do ustawień fabrycznych.</li>
+    <li>Diody CPU: <strong>RUN/STOP</strong> zielona = RUN, żółta = STOP; <strong>ERROR</strong> miga czerwono = błąd (szczegóły w buforze); <strong>MAINT</strong> = wymagana obsługa.</li>
+    <li>Kopia programu: karta pamięci SIMATIC MC (program transfer card) lub Upload z CPU (od V4 program da się wczytać z powrotem do projektu).</li>
+    <li>Zabezpieczenia: poziomy ochrony (read/write protection), know-how protect bloków, przywiązanie do numeru seryjnego karty/CPU.</li>
+  </ul>
+
+  <div class="pager">
+    <a href="sprzet.html">← Rozdział 1: Sprzęt</a>
+    <a href="instrukcje.html">Rozdział 3: Pełny katalog instrukcji →</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Poradnik edukacyjny S7-1200 · <a href="index.html">spis treści</a> · <a href="../../index.html">kolekcja stron</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMATIC S7-1200 CPU 1211C — pełny poradnik programowania</title>
+<meta name="description" content="Kompletna instrukcja programowania sterownika Siemens SIMATIC S7-1200 CPU 1211C AC/DC/RLY: sprzęt, TIA Portal, pełna lista instrukcji LAD/FBD/SCL i gotowe przykłady dla typowych maszyn.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-in">
+    <a class="brand" href="index.html"><span class="chip">S7-1200</span> Poradnik programisty</a>
+    <nav class="nav">
+      <a href="index.html" class="active">Start</a>
+      <a href="sprzet.html">Sprzęt</a>
+      <a href="program.html">TIA Portal</a>
+      <a href="instrukcje.html">Instrukcje</a>
+      <a href="przyklady.html">Przykłady maszyn</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>SIMATIC S7-1200 <em>CPU 1211C</em><br>AC/DC/PRZEKAŹNIK — jak go zaprogramować</h1>
+  <p class="lead">
+    Kompletny, praktyczny poradnik: od podłączenia zasilania i wejść/wyjść, przez środowisko
+    TIA Portal i strukturę programu, po <strong>pełny katalog instrukcji</strong> (LAD/FBD/SCL)
+    i gotowe, sprawdzone wzorce sterowania typowymi maszynami.
+  </p>
+  <div class="badges">
+    <span class="badge">6ES7211-1BE40-0XB0</span>
+    <span class="badge">TIA Portal (STEP 7 Basic/Prof.)</span>
+    <span class="badge">LAD · FBD · SCL</span>
+    <span class="badge">firmware V4.x</span>
+  </div>
+</section>
+
+<main class="wrap">
+
+  <h2><span class="h-icon">◆</span>Czy da się nim sterować „każdą maszyną"?</h2>
+  <p>
+    <strong>Zasady programowania są uniwersalne</strong> — te same instrukcje (styki, cewki,
+    timery, liczniki, arytmetyka, PID) sterują pompą, przenośnikiem, prasą czy bramą. Ten
+    poradnik uczy właśnie tych uniwersalnych wzorców. Trzeba jednak uczciwie powiedzieć dwie rzeczy:
+  </p>
+  <ul>
+    <li><strong>Każda maszyna wymaga własnego projektu</strong> — doboru wejść/wyjść, analizy ryzyka
+      i przetestowania sekwencji. Nie istnieje jeden program „do wszystkiego"; istnieją wzorce,
+      które składasz jak klocki (znajdziesz je w <a href="przyklady.html">przykładach</a>).</li>
+    <li><strong>CPU 1211C to najmniejszy model serii</strong> — 6 wejść i 4 wyjścia przekaźnikowe
+      bez możliwości dołożenia modułów rozszerzeń (tylko 1 płytka sygnałowa). Wystarczy na małą
+      maszynę (pompa, brama, mieszalnik, prosty przenośnik); większa instalacja wymaga CPU 1212C/1214C.</li>
+  </ul>
+  <div class="callout danger">
+    <span class="t">⚠ Bezpieczeństwo przede wszystkim</span>
+    Funkcje bezpieczeństwa (wyłącznik awaryjny E-STOP, kurtyny, ryglowanie osłon) muszą być
+    zrealizowane <strong>sprzętowo</strong> (przekaźnik bezpieczeństwa, np. SIRIUS 3SK1) lub w CPU
+    fail-safe — <strong>nigdy wyłącznie w programie standardowego PLC</strong>. Wymagają tego normy
+    PN-EN ISO 13849-1 i PN-EN 60204-1. Standardowy S7-1200 może jedynie <em>obserwować</em> stan
+    obwodu bezpieczeństwa.
+  </div>
+
+  <h2><span class="h-icon">◆</span>Rozdziały poradnika</h2>
+  <div class="grid">
+    <a class="card" href="sprzet.html">
+      <span class="ico">🔌</span>
+      <h3>1. Sprzęt i podłączenie</h3>
+      <p>Dane techniczne CPU 1211C AC/DC/RLY, schemat podłączenia zasilania 230 V AC, wejść 24 V DC
+         i wyjść przekaźnikowych, adresowanie I/Q/M/DB, typy danych, obszary pamięci.</p>
+      <span class="go">Czytaj →</span>
+    </a>
+    <a class="card" href="program.html">
+      <span class="ico">🖥️</span>
+      <h3>2. TIA Portal i struktura programu</h3>
+      <p>Instalacja i pierwszy projekt, bloki OB/FB/FC/DB, cykl programu, języki LAD/FBD/SCL,
+         bity systemowe i zegarowe, wgrywanie, tryb online i diagnostyka.</p>
+      <span class="go">Czytaj →</span>
+    </a>
+    <a class="card" href="instrukcje.html">
+      <span class="ico">📚</span>
+      <h3>3. Pełny katalog instrukcji</h3>
+      <p>Wszystkie instrukcje wewnętrzne S7-1200: logika bitowa, timery, liczniki, porównania,
+         matematyka, przenoszenie, konwersje, sterowanie programem, PID, HSC, komunikacja i inne.</p>
+      <span class="go">Czytaj →</span>
+    </a>
+    <a class="card" href="przyklady.html">
+      <span class="ico">⚙️</span>
+      <h3>4. Gotowe wzorce dla maszyn</h3>
+      <p>Start/stop z podtrzymaniem, nawrotnik silnika, gwiazda–trójkąt, przenośnik z licznikiem,
+         sterowanie pompą i zbiornikiem, skalowanie sygnału analogowego, sekwencje krokowe.</p>
+      <span class="go">Czytaj →</span>
+    </a>
+  </div>
+
+  <h2><span class="h-icon">◆</span>CPU 1211C AC/DC/RLY w pigułce</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tbody>
+        <tr><th>Numer katalogowy</th><td><code>6ES7211-1BE40-0XB0</code> (wersja z firmware V4.x)</td></tr>
+        <tr><th>Zasilanie</th><td>85–264 V AC (znamionowo 120/230 V AC), 47–63 Hz</td></tr>
+        <tr><th>Wejścia cyfrowe</th><td>6 × 24 V DC (I0.0–I0.5), sink/source, wbudowany zasilacz czujników 24 V DC / 300 mA</td></tr>
+        <tr><th>Wyjścia cyfrowe</th><td>4 × przekaźnikowe (Q0.0–Q0.3), 2 A, 5–30 V DC lub 5–250 V AC</td></tr>
+        <tr><th>Wejścia analogowe</th><td>2 × 0–10 V (10 bitów), adresy <code>IW64</code>, <code>IW66</code></td></tr>
+        <tr><th>Pamięć</th><td>50 KB robocza · 1 MB ładowania · 10 KB retentywna (podtrzymywana)</td></tr>
+        <tr><th>Szybkie liczniki (HSC)</th><td>3 × do 100 kHz (kwadraturowo do 80 kHz)</td></tr>
+        <tr><th>PTO/PWM</th><td>tylko przez płytkę sygnałową z wyjściami tranzystorowymi — wyjścia przekaźnikowe nie nadają się do impulsowania</td></tr>
+        <tr><th>Rozbudowa</th><td>0 modułów sygnałowych · 1 płytka sygnałowa (SB) · do 3 modułów komunikacyjnych (CM)</td></tr>
+        <tr><th>Komunikacja</th><td>1 × PROFINET (RJ45); S7, Open User Communication (TCP/ISO-on-TCP/UDP), Modbus TCP; przez CM 1241 także Modbus RTU / USS</td></tr>
+        <tr><th>Środowisko</th><td>TIA Portal — STEP 7 Basic (wystarcza) lub Professional</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Szczegóły podłączenia i adresowania — w rozdziale <a href="sprzet.html">Sprzęt</a>.</p>
+
+  <div class="pager">
+    <a href="../../index.html">← Wróć do kolekcji stron</a>
+    <a href="sprzet.html">Rozdział 1: Sprzęt i podłączenie →</a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  Poradnik edukacyjny S7-1200 · SIMATIC, STEP 7 i TIA Portal są znakami towarowymi Siemens AG ·
+  <a href="../../index.html">kolekcja stron</a>
+</footer>
+
+</body>
+</html>

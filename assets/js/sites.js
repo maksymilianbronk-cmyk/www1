@@ -353,6 +353,20 @@ const SITES = [
     },
   },
   {
+    slug: "s7-1200-poradnik",
+    title: "S7-1200 CPU 1211C — poradnik programisty PLC",
+    desc: "Kompletna instrukcja programowania sterownika Siemens SIMATIC S7-1200 CPU 1211C AC/DC/RLY: dane techniczne i schemat podłączenia (zasilanie 230 V AC, wejścia 24 V DC, wyjścia przekaźnikowe, analogi 0–10 V), środowisko TIA Portal krok po kroku, cykl programu, bloki OB/FB/FC/DB i wszystkie typy OB, języki LAD/FBD/SCL, bity systemowe i zegarowe. Pełny katalog instrukcji wewnętrznych w 20 grupach: logika bitowa, timery i liczniki IEC, porównania, matematyka, MOVE, konwersje (NORM_X/SCALE_X), sterowanie programem, logika słów, przesunięcia, data i czas, stringi, przerwania, diagnostyka, PWM/PTO, HSC, PID_Compact, Motion Control i komunikacja (OUC, GET/PUT, Modbus TCP/RTU, USS). Do tego gotowe wzorce dla typowych maszyn: start/stop z podtrzymaniem, nawrotnik, gwiazda–trójkąt, przenośnik z licznikiem, pompa ze zbiornikiem, alarmy analogowe, sekwencja krokowa CASE i checklista uruchomienia — z naciskiem na bezpieczeństwo (E-STOP sprzętowo, PN-EN ISO 13849-1).",
+    icon: "🎛️",
+    tag: "przewodnik",
+    status: "prywatna",
+    preview: true,
+    meta: {
+      colors: ["#0f0f13", "#1a1a22", "#6c63ff", "#43d9b8", "#f5a623"],
+      fonts: ["Segoe UI / system-ui", "Consolas / monospace"],
+      tech: ["HTML", "CSS"],
+    },
+  },
+  {
     slug: "kod-menedzer",
     title: "KodBox — menedżer projektów kodu",
     desc: "Wklejasz kod, aplikacja zapisuje go jako plik z wybranym (lub automatycznie rozpoznanym) rozszerzeniem. Praca na projektach: menedżer plików z podglądem, zmianą nazwy, duplikowaniem i wgrywaniem przez przeciąganie; edytor z numerami linii i własnym podświetlaniem składni (HTML, CSS, JS, PY, JSON, MD, SQL, SH, YAML, INI); podgląd HTML na żywo z automatycznym wstawianiem arkuszy CSS i skryptów JS z tego samego projektu. Import z Markdown: wklejasz cały eksport rozmowy (Perplexity, ChatGPT), a aplikacja wyodrębnia każdy blok kodu, rozpoznaje język i proponuje nazwy plików — z nazwy podanej w tekście, z nagłówka nad blokiem albo z języka bloku; nazwy można poprawić przed zapisem, opis zapisać jako README.md. Pobieranie pojedynczych plików i całego projektu jako ZIP (własny zapis archiwum, bez bibliotek). Udostępnianie w dwóch wariantach: samodzielny link z zaszytą i skompresowaną zawartością projektu (deflate-raw + base64url, strona odbiorcy share.html z podglądem, pobieraniem i kopiowaniem do własnych projektów) albo krótki link z tokenem obsługiwany przez backend. Dwa tryby zapisu: lokalny w przeglądarce (IndexedDB) i serwerowy — dołączony backend Node.js bez żadnych zależności (moduły wbudowane, ZIP z deflate, walidacja ścieżek i rozszerzeń, strona udostępniania), wykrywany automatycznie przez /api/ping.",
