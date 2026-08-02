@@ -200,6 +200,20 @@ svg .i-line{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;
 .check-list li{display:flex;gap:.7rem;align-items:flex-start;color:var(--ink-70)}
 .check-list svg{width:19px;height:19px;color:var(--ok);flex:none;margin-top:.25em}
 
+/* ---------- cennik ---------- */
+.price{font-family:'Archivo';font-weight:700;font-size:1.85rem;color:var(--brand-dark);
+  letter-spacing:-.02em;margin-top:.9rem;display:flex;align-items:baseline;gap:.4rem}
+.price .od{font-size:.85rem;font-weight:600;color:var(--ink-45);letter-spacing:.02em}
+.price .jm{font-size:.9rem;font-weight:600;color:var(--ink-45)}
+.rates{display:grid;grid-template-columns:repeat(3, 1fr);gap:1.15rem;margin-top:2.2rem}
+.rate{background:var(--bone);border:1px solid var(--line);border-radius:var(--r);padding:1.4rem 1.5rem;text-align:center}
+.rate .price{justify-content:center;margin-top:.4rem}
+.rate p{color:var(--ink-45);font-size:.9rem;margin-inline:auto}
+.disclaimer{border-left:4px solid var(--brand);background:var(--tint);border-radius:0 var(--r-s) var(--r-s) 0;
+  padding:1.1rem 1.4rem;margin-top:2.2rem;color:var(--ink-70);font-size:.95rem}
+.disclaimer b{color:var(--brand-dark)}
+@media (max-width:900px){.rates{grid-template-columns:1fr}}
+
 /* ---------- kontakt ---------- */
 .contact-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(2rem, 4vw, 3.4rem);align-items:start}
 .contact-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:1.5rem 1.5rem;display:flex;gap:1rem;align-items:flex-start}
