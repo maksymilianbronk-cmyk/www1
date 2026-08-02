@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jak pracujemy: stała cena, FDS, FAT, uruchomienie | CLAMAX</title>
+<meta name="description" content="Proces w 5 krokach: bezpłatny brief, oferta ze stałą ceną w 24 h, specyfikacja przed kodem, symulacja PLCSIM i FAT, uruchomienie z dokumentacją. 12 mies. gwarancji.">
+<link rel="canonical" href="https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/proces.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CLAMAX Automation">
+<meta property="og:title" content="Jak pracujemy: stała cena, FDS, FAT, uruchomienie | CLAMAX">
+<meta property="og:description" content="Proces w 5 krokach: bezpłatny brief, oferta ze stałą ceną w 24 h, specyfikacja przed kodem, symulacja PLCSIM i FAT, uruchomienie z dokumentacją. 12 mies. gwarancji.">
+<meta property="og:url" content="https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/proces.html">
+<meta property="og:image" content="https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/og.jpg">
+<meta property="og:image:secure_url" content="https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CLAMAX Automation — oprogramowanie maszyn i sterowników">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{
+  "@type":"ProfessionalService",
+  "@id":"https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/#firma",
+  "name":"CLAMAX Automation",
+  "description":"Oprogramowanie maszyn przemysłowych i sterowników PLC dla producentów maszyn: Siemens S7-1200/S7-1500, panele HMI, maszyny pakujące, owijarki do palet, retrofity. Stała cena z oferty, kod na własność klienta.",
+  "url":"https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/",
+  "email":"clamax1@makshost.eu",
+  "areaServed":"PL",
+  "knowsAbout":["Programowanie PLC","Siemens S7-1200","Siemens S7-1500","TIA Portal","HMI","Maszyny pakujące","Owijarki do palet","Retrofit maszyn","Modbus TCP","PROFINET"],
+  "priceRange":"$$"
+},{
+  "@type":"BreadcrumbList",
+  "itemListElement":[
+   {"@type":"ListItem","position":1,"name":"Start","item":"https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/index.html"},
+   {"@type":"ListItem","position":2,"name":"Jak pracujemy","item":"https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/proces.html"}]
+},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Skąd „najtaniej na rynku”? Gdzie jest haczyk?","acceptedAnswer":{"@type":"Answer","text":"Nie ma haczyka — jest model pracy: zdalnie (bez kosztów biura przerzucanych na klienta), na bibliotece przetestowanych bloków (płacisz za konfigurację i testy, nie pisanie od zera) i ze stałą ceną po podpisaniu specyfikacji. Nie oszczędzamy na testach ani dokumentacji — to jedyne pozycje, których cięcie zawsze mści się na obiekcie. Masz tańszą ofertę o tym samym zakresie? Prześlij ją — odniesiemy się konkretnie."}},{"@type":"Question","name":"Czy programujecie układy bezpieczeństwa maszyny?","acceptedAnswer":{"@type":"Answer","text":"Programujemy część standardową i aplikacyjną współpracującą z obwodami bezpieczeństwa. Same obwody (E-STOP, kurtyny, ryglowanie osłon) muszą być zaprojektowane sprzętowo przez osobę z uprawnieniami, zgodnie z PN-EN ISO 13849-1 — z oceną ryzyka po stronie producenta maszyny. Współpracujemy z Twoim projektantem albo pomożemy takiego znaleźć."}},{"@type":"Question","name":"Jak wygląda rozliczenie?","acceptedAnswer":{"@type":"Answer","text":"Standardowo: zaliczka po podpisaniu specyfikacji, druga transza po testach FAT (symulacja lub testy u producenta), reszta po uruchomieniu i podpisaniu protokołu. Dniówki uruchomieniowe na obiekcie i dojazd rozliczamy osobno wg cennika z oferty — to jedyna zmienna pozycja."}},{"@type":"Question","name":"Maszyna ma już program, potrzebuję tylko zmian. Wchodzicie w to?","acceptedAnswer":{"@type":"Answer","text":"Tak. Zaczynamy od audytu istniejącego programu i kopii bezpieczeństwa, potem wyceniamy zmiany. Jeśli program jest zablokowany (know-how protect) albo nie ma kopii — powiemy wprost, co jest możliwe, zanim wydasz złotówkę."}},{"@type":"Question","name":"Czy dojeżdżacie na uruchomienia? Gdzie działacie?","acceptedAnswer":{"@type":"Answer","text":"Programujemy i testujemy zdalnie (PLCSIM, zdalny dostęp), a na uruchomienia dojeżdżamy — cała Polska, a przy maszynach eksportowych także UE, również pod marką producenta maszyny."}},{"@type":"Question","name":"Co dostaję po zakończeniu projektu?","acceptedAnswer":{"@type":"Answer","text":"Komplet: projekt TIA Portal, kopię na karcie CPU, listę I/O, specyfikację powykonawczą, listę alarmów i parametrów, protokół testów oraz hasła dostępu. Kod przekazujemy bez blokad — jest Twoją własnością."}}]}]}</script>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true"><symbol id="i-plc" viewBox="0 0 24 24"><g class="i-fill"><rect x="5" y="4" width="14" height="16" rx="2"/></g><g class="i-line"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h3M2 15h3M19 9h3M19 15h3"/><rect x="8.5" y="7.5" width="7" height="4" rx="1"/><path d="M9 15h1.5M13.5 15H15"/></g></symbol><symbol id="i-hmi" viewBox="0 0 24 24"><g class="i-fill"><rect x="3" y="4" width="18" height="13" rx="2"/></g><g class="i-line"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4"/><path d="M6.5 12l2.5-3 2 2 3-4 3.5 5"/></g></symbol><symbol id="i-wrench" viewBox="0 0 24 24"><g class="i-fill"><path d="M13.5 6.5a4.5 4.5 0 0 1 6-4.2L16 5.8l2.2 2.2 3.5-3.5a4.5 4.5 0 0 1-6.2 6L8 18a2.1 2.1 0 0 1-3-3l8.5-8.5z"/></g><g class="i-line"><path d="M13.5 6.5a4.5 4.5 0 0 1 6-4.2L16 5.8l2.2 2.2 3.5-3.5a4.5 4.5 0 0 1-6.2 6L8 18a2.1 2.1 0 0 1-3-3l8.5-8.5z"/><circle cx="6.5" cy="16.5" r=".4"/></g></symbol><symbol id="i-network" viewBox="0 0 24 24"><g class="i-fill"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="5" r="3"/><circle cx="19" cy="19" r="3"/></g><g class="i-line"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="5" r="3"/><circle cx="19" cy="19" r="3"/><path d="M7.7 10.6L16.3 6.4M7.7 13.4l8.6 4.2"/></g></symbol><symbol id="i-shield" viewBox="0 0 24 24"><g class="i-fill"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5l8-3z"/></g><g class="i-line"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5l8-3z"/><path d="M8.5 12l2.4 2.4L15.5 9.5"/></g></symbol><symbol id="i-box" viewBox="0 0 24 24"><g class="i-fill"><path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5v-9z"/></g><g class="i-line"><path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5v-9z"/><path d="M3 7.5L12 12l9-4.5M12 12v9M7.5 5.3l9 4.5"/></g></symbol><symbol id="i-pallet" viewBox="0 0 24 24"><g class="i-fill"><rect x="6" y="4" width="12" height="12" rx="1"/></g><g class="i-line"><rect x="6" y="4" width="12" height="12" rx="1"/><path d="M6 8h12M6 12h12M12 4v12" opacity=".55"/><path d="M3 19h18M5 16v3M12 16v3M19 16v3"/><path d="M4 10c2.5-2 13.5-2 16 0" stroke-dasharray="2.5 2.5"/></g></symbol><symbol id="i-conveyor" viewBox="0 0 24 24"><g class="i-fill"><rect x="2" y="13" width="20" height="4" rx="2"/></g><g class="i-line"><rect x="2" y="13" width="20" height="4" rx="2"/><circle cx="6" cy="15" r=".4"/><circle cx="12" cy="15" r=".4"/><circle cx="18" cy="15" r=".4"/><rect x="8.5" y="7" width="7" height="6" rx="1"/><path d="M19.5 9.5l2-2-2-2" /><path d="M14 7.5h7.5" stroke-dasharray="2 2.4"/></g></symbol><symbol id="i-gauge" viewBox="0 0 24 24"><g class="i-fill"><path d="M4 18a8.5 8.5 0 1 1 16 0z"/></g><g class="i-line"><path d="M4 18a8.5 8.5 0 1 1 16 0"/><path d="M12 18l3.5-5M12 9.5V8M6.7 12.2l-1.2-.8M17.3 12.2l1.2-.8"/><circle cx="12" cy="18" r="1.3"/></g></symbol><symbol id="i-doc" viewBox="0 0 24 24"><g class="i-fill"><path d="M6 2h8l4 4v16H6z"/></g><g class="i-line"><path d="M6 2h8l4 4v16H6zM14 2v4h4"/><path d="M9 12l2 2 4-4.5"/><path d="M9 18h6"/></g></symbol><symbol id="i-tag" viewBox="0 0 24 24"><g class="i-fill"><path d="M3 3h8.6L21 12.4a2 2 0 0 1 0 2.8l-5.8 5.8a2 2 0 0 1-2.8 0L3 11.6V3z"/></g><g class="i-line"><path d="M3 3h8.6L21 12.4a2 2 0 0 1 0 2.8l-5.8 5.8a2 2 0 0 1-2.8 0L3 11.6V3z"/><circle cx="8" cy="8" r="1.6"/></g></symbol><symbol id="i-clock" viewBox="0 0 24 24"><g class="i-fill"><circle cx="12" cy="12" r="9"/></g><g class="i-line"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></g></symbol><symbol id="i-mail" viewBox="0 0 24 24"><g class="i-fill"><rect x="3" y="5" width="18" height="14" rx="2"/></g><g class="i-line"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/></g></symbol><symbol id="i-bolt" viewBox="0 0 24 24"><g class="i-fill"><path d="M13 2L4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"/></g><g class="i-line"><path d="M13 2L4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"/></g></symbol><symbol id="i-check" viewBox="0 0 24 24"><g class="i-line"><path d="M4.5 12.5l5 5L19.5 7"/></g></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><g class="i-line"><path d="M4 12h15M13.5 6.5L19 12l-5.5 5.5"/></g></symbol><symbol id="i-map" viewBox="0 0 24 24"><g class="i-fill"><path d="M9 4L3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z"/></g><g class="i-line"><path d="M9 4L3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4z"/><path d="M9 4v13M15 6.5v13"/></g></symbol></svg>
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <a class="logo" href="index.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" opacity=".16" d="M12 1.5l9 5.2v10.6l-9 5.2-9-5.2V6.7z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M12 1.5l9 5.2v10.6l-9 5.2-9-5.2V6.7z"/><path fill="currentColor" d="M13 5.5L7.5 13H11l-1 5.5L15.5 11H12z"/></svg>
+      <b>CLAMAX</b>&nbsp;<span>Automation</span>
+    </a>
+    <nav class="nav" aria-label="Menu główne"><a href="index.html">Start</a><a href="oferta.html">Oferta</a><a href="maszyny.html">Maszyny</a><a href="proces.html" class="active">Jak pracujemy</a><a href="kontakt.html">Kontakt</a><a class="cta" href="kontakt.html">Wycena w 24 h</a></nav>
+  </div>
+</header>
+<main>
+
+<div class="page-hero">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Okruszki"><a href="index.html">Start</a><span>/</span><b>Jak pracujemy</b></nav>
+    <span class="kicker">Proces współpracy</span>
+    <h1>Pięć kroków od zapytania<br>do działającej maszyny</h1>
+    <p class="sub">Proces jest prosty, bo ma być tani: minimum spotkań, maksimum konkretów.
+    Każdy etap kończy się czymś, co możesz zobaczyć i zatwierdzić.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap" style="max-width:880px">
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-no" aria-hidden="true"></div>
+        <div>
+          <h3>Brief <span class="tag">bezpłatnie</span></h3>
+          <p>Opisujesz maszynę: co robi, ile ma czujników i napędów, czy to nowa budowa czy retrofit.
+          Wystarczy e-mail albo krótka rozmowa — mamy gotową listę pytań, która porządkuje temat w 30 minut.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-no" aria-hidden="true"></div>
+        <div>
+          <h3>Oferta ze stałą ceną <span class="tag">w 24 h</span></h3>
+          <p>Dostajesz rozbitą wycenę: program, HMI, testy, uruchomienie, dokumentacja — osobno,
+          żebyś widział, za co płacisz. Cena jest stała; zmienia się tylko wtedy, gdy Ty zmieniasz zakres.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-no" aria-hidden="true"></div>
+        <div>
+          <h3>Specyfikacja funkcjonalna (FDS)</h3>
+          <p>Kilka stron opisujących tryby pracy, sekwencję krok po kroku, reakcje na awarie i parametry
+          operatora. Podpisujemy ją PRZED pisaniem kodu — to chroni obie strony przed „a myślałem, że…”.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-no" aria-hidden="true"></div>
+        <div>
+          <h3>Program, symulacja, FAT</h3>
+          <p>Piszemy program i panel, testujemy pełny cykl w symulatorze PLCSIM — łącznie z awariami.
+          Testy FAT możesz obejrzeć zdalnie, zanim maszyna w ogóle dostanie zasilanie.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-no" aria-hidden="true"></div>
+        <div>
+          <h3>Uruchomienie i przekazanie</h3>
+          <p>Uruchamiamy na obiekcie — u Ciebie albo u Twojego klienta końcowego. Podpisujemy protokół
+          testów, przekazujemy komplet dokumentacji, kopie projektu i hasła. Kod jest Twój.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="band reveal">
+      <div class="aurora"></div>
+      <div class="band-flex">
+        <div>
+          <span class="kicker">Gwarancja</span>
+          <h2>12 miesięcy gwarancji na oprogramowanie</h2>
+          <p style="margin-top:1rem">Błędy programu naprawiamy zdalnie z reakcją do 48 godzin —
+          bezpłatnie przez cały okres gwarancji. Po gwarancji wspieramy w rozliczeniu godzinowym,
+          ze stawkami zapisanymi w ofercie od pierwszego dnia.</p>
+        </div>
+        <div style="flex:0 0 auto">
+          <a class="btn btn-light" href="kontakt.html"><svg aria-hidden="true"><use href="#i-mail"/></svg> Rozpocznij od briefu</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="wrap" style="max-width:880px">
+    <div class="center reveal">
+      <span class="kicker">FAQ</span>
+      <h2>Najczęstsze pytania</h2>
+    </div>
+    <div class="faq">
+      <details class="reveal"><summary>Skąd „najtaniej na rynku”? Gdzie jest haczyk?</summary><div><p>Nie ma haczyka — jest model pracy: zdalnie (bez kosztów biura przerzucanych na klienta), na bibliotece przetestowanych bloków (płacisz za konfigurację i testy, nie pisanie od zera) i ze stałą ceną po podpisaniu specyfikacji. Nie oszczędzamy na testach ani dokumentacji — to jedyne pozycje, których cięcie zawsze mści się na obiekcie. Masz tańszą ofertę o tym samym zakresie? Prześlij ją — odniesiemy się konkretnie.</p></div></details><details class="reveal"><summary>Czy programujecie układy bezpieczeństwa maszyny?</summary><div><p>Programujemy część standardową i aplikacyjną współpracującą z obwodami bezpieczeństwa. Same obwody (E-STOP, kurtyny, ryglowanie osłon) muszą być zaprojektowane sprzętowo przez osobę z uprawnieniami, zgodnie z PN-EN ISO 13849-1 — z oceną ryzyka po stronie producenta maszyny. Współpracujemy z Twoim projektantem albo pomożemy takiego znaleźć.</p></div></details><details class="reveal"><summary>Jak wygląda rozliczenie?</summary><div><p>Standardowo: zaliczka po podpisaniu specyfikacji, druga transza po testach FAT (symulacja lub testy u producenta), reszta po uruchomieniu i podpisaniu protokołu. Dniówki uruchomieniowe na obiekcie i dojazd rozliczamy osobno wg cennika z oferty — to jedyna zmienna pozycja.</p></div></details><details class="reveal"><summary>Maszyna ma już program, potrzebuję tylko zmian. Wchodzicie w to?</summary><div><p>Tak. Zaczynamy od audytu istniejącego programu i kopii bezpieczeństwa, potem wyceniamy zmiany. Jeśli program jest zablokowany (know-how protect) albo nie ma kopii — powiemy wprost, co jest możliwe, zanim wydasz złotówkę.</p></div></details><details class="reveal"><summary>Czy dojeżdżacie na uruchomienia? Gdzie działacie?</summary><div><p>Programujemy i testujemy zdalnie (PLCSIM, zdalny dostęp), a na uruchomienia dojeżdżamy — cała Polska, a przy maszynach eksportowych także UE, również pod marką producenta maszyny.</p></div></details><details class="reveal"><summary>Co dostaję po zakończeniu projektu?</summary><div><p>Komplet: projekt TIA Portal, kopię na karcie CPU, listę I/O, specyfikację powykonawczą, listę alarmów i parametrów, protokół testów oraz hasła dostępu. Kod przekazujemy bez blokad — jest Twoją własnością.</p></div></details>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <a class="logo" href="index.html">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" opacity=".2" d="M12 1.5l9 5.2v10.6l-9 5.2-9-5.2V6.7z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M12 1.5l9 5.2v10.6l-9 5.2-9-5.2V6.7z"/><path fill="currentColor" d="M13 5.5L7.5 13H11l-1 5.5L15.5 11H12z"/></svg>
+        <b>CLAMAX</b>&nbsp;<span>Automation</span>
+      </a>
+      <p>Zewnętrzny dział software'u dla producentów maszyn. Programujemy sterowniki i panele HMI — szybko, w stałej cenie, z pełną dokumentacją.</p>
+    </div>
+    <div>
+      <h4>Serwis</h4>
+      <a href="oferta.html">Zakres usług</a><br>
+      <a href="maszyny.html">Maszyny pakujące i owijarki</a><br>
+      <a href="proces.html">Proces współpracy</a><br>
+      <a href="kontakt.html">Bezpłatna wycena</a>
+    </div>
+    <div>
+      <h4>Kontakt</h4>
+      <a href="mailto:clamax1@makshost.eu">clamax1@makshost.eu</a><br>
+      <a href="proces.html#faq">Najczęstsze pytania</a>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© <span id="rok">2026</span> CLAMAX Automation. Oprogramowanie maszyn i sterowników.</span>
+    <span>SIMATIC, TIA Portal — znaki towarowe Siemens AG.</span>
+  </div>
+</footer>
+<script>
+(function(){
+  document.getElementById('rok').textContent = new Date().getFullYear();
+  var els = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(en){
+      en.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+    els.forEach(function(el){ io.observe(el); });
+    // siatka bezpieczeństwa: element w kadrze po 1.2 s ma być widoczny
+    setTimeout(function(){
+      els.forEach(function(el){
+        var r = el.getBoundingClientRect();
+        if (r.top < innerHeight && r.bottom > 0) el.classList.add('in');
+      });
+    }, 1200);
+    addEventListener('scroll', function(){
+      els.forEach(function(el){
+        if (el.classList.contains('in')) return;
+        var r = el.getBoundingClientRect();
+        if (r.top < innerHeight * .96) el.classList.add('in');
+      });
+    }, { passive: true });
+  } else {
+    els.forEach(function(el){ el.classList.add('in'); });
+  }
+  var f = document.getElementById('formularz');
+  if (f) f.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var g = function(id){ var e = document.getElementById(id); return e ? e.value.trim() : ''; };
+    var temat = 'Wycena: ' + (g('f-maszyna') || 'maszyna') + (g('f-firma') ? ' — ' + g('f-firma') : '');
+    var tresc = 'Firma: ' + g('f-firma') + '\nOsoba: ' + g('f-imie') + '\nTelefon: ' + g('f-tel') +
+      '\nTyp maszyny: ' + g('f-maszyna') + '\nTermin: ' + g('f-termin') + '\n\nOpis:\n' + g('f-opis');
+    location.href = 'mailto:clamax1@makshost.eu?subject=' + encodeURIComponent(temat) + '&body=' + encodeURIComponent(tresc);
+  });
+})();
+</script>
+</body>
+</html>

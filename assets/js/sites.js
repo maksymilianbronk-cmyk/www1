@@ -353,6 +353,20 @@ const SITES = [
     },
   },
   {
+    slug: "automatyka-plc",
+    title: "CLAMAX Automation — oprogramowanie maszyn i sterowników",
+    desc: "Strona sprzedażowa usług programowania PLC dla producentów maszyn i zakładów produkcyjnych: „Oprogramowanie maszyn i sterowników — najtaniej na rynku”. Jasny, przestronny design premium (biel + granat + pomarańcz przemysłowy, Archivo/Inter), autorski sprite ikon dwutonowych, animowana scena SVG linii pakującej (sterownik S7-1200 → HMI → przenośnik → owijarka palet, sygnały i LED-y), marquee technologii, pasy navy z aurorą. 5 podstron — Start, Oferta (PLC, HMI, retrofit, integracje, safety, serwis), Maszyny (owijarki palet, flow-pack/VFFS, kartoniarki, paletyzery, dozowanie, znakowanie — każda z zakresem software'u), Jak pracujemy (5 kroków: brief → stała cena w 24 h → FDS → symulacja/FAT → uruchomienie; gwarancja 12 mies., FAQ), Kontakt (formularz mailto). Komplet SEO: unikalne title/description, canonical, Open Graph z generowaną miniaturą og.jpg 1200×630, JSON-LD (ProfessionalService, FAQPage, BreadcrumbList, ContactPage). Audyt Playwright 5 stron × 4 viewporty (w tym 2560 px): zero błędów, cele dotykowe 44px+, kontrast WCAG AA liczbowo, test szerokich ekranów i nieważnych deklaracji CSS. Zbudowana generatorem Python (wspólny nagłówek/stopka).",
+    icon: "🏭",
+    tag: "landing",
+    status: "prywatna",
+    preview: true,
+    meta: {
+      colors: ["#FFFFFF", "#F7F8FA", "#E85D04", "#0D1520", "#131A23"],
+      fonts: ["Archivo", "Inter"],
+      tech: ["HTML", "CSS", "SVG", "Vanilla JS", "Google Fonts", "Unsplash", "JSON-LD", "Python (generator)", "Playwright"],
+    },
+  },
+  {
     slug: "s7-1200-poradnik",
     title: "S7-1200 CPU 1211C — poradnik programisty PLC",
     desc: "Kompletna instrukcja programowania sterownika Siemens SIMATIC S7-1200 CPU 1211C AC/DC/RLY: dane techniczne i schemat podłączenia (zasilanie 230 V AC, wejścia 24 V DC, wyjścia przekaźnikowe, analogi 0–10 V), środowisko TIA Portal krok po kroku, cykl programu, bloki OB/FB/FC/DB i wszystkie typy OB, języki LAD/FBD/SCL, bity systemowe i zegarowe. Pełny katalog instrukcji wewnętrznych w 20 grupach: logika bitowa, timery i liczniki IEC, porównania, matematyka, MOVE, konwersje (NORM_X/SCALE_X), sterowanie programem, logika słów, przesunięcia, data i czas, stringi, przerwania, diagnostyka, PWM/PTO, HSC, PID_Compact, Motion Control i komunikacja (OUC, GET/PUT, Modbus TCP/RTU, USS). Do tego gotowe wzorce dla typowych maszyn: start/stop z podtrzymaniem, nawrotnik, gwiazda–trójkąt, przenośnik z licznikiem, pompa ze zbiornikiem, alarmy analogowe, sekwencja krokowa CASE i checklista uruchomienia — z naciskiem na bezpieczeństwo (E-STOP sprzętowo, PN-EN ISO 13849-1).",
