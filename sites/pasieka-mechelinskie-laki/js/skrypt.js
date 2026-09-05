@@ -46,9 +46,33 @@
   var czekajace = $$('[data-anim], .kaskada');
   var zamiataj = null;
 
+  /* liczby doliczają się od zera, gdy sekcja wjedzie w kadr */
+  function policz(kontener) {
+    $$('.liczba b', kontener).forEach(function (b) {
+      var tekst = b.textContent;
+      var m = tekst.match(/\d+(?:[.,]\d+)?/);
+      if (!m) return;
+      var cel = parseFloat(m[0].replace(',', '.'));
+      var przed = tekst.slice(0, m.index);
+      var po = tekst.slice(m.index + m[0].length);
+      var calkowita = Number.isInteger(cel);
+      var start = null;
+      function krok(t) {
+        if (start === null) start = t;
+        var p = Math.min(1, (t - start) / 1100);
+        var wartosc = cel * (1 - Math.pow(1 - p, 3));
+        b.textContent = przed + (calkowita ? Math.round(wartosc) : wartosc.toFixed(1)) + po;
+        if (p < 1) requestAnimationFrame(krok);
+      }
+      b.textContent = przed + (calkowita ? '0' : '0.0') + po;
+      requestAnimationFrame(krok);
+    });
+  }
+
   function pokaz(el) {
     if (el.classList.contains('widoczny')) return;
     el.classList.add('widoczny');
+    if (!mniejRuchu && el.querySelector && el.querySelector('.liczba b')) policz(el);
     if (el.classList.contains('kaskada')) {
       var krok = parseFloat(el.getAttribute('data-krok') || '0.08');
       Array.prototype.forEach.call(el.children, function (dziecko, i) {

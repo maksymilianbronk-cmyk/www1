@@ -102,22 +102,24 @@ def index():
 
     return f"""
 <section class="hero">
-  {plaster(9, 5, 62)}
+  {plaster()}
+  <div class="lsnienie" aria-hidden="true"></div>
+  <div class="pylek" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   {sztuka.pszczola(1)}{sztuka.pszczola(2)}
   <div class="wrap hero-uklad">
-    <div data-anim>
-      <p class="oko">Mosty · gmina Kosakowo · powiat pucki</p>
-      <h1>Miód z łąk<em>nad samą zatoką</em></h1>
-      <p class="lead">Pasieka stoi tam, gdzie Pradolina Kaszubska kończy się plażą — przy rezerwacie
+    <div>
+      <p class="oko wjazd" style="--op:.05s">Mosty · gmina Kosakowo · powiat pucki</p>
+      <h1><span class="wjazd" style="--op:.15s">Miód z łąk</span><em class="wjazd" style="--op:.3s">nad samą zatoką</em></h1>
+      <p class="lead wjazd" style="--op:.45s">Pasieka stoi tam, gdzie Pradolina Kaszubska kończy się plażą — przy rezerwacie
       Mechelińskie Łąki nad Zatoką Pucką. Pszczoły zbierają nektar ze słonawych łąk, trzcinowisk
       i przydomowych ogrodów. Stąd ten smak.</p>
-      <div class="przyciski">
+      <div class="przyciski wjazd" style="--op:.6s">
         <a class="btn btn-miod" href="miodomat.html">{ikona("sloik", "ico")} Kup w miodomacie</a>
         <a class="btn btn-obrys" href="miody.html">Zobacz miody</a>
       </div>
-      <p class="hero-podpis">poleca Marek Kunc</p>
+      <p class="hero-podpis wjazd" style="--op:.75s">poleca Marek Kunc</p>
     </div>
-    <figure class="hero-foto" data-anim>
+    <figure class="hero-foto wjazd" style="--op:.35s">
       <span class="hero-odznaka">Sprzedaż bezpośrednia</span>
       <img src="img/pszczelarz.webp" alt="Marek Kunc przy stoisku z miodami Pasieki Mechelińskie Łąki"
            width="1500" height="1125" fetchpriority="high">
@@ -774,7 +776,7 @@ if __name__ == "__main__":
            "Naturalny miód, wosk pszczeli i świece z węzy prosto z pasieki Marka Kunca w Mostach. "
            "Miodomat czynny samoobsługowo, płatność BLIK.",
            "og.jpg", "Marek Kunc przy stoisku z miodami Pasieki Mechelińskie Łąki",
-           "pszczelarz.webp", index(),
+           "pszczelarz.webp", index(), jasny_naglowek=True,
            ld_extra=[{"@type": "WebSite", "@id": BASE + "#strona", "url": BASE,
                       "name": "Pasieka Mechelińskie Łąki", "inLanguage": "pl-PL",
                       "publisher": {"@id": BASE + "#pasieka"}}])

@@ -94,13 +94,13 @@ HEAD = """<!DOCTYPE html>
 """
 
 
-def naglowek(aktywna):
+def naglowek(aktywna, jasne=False):
     linki = "".join(
         '<a href="%s"%s>%s</a>' % (plik, ' class="aktywny"' if plik == aktywna else "", nazwa)
         for plik, nazwa, _ in NAWIGACJA)
     linki_mob = "".join(
         '<a href="%s"><b>%s</b>%s</a>' % (plik, nr, nazwa) for plik, nazwa, nr in NAWIGACJA)
-    return """<header class="naglowek" id="naglowek">
+    return """<header class="naglowek%s" id="naglowek">
   <div class="wrap naglowek-in">
     <a class="marka" href="index.html">
       <img src="img/logo.webp" alt="" width="46" height="46">
@@ -117,7 +117,7 @@ def naglowek(aktywna):
     Bukszpanowa 4, 81-198 Mosty<br>
     tel. i BLIK <a href="%s">%s</a>
   </div>
-</div>""" % (linki, linki_mob, TEL_LINK, TEL)
+</div>""" % (" naglowek--jasne" if jasne else "", linki, linki_mob, TEL_LINK, TEL)
 
 
 def stopka():
@@ -194,7 +194,7 @@ def faq(pary):
         for q, a in pary)
 
 
-def strona(plik, title, desc, og, alt, hero_img, body, aktywna=None, ld_extra=None):
+def strona(plik, title, desc, og, alt, hero_img, body, aktywna=None, ld_extra=None, jasny_naglowek=False):
     url = BASE if plik == "index.html" else BASE + plik
     graf = [FIRMA] + (ld_extra or [])
     html = HEAD.format(
@@ -202,7 +202,7 @@ def strona(plik, title, desc, og, alt, hero_img, body, aktywna=None, ld_extra=No
         sprite=sztuka.sprite(),
         ld=json.dumps({"@context": "https://schema.org", "@graph": graf},
                       ensure_ascii=False, separators=(",", ":")))
-    html += naglowek(aktywna or plik)
+    html += naglowek(aktywna or plik, jasny_naglowek)
     html += '<main id="tresc">\n%s\n</main>\n' % body
     html += stopka() + "\n" + pasek_akcji() + "\n" + LIGHTBOX + "\n"
     html += '<script src="js/skrypt.js"></script>\n</body>\n</html>\n'

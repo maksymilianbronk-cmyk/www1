@@ -220,6 +220,18 @@ p:last-child { margin-bottom: 0; }
 .menu .btn-menu::after { display: none; }
 .menu .btn-menu:hover { background: var(--bursztyn-jasny); color: var(--gryka); transform: translateY(-2px); }
 
+/* wariant nagłówka nad jasnym, miodowym hero (strona główna) */
+.naglowek--jasne::before { background: linear-gradient(180deg, rgba(255, 243, 220, .5), transparent); }
+.naglowek--jasne:not(.przyklejony) .marka { color: var(--gryka); }
+.naglowek--jasne:not(.przyklejony) .marka small { color: #7A3520; }
+.naglowek--jasne:not(.przyklejony) .menu a { color: #4A2A12; }
+.naglowek--jasne:not(.przyklejony) .menu a:hover { color: var(--gryka); }
+.naglowek--jasne:not(.przyklejony) .menu a::after { background: var(--gryka); }
+.naglowek--jasne:not(.przyklejony) .menu .btn-menu { background: var(--gryka); color: #FFF3DC; box-shadow: 0 8px 24px rgba(94, 36, 23, .28); }
+.naglowek--jasne:not(.przyklejony) .menu .btn-menu:hover { background: #7A3520; color: #FFF9EC; }
+.naglowek--jasne:not(.przyklejony) .burger { background: rgba(255, 255, 255, .3); border-color: rgba(94, 36, 23, .4); }
+.naglowek--jasne:not(.przyklejony) .burger i { background: var(--gryka); }
+
 /* pasek postępu czytania */
 .postep {
   position: absolute; left: 0; bottom: -1px; height: 2px; width: 0;
@@ -356,72 +368,139 @@ section { position: relative; padding-block: var(--sekcja); }
 .szapo--rozstrzelony { display: grid; grid-template-columns: 1fr auto; gap: var(--gap); align-items: end; max-width: none; }
 
 /* =============================================================================
-   Hero
+   Hero — miodowy: gradient jak miód w słoiku, pyłek w powietrzu,
+   spływająca krawędź i wjazd treści po załadowaniu
    ========================================================================== */
 .hero {
-  position: relative; overflow: hidden; min-height: min(88vh, 860px); display: flex; align-items: center;
-  background: var(--morze); color: var(--na-ciemnym);
-  padding-block: calc(var(--naglowek-h) + clamp(3.4rem, 2rem + 6vw, 7rem)) clamp(4rem, 2.6rem + 5vw, 7.5rem);
-  isolation: isolate;
+  position: relative; overflow: hidden; isolation: isolate;
+  min-height: min(90vh, 880px); display: flex; align-items: center;
+  padding-block: calc(var(--naglowek-h) + clamp(3rem, 2rem + 5vw, 6rem)) clamp(4.4rem, 3rem + 5vw, 7.5rem);
+  background-color: #E6AC42;                     /* baza pod gradientem */
+  color: var(--hero-ink);
+  --hero-ink: #3A1A0A;
+  --hero-ink-2: #4A2A12;
 }
 .hero::before {
   content: ""; position: absolute; inset: 0; z-index: 0;
   background:
-    radial-gradient(58% 62% at 78% 18%, rgba(240, 190, 85, .2), transparent 62%),
-    radial-gradient(48% 55% at 12% 88%, rgba(22, 80, 95, .8), transparent 68%),
-    linear-gradient(178deg, #0B2E3A 0%, #0E3A48 58%, #0B2E3A 100%);
+    radial-gradient(46% 52% at 16% 14%, rgba(255, 246, 222, .95), transparent 66%),
+    radial-gradient(40% 46% at 84% 78%, rgba(176, 108, 12, .55), transparent 68%),
+    radial-gradient(34% 40% at 72% 12%, rgba(255, 228, 160, .7), transparent 70%),
+    linear-gradient(163deg, #FFF1D2 0%, #F6CB74 34%, #E5A93E 68%, #C9861A 100%);
+  animation: miodPlynie 26s var(--ease-miekki) infinite alternate;
+}
+/* miodowa poświata, która przesuwa się nad gradientem */
+.hero .lsnienie {
+  position: absolute; inset: -30% -10%; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(30% 34% at 30% 40%, rgba(255, 255, 255, .45), transparent 70%),
+    radial-gradient(26% 30% at 70% 60%, rgba(255, 214, 128, .5), transparent 72%);
+  filter: blur(8px);
+  animation: lsni 19s var(--ease-miekki) infinite alternate;
 }
 .hero::after {
-  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
   background-image: var(--ziarno); opacity: .05; mix-blend-mode: overlay;
 }
 .hero > * { position: relative; z-index: 2; }
+.hero > .wrap { width: min(100% - 2.6rem, var(--wrap)); }
+.hero .plaster { background-color: var(--gryka); opacity: .07; }
+
+@keyframes miodPlynie {
+  0% { transform: scale(1) translate3d(0, 0, 0); }
+  50% { transform: scale(1.05) translate3d(-1.5%, 1%, 0); }
+  100% { transform: scale(1.02) translate3d(1.5%, -1%, 0); }
+}
+@keyframes lsni {
+  0% { transform: translate3d(-4%, 2%, 0) scale(1); opacity: .7; }
+  50% { transform: translate3d(3%, -3%, 0) scale(1.12); opacity: 1; }
+  100% { transform: translate3d(-2%, 4%, 0) scale(1.04); opacity: .8; }
+}
+
+
+/* pyłek unoszący się w powietrzu */
+.pylek { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.pylek i {
+  position: absolute; bottom: -14px; width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255, 250, 232, .95);
+  box-shadow: 0 0 14px rgba(255, 214, 128, .95), 0 0 4px rgba(255, 255, 255, .8);
+  animation: unosi linear infinite;
+}
+.pylek i:nth-child(1) { left: 8%; animation-duration: 19s; animation-delay: -2s; }
+.pylek i:nth-child(2) { left: 21%; width: 5px; height: 5px; animation-duration: 24s; animation-delay: -9s; }
+.pylek i:nth-child(3) { left: 34%; width: 9px; height: 9px; animation-duration: 27s; animation-delay: -15s; }
+.pylek i:nth-child(4) { left: 47%; width: 4px; height: 4px; animation-duration: 21s; animation-delay: -5s; }
+.pylek i:nth-child(5) { left: 58%; animation-duration: 30s; animation-delay: -20s; }
+.pylek i:nth-child(6) { left: 69%; width: 6px; height: 6px; animation-duration: 23s; animation-delay: -12s; }
+.pylek i:nth-child(7) { left: 79%; width: 8px; height: 8px; animation-duration: 26s; animation-delay: -7s; }
+.pylek i:nth-child(8) { left: 91%; width: 5px; height: 5px; animation-duration: 18s; animation-delay: -16s; }
+@keyframes unosi {
+  0% { transform: translate3d(0, 0, 0) scale(.6); opacity: 0; }
+  12% { opacity: .9; }
+  50% { transform: translate3d(38px, -46vh, 0) scale(1); }
+  88% { opacity: .7; }
+  100% { transform: translate3d(-24px, -96vh, 0) scale(.5); opacity: 0; }
+}
+
 .hero-uklad {
   display: grid; grid-template-columns: 1.02fr .98fr;
   gap: clamp(2rem, 1rem + 4vw, 4.5rem); align-items: center;
 }
-.hero h1 { color: #FFF9EC; font-size: var(--fs-hero); letter-spacing: -.03em; }
-.hero h1 em { font-style: normal; display: block; color: var(--bursztyn); }
-.hero .lead { color: #D5CCBB; margin-top: 1.6rem; max-width: 44ch; }
+.hero h1 { color: var(--hero-ink); font-size: var(--fs-hero); letter-spacing: -.032em; }
+.hero h1 em {
+  font-style: normal; display: block;
+  background: linear-gradient(96deg, var(--gryka) 0%, #8A4A12 52%, var(--gryka) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero .oko { color: var(--gryka); }
+.hero .oko::before { background: var(--gryka); }
+.hero .lead { color: var(--hero-ink-2); margin-top: 1.6rem; max-width: 44ch; }
 .hero-podpis {
   display: flex; align-items: center; gap: .8rem; margin-top: 2.4rem;
-  font-family: var(--serif); font-size: 1.05rem; color: var(--bursztyn);
+  font-family: var(--serif); font-size: 1.05rem; color: var(--gryka);
 }
-.hero-podpis::before { content: ""; width: 42px; height: 1px; background: rgba(240, 190, 85, .55); flex: none; }
+.hero-podpis::before { content: ""; width: 42px; height: 1px; background: rgba(94, 36, 23, .5); flex: none; }
+
+.hero .btn-miod { background: var(--gryka); color: #FFF3DC; box-shadow: 0 12px 30px rgba(94, 36, 23, .3); }
+.hero .btn-miod:hover { background: #7A3520; color: #FFF9EC; }
+.hero .btn-obrys { border-color: rgba(94, 36, 23, .45); color: var(--gryka); }
+.hero .btn-obrys:hover { border-color: var(--gryka); background: rgba(94, 36, 23, .08); }
 
 /* kompozycja zdjęcia w hero */
 .hero-foto { position: relative; margin: 0; }
 .hero-foto > img {
   width: 100%; aspect-ratio: 4 / 3.15; object-fit: cover; object-position: 50% 26%;
-  border-radius: var(--r-duzy); box-shadow: 0 34px 80px rgba(0, 0, 0, .45);
+  border-radius: var(--r-duzy); box-shadow: 0 30px 70px rgba(94, 36, 23, .4);
+  animation: kadr 24s var(--ease-miekki) infinite alternate;
 }
+@keyframes kadr { from { transform: scale(1); } to { transform: scale(1.06); } }
 .hero-foto figcaption {
   position: absolute; left: 0; right: 0; bottom: 0;
-  padding: 3.4rem 9.5rem .9rem 1.2rem; font-size: .84rem; color: #EFE3CE;
-  background: linear-gradient(transparent, rgba(5, 26, 33, .88));
+  padding: 3.4rem 9.5rem .9rem 1.2rem; font-size: .84rem; color: #F6EADA;
+  background: linear-gradient(transparent, rgba(48, 20, 6, .62) 42%, rgba(40, 16, 4, .93));
   border-radius: 0 0 var(--r-duzy) var(--r-duzy);
 }
 .hero-foto img.pieczec {
   position: absolute; right: -18px; bottom: -24px; width: 132px; height: 132px;
   aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover; z-index: 3;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, .45), 0 0 0 6px var(--morze-2);
+  box-shadow: 0 16px 34px rgba(94, 36, 23, .38), 0 0 0 6px #F6CB74;
+  animation: pieczec 7s var(--ease-miekki) infinite alternate;
+}
+@keyframes pieczec {
+  from { transform: translateY(0) rotate(-4deg); }
+  to { transform: translateY(-9px) rotate(4deg); }
 }
 .hero-odznaka {
   position: absolute; left: -14px; top: 24px; z-index: 3;
   background: var(--papier); color: var(--gryka); border-radius: 2px;
   padding: .55rem .95rem; font-size: .75rem; font-weight: 700;
   letter-spacing: .14em; text-transform: uppercase;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .3);
+  box-shadow: 0 12px 30px rgba(94, 36, 23, .3);
 }
 
-/* pasek zachęty do przewijania */
-.zjedz {
-  display: inline-flex; flex-direction: column; align-items: flex-start; gap: .7rem; margin-top: 3.2rem;
-  font-size: .74rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
-  color: rgba(246, 238, 223, .6);
-}
-.zjedz i { display: block; width: 1px; height: 34px; background: linear-gradient(var(--bursztyn), transparent); animation: spadaj 2.4s var(--ease-miekki) infinite; }
-@keyframes spadaj { 0%, 100% { opacity: .3; transform: scaleY(.6); transform-origin: top; } 50% { opacity: 1; transform: scaleY(1); } }
+/* wjazd treści po załadowaniu strony */
+.wjazd { opacity: 0; transform: translate3d(0, 28px, 0); animation: wjazd 1s var(--ease) var(--op, 0s) forwards; }
+@keyframes wjazd { to { opacity: 1; transform: none; } }
 
 /* nagłówek podstrony */
 .hero-strona {
@@ -450,20 +529,23 @@ section { position: relative; padding-block: var(--sekcja); }
 /* =============================================================================
    Taśma z faktami
    ========================================================================== */
-.tasma { position: relative; background: var(--bursztyn); color: #40290A; padding: .95rem 0; }
-.tasma-maska { overflow: hidden; }
-/* miód spływający spod taśmy — kafel maski powielany w poziomie */
-.tasma::after {
-  content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 26px; z-index: 3;
-  background-color: var(--bursztyn); pointer-events: none;
+.tasma { position: relative; background: var(--gryka); color: #F7E9CE; padding: 1.05rem 0; }
+/* miód spływający z miodowego hero na taśmę */
+.tasma::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -2px; height: 30px; z-index: 3;
+  background-color: #DB941B; pointer-events: none;
   -webkit-mask-image: var(--kapie); mask-image: var(--kapie);
-  -webkit-mask-size: 260px 26px; mask-size: 260px 26px;
+  -webkit-mask-size: 260px 30px; mask-size: 260px 30px;
   -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+  animation: splyw 9s var(--ease-miekki) infinite alternate;
 }
+@keyframes splyw { from { transform: translateY(-3px); } to { transform: translateY(3px); } }
+.tasma-maska { overflow: hidden; }
+
 .tasma-tor { display: flex; gap: 0; width: max-content; animation: przesun 46s linear infinite; }
 .tasma-grupa { display: flex; align-items: center; gap: 2.6rem; padding-right: 2.6rem; }
 .tasma b { font-family: var(--serif); font-size: 1rem; font-weight: 700; white-space: nowrap; letter-spacing: -.01em; }
-.tasma i { width: 5px; height: 5px; border-radius: 50%; background: rgba(64, 41, 10, .5); flex: none; }
+.tasma i { width: 5px; height: 5px; border-radius: 50%; background: rgba(240, 190, 85, .65); flex: none; }
 @keyframes przesun { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 .tasma:hover .tasma-tor { animation-play-state: paused; }
 
@@ -770,6 +852,50 @@ body.menu-otwarte .pasek-akcji { display: none; }
 .kaskada > * { opacity: 0; transform: translate3d(0, 22px, 0); transition: opacity .7s var(--ease), transform .8s var(--ease); }
 .kaskada.widoczny > * { opacity: 1; transform: none; }
 
+/* kreska przy nadtytule rysuje się przy wejściu sekcji */
+.oko::before { transform-origin: left; }
+.widoczny .oko::before { animation: kreska .9s var(--ease) .15s both; }
+.oko.wjazd::before { animation: kreska .9s var(--ease) var(--op, 0s) both; }
+@keyframes kreska { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* połysk przesuwający się po przyciskach i kaflach */
+.btn { position: relative; overflow: hidden; }
+.btn::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 34%, rgba(255, 255, 255, .38) 50%, transparent 66%);
+  transform: translateX(-140%); transition: transform .85s var(--ease);
+}
+.btn:hover::after { transform: translateX(140%); }
+.kafel-foto::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(100deg, transparent 32%, rgba(255, 255, 255, .32) 50%, transparent 68%);
+  transform: translateX(-130%); transition: transform .95s var(--ease);
+}
+.kafel:hover .kafel-foto::after { transform: translateX(130%); }
+
+/* słupki kalendarza miodobrania wyrastają od lewej */
+.kalendarz svg rect { transform-box: fill-box; transform-origin: left center; transform: scaleX(0); }
+.widoczny .kalendarz svg rect { animation: slupek .85s var(--ease) both; }
+.widoczny .kalendarz svg rect:nth-of-type(1) { animation-delay: .05s; }
+.widoczny .kalendarz svg rect:nth-of-type(2) { animation-delay: .15s; }
+.widoczny .kalendarz svg rect:nth-of-type(3) { animation-delay: .25s; }
+.widoczny .kalendarz svg rect:nth-of-type(4) { animation-delay: .35s; }
+.widoczny .kalendarz svg rect:nth-of-type(5) { animation-delay: .45s; }
+.widoczny .kalendarz svg rect:nth-of-type(6) { animation-delay: .55s; }
+@keyframes slupek { to { transform: scaleX(1); } }
+
+/* zdjęcie w pełnowymiarowym pasie płynie z przewijaniem (tam, gdzie przeglądarka to potrafi) */
+@supports (animation-timeline: view()) {
+  .pas-foto img { animation: parallaks linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
+  @keyframes parallaks {
+    from { transform: translate3d(0, -5%, 0) scale(1.12); }
+    to { transform: translate3d(0, 5%, 0) scale(1.12); }
+  }
+}
+
+/* liczby doliczają się po wejściu w kadr (JS podmienia treść) */
+.liczba b { font-variant-numeric: tabular-nums; }
+
 /* kapiąca kropla między sekcjami */
 .kropla-sep { display: block; width: 100%; height: 54px; overflow: visible; }
 .kropla-sep path { fill: none; stroke: var(--miod); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
@@ -849,7 +975,9 @@ body.menu-otwarte .pasek-akcji { display: none; }
   }
   [data-anim], .kaskada > * { opacity: 1 !important; transform: none !important; }
   .kropla-sep path { stroke-dashoffset: 0; }
-  .pszczola { display: none; }
+  .pszczola, .pylek { display: none; }
+  .wjazd { opacity: 1 !important; transform: none !important; }
+  .kalendarz svg rect { transform: scaleX(1); }
   .tasma-tor { animation: none; width: auto; flex-wrap: wrap; }
   .tasma-grupa[aria-hidden="true"] { display: none; }
   .tasma-grupa { flex-wrap: wrap; padding-right: 0; gap: 1rem 2rem; }
