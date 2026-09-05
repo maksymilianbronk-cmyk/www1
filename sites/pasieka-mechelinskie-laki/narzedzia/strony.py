@@ -506,12 +506,13 @@ def wosk():
          "Czysty, przetopiony wosk dla rękodzielników, mydlarzy i pszczelarzy. Odcinam kawałek "
          "o wadze, jakiej potrzebujesz.", "cena za kilogram — zapytaj"),
     ]
+    # karta prowadzi do telefonu — asortyment i wielkości potwierdzam na miejscu
     karty_html = "".join(
-        '<a class="kafel" href="%s" target="_blank" rel="noopener"><div class="kafel-foto">'
+        '<a class="kafel" href="%s"><div class="kafel-foto">'
         '<img loading="lazy" src="img/%s" alt="%s" width="1000" height="760"></div>'
         '<div class="kafel-tresc"><h3>%s</h3><p>%s</p>'
-        '<span class="strzalka">%s %s</span></div></a>' % (MAPY, foto, alt, tytul, opis, cena,
-                                                           ikona("strzalka", "ico"))
+        '<span class="strzalka">%s %s</span></div></a>' % (TEL_LINK, foto, alt, tytul, opis, cena,
+                                                           ikona("telefon", "ico"))
         for foto, alt, tytul, opis, cena in karty)
     return f"""
 <section class="hero-strona">
