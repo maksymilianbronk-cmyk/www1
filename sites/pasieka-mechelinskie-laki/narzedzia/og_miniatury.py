@@ -7,7 +7,7 @@ import os
 SITE = "/home/user/www1/sites/pasieka-mechelinskie-laki"
 IMG = os.path.join(SITE, "img")
 W, H = 1200, 630
-MORZE = (14, 58, 72)
+MORZE = (11, 46, 58)
 MIOD = (208, 138, 21)
 MIOD_JASNY = (240, 190, 85)
 KREM = (247, 238, 222)

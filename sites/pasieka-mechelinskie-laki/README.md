@@ -16,7 +16,7 @@ wosk-i-swiece.html    – świece z węzy, szyszki, wosk w bloku
 o-pasiece.html        – pasieka, rezerwat, droga od ula do słoika, galeria
 kontakt.html          – dane kontaktowe i rejestrowe
 css/styl.css          – jeden arkusz dla całego serwisu
-js/skrypt.js          – menu mobilne i lightbox galerii
+js/skrypt.js          – nagłówek, menu mobilne, animacje wejścia, lightbox
 img/                  – zdjęcia w WebP, logo, obrazek Open Graph
 favicon.png, apple-touch-icon.png
 sitemap.xml, robots.txt
@@ -48,25 +48,54 @@ Adres publiczny:
 Podgląd lokalny działa tak samo jak wyżej (`python3 -m http.server`), bo wszystkie
 ścieżki w HTML są względne.
 
-## Co doszło przy wdrożeniu
+## System wizualny „Bursztyn i sól"
 
-Do pakietu dołożone zostały rzeczy potrzebne dopiero pod publicznym adresem —
-treść i wygląd stron zostały bez zmian:
+Redesign zrobiony pod standard, jaki trzymają dziś najlepsze marki miodowe
+(terroir opisany jak przy winie, karta degustacyjna zamiast listy odmian,
+sezonowość podana wprost, mobile-first ścieżka zakupu):
 
-- `canonical`, `og:url` i `og:image` na adresie bezwzględnym (relatywny `og:image`
-  nie pokazuje miniatury przy wysyłaniu linku),
-- sześć miniatur Open Graph 1200×630 (`img/og*.jpg`) — panel z logo i tytułem
-  plus zdjęcie z pakietu; generator: `narzedzia/og_miniatury.py`,
-- Twitter Card, `og:site_name`, `og:locale`,
-- JSON-LD: `LocalBusiness`/`Store` z adresem, telefonem, numerami WNI i WET,
-  `BreadcrumbList` na podstronach i `FAQPage` na stronie miodomatu,
-- `sitemap.xml` i `robots.txt`,
-- poprawki dostępności i układu wyłapane audytem (Playwright, 6 podstron ×
-  4 szerokości okna): pieczęć z logo w hero rozpychała się na całe zdjęcie
-  (kolizja specyficzności `.hero-foto img` z `.pieczec`), podpis pod zdjęciem
-  chował się pod pieczęcią, linki w stopce i w tekście miały cel dotykowy
-  poniżej 44 px, najmniejszy tekst miał 11,2 px, a „Zobacz odmiany" i znak „+"
-  w FAQ dawały kontrast 2,87:1 przy wymaganych 4,5:1.
+- **Paleta** — papier w kolorze piasku jako baza, głęboka zieleń morska
+  (`#0B2E3A`) na pasy i stopkę, miód wyłącznie jako akcent. Kontrast każdego
+  napisu policzony liczbowo do WCAG AA, także dla przyklejonego nagłówka.
+- **Typografia** — Fraunces (display, 300–700) + Karla; płynna skala `clamp()`
+  od 16 px do 6,4 rem w hero, nagłówki z ujemnym trackingiem.
+- **Plaster miodu** — jeden kafel SVG powielany maską CSS (`--hex`), więc wzór
+  nie waży nic w HTML i skaluje się bez końca. Do tego ziarno filmowe na
+  ciemnych pasach i miód kapiący spod taśmy z faktami (maska `--kapie`).
+- **Karty degustacyjne** — każda odmiana z kroplą w swojej barwie, sezonem
+  i czterema nutami: aromat, smak, krystalizacja, podanie.
+- **Kalendarz miodobrania** — wykres SVG generowany w Pythonie
+  (`narzedzia/`), sześć odmian na osi kwiecień–wrzesień.
+- **Mapa terroir** — autorska ilustracja SVG: Zatoka Pucka, rezerwat,
+  Mosty i znacznik pasieki (podpisana jako poglądowa, nie nawigacyjna).
+- **Mikrointerakcje** — animacje wejścia z siatką bezpieczeństwa (sam
+  IntersectionObserver gubi elementy przy szybkim przewinięciu), pasek
+  postępu czytania, przyklejany nagłówek, powiększenie zdjęć w kaflach,
+  pszczoły krążące nad hero, wszystko wyłączane przez `prefers-reduced-motion`.
+- **Mobile** — pełnoekranowe menu, dolny pasek akcji (Zadzwoń / Miodomat /
+  Dojazd), cele dotykowe 44 px+, `safe-area-inset`.
+
+Strony powstają z generatora w Pythonie (`build.py` + `strony.py` + `sztuka.py`
+w historii wdrożenia), więc nagłówek, stopka i `<head>` mają jedno źródło.
+
+## SEO i wdrożenie
+
+- `canonical`, `og:url` i `og:image` na adresach bezwzględnych (relatywny
+  `og:image` nie pokazuje miniatury przy wysyłaniu linku),
+- sześć miniatur Open Graph 1200×630 (`img/og*.jpg`) składanych w Pythonie —
+  generator: `narzedzia/og_miniatury.py`,
+- Twitter Card, `og:site_name`, `og:locale`, `preload` zdjęcia hero,
+- JSON-LD: `LocalBusiness`/`Store` z adresem, telefonem i numerami WNI/WET,
+  `BreadcrumbList` na podstronach, `FAQPage` na stronie miodomatu,
+- `sitemap.xml` i `robots.txt`.
+
+## Audyt
+
+Playwright, 6 podstron × 4 szerokości okna (390, 820, 1440, 2560 px):
+zero błędów JS, zero przewijania w poziomie, cele dotykowe 44 px+, tekst
+≥ 12 px, kontrast AA policzony dla każdego napisu, test menu mobilnego na
+390 i 320 px, lightboxa galerii i rozwijanych pytań, kontrola deklaracji CSS
+odrzuconych przez przeglądarkę oraz układu przy 7600 px.
 
 ## Do uzupełnienia przed publikacją
 
