@@ -144,8 +144,8 @@ p:last-child { margin-bottom: 0; }
    Ikony dwutonowe (plama 18% + kreska 1.5) i mapa
    ========================================================================== */
 .ico { width: 20px; height: 20px; display: inline-block; flex: none; vertical-align: -.22em; }
-.ico .i-fill { fill: currentColor; opacity: .18; }
-.ico .i-line { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+/* kolory ikon ustawia sprite (atrybuty prezentacyjne + currentColor) — reguły
+   CSS z dokumentu nie docierają do drzewa cienia <use> */
 .btn .ico, .strzalka .ico { width: 18px; height: 18px; }
 .pasek-akcji .ico { width: 20px; height: 20px; }
 
@@ -498,6 +498,46 @@ section { position: relative; padding-block: var(--sekcja); }
   box-shadow: 0 12px 30px rgba(94, 36, 23, .3);
 }
 
+/* wstęga miodu spływająca zza górnej krawędzi */
+.strumien {
+  position: absolute; top: -60px; right: 30%; width: clamp(150px, 17vw, 260px); height: 86%;
+  z-index: 1; pointer-events: none; opacity: .42; filter: blur(1.5px);
+  animation: kolysanie 14s var(--ease-miekki) infinite alternate;
+  transform-origin: top center;
+}
+.strumien svg { width: 100%; height: 100%; display: block; }
+@keyframes kolysanie {
+  from { transform: rotate(-1.6deg) translateX(-6px) scaleY(.98); }
+  to { transform: rotate(1.6deg) translateX(6px) scaleY(1.03); }
+}
+@media (max-width: 900px) { .strumien { right: 4%; width: 150px; opacity: .3; } }
+
+/* fala domykająca hero */
+.hero-fala { position: absolute; left: 0; right: 0; bottom: -1px; z-index: 3; pointer-events: none; line-height: 0; }
+.hero-fala svg { width: 100%; height: clamp(48px, 6vw, 96px); display: block; }
+
+/* krople miodu spływające w powietrzu */
+.krople { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.krople i {
+  position: absolute; left: var(--x); top: -60px;
+  width: calc(18px * var(--s, 1)); height: calc(30px * var(--s, 1));
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: linear-gradient(180deg, rgba(255, 236, 186, .85), rgba(201, 134, 26, .75));
+  box-shadow: inset -2px -3px 6px rgba(126, 79, 9, .35), 0 6px 14px rgba(126, 79, 9, .18);
+  opacity: 0;
+  animation: splywKropli var(--t, 18s) var(--ease-miekki) var(--d, 0s) infinite;
+}
+.krople i::after {
+  content: ""; position: absolute; left: 26%; top: 16%; width: 26%; height: 22%;
+  border-radius: 50%; background: rgba(255, 250, 230, .75);
+}
+@keyframes splywKropli {
+  0% { transform: translate3d(0, 0, 0) scaleY(.7); opacity: 0; }
+  8% { opacity: .95; }
+  70% { transform: translate3d(-14px, 62vh, 0) scaleY(1.15); opacity: .9; }
+  100% { transform: translate3d(-22px, 96vh, 0) scaleY(1.3); opacity: 0; }
+}
+
 /* wjazd treści po załadowaniu strony */
 .wjazd { opacity: 0; transform: translate3d(0, 28px, 0); animation: wjazd 1s var(--ease) var(--op, 0s) forwards; }
 @keyframes wjazd { to { opacity: 1; transform: none; } }
@@ -527,27 +567,42 @@ section { position: relative; padding-block: var(--sekcja); }
 .okruszki span { opacity: .5; margin-inline: .45rem; }
 
 /* =============================================================================
-   Taśma z faktami
+   Pasek zaufania pod hero — cztery fakty w rzędzie, spokojnie, bez ruchu
    ========================================================================== */
-.tasma { position: relative; background: var(--gryka); color: #F7E9CE; padding: 1.05rem 0; }
-/* miód spływający z miodowego hero na taśmę */
-.tasma::before {
-  content: ""; position: absolute; left: 0; right: 0; top: -2px; height: 30px; z-index: 3;
-  background-color: #DB941B; pointer-events: none;
-  -webkit-mask-image: var(--kapie); mask-image: var(--kapie);
-  -webkit-mask-size: 260px 30px; mask-size: 260px 30px;
-  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
-  animation: splyw 9s var(--ease-miekki) infinite alternate;
+.fakty {
+  position: relative; overflow: hidden;
+  background: var(--papier-2); border-bottom: 1px solid var(--linia);
+  padding-block: clamp(2.2rem, 1.6rem + 1.6vw, 3.2rem);
 }
-@keyframes splyw { from { transform: translateY(-3px); } to { transform: translateY(3px); } }
-.tasma-maska { overflow: hidden; }
+.fakty .plaster { opacity: .05; }
+.fakty-siatka {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1.4rem, 1rem + 1.6vw, 2.8rem);
+}
+.fakt { position: relative; display: flex; gap: .95rem; align-items: flex-start; }
+.fakt + .fakt::before {
+  content: ""; position: absolute; left: calc(-1 * clamp(.7rem, .5rem + .8vw, 1.4rem));
+  top: .2rem; bottom: .2rem; width: 1px; background: var(--linia-2);
+}
+.fakt .ico { width: 26px; height: 26px; color: var(--miod-ciemny); margin-top: .1rem; }
+.fakt b {
+  display: block; font-family: var(--serif); font-size: 1.06rem; font-weight: 600;
+  line-height: 1.25; color: var(--gryka); letter-spacing: -.01em;
+}
+.fakt span { display: block; margin-top: .3rem; font-size: .9rem; color: var(--atrament-55); line-height: 1.5; }
+.fakt a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--linia-2); padding-block: 1.05em; }
+.fakt a:hover { color: var(--miod-gleboki); border-bottom-color: var(--miod); }
 
-.tasma-tor { display: flex; gap: 0; width: max-content; animation: przesun 46s linear infinite; }
-.tasma-grupa { display: flex; align-items: center; gap: 2.6rem; padding-right: 2.6rem; }
-.tasma b { font-family: var(--serif); font-size: 1rem; font-weight: 700; white-space: nowrap; letter-spacing: -.01em; }
-.tasma i { width: 5px; height: 5px; border-radius: 50%; background: rgba(240, 190, 85, .65); flex: none; }
-@keyframes przesun { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
-.tasma:hover .tasma-tor { animation-play-state: paused; }
+@media (max-width: 900px) {
+  .fakty-siatka { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem; }
+  .fakt:nth-child(3)::before { display: none; }
+}
+@media (max-width: 560px) {
+  .fakty-siatka { grid-template-columns: 1fr; gap: 1.3rem; }
+  .fakt + .fakt::before { display: none; }
+  .fakt + .fakt { padding-top: 1.3rem; border-top: 1px solid var(--linia); }
+}
 
 /* =============================================================================
    Kafle nawigacyjne
@@ -978,7 +1033,4 @@ body.menu-otwarte .pasek-akcji { display: none; }
   .pszczola, .pylek { display: none; }
   .wjazd { opacity: 1 !important; transform: none !important; }
   .kalendarz svg rect { transform: scaleX(1); }
-  .tasma-tor { animation: none; width: auto; flex-wrap: wrap; }
-  .tasma-grupa[aria-hidden="true"] { display: none; }
-  .tasma-grupa { flex-wrap: wrap; padding-right: 0; gap: 1rem 2rem; }
 }

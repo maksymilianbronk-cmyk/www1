@@ -48,21 +48,20 @@ MIODY = [
 ]
 
 FAKTY = [
-    "Miodomat — Bukszpanowa 4, Mosty",
-    "Płatność BLIK na 600 192 252",
-    "Miód nierozgrzewany",
-    "Prosto po odwirowaniu do słoika",
-    "Sprzedaż bezpośrednia, bez pośredników",
-    "Odmiana dopisana ręcznie na etykiecie",
-    "Nr WNI 22114725 · nr WET 22115688",
+    ("pin", "Bukszpanowa 4, Mosty", 'miodomat stoi przy posesji, gmina Kosakowo'),
+    ("blik", "BLIK na %s" % TEL, "przelew na telefon, bez prowizji i terminala"),
+    ("kropla", "Miód nierozgrzewany", "prosto po odwirowaniu i odstaniu do słoika"),
+    ("tarcza", "Nr WNI 22114725", "sprzedaż bezpośrednia zarejestrowana u weterynarii"),
 ]
 
 
-def tasma():
-    grupa = "".join('<b>%s</b><i></i>' % f for f in FAKTY)
-    return ('<div class="tasma" aria-label="Najważniejsze informacje o pasiece"><div class="tasma-maska">'
-            '<div class="tasma-tor"><div class="tasma-grupa">%s</div>'
-            '<div class="tasma-grupa" aria-hidden="true">%s</div></div></div></div>' % (grupa, grupa))
+def pasek_faktow():
+    pozycje = "".join(
+        '<div class="fakt">%s<div><b>%s</b><span>%s</span></div></div>' % (ikona(i, "ico"), tytul, opis)
+        for i, tytul, opis in FAKTY)
+    return ('<section class="fakty" aria-label="Najważniejsze informacje o pasiece">'
+            '%s<div class="wrap"><div class="fakty-siatka kaskada" data-anim data-krok="0.1">%s</div></div>'
+            '</section>' % (plaster(), pozycje))
 
 
 def karta_miodu(m):
@@ -105,7 +104,10 @@ def index():
   {plaster()}
   <div class="lsnienie" aria-hidden="true"></div>
   <div class="pylek" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  {sztuka.strumien()}
+  {sztuka.krople_hero()}
   {sztuka.pszczola(1)}{sztuka.pszczola(2)}
+  {sztuka.fala()}
   <div class="wrap hero-uklad">
     <div>
       <p class="oko wjazd" style="--op:.05s">Mosty · gmina Kosakowo · powiat pucki</p>
@@ -129,7 +131,7 @@ def index():
   </div>
 </section>
 
-{tasma()}
+{pasek_faktow()}
 
 <section class="sec-papier2">
   <div class="wrap">

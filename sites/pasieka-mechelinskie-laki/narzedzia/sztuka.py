@@ -35,13 +35,19 @@ IKONY = {
 
 
 def sprite():
-    """Jeden sprite <symbol> wklejany na początku <body>; zero dodatkowych żądań."""
+    """Jeden sprite <symbol> wklejany na początku <body>; zero dodatkowych żądań.
+
+    Kolory idą atrybutami prezentacyjnymi, nie klasami: treść <symbol> trafia do
+    drzewa cienia <use>, gdzie reguły CSS z dokumentu nie sięgają. Dziedziczy się
+    tylko `color`, więc fill/stroke ustawiamy na currentColor przy elementach.
+    """
     out = ['<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">']
     for nazwa, (plama, kreska) in IKONY.items():
         out.append('<symbol id="i-%s" viewBox="0 0 24 24">' % nazwa)
         if plama:
-            out.append('<g class="i-fill">%s</g>' % plama)
-        out.append('<g class="i-line">%s</g></symbol>' % kreska)
+            out.append('<g fill="currentColor" opacity=".18">%s</g>' % plama)
+        out.append('<g fill="none" stroke="currentColor" stroke-width="1.5" '
+                   'stroke-linecap="round" stroke-linejoin="round">%s</g></symbol>' % kreska)
     out.append("</svg>")
     return "".join(out)
 
@@ -53,6 +59,38 @@ def ikona(nazwa, klasa="ico"):
 # --- plaster miodu (wzór z maski CSS, zero kodu w HTML) ---------------------
 def plaster(*_args, gesty=False, **_kw):
     return '<div class="plaster%s" aria-hidden="true"></div>' % (" plaster--gesty" if gesty else "")
+
+
+# --- miodowe elementy tła hero ----------------------------------------------
+def fala(kolor="var(--papier-2)"):
+    """Miękka fala domykająca hero — miód rozlewa się na sekcję niżej."""
+    return ('<div class="hero-fala" aria-hidden="true">'
+            '<svg viewBox="0 0 1440 96" preserveAspectRatio="none">'
+            '<path fill="%s" d="M0 96V54c150-30 260 18 420 6s250-54 420-40 240 62 390 42 150-30 210-38v72z"/>'
+            '<path fill="%s" opacity=".45" d="M0 96V70c170-24 250 12 430 2s260-40 430-26 230 46 370 30 150-18 210-24v44z"/>'
+            '</svg></div>' % (kolor, kolor))
+
+
+def krople_hero():
+    """Krople miodu spływające w powietrzu — różne rozmiary, tory i tempo."""
+    krople = [(14, 17, 4, 1.25), (33, 23, 13, .8), (55, 20, 8, 1.5),
+              (72, 26, 18, .95), (88, 19, 2, 1.15)]
+    return ('<div class="krople" aria-hidden="true">%s</div>'
+            % "".join('<i style="--x:%d%%;--t:%ds;--d:-%ds;--s:%.2f"></i>' % k for k in krople))
+
+
+def strumien():
+    """Wstęga miodu spływająca zza górnej krawędzi hero — miękka, rozmyta."""
+    return ('<div class="strumien" aria-hidden="true">'
+            '<svg viewBox="0 0 420 620" preserveAspectRatio="xMidYMin slice">'
+            '<defs><linearGradient id="gmiod" x1="0" y1="0" x2="0" y2="1">'
+            '<stop offset="0" stop-color="#FFE7A8" stop-opacity=".95"/>'
+            '<stop offset="55%" stop-color="#E8AE3C" stop-opacity=".65"/>'
+            '<stop offset="100%" stop-color="#C9861A" stop-opacity="0"/>'
+            '</linearGradient></defs>'
+            '<path fill="url(#gmiod)" d="M196 0h58c6 74-14 118-16 176-3 62 26 104 24 166-2 58-34 92-38 150'
+            '-3 44 10 74 6 128h-40c-6-60 6-92 8-136 3-62-24-102-22-164 2-60 32-100 34-158 2-56-18-96-14-162z"/>'
+            '</svg></div>')
 
 
 # --- kapiąca kropla jako separator sekcji -----------------------------------
