@@ -394,4 +394,18 @@ const SITES = [
       tech: ["HTML", "CSS", "Vanilla JS", "IndexedDB", "Node.js", "CompressionStream", "Playwright"],
     },
   },
+  {
+    slug: "pasieka-mechelinskie-laki",
+    title: "Pasieka Mechelińskie Łąki — miód znad Zatoki Puckiej",
+    desc: "Strona wizytówka pasieki Marka Kunca z Mostów pod Kosakowem (powiat pucki), zbudowana z materiałów właściciela: 15 własnych zdjęć w WebP (stoisko, słoiki pod światło, krąg wosku, świece-szyszki, miodomat i jego tabliczka), logo z etykiety i cytat z etykiety. Sześć podstron — Start, Miody (wielokwiatowy, rzepakowy, lipowy, gryczany, spadziowy, nawłociowy z kroplami w kolorze każdej odmiany, krystalizacja i przechowywanie), Miodomat w Mostach (co to jest automat z miodem, trzy kroki zakupu, płatność BLIK na telefon, dane rejestrowe i pięć pytań FAQ), Wosk i świece (szyszki z formy, świece rolowane z węzy, wosk w bloku), O pasiece (rezerwat Mechelińskie Łąki — 113 ha słonawych łąk nad Zatoką Pucką, droga od ula do słoika, galeria z lightboxem) i Kontakt. Paleta z natury i z etykiety: głęboka zieleń morska, piaskowy papier, miodowy bursztyn i brąz gryki; Fraunces + Karla, tło hero w plaster miodu rysowany SVG. Dołożone przy wdrożeniu: sześć miniatur Open Graph 1200×630 składanych w Pythonie (panel z logo i tytułem + zdjęcie), canonical i pełny OG/Twitter na adresach bezwzględnych, JSON-LD (LocalBusiness/Store z adresem, telefonem i numerami WNI 22114725 / WET 22115688, BreadcrumbList, FAQPage), sitemap.xml i robots.txt. Audyt Playwright 6 podstron × 4 viewporty (do 2560 px) plus testy menu mobilnego, lightboxa i kontrastu: naprawiona pieczęć z logo rozpychająca się na całe zdjęcie w hero (kolizja specyficzności), podpis chowający się pod pieczęcią, cele dotykowe poniżej 44 px, tekst 11,2 px i akcenty o kontraście 2,87:1.",
+    icon: "\ud83c\udf6f",
+    tag: "landing",
+    status: "klient-w-trakcie",
+    preview: true,
+    meta: {
+      colors: ["#0E3A48", "#F7F0E2", "#D08A15", "#F0BE55", "#5E2417"],
+      fonts: ["Fraunces", "Karla"],
+      tech: ["HTML", "CSS", "Vanilla JS", "Google Fonts", "WebP", "JSON-LD", "Python (miniatury OG)", "Playwright"],
+    },
+  },
 ];

@@ -15,6 +15,7 @@ po każdym pushu na gałąź domyślną (workflow `.github/workflows/pages.yml`)
 | **Aplikacja Trasa — mapy podróżnicze** 🧭 | **https://maksymilianbronk-cmyk.github.io/www1/sites/podroze-mapy/** |
 | **Dormed Medical SPA — Busko-Zdrój** 🌿 | **https://maksymilianbronk-cmyk.github.io/www1/sites/dormed-busko/** |
 | **CLAMAX Automation — oprogramowanie maszyn i PLC** 🏭 | **https://maksymilianbronk-cmyk.github.io/www1/sites/automatyka-plc/** |
+| **Pasieka Mechelińskie Łąki — miód znad Zatoki Puckiej** 🍯 | **https://maksymilianbronk-cmyk.github.io/www1/sites/pasieka-mechelinskie-laki/** |
 | **Poradnik S7-1200 CPU 1211C** 🎛️ | **https://maksymilianbronk-cmyk.github.io/www1/sites/s7-1200-poradnik/** |
 | **Skill `uslugi-plc` + podręcznik (ZIP do pobrania)** 📦 | **https://maksymilianbronk-cmyk.github.io/www1/pliki/skill-uslugi-plc.zip** |
 | **Podręcznik programowania maszyn (MD)** 📖 | **https://maksymilianbronk-cmyk.github.io/www1/docs/podrecznik-programowania-maszyn.md** |

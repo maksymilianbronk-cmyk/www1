@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://maksymilianbronk-cmyk.github.io/www1/sites/pasieka-mechelinskie-laki/sitemap.xml
