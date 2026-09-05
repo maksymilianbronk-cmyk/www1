@@ -786,8 +786,8 @@ body.menu-otwarte .pasek-akcji { display: none; }
 
 /* pszczoła */
 .pszczola { position: absolute; width: 30px; height: 30px; z-index: 3; pointer-events: none; opacity: .85; }
-.pszczola--1 { top: 16%; left: 4%; animation: lot1 30s var(--ease-miekki) infinite; }
-.pszczola--2 { bottom: 18%; right: 6%; animation: lot2 36s var(--ease-miekki) infinite; }
+.pszczola--1 { top: 76%; left: 24%; animation: lot1 30s var(--ease-miekki) infinite; }
+.pszczola--2 { top: 18%; right: 4%; animation: lot2 36s var(--ease-miekki) infinite; }
 .pszczola .skrzydlo { transform-origin: 12px 9px; animation: skrzydlo .16s linear infinite alternate; }
 @keyframes skrzydlo { from { transform: rotate(-10deg); } to { transform: rotate(16deg); } }
 @keyframes lot1 {
@@ -817,6 +817,7 @@ body.menu-otwarte .pasek-akcji { display: none; }
   .stopka-uklad { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 900px) {
+  .pszczola { display: none; }   /* na wąskim ekranie wchodziłyby na tekst */
   .hero-uklad, .hero-strona-uklad, .duo, .duo--7-5, .duo--5-7 { grid-template-columns: 1fr; }
   .hero-foto { order: -1; }
   .kroki { grid-template-columns: 1fr; gap: 1.6rem; }
